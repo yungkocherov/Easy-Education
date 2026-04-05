@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Easy Education — DS / ML / DL</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- KaTeX для математики -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <!-- Chart.js для графиков -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="brand">
+        <h1>Easy Education</h1>
+        <p class="subtitle">DS · ML · DL — наглядно</p>
+      </div>
+      <div class="search-wrap">
+        <input id="search" type="text" placeholder="Поиск темы..." />
+      </div>
+      <nav id="nav"></nav>
+    </aside>
+
+    <main id="content">
+      <div id="welcome" class="welcome">
+        <h2>Добро пожаловать</h2>
+        <p>Выберите тему слева. Каждая тема содержит теорию, числовые примеры, интерактивную симуляцию, области применения, плюсы и минусы, математическую постановку и дополнительные материалы.</p>
+        <p class="hint">💡 Начните с <b>Описательной статистики</b>, если вы новичок, или сразу переходите к интересующей модели.</p>
+      </div>
+      <div id="topic-view" class="hidden">
+        <header class="topic-header">
+          <div class="breadcrumb" id="breadcrumb"></div>
+          <h2 id="topic-title"></h2>
+          <p id="topic-summary" class="topic-summary"></p>
+        </header>
+        <div class="tabs" id="tabs"></div>
+        <div class="tab-content" id="tab-content"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Core -->
+  <script src="js/app.js"></script>
+
+  <!-- Topics: Статистика -->
+  <script src="js/topics/descriptive-stats.js"></script>
+  <script src="js/topics/distributions.js"></script>
+  <script src="js/topics/clt.js"></script>
+  <script src="js/topics/hypothesis-testing.js"></script>
+  <script src="js/topics/correlation.js"></script>
+
+  <!-- Topics: Основы ML -->
+  <script src="js/topics/metrics.js"></script>
+  <script src="js/topics/roc-auc.js"></script>
+  <script src="js/topics/cross-validation.js"></script>
+  <script src="js/topics/bias-variance.js"></script>
+  <script src="js/topics/regularization.js"></script>
+  <script src="js/topics/smote.js"></script>
+
+  <!-- Topics: Модели ML -->
+  <script src="js/topics/linear-regression.js"></script>
+  <script src="js/topics/logistic-regression.js"></script>
+  <script src="js/topics/knn.js"></script>
+  <script src="js/topics/decision-tree.js"></script>
+  <script src="js/topics/random-forest.js"></script>
+  <script src="js/topics/gradient-boosting.js"></script>
+  <script src="js/topics/svm.js"></script>
+  <script src="js/topics/bayesian.js"></script>
+  <script src="js/topics/kmeans.js"></script>
+  <script src="js/topics/dbscan.js"></script>
+  <script src="js/topics/pca.js"></script>
+  <script src="js/topics/isolation-forest.js"></script>
+
+  <!-- Topics: Нейронные сети -->
+  <script src="js/topics/gradient-descent.js"></script>
+  <script src="js/topics/perceptron.js"></script>
+  <script src="js/topics/neural-network.js"></script>
+  <script src="js/topics/cnn.js"></script>
+  <script src="js/topics/rnn-lstm.js"></script>
+  <script src="js/topics/transformer.js"></script>
+
+  <!-- Init -->
+  <script>window.addEventListener('DOMContentLoaded', () => App.init());</script>
+</body>
+</html>
