@@ -210,6 +210,142 @@ body {
 .callout.warn { border-color: #f59e0b; background: #fffbeb; color: #78350f; }
 .callout.tip { border-color: #10b981; background: #ecfdf5; color: #065f46; }
 
+/* ========== Intuition / analogy block ========== */
+.intuition {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 8px 0 24px;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.12);
+}
+.intuition::before {
+  content: "🎯";
+  position: absolute;
+  top: -10px;
+  left: 18px;
+  background: #fbbf24;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.intuition .intuition-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #78350f;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-left: 36px;
+  margin-bottom: 8px;
+}
+.intuition p {
+  color: #451a03;
+  font-size: 15px;
+  line-height: 1.65;
+  margin-bottom: 10px;
+}
+.intuition p:last-child { margin-bottom: 0; }
+.intuition b, .intuition strong { color: #7c2d12; }
+
+/* ========== Term with tooltip ========== */
+.term {
+  border-bottom: 1px dotted #3b82f6;
+  cursor: help;
+  position: relative;
+  color: #1e40af;
+  font-weight: 500;
+}
+.term:hover {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+.term:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  min-width: 240px;
+  max-width: 360px;
+  background: #0f172a;
+  color: #f1f5f9;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  white-space: normal;
+  border-bottom: none;
+  pointer-events: none;
+}
+.term:hover::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: calc(100% + 2px);
+  border: 6px solid transparent;
+  border-bottom-color: #0f172a;
+  z-index: 101;
+  pointer-events: none;
+}
+
+/* ========== Deep dive collapsible ========== */
+.deep-dive {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow: hidden;
+  background: #fafbfc;
+}
+.deep-dive summary {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #3b82f6;
+  font-size: 14px;
+  user-select: none;
+  background: #f8fafc;
+  list-style: none;
+}
+.deep-dive summary::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: transform 0.15s;
+  margin-right: 4px;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary:hover { background: #eff6ff; }
+.deep-dive .deep-dive-body { padding: 14px 18px; border-top: 1px solid #e5e7eb; }
+.deep-dive .deep-dive-body > :last-child { margin-bottom: 0; }
+
+/* ========== Key concept highlight ========== */
+.key-concept {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0ea5e9;
+  padding: 14px 18px;
+  border-radius: 6px;
+  margin: 14px 0;
+}
+.key-concept .kc-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.key-concept p { color: #0c4a6e; margin-bottom: 6px; }
+.key-concept p:last-child { margin-bottom: 0; }
+
 /* ========== Pros / Cons ========== */
 .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0; }
 .proscons > div { padding: 14px 18px; border-radius: 8px; }
