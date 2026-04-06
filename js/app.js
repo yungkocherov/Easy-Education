@@ -52,6 +52,7 @@ const App = (function () {
   function selectTopic(id) {
     destroyCharts();
     currentTopicId = id;
+    currentSubTabIdx = 0;
     const topic = topics.find((t) => t.id === id);
     if (!topic) return;
 
@@ -90,6 +91,7 @@ const App = (function () {
       el.textContent = tabLabels[k];
       el.onclick = () => {
         currentTabKey = k;
+        currentSubTabIdx = 0;
         renderTabs(topic);
       };
       tabsEl.appendChild(el);
@@ -97,6 +99,8 @@ const App = (function () {
 
     renderTabContent(topic);
   }
+
+  let currentSubTabIdx = 0;
 
   function renderTabContent(topic) {
     destroyCharts();
@@ -106,11 +110,35 @@ const App = (function () {
     const pane = document.createElement('div');
     pane.className = 'tab-pane';
 
-    if (typeof tabData === 'string') {
+    // Подвкладки: если tabData это массив — рендерим подвкладки
+    if (Array.isArray(tabData)) {
+      currentSubTabIdx = Math.max(0, Math.min(currentSubTabIdx, tabData.length - 1));
+      const subtabsNav = document.createElement('div');
+      subtabsNav.className = 'subtabs';
+      tabData.forEach((st, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'subtab' + (i === currentSubTabIdx ? ' active' : '');
+        btn.textContent = st.title || `Пример ${i + 1}`;
+        btn.onclick = () => { currentSubTabIdx = i; renderTabContent(topic); };
+        subtabsNav.appendChild(btn);
+      });
+      pane.appendChild(subtabsNav);
+
+      const body = document.createElement('div');
+      body.className = 'subtab-content';
+      const st = tabData[currentSubTabIdx];
+      if (typeof st.content === 'string') {
+        body.innerHTML = st.content;
+      } else if (st.html) {
+        body.innerHTML = st.html;
+      }
+      pane.appendChild(body);
+      el.appendChild(pane);
+      if (st && typeof st.init === 'function') st.init(body);
+    } else if (typeof tabData === 'string') {
       pane.innerHTML = tabData;
       el.appendChild(pane);
     } else if (typeof tabData === 'function') {
-      // функция принимает контейнер и строит в нём контент
       el.appendChild(pane);
       tabData(pane);
     } else if (tabData && typeof tabData === 'object' && tabData.html) {
