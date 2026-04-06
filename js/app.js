@@ -88,8 +88,6 @@ const App = (function () {
     const keys = Object.keys(tabLabels).filter((k) => topic.tabs && topic.tabs[k]);
     if (!currentTabKey || !keys.includes(currentTabKey)) currentTabKey = keys[0];
 
-    const inner = document.createElement('div');
-    inner.className = 'tabs-inner';
     keys.forEach((k) => {
       const el = document.createElement('div');
       el.className = 'tab' + (k === currentTabKey ? ' active' : '');
@@ -99,9 +97,8 @@ const App = (function () {
         currentSubTabIdx = 0;
         renderTabs(topic);
       };
-      inner.appendChild(el);
+      tabsEl.appendChild(el);
     });
-    tabsEl.appendChild(inner);
 
     renderTabContent(topic);
   }

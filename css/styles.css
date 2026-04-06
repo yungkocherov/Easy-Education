@@ -114,10 +114,6 @@ body {
   background: white;
   border-bottom: 1px solid #e5e7eb;
 }
-.topic-header-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-}
 .breadcrumb {
   font-size: 12px;
   color: #64748b;
@@ -145,12 +141,6 @@ body {
   background: white;
   border-bottom: 1px solid #e5e7eb;
   overflow-x: auto;
-}
-.tabs-inner {
-  display: flex;
-  gap: 4px;
-  max-width: 1000px;
-  margin: 0 auto;
 }
 .tab {
   padding: 12px 18px;
