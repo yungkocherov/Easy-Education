@@ -208,6 +208,42 @@ App.registerTopic({
             <p>Среднее = <b>121.9 тыс.</b>, медиана = <b>77.5 тыс.</b> При наличии выброса (директор) медиана лучше описывает «типичную» зарплату.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Зарплаты: среднее vs медиана</text>
+              <!-- axis -->
+              <line x1="30" y1="90" x2="460" y2="90" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- scale labels: 60..450 mapped to x=30..460 -->
+              <!-- x = 30 + (val-60)/(450-60)*430 -->
+              <!-- 60→30, 65→35.5, 70→41, 75→46.5, 80→52, 85→57.5, 90→63, 450→460 -->
+              <!-- salary dots -->
+              <circle cx="30"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="36"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="41"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="47"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="52"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="58"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="63"  cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="460" cy="90" r="6" fill="#3b82f6" opacity="0.85"/>
+              <!-- mean line at 121.9 → x = 30 + (121.9-60)/390*430 ≈ 98 -->
+              <line x1="98" y1="55" x2="98" y2="125" stroke="#ef4444" stroke-width="2.5"/>
+              <text x="98" y="48" text-anchor="middle" font-size="11" font-weight="600" fill="#ef4444">Среднее</text>
+              <text x="98" y="140" text-anchor="middle" font-size="10" fill="#ef4444">121.9 тыс.</text>
+              <!-- median line at 77.5 → x = 30 + (77.5-60)/390*430 ≈ 49 -->
+              <line x1="49" y1="55" x2="49" y2="125" stroke="#10b981" stroke-width="2.5"/>
+              <text x="49" y="48" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">Медиана</text>
+              <text x="49" y="140" text-anchor="middle" font-size="10" fill="#10b981">77.5 тыс.</text>
+              <!-- axis ticks -->
+              <text x="30"  y="106" text-anchor="middle" font-size="9" fill="#64748b">60</text>
+              <text x="460" y="106" text-anchor="middle" font-size="9" fill="#64748b">450</text>
+              <!-- arrow showing pull -->
+              <path d="M55,72 Q76,62 92,72" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+              <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/></marker></defs>
+              <text x="73" y="60" text-anchor="middle" font-size="9" fill="#ef4444">выброс тянет вверх</text>
+            </svg>
+            <div class="caption">Число 450 (директор) сдвигает среднее (красная линия) далеко вправо от реальной «середины» данных. Медиана (зелёная) остаётся там, где большинство точек.</div>
+          </div>
+
           <div class="lesson-box">Когда в данных есть выбросы или сильный «скос» — используй медиану вместо среднего. Именно поэтому новости о «средней зарплате по стране» часто вводят в заблуждение.</div>
         `
       },
@@ -270,6 +306,50 @@ App.registerTopic({
             <div class="answer-label">Ответ</div>
             <p>Магазин A: среднее 50, std ≈ <b>1.6</b> — очень стабильный.</p>
             <p>Магазин B: среднее 50, std ≈ <b>25.5</b> — непредсказуемый, огромные колебания.</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Разброс: Магазин A (тесно) vs Магазин B (широко)</text>
+              <!-- Store A axis -->
+              <line x1="20" y1="70" x2="220" y2="70" stroke="#94a3b8" stroke-width="1.2"/>
+              <text x="120" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#3b82f6">Магазин A  std ≈ 1.6</text>
+              <!-- A dots: 48,49,50,51,52 — center 50, range 48-52 → scale to x 20-220, center=120 -->
+              <!-- x = 120 + (val-50)*20 -->
+              <circle cx="80"  cy="70" r="8" fill="#3b82f6" opacity="0.75"/> <!-- 48 -->
+              <circle cx="100" cy="70" r="8" fill="#3b82f6" opacity="0.75"/> <!-- 49 -->
+              <circle cx="120" cy="70" r="8" fill="#3b82f6" opacity="0.75"/> <!-- 50 -->
+              <circle cx="140" cy="70" r="8" fill="#3b82f6" opacity="0.75"/> <!-- 51 -->
+              <circle cx="160" cy="70" r="8" fill="#3b82f6" opacity="0.75"/> <!-- 52 -->
+              <!-- center tick A -->
+              <line x1="120" y1="55" x2="120" y2="85" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <text x="120" y="50" text-anchor="middle" font-size="10" fill="#64748b">μ=50</text>
+              <!-- Store B axis -->
+              <line x1="260" y1="70" x2="460" y2="70" stroke="#94a3b8" stroke-width="1.2"/>
+              <text x="360" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#ef4444">Магазин B  std ≈ 25.5</text>
+              <!-- B dots: 20,30,50,70,80 — center 50, range 20-80 → scale center=360, x=360+(val-50)*2 -->
+              <circle cx="300" cy="70" r="8" fill="#ef4444" opacity="0.75"/> <!-- 20 -->
+              <circle cx="320" cy="70" r="8" fill="#ef4444" opacity="0.75"/> <!-- 30 -->
+              <circle cx="360" cy="70" r="8" fill="#ef4444" opacity="0.75"/> <!-- 50 -->
+              <circle cx="400" cy="70" r="8" fill="#ef4444" opacity="0.75"/> <!-- 70 -->
+              <circle cx="420" cy="70" r="8" fill="#ef4444" opacity="0.75"/> <!-- 80 -->
+              <!-- center tick B -->
+              <line x1="360" y1="55" x2="360" y2="85" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <text x="360" y="50" text-anchor="middle" font-size="10" fill="#64748b">μ=50</text>
+              <!-- divider -->
+              <line x1="240" y1="25" x2="240" y2="115" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- bracket A -->
+              <line x1="80" y1="130" x2="160" y2="130" stroke="#3b82f6" stroke-width="1.5"/>
+              <line x1="80" y1="125" x2="80" y2="135" stroke="#3b82f6" stroke-width="1.5"/>
+              <line x1="160" y1="125" x2="160" y2="135" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="120" y="148" text-anchor="middle" font-size="9" fill="#3b82f6">диапазон 48–52</text>
+              <!-- bracket B -->
+              <line x1="300" y1="130" x2="420" y2="130" stroke="#ef4444" stroke-width="1.5"/>
+              <line x1="300" y1="125" x2="300" y2="135" stroke="#ef4444" stroke-width="1.5"/>
+              <line x1="420" y1="125" x2="420" y2="135" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="360" y="148" text-anchor="middle" font-size="9" fill="#ef4444">диапазон 20–80</text>
+            </svg>
+            <div class="caption">Оба магазина имеют одинаковое среднее (μ = 50). Но Магазин A (синий) компактен — все значения близко. Магазин B (красный) разбросан на весь диапазон. Std улавливает именно этот разброс.</div>
           </div>
 
           <div class="lesson-box">Среднее само по себе не показывает, насколько данные стабильны. Стандартное отклонение — это «типичный размер колебания» вокруг среднего. Маленький std = стабильные данные, большой std = хаос.</div>
@@ -349,6 +429,46 @@ Max = 120 (выброс!)</div>
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Медиана пульса = <b>72</b>. IQR = <b>15</b> (от 65 до 80). Пациент с пульсом <b>120</b> — выброс (нужно проверить: тахикардия? ошибка измерения?).</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Boxplot: пульс 11 пациентов</text>
+              <!-- axis: values 58..120, map to x 40..420, scale=(420-40)/(120-58)=380/62≈6.13 -->
+              <!-- x = 40 + (val-58)*6.13 -->
+              <!-- Min=58→40, Q1=65→82.9, Q2=72→124.9, Q3=80→173.8, max(non-outlier)=85→204.5, outlier=120→451 clamp to 430 -->
+              <line x1="40" y1="90" x2="435" y2="90" stroke="#94a3b8" stroke-width="1.2"/>
+              <!-- whisker left: min(58)→40 to Q1(65)→83 -->
+              <line x1="40" y1="90" x2="83" y2="90" stroke="#6366f1" stroke-width="2"/>
+              <line x1="40" y1="80" x2="40" y2="100" stroke="#6366f1" stroke-width="2"/>
+              <!-- box Q1(65)→83 to Q3(80)→174 -->
+              <rect x="83" y="65" width="91" height="50" fill="#818cf8" fill-opacity="0.22" stroke="#6366f1" stroke-width="2.5" rx="3"/>
+              <!-- median Q2(72)→125 -->
+              <line x1="125" y1="65" x2="125" y2="115" stroke="#6366f1" stroke-width="3"/>
+              <!-- whisker right: Q3(80)→174 to max-non-outlier(85)→204 -->
+              <line x1="174" y1="90" x2="204" y2="90" stroke="#6366f1" stroke-width="2"/>
+              <line x1="204" y1="80" x2="204" y2="100" stroke="#6366f1" stroke-width="2"/>
+              <!-- dashed to outlier -->
+              <line x1="204" y1="90" x2="420" y2="90" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <!-- outlier dot at 120 -->
+              <circle cx="430" cy="90" r="7" fill="none" stroke="#ef4444" stroke-width="2"/>
+              <!-- labels below axis -->
+              <text x="40"  y="115" text-anchor="middle" font-size="10" fill="#64748b">58</text>
+              <text x="83"  y="115" text-anchor="middle" font-size="10" fill="#6366f1">Q1=65</text>
+              <text x="125" y="115" text-anchor="middle" font-size="10" fill="#6366f1">M=72</text>
+              <text x="174" y="115" text-anchor="middle" font-size="10" fill="#6366f1">Q3=80</text>
+              <text x="204" y="115" text-anchor="middle" font-size="10" fill="#64748b">85</text>
+              <text x="430" y="115" text-anchor="middle" font-size="10" fill="#ef4444">120!</text>
+              <!-- IQR bracket -->
+              <line x1="83" y1="140" x2="174" y2="140" stroke="#6366f1" stroke-width="1.5"/>
+              <line x1="83" y1="135" x2="83" y2="145" stroke="#6366f1" stroke-width="1.5"/>
+              <line x1="174" y1="135" x2="174" y2="145" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="128" y="155" text-anchor="middle" font-size="10" fill="#6366f1">IQR = 15</text>
+              <!-- outlier label -->
+              <text x="430" y="55" text-anchor="middle" font-size="10" fill="#ef4444">выброс</text>
+              <line x1="430" y1="58" x2="430" y2="78" stroke="#ef4444" stroke-width="1"/>
+            </svg>
+            <div class="caption">Boxplot: ящик — от Q1 до Q3 (IQR=15), линия внутри — медиана (72), усы — до крайних «нормальных» значений (58 и 85). Пульс 120 вышел за порог 1.5×IQR — показан отдельной точкой-выбросом.</div>
           </div>
 
           <div class="lesson-box">Квартили и IQR — «робастная» альтернатива среднему и std: они устойчивы к выбросам. В boxplot всё наглядно видно: центр, разброс и подозрительные точки.</div>

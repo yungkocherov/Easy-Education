@@ -258,6 +258,35 @@ TN = 170 - 5 = 165  (не спам, пропущен верно)
             <div class="why">F1 — гармоническое среднее между Precision и Recall. Оно наказывает за низкое значение любого из двух. Здесь 72.7% честнее отражает качество, чем 92.5% Accuracy.</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 440 170" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
+              <text x="220" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Confusion Matrix: спам-фильтр</text>
+              <!-- Column headers -->
+              <text x="175" y="42" text-anchor="middle" font-size="10" fill="#64748b">Помечено: Спам</text>
+              <text x="335" y="42" text-anchor="middle" font-size="10" fill="#64748b">Помечено: Норм.</text>
+              <!-- Row headers -->
+              <text x="72" y="95" text-anchor="middle" font-size="10" fill="#64748b">Реально: Спам</text>
+              <text x="72" y="145" text-anchor="middle" font-size="10" fill="#64748b">Реально: Норм.</text>
+              <!-- TP cell -->
+              <rect x="110" y="52" width="130" height="52" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="175" y="76" text-anchor="middle" font-size="16" font-weight="700" fill="#065f46">20</text>
+              <text x="175" y="93" text-anchor="middle" font-size="10" fill="#065f46">TP (верный спам)</text>
+              <!-- FN cell -->
+              <rect x="248" y="52" width="130" height="52" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="313" y="76" text-anchor="middle" font-size="16" font-weight="700" fill="#991b1b">10</text>
+              <text x="313" y="93" text-anchor="middle" font-size="10" fill="#991b1b">FN (пропущен)</text>
+              <!-- FP cell -->
+              <rect x="110" y="112" width="130" height="52" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="175" y="136" text-anchor="middle" font-size="16" font-weight="700" fill="#991b1b">5</text>
+              <text x="175" y="153" text-anchor="middle" font-size="10" fill="#991b1b">FP (ложная тревога)</text>
+              <!-- TN cell -->
+              <rect x="248" y="112" width="130" height="52" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="313" y="136" text-anchor="middle" font-size="16" font-weight="700" fill="#065f46">165</text>
+              <text x="313" y="153" text-anchor="middle" font-size="10" fill="#065f46">TN (верная норм.)</text>
+            </svg>
+            <div class="caption">Confusion matrix спам-фильтра: зелёные ячейки — верные решения, красные — ошибки. Precision = 20/25 = 80%, Recall = 20/30 = 67%.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>TP=20, FP=5, FN=10, TN=165</p>

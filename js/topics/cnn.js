@@ -263,6 +263,93 @@ App.registerTopic({
             <div class="math-block">$$K = \\begin{pmatrix}-1 & 0 & 1 \\\\ -2 & 0 & 2 \\\\ -1 & 0 & 1\\end{pmatrix}$$</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <!-- 5x5 input grid, cell size 22px starting at x=10,y=10 -->
+              <!-- Highlight top-left 3x3 window -->
+              <rect x="10" y="10" width="66" height="66" fill="#fef9c3" rx="2"/>
+              <!-- 5x5 grid lines -->
+              <g stroke="#64748b" stroke-width="1" fill="none">
+                <rect x="10" y="10" width="110" height="110" rx="2"/>
+                <line x1="10" y1="32" x2="120" y2="32"/><line x1="10" y1="54" x2="120" y2="54"/>
+                <line x1="10" y1="76" x2="120" y2="76"/><line x1="10" y1="98" x2="120" y2="98"/>
+                <line x1="32" y1="10" x2="32" y2="120"/><line x1="54" y1="10" x2="54" y2="120"/>
+                <line x1="76" y1="10" x2="76" y2="120"/><line x1="98" y1="10" x2="98" y2="120"/>
+              </g>
+              <!-- Cell values (5x5): first 2 cols=0, last 3=1 -->
+              <g font-size="11" text-anchor="middle" fill="#1e293b">
+                <!-- Row 0 -->
+                <text x="21" y="26">0</text><text x="43" y="26">0</text>
+                <text x="65" y="26" fill="#3b82f6" font-weight="600">1</text>
+                <text x="87" y="26" fill="#3b82f6" font-weight="600">1</text>
+                <text x="109" y="26" fill="#3b82f6" font-weight="600">1</text>
+                <!-- Row 1 -->
+                <text x="21" y="48">0</text><text x="43" y="48">0</text>
+                <text x="65" y="48" fill="#3b82f6" font-weight="600">1</text>
+                <text x="87" y="48" fill="#3b82f6" font-weight="600">1</text>
+                <text x="109" y="48" fill="#3b82f6" font-weight="600">1</text>
+                <!-- Row 2 -->
+                <text x="21" y="70">0</text><text x="43" y="70">0</text>
+                <text x="65" y="70" fill="#3b82f6" font-weight="600">1</text>
+                <text x="87" y="70" fill="#3b82f6" font-weight="600">1</text>
+                <text x="109" y="70" fill="#3b82f6" font-weight="600">1</text>
+                <!-- Row 3 -->
+                <text x="21" y="92">0</text><text x="43" y="92">0</text>
+                <text x="65" y="92" fill="#3b82f6" font-weight="600">1</text>
+                <text x="87" y="92" fill="#3b82f6" font-weight="600">1</text>
+                <text x="109" y="92" fill="#3b82f6" font-weight="600">1</text>
+                <!-- Row 4 -->
+                <text x="21" y="114">0</text><text x="43" y="114">0</text>
+                <text x="65" y="114" fill="#3b82f6" font-weight="600">1</text>
+                <text x="87" y="114" fill="#3b82f6" font-weight="600">1</text>
+                <text x="109" y="114" fill="#3b82f6" font-weight="600">1</text>
+              </g>
+              <text x="65" y="130" text-anchor="middle" font-size="9" fill="#64748b">вход 5×5</text>
+              <!-- Arrow -->
+              <line x1="130" y1="65" x2="155" y2="65" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-arr)"/>
+              <defs>
+                <marker id="cnn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+              </defs>
+              <!-- 3x3 filter grid at x=158 -->
+              <g stroke="#ef4444" stroke-width="1.5" fill="none">
+                <rect x="158" y="32" width="66" height="66" rx="2"/>
+                <line x1="158" y1="54" x2="224" y2="54"/><line x1="158" y1="76" x2="224" y2="76"/>
+                <line x1="180" y1="32" x2="180" y2="98"/><line x1="202" y1="32" x2="202" y2="98"/>
+              </g>
+              <!-- Filter values (Sobel): -1 0 1 / -2 0 2 / -1 0 1 -->
+              <g font-size="10" text-anchor="middle" fill="#b91c1c" font-weight="600">
+                <text x="169" y="48">−1</text><text x="191" y="48">0</text><text x="213" y="48">1</text>
+                <text x="169" y="70">−2</text><text x="191" y="70">0</text><text x="213" y="70">2</text>
+                <text x="169" y="92">−1</text><text x="191" y="92">0</text><text x="213" y="92">1</text>
+              </g>
+              <text x="191" y="112" text-anchor="middle" font-size="9" fill="#64748b">фильтр 3×3</text>
+              <!-- Arrow -->
+              <line x1="234" y1="65" x2="260" y2="65" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-arr)"/>
+              <!-- 3x3 output grid at x=265 -->
+              <g stroke="#10b981" stroke-width="1.5" fill="none">
+                <rect x="265" y="32" width="66" height="66" rx="2"/>
+                <line x1="265" y1="54" x2="331" y2="54"/><line x1="265" y1="76" x2="331" y2="76"/>
+                <line x1="287" y1="32" x2="287" y2="98"/><line x1="309" y1="32" x2="309" y2="98"/>
+              </g>
+              <!-- Output values: 4 4 0 / 4 4 0 / 4 4 0 -->
+              <g font-size="11" text-anchor="middle" font-weight="600">
+                <text x="276" y="48" fill="#10b981">4</text><text x="298" y="48" fill="#10b981">4</text><text x="320" y="48" fill="#64748b">0</text>
+                <text x="276" y="70" fill="#10b981">4</text><text x="298" y="70" fill="#10b981">4</text><text x="320" y="70" fill="#64748b">0</text>
+                <text x="276" y="92" fill="#10b981">4</text><text x="298" y="92" fill="#10b981">4</text><text x="320" y="92" fill="#64748b">0</text>
+              </g>
+              <text x="298" y="112" text-anchor="middle" font-size="9" fill="#64748b">feature map 3×3</text>
+              <!-- Yellow highlight box shows active window in input -->
+              <rect x="10" y="10" width="66" height="66" fill="none" stroke="#f59e0b" stroke-width="2.5" rx="2" stroke-dasharray="4,2"/>
+              <text x="43" y="7" text-anchor="middle" font-size="8" fill="#f59e0b">окно</text>
+              <!-- "=" label -->
+              <text x="253" y="70" text-anchor="middle" font-size="14" fill="#64748b">*</text>
+              <text x="350" y="70" text-anchor="middle" font-size="14" fill="#64748b">=</text>
+            </svg>
+            <div class="caption">Свёртка 5×5 ✱ фильтр Собеля 3×3 = feature map 3×3. Жёлтая рамка — текущее окно (поз. 0,0). Зелёные ячейки: отклик 4 (граница найдена). Серые: 0 (однородная область).</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th colspan="5">Изображение $I$ (5×5)</th></tr>
@@ -416,6 +503,73 @@ App.registerTopic({
           <div class="example-problem">
             <div class="problem-label">Задача</div>
             <p>Применить MaxPooling 2×2 (stride=2) к feature map 4×4 после ReLU. Понять, что теряется и что сохраняется. Сравнить с AvgPooling.</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 440 160" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
+              <defs>
+                <marker id="mp-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+              </defs>
+              <!-- 4x4 input grid, cell 30px, start x=20,y=20 -->
+              <!-- Highlight the 4 2x2 blocks -->
+              <rect x="20" y="20" width="60" height="60" fill="#dbeafe" rx="1"/>
+              <rect x="80" y="20" width="60" height="60" fill="#fef3c7" rx="1"/>
+              <rect x="20" y="80" width="60" height="60" fill="#d1fae5" rx="1"/>
+              <rect x="80" y="80" width="60" height="60" fill="#fce7f3" rx="1"/>
+              <!-- Grid lines 4x4 -->
+              <g stroke="#64748b" stroke-width="1">
+                <rect x="20" y="20" width="120" height="120" fill="none"/>
+                <line x1="20" y1="50" x2="140" y2="50"/><line x1="20" y1="80" x2="140" y2="80"/><line x1="20" y1="110" x2="140" y2="110"/>
+                <line x1="50" y1="20" x2="50" y2="140"/><line x1="80" y1="20" x2="80" y2="140"/><line x1="110" y1="20" x2="110" y2="140"/>
+              </g>
+              <!-- Values: row0: 3,1,0,5; row1: 0,4,2,1; row2: 2,0,6,0; row3: 1,3,0,4 -->
+              <g font-size="13" text-anchor="middle" font-weight="600">
+                <!-- row 0 -->
+                <text x="35" y="42" fill="#1e40af">3</text><text x="65" y="42" fill="#1e40af">1</text>
+                <text x="95" y="42" fill="#92400e">0</text><text x="125" y="42" fill="#92400e">5</text>
+                <!-- row 1 -->
+                <text x="35" y="72" fill="#1e40af">0</text>
+                <text x="65" y="72" fill="#1e40af" font-size="14">4</text>
+                <text x="95" y="72" fill="#92400e">2</text><text x="125" y="72" fill="#92400e">1</text>
+                <!-- row 2 -->
+                <text x="35" y="102" fill="#065f46">2</text><text x="65" y="102" fill="#065f46">0</text>
+                <text x="95" y="102" fill="#831843">6</text><text x="125" y="102" fill="#831843">0</text>
+                <!-- row 3 -->
+                <text x="35" y="132" fill="#065f46">1</text><text x="65" y="132" fill="#065f46">3</text>
+                <text x="95" y="132" fill="#831843">0</text><text x="125" y="132" fill="#831843">4</text>
+              </g>
+              <text x="80" y="154" text-anchor="middle" font-size="9" fill="#64748b">feature map 4×4</text>
+              <!-- Arrow -->
+              <line x1="150" y1="80" x2="178" y2="80" stroke="#64748b" stroke-width="1.5" marker-end="url(#mp-arr)"/>
+              <text x="164" y="75" text-anchor="middle" font-size="8" fill="#64748b">MaxPool</text>
+              <text x="164" y="95" text-anchor="middle" font-size="8" fill="#64748b">2×2</text>
+              <!-- 2x2 output grid, cell 50px, start x=185,y=55 -->
+              <rect x="185" y="55" width="50" height="50" fill="#dbeafe" rx="2"/>
+              <rect x="235" y="55" width="50" height="50" fill="#fef3c7" rx="2"/>
+              <rect x="185" y="105" width="50" height="50" fill="#d1fae5" rx="2"/>
+              <rect x="235" y="105" width="50" height="50" fill="#fce7f3" rx="2"/>
+              <g stroke="#64748b" stroke-width="1.5">
+                <rect x="185" y="55" width="100" height="100" fill="none"/>
+                <line x1="185" y1="105" x2="285" y2="105"/>
+                <line x1="235" y1="55" x2="235" y2="155"/>
+              </g>
+              <!-- Max values -->
+              <g font-size="18" text-anchor="middle" font-weight="700">
+                <text x="210" y="88" fill="#1e40af">4</text>
+                <text x="260" y="88" fill="#92400e">5</text>
+                <text x="210" y="138" fill="#065f46">3</text>
+                <text x="260" y="138" fill="#831843">6</text>
+              </g>
+              <text x="235" y="170" text-anchor="middle" font-size="9" fill="#64748b">MaxPool 2×2</text>
+              <!-- Max labels -->
+              <text x="210" y="62" text-anchor="middle" font-size="8" fill="#64748b">max=4</text>
+              <text x="260" y="62" text-anchor="middle" font-size="8" fill="#64748b">max=5</text>
+              <text x="210" y="112" text-anchor="middle" font-size="8" fill="#64748b">max=3</text>
+              <text x="260" y="112" text-anchor="middle" font-size="8" fill="#64748b">max=6</text>
+            </svg>
+            <div class="caption">MaxPooling 2×2: 4 цветных блока в сетке 4×4 → 4 максимума в сетке 2×2. Каждый блок 2×2 «сворачивается» в одно число — самый сильный отклик.</div>
           </div>
 
           <div class="example-data-table">

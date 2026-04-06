@@ -292,6 +292,54 @@ App.registerTopic({
               P5: 2·0.76 + 0·0.64 = <b>1.52</b>
             </div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">PCA: 5 точек, PC1 и PC2</text>
+              <!-- Axes -->
+              <line x1="50" y1="20" x2="50" y2="145" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="50" y1="145" x2="390" y2="145" stroke="#64748b" stroke-width="1.5"/>
+              <text x="390" y="157" font-size="9" fill="#64748b">x₁</text>
+              <text x="36" y="16" font-size="9" fill="#64748b">x₂</text>
+              <!-- Scale: x1=2..6 → x=50+(x1-1)*62; x2=2..6 → y=145-(x2-1)*27 -->
+              <!-- P1(2,2)→(112,118), P2(3,4)→(174,64), P3(4,4)→(236,64), P4(5,6)→(298,10), P5(6,4)→(360,64) -->
+              <!-- Center mark (mean at 4,4 → (236,64)) -->
+              <circle cx="236" cy="64" r="4" fill="#64748b" opacity="0.4"/>
+              <text x="245" y="60" font-size="8" fill="#64748b">x̄=(4,4)</text>
+              <!-- Grid lines light -->
+              <line x1="50" y1="118" x2="390" y2="118" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="50" y1="64" x2="390" y2="64" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="112" y1="20" x2="112" y2="145" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="236" y1="20" x2="236" y2="145" stroke="#f1f5f9" stroke-width="1"/>
+              <!-- Data points -->
+              <circle cx="112" cy="118" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="100" y="115" font-size="9" fill="#3b82f6">P1</text>
+              <circle cx="174" cy="64" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="162" y="61" font-size="9" fill="#3b82f6">P2</text>
+              <circle cx="236" cy="64" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="240" y="61" font-size="9" fill="#3b82f6">P3</text>
+              <circle cx="298" cy="10" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="302" y="10" font-size="9" fill="#3b82f6">P4</text>
+              <circle cx="360" cy="64" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="364" y="61" font-size="9" fill="#3b82f6">P5</text>
+              <!-- PC1 direction: (0.76, 0.64) from center → arrow from (236,64) in direction (0.76,-0.64)*90 -->
+              <!-- PC1 end: (236+0.76*90, 64-0.64*90) = (304, 6) -->
+              <!-- PC1 start: (236-0.76*90, 64+0.64*90) = (168, 122) -->
+              <line x1="130" y1="128" x2="340" y2="22" stroke="#ef4444" stroke-width="2.5"/>
+              <text x="345" y="20" font-size="10" font-weight="600" fill="#ef4444">PC1</text>
+              <text x="348" y="30" font-size="8" fill="#ef4444">83.8%</text>
+              <!-- PC2 direction: perpendicular to PC1 → (-0.64, 0.76) from center -->
+              <!-- PC2 end: (236-0.64*50, 64-0.76*50) = (204, 26) -->
+              <!-- PC2 start: (236+0.64*50, 64+0.76*50) = (268, 102) -->
+              <line x1="268" y1="102" x2="200" y2="26" stroke="#10b981" stroke-width="2.5"/>
+              <text x="190" y="24" font-size="10" font-weight="600" fill="#10b981">PC2</text>
+              <text x="182" y="34" font-size="8" fill="#10b981">16.2%</text>
+              <!-- Projection lines of points onto PC1 -->
+              <line x1="112" y1="118" x2="140" y2="96" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+              <line x1="298" y1="10" x2="298" y2="22" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            </svg>
+            <div class="caption">5 точек (синие) с PC1 (красная, 83.8% дисперсии) и PC2 (зелёная, 16.2%). PC1 указывает направление наибольшего разброса. Пунктирные линии — проекции точек на PC1.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>PC1 направлен ~(0.76, 0.64), объясняет λ₁/(λ₁+λ₂) = 3.77/4.5 = <b>83.8%</b> дисперсии. PC2 — 16.2%. Проекции на PC1: [−2.80, −0.76, 0.00, 2.04, 1.52].</p>

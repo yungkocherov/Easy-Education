@@ -229,6 +229,45 @@ App.registerTopic({
             <p>Минимизируем $L(w) = w^2$ градиентным спуском. Градиент: $\\nabla L = 2w$. Начальная точка $w_0 = 5$, learning rate $\\eta = 0{,}3$. Найти минимум.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <marker id="gd-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#10b981"/>
+                </marker>
+              </defs>
+              <!-- Axes -->
+              <line x1="30" y1="140" x2="440" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="30" y1="10" x2="30" y2="145" stroke="#64748b" stroke-width="1.5"/>
+              <text x="445" y="144" font-size="10" fill="#64748b">w</text>
+              <text x="32" y="10" font-size="10" fill="#64748b">L</text>
+              <!-- Parabola L=w^2: map w in [-0.5..5.2] to x in [30..440], L in [0..27] to y in [140..10] -->
+              <!-- x = 30 + (w+0.5)/5.7 * 410, y = 140 - L/27*130 -->
+              <polyline fill="none" stroke="#64748b" stroke-width="1.8"
+                points="30,137 47,128 66,111 87,88 110,59 136,28 164,5"/>
+              <!-- points at w=5,2,0.8,0.32 -->
+              <!-- w=5: x=30+(5.5/5.7)*410=426, y=140-(25/27)*130=20 -->
+              <!-- w=2: x=30+(2.5/5.7)*410=210, y=140-(4/27)*130=121 -->
+              <!-- w=0.8: x=30+(1.3/5.7)*410=124, y=140-(0.64/27)*130=137 -->
+              <!-- w=0.32: x=30+(0.82/5.7)*410=89, y=140-(0.10/27)*130=139.5 -->
+              <circle cx="426" cy="20" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <text x="430" y="17" font-size="9" fill="#ef4444">w₀=5</text>
+              <circle cx="210" cy="121" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="214" y="118" font-size="9" fill="#f59e0b">w₁=2</text>
+              <circle cx="124" cy="137" r="6" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="96" y="133" font-size="9" fill="#3b82f6">w₂=0.8</text>
+              <circle cx="89" cy="140" r="5" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <text x="60" y="152" font-size="9" fill="#10b981">w₃=0.32</text>
+              <!-- Arrows between points -->
+              <line x1="420" y1="23" x2="216" y2="119" stroke="#10b981" stroke-width="1.8" marker-end="url(#gd-arr)"/>
+              <line x1="204" y1="122" x2="130" y2="136" stroke="#10b981" stroke-width="1.8" marker-end="url(#gd-arr)"/>
+              <line x1="118" y1="138" x2="95" y2="140" stroke="#10b981" stroke-width="1.8" marker-end="url(#gd-arr)"/>
+              <!-- Min label -->
+              <text x="32" y="152" font-size="9" fill="#10b981" font-weight="600">min(w*=0)</text>
+            </svg>
+            <div class="caption">Сходимость: точки w=5→2→0.8→0.32 движутся к минимуму w*=0 вдоль параболы L=w². Каждый шаг в 2.5 раза ближе к нулю.</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>Шаг $t$</th><th>$w_t$</th><th>Градиент $2w_t$</th><th>Шаг $\\eta \\cdot 2w_t$</th><th>$L(w_t) = w_t^2$</th></tr>
@@ -276,6 +315,45 @@ App.registerTopic({
           <div class="example-problem">
             <div class="problem-label">Задача</div>
             <p>Та же функция $L(w) = w^2$, тот же старт $w_0 = 5$, но $\\eta = 1{,}1$. Что произойдёт с обучением?</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <marker id="div-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#ef4444"/>
+                </marker>
+              </defs>
+              <!-- Axes: center at x=230 (w=0), y=155 (L=0) -->
+              <!-- x = 230 + w*18, y = 155 - L*1.2 (clipped) -->
+              <line x1="20" y1="155" x2="450" y2="155" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="230" y1="8" x2="230" y2="158" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <text x="452" y="158" font-size="10" fill="#64748b">w</text>
+              <text x="232" y="10" font-size="10" fill="#64748b">L</text>
+              <text x="227" y="163" font-size="9" fill="#10b981">0</text>
+              <!-- Parabola: w from -14 to 14 -->
+              <polyline fill="none" stroke="#64748b" stroke-width="1.8"
+                points="22,147 60,131 98,107 136,75 174,39 230,155 286,39 324,75 362,107 400,131 438,147"/>
+              <!-- Actually parabola L=w^2: for w=-13 to 13 step 1 -->
+              <!-- x=230+w*16, y=155-w^2*0.9 (for w=13: y=155-152=3; for w=0: y=155) -->
+              <polyline fill="none" stroke="#64748b" stroke-width="1.8"
+                points="22,3 46,22 70,46 94,75 118,107 142,132 166,150 230,155 294,150 318,132 342,107 366,75 390,46 414,22 438,3"/>
+              <!-- Points: w=5 (x=310,y=155-25*0.9=132.5), w=-6 (x=134,y=155-36*0.9=122.6), w=7.2 (x=345,y=155-51.84*0.9=108.3), w=-8.64 (x=91,y=155-74.65*0.9=88) -->
+              <circle cx="310" cy="133" r="6" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="314" y="130" font-size="9" fill="#3b82f6">w₀=5</text>
+              <circle cx="134" cy="123" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <text x="90" y="120" font-size="9" fill="#ef4444">w₁=−6</text>
+              <circle cx="345" cy="109" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="349" y="106" font-size="9" fill="#f59e0b">w₂=7.2</text>
+              <circle cx="91" cy="89" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <text x="48" y="86" font-size="9" fill="#ef4444">w₃=−8.64</text>
+              <!-- Zigzag arrows showing bouncing away -->
+              <line x1="304" y1="130" x2="140" y2="124" stroke="#ef4444" stroke-width="1.8" marker-end="url(#div-arr)"/>
+              <line x1="140" y1="120" x2="339" y2="110" stroke="#ef4444" stroke-width="1.8" marker-end="url(#div-arr)"/>
+              <line x1="339" y1="106" x2="97" y2="90" stroke="#ef4444" stroke-width="1.8" marker-end="url(#div-arr)"/>
+              <text x="195" y="148" font-size="9" fill="#ef4444" font-weight="600">расходимость!</text>
+            </svg>
+            <div class="caption">Расходимость (η=1.1): точки прыгают по параболе с нарастающей амплитудой — 5→−6→7.2→−8.64. Каждый «перелёт» через минимум дальше предыдущего.</div>
           </div>
 
           <div class="example-data-table">

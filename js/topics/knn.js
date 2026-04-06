@@ -258,6 +258,52 @@ App.registerTopic({
             </div>
             <div class="why">Большинство побеждает. При вероятностном kNN: P(яблоко) = 2/3 ≈ 67%, P(апельсин) = 1/3 ≈ 33%.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">kNN (k=3): фрукт по весу и диаметру</text>
+              <!-- Axes -->
+              <line x1="55" y1="20" x2="55" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="55" y1="140" x2="390" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <text x="222" y="158" text-anchor="middle" font-size="10" fill="#64748b">Вес (г)</text>
+              <text x="20" y="82" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,20,82)">Диаметр (см)</text>
+              <!-- Scale: x: 140→80, 220→350 → 1g=3.75px; y: 6.5→130, 9.0→25 → 1cm=42px -->
+              <!-- x = 55 + (weight-130)*2.8; y = 140 - (diam-6.0)*42 -->
+              <!-- Apples: (150,7.0)→(111,94), (160,7.5)→(139,73), (140,6.5)→(83,115) -->
+              <!-- Oranges: (200,8.5)→(251,31), (220,9.0)→(307,10), (180,8.0)→(195,52) -->
+              <!-- Query: (170,7.8)→(167,61) -->
+              <!-- Dashed circle: r~10 in feature space, scaled: 10g*2.8=28px, 0.3cm*42=12.6px → use r=28 approx -->
+              <circle cx="167" cy="61" r="40" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6,4"/>
+              <!-- Apple dots -->
+              <circle cx="111" cy="94" r="8" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <text x="111" y="110" text-anchor="middle" font-size="8" fill="#10b981">№1</text>
+              <circle cx="139" cy="73" r="8" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <text x="139" y="88" text-anchor="middle" font-size="8" fill="#10b981">№2</text>
+              <circle cx="83" cy="115" r="8" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <text x="83" y="130" text-anchor="middle" font-size="8" fill="#10b981">№3</text>
+              <!-- Orange dots -->
+              <circle cx="251" cy="31" r="8" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="251" y="22" text-anchor="middle" font-size="8" fill="#f59e0b">№4</text>
+              <circle cx="307" cy="10" r="8" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="307" y="26" text-anchor="middle" font-size="8" fill="#f59e0b">№5</text>
+              <circle cx="195" cy="52" r="8" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="207" y="48" text-anchor="middle" font-size="8" fill="#f59e0b">№6</text>
+              <!-- Query star -->
+              <text x="167" y="65" text-anchor="middle" font-size="18" fill="#ef4444">★</text>
+              <text x="167" y="80" text-anchor="middle" font-size="8" fill="#ef4444">?</text>
+              <!-- Distance lines to k=3 neighbors -->
+              <line x1="167" y1="61" x2="139" y2="73" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <line x1="167" y1="61" x2="195" y2="52" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <line x1="167" y1="61" x2="111" y2="94" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <!-- Legend -->
+              <circle cx="60" cy="150" r="6" fill="#10b981"/>
+              <text x="70" y="154" font-size="9" fill="#10b981">Яблоко (2 из 3)</text>
+              <circle cx="160" cy="150" r="6" fill="#f59e0b"/>
+              <text x="170" y="154" font-size="9" fill="#f59e0b">Апельсин (1 из 3)</text>
+              <text x="290" y="154" font-size="9" fill="#ef4444">★ = новый фрукт</text>
+            </svg>
+            <div class="caption">Звёздочка — новый фрукт (170 г, 7.8 см). Пунктирный круг — радиус поиска. 3 ближайших соседа: №2 (яблоко), №6 (апельсин), №1 (яблоко). Голосование: Яблоко 2:1.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Новый фрукт (170 г, 7.8 см) классифицирован как <b>Яблоко</b>. Три ближайших соседа: расстояния 10.0, 10.0, 20.0.</p>

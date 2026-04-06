@@ -265,6 +265,44 @@ App.registerTopic({
             </div>
             <div class="why">Линейная модель проходит через центр тяжести (x̄, ȳ) и минимизирует сумму квадратов ошибок.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Цена квартиры = 9 + 2.7 · площадь</text>
+              <!-- Axes -->
+              <line x1="55" y1="20" x2="55" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="55" y1="140" x2="400" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <!-- Axis labels -->
+              <text x="228" y="158" text-anchor="middle" font-size="10" fill="#64748b">Площадь (м²)</text>
+              <text x="22" y="85" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,22,85)">Цена (тыс.)</text>
+              <!-- X ticks: 30, 40, 50, 60, 70 → mapped to x=97, 159, 221, 283, 345 -->
+              <text x="97" y="152" text-anchor="middle" font-size="9" fill="#64748b">30</text>
+              <text x="159" y="152" text-anchor="middle" font-size="9" fill="#64748b">40</text>
+              <text x="221" y="152" text-anchor="middle" font-size="9" fill="#64748b">50</text>
+              <text x="283" y="152" text-anchor="middle" font-size="9" fill="#64748b">60</text>
+              <text x="345" y="152" text-anchor="middle" font-size="9" fill="#64748b">70</text>
+              <!-- Y ticks: 90,120,140,170,200 → mapped (200=y30, 90=y129) scale: 1 unit = 0.9px, y=140-val*0.9+81 -->
+              <!-- y=140-(val-90)*0.6 : 90→116, 120→98, 140→86, 170→68, 200→50 -->
+              <text x="50" y="119" text-anchor="end" font-size="9" fill="#64748b">90</text>
+              <text x="50" y="101" text-anchor="end" font-size="9" fill="#64748b">120</text>
+              <text x="50" y="89" text-anchor="end" font-size="9" fill="#64748b">140</text>
+              <text x="50" y="71" text-anchor="end" font-size="9" fill="#64748b">170</text>
+              <text x="50" y="53" text-anchor="end" font-size="9" fill="#64748b">200</text>
+              <!-- Fitted line: y(30)=90→(97,119), y(70)=198→(345,52) -->
+              <line x1="75" y1="126" x2="370" y2="49" stroke="#3b82f6" stroke-width="2.5"/>
+              <text x="355" y="44" font-size="9" fill="#3b82f6">ŷ = 9 + 2.7x</text>
+              <!-- Data points (30,90),(40,120),(50,140),(60,170),(70,200) -->
+              <circle cx="97" cy="119" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="159" cy="101" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="221" cy="89" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="283" cy="71" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="345" cy="53" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <!-- Residual lines (from point to line) -->
+              <line x1="221" y1="89" x2="221" y2="83" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <line x1="283" y1="71" x2="283" y2="65" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+            </svg>
+            <div class="caption">5 точек (жёлтые) с подогнанной прямой (синяя). Красные пунктиры — остатки (residuals). Прямая проходит через центр тяжести (50, 144).</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Модель: <b>цена = 9 + 2.7 · площадь</b>. За каждый лишний м² квартира дорожает на 2700 руб.</p>

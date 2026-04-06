@@ -225,6 +225,34 @@ X̄₃₆ ~ N(3.5, 0.285²)  приблизительно</div>
             <p>Среднее 36 бросков: E = <b>3.5</b>, SE = <b>0.285</b>. В 95% случаев среднее окажется в [2.93, 4.07]. ЦПТ работает, хотя один бросок — совсем не нормальный.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">ЦПТ: равномерное → нормальное при росте n</text>
+              <!-- Left: uniform flat bars for n=1 (dice) -->
+              <text x="80" y="32" text-anchor="middle" font-size="10" fill="#64748b">n=1 (один бросок)</text>
+              <line x1="20" y1="110" x2="140" y2="110" stroke="#94a3b8" stroke-width="1"/>
+              <rect x="22"  y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <rect x="40"  y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <rect x="58"  y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <rect x="76"  y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <rect x="94"  y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <rect x="112" y="65" width="16" height="45" fill="#64748b" opacity="0.6" rx="1"/>
+              <text x="80" y="125" text-anchor="middle" font-size="9" fill="#64748b">равномерное</text>
+              <!-- Arrow -->
+              <text x="190" y="90" text-anchor="middle" font-size="22" fill="#94a3b8">→</text>
+              <text x="190" y="106" text-anchor="middle" font-size="8" fill="#64748b">n растёт</text>
+              <!-- Right: bell curve for n=36 -->
+              <text x="355" y="32" text-anchor="middle" font-size="10" fill="#64748b">n=36 (среднее)</text>
+              <line x1="240" y1="110" x2="460" y2="110" stroke="#94a3b8" stroke-width="1"/>
+              <path d="M240,110 C260,110 275,108 290,103 C305,97 315,86 325,72 C335,57 340,47 345,42 C350,38 353,36 355,35 C357,36 360,38 365,42 C370,47 375,57 385,72 C395,86 405,97 420,103 C435,108 450,110 460,110" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="2.5"/>
+              <text x="355" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">нормальное N(3.5, 0.285²)</text>
+              <!-- center line -->
+              <line x1="355" y1="35" x2="355" y2="110" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.6"/>
+              <text x="355" y="140" text-anchor="middle" font-size="9" fill="#3b82f6">μ=3.5</text>
+            </svg>
+            <div class="caption">Слева — исходное равномерное распределение (один бросок кубика). Справа — распределение среднего из 36 бросков: по ЦПТ оно нормальное N(3.5, 0.285²), хотя исходное совсем не нормальное.</div>
+          </div>
+
           <div class="lesson-box">ЦПТ не требует нормальности исходных данных. Кубик — равномерный, дискретный, «прямоугольный», но среднее бросков уже при n=36 — отличный колокол.</div>
         `
       },
@@ -274,6 +302,32 @@ n ≥ 7.84² = 61.5
             <p>Нужно <b>62 пациента</b> для точности ±5 мм при 95% уверенности. Для ±1 мм — уже 1537 пациентов (в 25 раз больше).</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">SE = σ/√n: чем больше n — тем уже колокол</text>
+              <!-- axis -->
+              <line x1="30" y1="130" x2="450" y2="130" stroke="#94a3b8" stroke-width="1.2"/>
+              <!-- center at x=240 for all curves -->
+              <!-- n=4: SE=0.855 → wide, scale 120px/unit, half-width = 0.855*120=102px -->
+              <path d="M90,130 C110,130 130,126 155,115 C170,108 185,94 200,78 C210,65 220,55 230,50 C235,47 238,46 240,45 C242,46 245,47 250,50 C260,55 270,65 280,78 C295,94 310,108 325,115 C350,126 370,130 390,130" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.8"/>
+              <!-- n=36: SE=0.285 → medium, half-width=0.285*120=34px -->
+              <path d="M180,130 C190,130 200,128 210,122 C218,117 224,109 230,98 C234,90 237,83 240,79 C243,83 246,90 250,98 C256,109 262,117 270,122 C280,128 290,130 300,130" fill="none" stroke="#10b981" stroke-width="2" opacity="0.85"/>
+              <!-- n=100: SE=0.171 → narrow, half-width=0.171*120=20px -->
+              <path d="M210,130 C216,130 221,128 226,122 C230,116 234,106 237,97 C239,90 240,85 240,82 C240,85 241,90 243,97 C246,106 250,116 254,122 C259,128 264,130 270,130" fill="none" stroke="#3b82f6" stroke-width="2.5" opacity="0.9"/>
+              <!-- center line -->
+              <line x1="240" y1="42" x2="240" y2="130" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="240" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=3.5</text>
+              <!-- legend -->
+              <rect x="40" y="42" width="18" height="3" fill="#f59e0b"/>
+              <text x="62" y="47" font-size="10" fill="#b45309">n=4,  SE=0.855 (широкий)</text>
+              <rect x="40" y="58" width="18" height="3" fill="#10b981"/>
+              <text x="62" y="63" font-size="10" fill="#047857">n=36, SE=0.285 (средний)</text>
+              <rect x="40" y="74" width="18" height="3" fill="#3b82f6"/>
+              <text x="62" y="79" font-size="10" fill="#1d4ed8">n=100, SE=0.171 (узкий)</text>
+            </svg>
+            <div class="caption">Три кривые показывают распределение выборочного среднего при n=4, 36, 100. Все центрированы на μ=3.5. При росте n кривая сужается по закону SE=σ/√n: чем больше выборка, тем точнее оценка среднего.</div>
+          </div>
+
           <div class="lesson-box">SE = σ/√n — главная формула планирования исследований. Она показывает, сколько данных нужно для заданной точности. Удвоение точности стоит в 4 раза дороже.</div>
         `
       },
@@ -319,6 +373,37 @@ s = 300 руб (выборочное std)
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>95% CI для среднего чека: <b>[1117, 1283] руб</b>. Ширина ±83 руб.</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 145" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">95% доверительный интервал: 1117–1283 руб</text>
+              <!-- number line -->
+              <line x1="40" y1="75" x2="420" y2="75" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- range: 1000..1400, map to x=40..420, scale=380/400=0.95px per rub -->
+              <!-- 1117 → 40+(117)*0.95=151, 1200→40+200*0.95=230, 1283→40+283*0.95=309 -->
+              <!-- CI bracket -->
+              <line x1="151" y1="60" x2="309" y2="60" stroke="#3b82f6" stroke-width="3"/>
+              <line x1="151" y1="52" x2="151" y2="68" stroke="#3b82f6" stroke-width="2.5"/>
+              <line x1="309" y1="52" x2="309" y2="68" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- point estimate -->
+              <circle cx="230" cy="75" r="7" fill="#3b82f6"/>
+              <line x1="230" y1="68" x2="230" y2="82" stroke="#3b82f6" stroke-width="2"/>
+              <!-- labels -->
+              <text x="151" y="85" text-anchor="middle" font-size="10" fill="#3b82f6">1117</text>
+              <text x="230" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#3b82f6">x̄=1200</text>
+              <text x="309" y="85" text-anchor="middle" font-size="10" fill="#3b82f6">1283</text>
+              <!-- CI label -->
+              <text x="230" y="50" text-anchor="middle" font-size="10" fill="#1d4ed8">← 95% CI: ±83 руб →</text>
+              <!-- axis ticks -->
+              <text x="40"  y="90" text-anchor="middle" font-size="9" fill="#64748b">1000</text>
+              <text x="230" y="90" text-anchor="middle" font-size="9" fill="#64748b"></text>
+              <text x="420" y="90" text-anchor="middle" font-size="9" fill="#64748b">1400</text>
+              <!-- "true mean" zone label -->
+              <text x="230" y="115" text-anchor="middle" font-size="10" fill="#475569">«Истинное среднее всех клиентов — где-то здесь»</text>
+              <text x="230" y="130" text-anchor="middle" font-size="9" fill="#64748b">в 95 случаях из 100 CI накрывает истинный параметр</text>
+            </svg>
+            <div class="caption">95% доверительный интервал для среднего чека: точечная оценка x̄=1200 (синяя точка), горизонтальная скобка — от 1117 до 1283 руб. ЦПТ гарантирует, что такой интервал накрывает истинное μ в 95% случаев.</div>
           </div>
 
           <div class="lesson-box">Доверительный интервал — прямое следствие ЦПТ. Формула: x̄ ± z × (s/√n). Чем больше выборка, тем уже интервал. Чем выше уверенность (99% вместо 95%), тем шире.</div>

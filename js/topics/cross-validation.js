@@ -270,6 +270,51 @@ Fold 5: test = точки 17–20, train = 1–16
             <div class="why">CV даёт не только среднее (0.90), но и разброс (±0.134). Большой std означает, что модель нестабильна. В нашем случае std=0.134 достаточно высокий — из-за маленького датасета (20 точек).</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">5-Fold CV: 20 точек → фолды по 4</text>
+              <!-- Row labels -->
+              <text x="38" y="44" text-anchor="end" font-size="10" fill="#64748b">Fold 1</text>
+              <text x="38" y="76" text-anchor="end" font-size="10" fill="#64748b">Fold 2</text>
+              <text x="38" y="108" text-anchor="end" font-size="10" fill="#64748b">Fold 3</text>
+              <text x="38" y="140" text-anchor="end" font-size="10" fill="#64748b">Fold 4+5</text>
+              <!-- Fold 1: test=pts 1-4, train=5-20 -->
+              <rect x="42" y="27" width="72" height="26" rx="4" fill="#f59e0b"/>
+              <text x="78" y="44" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">1–4 test</text>
+              <rect x="118" y="27" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="194" y="27" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="270" y="27" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="346" y="27" width="72" height="26" rx="4" fill="#6366f1"/>
+              <text x="268" y="44" text-anchor="middle" font-size="9" fill="#c7d2fe">5–20 train</text>
+              <text x="418" y="44" text-anchor="end" font-size="9" fill="#f59e0b">acc=1.00</text>
+              <!-- Fold 2 -->
+              <rect x="42" y="59" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="118" y="59" width="72" height="26" rx="4" fill="#f59e0b"/>
+              <text x="154" y="76" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">5–8 test</text>
+              <rect x="194" y="59" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="270" y="59" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="346" y="59" width="72" height="26" rx="4" fill="#6366f1"/>
+              <text x="418" y="76" text-anchor="end" font-size="9" fill="#f59e0b">acc=0.75</text>
+              <!-- Fold 3 -->
+              <rect x="42" y="91" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="118" y="91" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="194" y="91" width="72" height="26" rx="4" fill="#f59e0b"/>
+              <text x="230" y="108" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">9–12 test</text>
+              <rect x="270" y="91" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="346" y="91" width="72" height="26" rx="4" fill="#6366f1"/>
+              <text x="418" y="108" text-anchor="end" font-size="9" fill="#f59e0b">acc=1.00</text>
+              <!-- Fold 4+5 summary -->
+              <rect x="42" y="123" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="118" y="123" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="194" y="123" width="72" height="26" rx="4" fill="#6366f1"/>
+              <rect x="270" y="123" width="72" height="26" rx="4" fill="#f59e0b"/>
+              <text x="306" y="140" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">13–16,17–20</text>
+              <rect x="346" y="123" width="72" height="26" rx="4" fill="#f59e0b"/>
+              <text x="418" y="140" text-anchor="end" font-size="9" fill="#f59e0b">0.75, 1.00</text>
+            </svg>
+            <div class="caption">Каждый фолд (оранжевый) поочерёдно становится тестом. Accuracy по фолдам: [1.00, 0.75, 1.00, 0.75, 1.00] → среднее 0.90 ± 0.134.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>5-Fold CV на 20 точках: каждый фолд = 4 точки в test, 16 точек в train.</p>

@@ -225,6 +225,57 @@ App.registerTopic({
             <p>Выходной слой: $W^{(2)} = (0{,}6,\; -0{,}4)$, $b^{(2)} = 0{,}2$. Активация скрытого слоя: ReLU. Выход: линейный (регрессия).</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <marker id="nn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+              </defs>
+              <!-- Input layer: x1=1, x2=2 -->
+              <circle cx="60" cy="60" r="22" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+              <text x="60" y="57" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="600">x₁</text>
+              <text x="60" y="70" text-anchor="middle" font-size="10" fill="#1e40af">= 1</text>
+              <circle cx="60" cy="130" r="22" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+              <text x="60" y="127" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="600">x₂</text>
+              <text x="60" y="140" text-anchor="middle" font-size="10" fill="#1e40af">= 2</text>
+              <!-- Hidden layer: h1, h2 -->
+              <circle cx="230" cy="60" r="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+              <text x="230" y="57" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">h₁</text>
+              <text x="230" y="70" text-anchor="middle" font-size="10" fill="#92400e">1.0</text>
+              <circle cx="230" cy="130" r="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+              <text x="230" y="127" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">h₂</text>
+              <text x="230" y="140" text-anchor="middle" font-size="10" fill="#92400e">0.8</text>
+              <!-- Output layer -->
+              <circle cx="390" cy="95" r="22" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+              <text x="390" y="92" text-anchor="middle" font-size="11" fill="#065f46" font-weight="600">ŷ</text>
+              <text x="390" y="105" text-anchor="middle" font-size="10" fill="#065f46">0.48</text>
+              <!-- Edges x1→h1: w=0.5 -->
+              <line x1="82" y1="60" x2="208" y2="60" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
+              <text x="145" y="52" text-anchor="middle" font-size="9" fill="#6366f1">0.5</text>
+              <!-- Edges x1→h2: w=-0.3 -->
+              <line x1="80" y1="68" x2="210" y2="122" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
+              <text x="148" y="105" text-anchor="middle" font-size="9" fill="#6366f1">−0.3</text>
+              <!-- Edges x2→h1: w=0.2 -->
+              <line x1="80" y1="122" x2="210" y2="68" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
+              <text x="148" y="87" text-anchor="middle" font-size="9" fill="#6366f1">0.2</text>
+              <!-- Edges x2→h2: w=0.8 -->
+              <line x1="82" y1="130" x2="208" y2="130" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
+              <text x="145" y="143" text-anchor="middle" font-size="9" fill="#6366f1">0.8</text>
+              <!-- Edges h1→out: w=0.6 -->
+              <line x1="252" y1="67" x2="368" y2="88" stroke="#10b981" stroke-width="1.8" marker-end="url(#nn-arr)"/>
+              <text x="310" y="72" text-anchor="middle" font-size="9" fill="#10b981">0.6</text>
+              <!-- Edges h2→out: w=-0.4 -->
+              <line x1="252" y1="123" x2="368" y2="102" stroke="#10b981" stroke-width="1.8" marker-end="url(#nn-arr)"/>
+              <text x="310" y="122" text-anchor="middle" font-size="9" fill="#10b981">−0.4</text>
+              <!-- Layer labels -->
+              <text x="60" y="165" text-anchor="middle" font-size="9" fill="#64748b">вход</text>
+              <text x="230" y="165" text-anchor="middle" font-size="9" fill="#64748b">скрытый (ReLU)</text>
+              <text x="390" y="165" text-anchor="middle" font-size="9" fill="#64748b">выход</text>
+            </svg>
+            <div class="caption">Сеть 2→2→1: веса на рёбрах, значения активаций внутри узлов после forward pass (x=(1,2)). Скрытый слой: ReLU(z). Выход: 0.48.</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>Слой</th><th>Операция</th><th>Результат</th></tr>

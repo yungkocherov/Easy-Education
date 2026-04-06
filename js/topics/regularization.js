@@ -277,6 +277,57 @@ lambda=100:  8.9       9.1       0.2   (явный underfit)
             <div class="why">Классическая кривая: при росте lambda train MSE растёт (теряем качество на train), val MSE сначала падает (борьба с overfit), потом растёт (underfit). Минимум val MSE = оптимальный lambda. Подбирать через CV.</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Ridge: веса сжимаются с ростом λ</text>
+              <!-- Y-axis (feature labels) -->
+              <text x="88" y="52" text-anchor="end" font-size="10" fill="#334155">Площадь</text>
+              <text x="88" y="85" text-anchor="end" font-size="10" fill="#334155">До метро</text>
+              <text x="88" y="118" text-anchor="end" font-size="10" fill="#334155">Год постр.</text>
+              <text x="88" y="151" text-anchor="end" font-size="10" fill="#334155">Этаж</text>
+              <!-- Baseline -->
+              <line x1="95" y1="28" x2="95" y2="158" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- λ=0 bars (rightward for positive, leftward-equivalent shown as positive widths) -->
+              <!-- Площадь: 12.5 → bar width proportional, use scale 1px = 2.8 units → 35px for 12.5, max scale  -->
+              <!-- Using scale: 1px per 0.33 weight unit, max ~350px for 12.5 -->
+              <!-- Scale: width = weight * 28 (max 12.5 → 350, compressed: * 14) -->
+              <!-- λ=0: 12.5, 8.9, 3.2, 0.85 | λ=0.1: 11.8, 8.4, 3.0, 0.80 | λ=1: 8.7, 6.2, 2.1, 0.55 | λ=10: 3.2, 2.3, 0.75, 0.18 -->
+              <!-- Groups of 4 bars per feature. Bar height=10, gap=2 -->
+              <!-- Feature 1: Площадь (y centers: 34, 44, 54, 64) -->
+              <rect x="95" y="32" width="175" height="9" rx="2" fill="#64748b" opacity="0.5"/>
+              <rect x="95" y="42" width="165" height="9" rx="2" fill="#3b82f6" opacity="0.7"/>
+              <rect x="95" y="52" width="122" height="9" rx="2" fill="#f59e0b" opacity="0.85"/>
+              <rect x="95" y="62" width="45" height="9" rx="2" fill="#ef4444"/>
+              <!-- Feature 2: До метро (y: 68,78,88,98) -->
+              <rect x="95" y="68" width="125" height="9" rx="2" fill="#64748b" opacity="0.5"/>
+              <rect x="95" y="78" width="118" height="9" rx="2" fill="#3b82f6" opacity="0.7"/>
+              <rect x="95" y="88" width="87" height="9" rx="2" fill="#f59e0b" opacity="0.85"/>
+              <rect x="95" y="98" width="32" height="9" rx="2" fill="#ef4444"/>
+              <!-- Feature 3: Год постройки (y: 104,114,124,134) -->
+              <rect x="95" y="104" width="45" height="9" rx="2" fill="#64748b" opacity="0.5"/>
+              <rect x="95" y="114" width="42" height="9" rx="2" fill="#3b82f6" opacity="0.7"/>
+              <rect x="95" y="124" width="29" height="9" rx="2" fill="#f59e0b" opacity="0.85"/>
+              <rect x="95" y="134" width="11" height="9" rx="2" fill="#ef4444"/>
+              <!-- Feature 4: Этаж (y: 140,150) abbreviated -->
+              <rect x="95" y="140" width="12" height="9" rx="2" fill="#64748b" opacity="0.5"/>
+              <rect x="95" y="150" width="3" height="9" rx="2" fill="#ef4444"/>
+              <!-- Arrow λ↑ -->
+              <text x="295" y="90" font-size="22" fill="#ef4444">→</text>
+              <text x="320" y="80" font-size="11" font-weight="600" fill="#ef4444">λ↑</text>
+              <text x="320" y="95" font-size="10" fill="#64748b">веса →0</text>
+              <!-- Legend -->
+              <rect x="95" y="4" width="10" height="8" rx="1" fill="#64748b" opacity="0.5"/>
+              <text x="108" y="11" font-size="9" fill="#64748b">λ=0</text>
+              <rect x="140" y="4" width="10" height="8" rx="1" fill="#3b82f6" opacity="0.8"/>
+              <text x="153" y="11" font-size="9" fill="#3b82f6">λ=0.1</text>
+              <rect x="195" y="4" width="10" height="8" rx="1" fill="#f59e0b"/>
+              <text x="208" y="11" font-size="9" fill="#f59e0b">λ=1.0</text>
+              <rect x="245" y="4" width="10" height="8" rx="1" fill="#ef4444"/>
+              <text x="258" y="11" font-size="9" fill="#ef4444">λ=10</text>
+            </svg>
+            <div class="caption">Ridge сжимает все 4 веса с ростом λ (слева — большие веса, справа — маленькие). Самый большой признак (Площадь) сжимается с 12.5 до 3.2. Ни один вес не обнуляется.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Ridge сжимает все веса пропорционально, но никогда не обнуляет их.</p>

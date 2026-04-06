@@ -292,6 +292,75 @@ App.registerTopic({
             </div>
             <div class="why">Если не ограничивать признаки — доминирующий признак попадёт в корень всех деревьев, и они станут похожими. Разнообразие ключевое для Random Forest.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 155" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Bootstrap: выборка 10 элементов с возвращением</text>
+              <!-- Original dataset: indices 1-10 -->
+              <text x="50" y="38" font-size="10" fill="#64748b" font-weight="600">Оригинал:</text>
+              <text x="50" y="52" font-size="9" fill="#64748b">Индексы 1–10</text>
+              <!-- Boxes for original 1-10 -->
+              <rect x="130" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="142" y="46" text-anchor="middle" font-size="10" fill="#3730a3">1</text>
+              <rect x="158" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="170" y="46" text-anchor="middle" font-size="10" fill="#3730a3">2</text>
+              <rect x="186" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="198" y="46" text-anchor="middle" font-size="10" fill="#3730a3">3</text>
+              <rect x="214" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="226" y="46" text-anchor="middle" font-size="10" fill="#3730a3">4</text>
+              <rect x="242" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="254" y="46" text-anchor="middle" font-size="10" fill="#3730a3">5</text>
+              <rect x="270" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="282" y="46" text-anchor="middle" font-size="10" fill="#3730a3">6</text>
+              <rect x="298" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="310" y="46" text-anchor="middle" font-size="10" fill="#3730a3">7</text>
+              <rect x="326" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="338" y="46" text-anchor="middle" font-size="10" fill="#3730a3">8</text>
+              <rect x="354" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="366" y="46" text-anchor="middle" font-size="10" fill="#3730a3">9</text>
+              <rect x="382" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="394" y="46" text-anchor="middle" font-size="10" fill="#3730a3">10</text>
+              <!-- Arrow down -->
+              <text x="230" y="74" text-anchor="middle" font-size="16" fill="#64748b">↓ с возвращением</text>
+              <!-- Bootstrap sample: [3,7,3,1,9,2,5,3,8,1] -->
+              <text x="50" y="100" font-size="10" fill="#64748b" font-weight="600">Bootstrap:</text>
+              <text x="50" y="114" font-size="9" fill="#64748b">выборка дерева 1</text>
+              <!-- 3 repeated -->
+              <rect x="130" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="142" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
+              <rect x="158" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="170" y="104" text-anchor="middle" font-size="10" fill="#3730a3">7</text>
+              <!-- 3 repeated again -->
+              <rect x="186" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="198" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
+              <rect x="214" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="226" y="104" text-anchor="middle" font-size="10" fill="#3730a3">1</text>
+              <rect x="242" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="254" y="104" text-anchor="middle" font-size="10" fill="#3730a3">9</text>
+              <rect x="270" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="282" y="104" text-anchor="middle" font-size="10" fill="#3730a3">2</text>
+              <rect x="298" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="310" y="104" text-anchor="middle" font-size="10" fill="#3730a3">5</text>
+              <!-- 3 third time -->
+              <rect x="326" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="338" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
+              <rect x="354" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="366" y="104" text-anchor="middle" font-size="10" fill="#3730a3">8</text>
+              <!-- 1 repeated -->
+              <rect x="382" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="394" y="104" text-anchor="middle" font-size="10" fill="#065f46">1</text>
+              <!-- OOB label -->
+              <text x="50" y="135" font-size="10" fill="#ef4444" font-weight="600">OOB (не попали):</text>
+              <rect x="178" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="190" y="138" text-anchor="middle" font-size="10" fill="#991b1b">4</text>
+              <rect x="206" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="218" y="138" text-anchor="middle" font-size="10" fill="#991b1b">6</text>
+              <rect x="234" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="246" y="138" text-anchor="middle" font-size="10" fill="#991b1b">10</text>
+              <text x="275" y="138" font-size="9" fill="#ef4444">← ~36.8% пропущено</text>
+            </svg>
+            <div class="caption">Bootstrap: зелёные клетки повторяются (3 встречается трижды, 1 дважды). Красные клетки (4, 6, 10) не попали — это OOB примеры для оценки качества без test set.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Bootstrap + random features = два уровня рандомизации. Вместе они гарантируют разнообразие деревьев и снижают variance ансамбля по сравнению с одним деревом.</p>

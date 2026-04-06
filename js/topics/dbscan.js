@@ -282,6 +282,56 @@ App.registerTopic({
             </div>
             <div class="why">Border точки принадлежат кластеру ближайшей Core точки. Noise точки не достижимы ни из одной Core точки.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">DBSCAN: 10 точек (eps=1.5, minPts=3)</text>
+              <!-- Scale: x=(coord)*35+30; y=155-coord*22 -->
+              <!-- Cluster 1: P1(1,1)→(65,133), P2(1.5,1.5)→(82,122), P3(2,1)→(100,133), P4(2,2.5)→(100,100) -->
+              <!-- Cluster 2: P5(5,5)→(205,45), P6(5.5,5.5)→(222,33), P7(6,5)→(240,45), P8(5.5,4.5)→(222,56) -->
+              <!-- Noise: P9(9,1)→(345,133), P10(3,4)→(135,67) -->
+              <!-- eps circle around P2 (core) -->
+              <circle cx="82" cy="122" r="52" fill="#3b82f6" fill-opacity="0.08" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <text x="50" y="75" font-size="8" fill="#3b82f6">ε=1.5</text>
+              <!-- Cluster 1 dots -->
+              <!-- P2 = Core -->
+              <circle cx="82" cy="122" r="10" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2.5"/>
+              <text x="82" y="119" text-anchor="middle" font-size="7" fill="#fff">P2</text>
+              <text x="82" y="138" text-anchor="middle" font-size="7" fill="#3b82f6">Core</text>
+              <!-- P1, P3, P4 = Border -->
+              <circle cx="65" cy="133" r="8" fill="#93c5fd" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="65" y="130" text-anchor="middle" font-size="7" fill="#1d4ed8">P1</text>
+              <circle cx="100" cy="133" r="8" fill="#93c5fd" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="100" y="130" text-anchor="middle" font-size="7" fill="#1d4ed8">P3</text>
+              <circle cx="100" cy="100" r="8" fill="#93c5fd" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="100" y="97" text-anchor="middle" font-size="7" fill="#1d4ed8">P4</text>
+              <!-- Cluster 2 dots (all Core) -->
+              <circle cx="205" cy="45" r="10" fill="#10b981" stroke="#065f46" stroke-width="2.5"/>
+              <text x="205" y="42" text-anchor="middle" font-size="7" fill="#fff">P5</text>
+              <circle cx="222" cy="33" r="10" fill="#10b981" stroke="#065f46" stroke-width="2.5"/>
+              <text x="222" y="30" text-anchor="middle" font-size="7" fill="#fff">P6</text>
+              <circle cx="240" cy="45" r="10" fill="#10b981" stroke="#065f46" stroke-width="2.5"/>
+              <text x="240" y="42" text-anchor="middle" font-size="7" fill="#fff">P7</text>
+              <circle cx="222" cy="56" r="10" fill="#10b981" stroke="#065f46" stroke-width="2.5"/>
+              <text x="222" y="53" text-anchor="middle" font-size="7" fill="#fff">P8</text>
+              <text x="222" y="74" text-anchor="middle" font-size="7" fill="#10b981">Core×4</text>
+              <!-- Noise points -->
+              <circle cx="345" cy="133" r="8" fill="#64748b" stroke="#475569" stroke-width="1.5"/>
+              <text x="345" y="130" text-anchor="middle" font-size="7" fill="#fff">P9</text>
+              <text x="345" y="148" text-anchor="middle" font-size="7" fill="#64748b">Noise</text>
+              <circle cx="135" cy="67" r="8" fill="#64748b" stroke="#475569" stroke-width="1.5"/>
+              <text x="135" y="64" text-anchor="middle" font-size="7" fill="#fff">P10</text>
+              <text x="135" y="82" text-anchor="middle" font-size="7" fill="#64748b">Noise</text>
+              <!-- Legend -->
+              <circle cx="275" cy="100" r="7" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="286" y="104" font-size="9" fill="#3b82f6">Core (P2,P5-P8)</text>
+              <circle cx="275" cy="120" r="7" fill="#93c5fd" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="286" y="124" font-size="9" fill="#3b82f6">Border (P1,P3,P4)</text>
+              <circle cx="275" cy="140" r="7" fill="#64748b" stroke="#475569" stroke-width="1.5"/>
+              <text x="286" y="144" font-size="9" fill="#64748b">Noise (P9,P10)</text>
+            </svg>
+            <div class="caption">Синий кластер {P1-P4}: P2 — Core (3 соседа), P1/P3/P4 — Border. Зелёный кластер {P5-P8}: все Core. Серые P9 и P10 — Noise (0 соседей в радиусе eps=1.5). Пунктир — eps-окрестность P2.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>2 кластера. Кластер 1: {P1-P4}. Кластер 2: {P5-P8}. Шум: {P9, P10}. Core точки: P2, P5, P6, P7, P8. Border: P1, P3, P4.</p>

@@ -280,6 +280,69 @@ App.registerTopic({
               Назначения не изменились → <b>сходимость!</b>
             </div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 440 165" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
+              <text x="220" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">K-Means: 2 итерации на 6 точках (k=2)</text>
+              <!-- Left panel: Iteration 1 -->
+              <text x="110" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Итерация 1</text>
+              <!-- Axes left -->
+              <line x1="30" y1="42" x2="30" y2="148" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="30" y1="148" x2="210" y2="148" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- Scale: x=(coord-0)*26+30, y=148-(coord-0)*18 -->
+              <!-- Points: A(1,1),B(1.5,2),C(2,1),D(5,4),E(5,5),F(6,4) -->
+              <!-- Left panel (x: *26+30, y: 148-*18) -->
+              <!-- Cluster 1 points (blue): A(56,130), B(69,112), C(82,130) -->
+              <circle cx="56" cy="130" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="56" y="126" text-anchor="middle" font-size="7" fill="#fff">A</text>
+              <circle cx="69" cy="112" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="69" y="108" text-anchor="middle" font-size="7" fill="#fff">B</text>
+              <circle cx="82" cy="130" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="82" y="126" text-anchor="middle" font-size="7" fill="#fff">C</text>
+              <!-- Cluster 2 points (orange): D(160,76), E(160,58), F(186,76) -->
+              <circle cx="160" cy="76" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="160" y="72" text-anchor="middle" font-size="7" fill="#fff">D</text>
+              <circle cx="160" cy="58" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="160" y="54" text-anchor="middle" font-size="7" fill="#fff">E</text>
+              <circle cx="186" cy="76" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="186" y="72" text-anchor="middle" font-size="7" fill="#fff">F</text>
+              <!-- Initial centroids: μ1=A(56,130), μ2=E(160,58) -->
+              <circle cx="56" cy="130" r="12" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="4,3"/>
+              <text x="44" y="148" font-size="8" fill="#3b82f6">μ₁=A</text>
+              <circle cx="160" cy="58" r="12" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="4,3"/>
+              <text x="160" y="46" text-anchor="middle" font-size="8" fill="#f59e0b">μ₂=E</text>
+              <!-- Arrow between panels -->
+              <text x="218" y="95" font-size="20" fill="#64748b">→</text>
+              <!-- Right panel: After Update -->
+              <text x="330" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">После обновления μ</text>
+              <!-- Axes right -->
+              <line x1="245" y1="42" x2="245" y2="148" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="245" y1="148" x2="425" y2="148" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- Same points shifted by +215 on x -->
+              <circle cx="271" cy="130" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="271" y="126" text-anchor="middle" font-size="7" fill="#fff">A</text>
+              <circle cx="284" cy="112" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="284" y="108" text-anchor="middle" font-size="7" fill="#fff">B</text>
+              <circle cx="297" cy="130" r="7" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
+              <text x="297" y="126" text-anchor="middle" font-size="7" fill="#fff">C</text>
+              <circle cx="375" cy="76" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="375" y="72" text-anchor="middle" font-size="7" fill="#fff">D</text>
+              <circle cx="375" cy="58" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="375" y="54" text-anchor="middle" font-size="7" fill="#fff">E</text>
+              <circle cx="401" cy="76" r="7" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+              <text x="401" y="72" text-anchor="middle" font-size="7" fill="#fff">F</text>
+              <!-- New centroids: μ1=(1.5,1.33)→(69,124), μ2=(5.33,4.33)→(383,70) -->
+              <circle cx="284" cy="124" r="9" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2.5"/>
+              <text x="275" y="148" font-size="8" fill="#3b82f6">μ₁'</text>
+              <circle cx="383" cy="70" r="9" fill="#f59e0b" stroke="#d97706" stroke-width="2.5"/>
+              <text x="396" y="68" font-size="8" fill="#f59e0b">μ₂'</text>
+              <!-- Arrows from old to new centroids -->
+              <line x1="271" y1="130" x2="282" y2="125" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr)"/>
+              <line x1="375" y1="58" x2="383" y2="71" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="330" y="158" text-anchor="middle" font-size="9" fill="#10b981">Сходимость!</text>
+            </svg>
+            <div class="caption">Слева: исходные центроиды μ₁=A(1,1), μ₂=E(5,5). Справа: после Assign+Update центроиды сдвинулись к центрам кластеров. Итерация 2 — назначения не меняются → сходимость.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>K-Means сошёлся за 2 итерации. Кластер 1: {A, B, C} с центром (1.5, 1.33). Кластер 2: {D, E, F} с центром (5.33, 4.33). Inertia = сумма квадратов расстояний до центров ≈ 3.1.</p>

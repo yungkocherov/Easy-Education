@@ -281,6 +281,40 @@ else:
             </div>
             <div class="why">Признак «Долги» лучше всех: правая ветка абсолютно чистая. Правило жёсткое и понятное.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 440 165" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
+              <text x="220" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево решений: одобрение кредита</text>
+              <!-- Root node -->
+              <rect x="155" y="26" width="130" height="38" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+              <text x="220" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#3730a3">Есть долги?</text>
+              <text x="220" y="58" text-anchor="middle" font-size="9" fill="#6366f1">Gini=0.50, n=6</text>
+              <!-- Left branch: Да → Отказать -->
+              <line x1="185" y1="64" x2="110" y2="100" stroke="#ef4444" stroke-width="2"/>
+              <text x="138" y="88" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="600">Да</text>
+              <rect x="55" y="100" width="110" height="38" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+              <text x="110" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">Отказать</text>
+              <text x="110" y="131" text-anchor="middle" font-size="9" fill="#ef4444">Gini=0.0, n=2</text>
+              <!-- Right branch: Нет → second split -->
+              <line x1="255" y1="64" x2="330" y2="100" stroke="#10b981" stroke-width="2"/>
+              <text x="302" y="88" text-anchor="middle" font-size="9" fill="#10b981" font-weight="600">Нет</text>
+              <rect x="270" y="100" width="130" height="38" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+              <text x="335" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#065f46">Зарплата ≥ 65?</text>
+              <text x="335" y="131" text-anchor="middle" font-size="9" fill="#10b981">Gini=0.375, n=4</text>
+              <!-- Level 2 from "Зарплата >= 65?" -->
+              <line x1="300" y1="138" x2="260" y2="155" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="270" y="150" text-anchor="middle" font-size="8" fill="#ef4444">Нет</text>
+              <rect x="215" y="152" width="80" height="10" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+              <text x="255" y="160" text-anchor="middle" font-size="8" fill="#991b1b">Отказать</text>
+              <line x1="370" y1="138" x2="405" y2="155" stroke="#10b981" stroke-width="1.5"/>
+              <text x="396" y="150" text-anchor="middle" font-size="8" fill="#10b981">Да</text>
+              <rect x="362" y="152" width="80" height="10" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+              <text x="402" y="160" text-anchor="middle" font-size="8" fill="#065f46">Одобрить</text>
+              <!-- Gain labels -->
+              <text x="110" y="95" text-anchor="middle" font-size="8" fill="#ef4444">Gain=0.250</text>
+            </svg>
+            <div class="caption">Дерево решений для кредита. Корень: «Есть долги?» — лучший сплит (Gain=0.25). Левая ветка (Да) — чистый лист Отказать. Правая (Нет) — второй уровень по зарплате.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Первое разбиение: «Есть долги?». Да → Отказать. Нет → второй уровень. Дерево глубиной 2 классифицирует все 6 примеров без ошибок.</p>

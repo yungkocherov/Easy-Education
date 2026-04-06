@@ -228,6 +228,69 @@ App.registerTopic({
             <p>Прогнать последовательность $x = (1,\; 0,\; -1)$ через простую RNN с размером hidden state $h = 1$ (скалярный). Веса: $W_{xh} = 0{,}5$, $W_{hh} = 0{,}8$, $b_h = 0{,}1$. Начальное состояние $h_0 = 0$. Вычислить $h_1, h_2, h_3$.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 155" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <marker id="rnn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+                <marker id="rnn-arr-b" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#3b82f6"/>
+                </marker>
+              </defs>
+              <!-- h0 box -->
+              <rect x="10" y="55" width="60" height="44" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+              <text x="40" y="74" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">h₀</text>
+              <text x="40" y="88" text-anchor="middle" font-size="10" fill="#64748b">= 0</text>
+              <!-- Arrow h0 → RNN1 -->
+              <line x1="70" y1="77" x2="100" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
+              <!-- x1 input arrow -->
+              <line x1="130" y1="10" x2="130" y2="52" stroke="#f59e0b" stroke-width="2" marker-end="url(#rnn-arr)"/>
+              <text x="130" y="8" text-anchor="middle" font-size="10" fill="#f59e0b" font-weight="600">x₁=1</text>
+              <!-- RNN step 1 box -->
+              <rect x="100" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+              <text x="130" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
+              <text x="130" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₁=0.54</text>
+              <!-- Arrow RNN1 → RNN2 -->
+              <line x1="160" y1="77" x2="190" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
+              <!-- x2 input arrow -->
+              <line x1="220" y1="10" x2="220" y2="52" stroke="#f59e0b" stroke-width="2" marker-end="url(#rnn-arr)"/>
+              <text x="220" y="8" text-anchor="middle" font-size="10" fill="#f59e0b" font-weight="600">x₂=0</text>
+              <!-- RNN step 2 box -->
+              <rect x="190" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+              <text x="220" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
+              <text x="220" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₂=0.49</text>
+              <!-- Arrow RNN2 → RNN3 -->
+              <line x1="250" y1="77" x2="280" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
+              <!-- x3 input arrow -->
+              <line x1="310" y1="10" x2="310" y2="52" stroke="#ef4444" stroke-width="2" marker-end="url(#rnn-arr)"/>
+              <text x="310" y="8" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="600">x₃=−1</text>
+              <!-- RNN step 3 box -->
+              <rect x="280" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+              <text x="310" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
+              <text x="310" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₃=−0.01</text>
+              <!-- Arrow to output -->
+              <line x1="340" y1="77" x2="380" y2="77" stroke="#64748b" stroke-width="1.8" marker-end="url(#rnn-arr)"/>
+              <text x="400" y="74" text-anchor="middle" font-size="10" fill="#64748b">выход</text>
+              <!-- Recurrent connection labels -->
+              <text x="85" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
+              <text x="175" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
+              <text x="265" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
+              <!-- Time axis -->
+              <line x1="10" y1="118" x2="370" y2="118" stroke="#64748b" stroke-width="1" marker-end="url(#rnn-arr)"/>
+              <text x="190" y="132" text-anchor="middle" font-size="9" fill="#64748b">время →</text>
+              <text x="40" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=0</text>
+              <text x="130" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=1</text>
+              <text x="220" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=2</text>
+              <text x="310" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=3</text>
+              <!-- Weights legend -->
+              <text x="390" y="120" font-size="8" fill="#64748b">W_xh=0.5</text>
+              <text x="390" y="132" font-size="8" fill="#3b82f6">W_hh=0.8</text>
+              <text x="390" y="144" font-size="8" fill="#64748b">b=0.1</text>
+            </svg>
+            <div class="caption">RNN forward на 3 шагах: каждый блок получает вход xₜ и скрытое состояние hₜ₋₁, выдаёт hₜ=tanh(). h₁=0.54 → h₂=0.49 (память затухает) → h₃=−0.01 (отрицательный вход побеждает).</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>Шаг $t$</th><th>Вход $x_t$</th><th>Предыдущее $h_{t-1}$</th><th>$z_t = W_{xh}x_t + W_{hh}h_{t-1} + b$</th><th>$h_t = \\tanh(z_t)$</th></tr>

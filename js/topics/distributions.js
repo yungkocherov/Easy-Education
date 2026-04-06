@@ -208,6 +208,57 @@ App.registerTopic({
             <p>~<b>68%</b> мужчин имеют рост 169–183 см. Рост выше <b>197 см</b> (~3σ) — экстремально редкий (<0.15%).</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <defs>
+                <linearGradient id="band1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.55"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1"/>
+                </linearGradient>
+                <linearGradient id="band2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.45"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.08"/>
+                </linearGradient>
+                <linearGradient id="band3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.06"/>
+                </linearGradient>
+              </defs>
+              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Правило трёх сигм N(176, 7²)</text>
+              <!-- axis -->
+              <line x1="30" y1="130" x2="450" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- μ=176 → x=240, σ=7 → 60px; ±3σ covers x=60..420 -->
+              <!-- 99.7% band: −3σ→180−3*60=x=−0=60 to +3σ→420 -->
+              <path d="M60,130 L60,128 C80,120 100,105 120,87 C140,68 160,50 180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 C320,50 340,68 360,87 C380,105 400,120 420,128 L420,130 Z" fill="url(#band3)"/>
+              <!-- 95% band: −2σ→120 to +2σ→360 -->
+              <path d="M120,130 L120,87 C140,68 160,50 180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 C320,50 340,68 360,87 L360,130 Z" fill="url(#band2)"/>
+              <!-- 68% band: −1σ→180 to +1σ→300 -->
+              <path d="M180,130 L180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 L300,130 Z" fill="url(#band1)"/>
+              <!-- bell outline -->
+              <path d="M30,130 C50,130 65,128 80,122 C100,113 120,95 140,75 C160,54 175,38 185,30 C200,21 220,17 240,16 C260,17 280,21 295,30 C305,38 320,54 340,75 C360,95 380,113 400,122 C415,128 430,130 450,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- sigma lines -->
+              <line x1="180" y1="37" x2="180" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="300" y1="37" x2="300" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="120" y1="87" x2="120" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="360" y1="87" x2="360" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="60"  y1="128" x2="60"  y2="130" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+              <line x1="420" y1="128" x2="420" y2="130" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+              <!-- labels -->
+              <text x="240" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=176</text>
+              <text x="180" y="145" text-anchor="middle" font-size="9" fill="#3b82f6">−1σ</text>
+              <text x="300" y="145" text-anchor="middle" font-size="9" fill="#3b82f6">+1σ</text>
+              <text x="120" y="145" text-anchor="middle" font-size="9" fill="#10b981">−2σ</text>
+              <text x="360" y="145" text-anchor="middle" font-size="9" fill="#10b981">+2σ</text>
+              <text x="60"  y="145" text-anchor="middle" font-size="9" fill="#f59e0b">−3σ</text>
+              <text x="420" y="145" text-anchor="middle" font-size="9" fill="#f59e0b">+3σ</text>
+              <!-- band labels -->
+              <text x="240" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">68%</text>
+              <text x="155" y="110" text-anchor="middle" font-size="10" fill="#059669">95%</text>
+              <text x="85"  y="125" text-anchor="middle" font-size="10" fill="#b45309">99.7%</text>
+            </svg>
+            <div class="caption">Три «полосы» нормального распределения N(176, 7²). Синяя зона (±1σ, 169–183 см) — 68% мужчин. Зелёная (±2σ) — 95%. Янтарная (±3σ) — 99.7%.</div>
+          </div>
+
           <div class="lesson-box">Правило 68-95-99.7 позволяет быстро оценивать вероятности без калькулятора. Работает только для нормального распределения.</div>
         `
       },
@@ -267,6 +318,52 @@ std = √4.2 ≈ 2.05</div>
             <p>P(ровно 8 кликов) ≈ <b>11.4%</b>. P(10+ кликов) ≈ <b>4.8%</b> — значимо на уровне 5%.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">PMF: Bin(20, 0.3) — подсвечен k=8</text>
+              <!-- axes -->
+              <line x1="30" y1="135" x2="460" y2="135" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="30" y1="135" x2="30" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Bin(20,0.3) PMF approximate values for k=0..12 (max prob ~0.192 at k=6) -->
+              <!-- heights scaled so max bar height = 100px, P(k=6)≈0.192 → 100px scale=521 -->
+              <!-- k: 0→P≈0.001, 1→0.007, 2→0.028, 3→0.072, 4→0.130, 5→0.179, 6→0.192, 7→0.164, 8→0.114, 9→0.065, 10→0.031, 11→0.012, 12→0.004 -->
+              <!-- bar x positions: x=40+k*35, width=22 -->
+              <rect x="40"  y="134" width="22" height="1"   fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=0 -->
+              <rect x="75"  y="131" width="22" height="4"   fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=1 -->
+              <rect x="110" y="120" width="22" height="15"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=2 -->
+              <rect x="145" y="98"  width="22" height="37"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=3 -->
+              <rect x="180" y="68"  width="22" height="67"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=4 -->
+              <rect x="215" y="42"  width="22" height="93"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=5 -->
+              <rect x="250" y="35"  width="22" height="100" fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=6 -->
+              <rect x="285" y="50"  width="22" height="85"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=7 -->
+              <!-- k=8 highlighted -->
+              <rect x="320" y="76"  width="22" height="59"  fill="#ef4444" opacity="0.85" rx="2"/> <!-- k=8 highlighted -->
+              <rect x="355" y="101" width="22" height="34"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=9 -->
+              <rect x="390" y="119" width="22" height="16"  fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=10 -->
+              <rect x="425" y="129" width="22" height="6"   fill="#3b82f6" opacity="0.7" rx="2"/> <!-- k=11 -->
+              <!-- x labels -->
+              <text x="51"  y="150" text-anchor="middle" font-size="9" fill="#334155">0</text>
+              <text x="86"  y="150" text-anchor="middle" font-size="9" fill="#334155">1</text>
+              <text x="121" y="150" text-anchor="middle" font-size="9" fill="#334155">2</text>
+              <text x="156" y="150" text-anchor="middle" font-size="9" fill="#334155">3</text>
+              <text x="191" y="150" text-anchor="middle" font-size="9" fill="#334155">4</text>
+              <text x="226" y="150" text-anchor="middle" font-size="9" fill="#334155">5</text>
+              <text x="261" y="150" text-anchor="middle" font-size="9" fill="#334155">6</text>
+              <text x="296" y="150" text-anchor="middle" font-size="9" fill="#334155">7</text>
+              <text x="331" y="150" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="600">8</text>
+              <text x="366" y="150" text-anchor="middle" font-size="9" fill="#334155">9</text>
+              <text x="401" y="150" text-anchor="middle" font-size="9" fill="#334155">10</text>
+              <text x="436" y="150" text-anchor="middle" font-size="9" fill="#334155">11</text>
+              <!-- annotation -->
+              <line x1="331" y1="74" x2="360" y2="55" stroke="#ef4444" stroke-width="1"/>
+              <text x="365" y="50" font-size="10" fill="#ef4444" font-weight="600">P(8) ≈ 11.4%</text>
+              <!-- mean line -->
+              <line x1="261" y1="30" x2="261" y2="135" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,2"/>
+              <text x="261" y="25" text-anchor="middle" font-size="9" fill="#64748b">μ=6</text>
+            </svg>
+            <div class="caption">PMF биномиального Bin(20, p=0.3). Наиболее вероятны k=6 (μ=np=6). Столбик k=8 выделен красным — P(X=8) ≈ 11.4%, примерно на 1σ правее среднего.</div>
+          </div>
+
           <div class="lesson-box">Биномиальное распределение считает «число успехов из n попыток». Его среднее = np, разброс = np(1-p). Полезно для A/B тестов, конверсий, контроля качества.</div>
         `
       },
@@ -322,6 +419,46 @@ P(X=4) = e⁻³ · 3⁴/4! = 0.1680
             <p>P(ни одного звонка) ≈ <b>5%</b>. P(5+ звонков) ≈ <b>18.5%</b>. Самые вероятные исходы: 2 или 3 звонка (по ~22% каждый).</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">PMF: Poisson(λ=3)</text>
+              <!-- axes -->
+              <line x1="30" y1="135" x2="400" y2="135" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="30" y1="135" x2="30" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Poisson(3) PMF: k=0..9 -->
+              <!-- P(0)=0.0498, P(1)=0.1494, P(2)=0.2240, P(3)=0.2240, P(4)=0.1680, P(5)=0.1008, P(6)=0.0504, P(7)=0.0216, P(8)=0.0081, P(9)=0.0027 -->
+              <!-- scale: P(2)=P(3)=0.224 → 100px bar height. scale=446 -->
+              <!-- x positions: x=45+k*36, bar width=24 -->
+              <rect x="45"  y="113" width="24" height="22"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=0: 0.0498*446=22 -->
+              <rect x="81"  y="68"  width="24" height="67"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=1: 0.1494*446=67 -->
+              <rect x="117" y="35"  width="24" height="100" fill="#10b981" opacity="0.75" rx="2"/> <!-- k=2: 0.2240*446=100 -->
+              <rect x="153" y="35"  width="24" height="100" fill="#10b981" opacity="0.75" rx="2"/> <!-- k=3: 0.2240*446=100 -->
+              <rect x="189" y="60"  width="24" height="75"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=4: 0.1680*446=75 -->
+              <rect x="225" y="90"  width="24" height="45"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=5: 0.1008*446=45 -->
+              <rect x="261" y="113" width="24" height="22"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=6: 0.0504*446=22 -->
+              <rect x="297" y="125" width="24" height="10"  fill="#10b981" opacity="0.75" rx="2"/> <!-- k=7 -->
+              <rect x="333" y="131" width="24" height="4"   fill="#10b981" opacity="0.75" rx="2"/> <!-- k=8 -->
+              <rect x="369" y="133" width="24" height="2"   fill="#10b981" opacity="0.75" rx="2"/> <!-- k=9 -->
+              <!-- x labels -->
+              <text x="57"  y="150" text-anchor="middle" font-size="10" fill="#334155">0</text>
+              <text x="93"  y="150" text-anchor="middle" font-size="10" fill="#334155">1</text>
+              <text x="129" y="150" text-anchor="middle" font-size="10" fill="#334155">2</text>
+              <text x="165" y="150" text-anchor="middle" font-size="10" fill="#334155">3</text>
+              <text x="201" y="150" text-anchor="middle" font-size="10" fill="#334155">4</text>
+              <text x="237" y="150" text-anchor="middle" font-size="10" fill="#334155">5</text>
+              <text x="273" y="150" text-anchor="middle" font-size="10" fill="#334155">6</text>
+              <text x="309" y="150" text-anchor="middle" font-size="10" fill="#334155">7</text>
+              <text x="345" y="150" text-anchor="middle" font-size="10" fill="#334155">8</text>
+              <text x="381" y="150" text-anchor="middle" font-size="10" fill="#334155">9</text>
+              <!-- λ=μ line -->
+              <line x1="165" y1="30" x2="165" y2="135" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,2"/>
+              <text x="155" y="25" text-anchor="middle" font-size="9" fill="#64748b">λ=μ=3</text>
+              <!-- y axis label -->
+              <text x="18" y="85" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,18,85)">P(X=k)</text>
+            </svg>
+            <div class="caption">PMF распределения Пуассона с λ=3. Наиболее вероятны k=2 и k=3 (оба ~22.4%). P(X=0) ≈ 5% — «ни одного звонка» маловероятно, но возможно.</div>
+          </div>
+
           <div class="lesson-box">Пуассон описывает «число редких событий за интервал». Его среднее и дисперсия оба равны λ. Чем больше λ, тем больше похож на нормальное.</div>
         `
       },
@@ -369,6 +506,46 @@ T ~ Exp(λ = 4), в часах</div>
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>P(ждать > 20 мин) ≈ <b>26%</b>. P(ждать > 30 мин) ≈ <b>14%</b>. Прошлое ожидание не влияет на будущее (memoryless property).</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <linearGradient id="tailFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ef4444" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
+                </linearGradient>
+              </defs>
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Exp(λ=4): P(T &gt; 20 мин) ≈ 26%</text>
+              <!-- axes -->
+              <line x1="40" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="40" y1="130" x2="40" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Exp PDF: f(t) = λ·e^(-λt), in minutes λ=1/15 per min -->
+              <!-- map t(min) 0..60 to x=40..430, so scale=(430-40)/60=6.5px/min -->
+              <!-- f(0)=1/15≈0.0667, peak at x=40, y scaled: f(0)*scale_y + 130 = 20 → scale_y=(110)/0.0667=1649 -->
+              <!-- curve: decreasing from (40,20) to (430,~130) -->
+              <!-- shaded tail area from t=20min → x=40+20*6.5=170 to end -->
+              <path d="M170,130 L170,64 C185,72 205,84 230,96 C260,110 300,120 350,126 C380,128 410,129 430,130 Z" fill="url(#tailFill)"/>
+              <!-- main curve -->
+              <path d="M40,20 C50,28 60,38 75,50 C95,66 120,82 150,96 C180,108 210,117 240,122 C280,127 330,129 430,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- vertical line at t=20 min → x=170 -->
+              <line x1="170" y1="64" x2="170" y2="130" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+              <text x="170" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">20 мин</text>
+              <!-- mean line at t=15 min → x=40+15*6.5=137.5 -->
+              <line x1="137" y1="76" x2="137" y2="130" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <text x="137" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=15</text>
+              <!-- tail annotation -->
+              <text x="310" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">26%</text>
+              <text x="310" y="122" text-anchor="middle" font-size="9" fill="#dc2626">P(T&gt;20мин)</text>
+              <!-- y axis -->
+              <text x="34" y="23" text-anchor="end" font-size="9" fill="#64748b">f(0)</text>
+              <text x="34" y="133" text-anchor="end" font-size="9" fill="#64748b">0</text>
+              <!-- x axis labels -->
+              <text x="40"  y="145" text-anchor="middle" font-size="9" fill="#64748b">0</text>
+              <text x="235" y="145" text-anchor="middle" font-size="9" fill="#64748b">30</text>
+              <text x="430" y="145" text-anchor="middle" font-size="9" fill="#64748b">60 мин</text>
+            </svg>
+            <div class="caption">PDF экспоненциального распределения (λ=4/час = 1 автобус/15 мин). Красная зона — вероятность ждать дольше 20 минут: P(T&gt;20) ≈ 26%. Кривая резко убывает, большинство ожиданий коротких.</div>
           </div>
 
           <div class="lesson-box">Экспоненциальное — «партнёр» Пуассона. Если число событий ~ Poisson(λ), то время между событиями ~ Exp(λ). Среднее время = 1/λ.</div>

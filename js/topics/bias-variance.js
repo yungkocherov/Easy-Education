@@ -268,6 +268,42 @@ Train: идеально, Test: ужасно — overfit</div>
             <div class="why">Это классическая U-образная кривая test error в зависимости от сложности модели. Минимум test error = оптимальная сложность. Здесь это степень 3. Выбираем её для финальной модели.</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Полиномы степени 1, 3, 9 на данных sin(x)</text>
+              <!-- Axes -->
+              <line x1="40" y1="20" x2="40" y2="148" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="40" y1="148" x2="440" y2="148" stroke="#64748b" stroke-width="1.5"/>
+              <text x="440" y="160" font-size="9" fill="#64748b">x</text>
+              <text x="28" y="16" font-size="9" fill="#64748b">y</text>
+              <!-- Scatter dots (approximating sin curve with noise) -->
+              <circle cx="80" cy="80" r="4" fill="#64748b"/>
+              <circle cx="118" cy="50" r="4" fill="#64748b"/>
+              <circle cx="156" cy="35" r="4" fill="#64748b"/>
+              <circle cx="194" cy="42" r="4" fill="#64748b"/>
+              <circle cx="232" cy="65" r="4" fill="#64748b"/>
+              <circle cx="270" cy="100" r="4" fill="#64748b"/>
+              <circle cx="308" cy="122" r="4" fill="#64748b"/>
+              <circle cx="346" cy="135" r="4" fill="#64748b"/>
+              <circle cx="384" cy="130" r="4" fill="#64748b"/>
+              <circle cx="420" cy="115" r="4" fill="#64748b"/>
+              <!-- Degree 1: straight line (high bias) -->
+              <line x1="50" y1="130" x2="430" y2="60" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+              <!-- Degree 3: smooth curve fitting sin (good) -->
+              <path d="M50,95 C100,35 150,20 200,40 C250,60 300,115 350,140 C390,158 420,125 435,105" fill="none" stroke="#10b981" stroke-width="2.5"/>
+              <!-- Degree 9: wild oscillating curve (high variance) -->
+              <path d="M50,80 C65,20 80,130 100,40 C120,30 140,15 160,35 C185,60 205,40 230,65 C255,90 270,105 295,120 C320,135 340,130 360,128 C385,126 410,70 435,110" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <!-- Legend -->
+              <line x1="48" y1="162" x2="72" y2="162" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,2"/>
+              <text x="75" y="165" font-size="9" fill="#ef4444">степень 1 (underfit)</text>
+              <line x1="178" y1="162" x2="202" y2="162" stroke="#10b981" stroke-width="2.5"/>
+              <text x="205" y="165" font-size="9" fill="#10b981">степень 3 (оптимум)</text>
+              <line x1="318" y1="162" x2="342" y2="162" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <text x="345" y="165" font-size="9" fill="#3b82f6">степень 9 (overfit)</text>
+            </svg>
+            <div class="caption">Красная прямая (степень 1) не описывает форму — высокий bias. Зелёная кривая (степень 3) — оптимальный баланс. Синяя (степень 9) дрожит между точками — высокая variance.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Степень 1: High Bias — Train MSE=0.187, Test MSE=0.214. Underfitting.</p>

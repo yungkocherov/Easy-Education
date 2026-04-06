@@ -276,6 +276,58 @@ App.registerTopic({
             </div>
             <div class="why">Два положительных теста: вероятность болезни 80%. Это и есть байесовское обновление: каждое наблюдение обновляет prior.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево вероятностей: тест на болезнь (10 000 чел.)</text>
+              <!-- Root node -->
+              <text x="60" y="55" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">10000</text>
+              <text x="60" y="68" text-anchor="middle" font-size="9" fill="#64748b">человек</text>
+              <!-- Branch to sick -->
+              <line x1="75" y1="58" x2="165" y2="50" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="120" y="44" text-anchor="middle" font-size="9" fill="#ef4444">P(D)=0.01</text>
+              <!-- Branch to healthy -->
+              <line x1="75" y1="68" x2="165" y2="115" stroke="#10b981" stroke-width="1.5"/>
+              <text x="120" y="105" text-anchor="middle" font-size="9" fill="#10b981">P(¬D)=0.99</text>
+              <!-- Sick node -->
+              <rect x="165" y="32" width="80" height="36" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="205" y="49" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">100</text>
+              <text x="205" y="62" text-anchor="middle" font-size="8" fill="#ef4444">больных</text>
+              <!-- Healthy node -->
+              <rect x="165" y="97" width="80" height="36" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+              <text x="205" y="114" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">9900</text>
+              <text x="205" y="127" text-anchor="middle" font-size="8" fill="#10b981">здоровых</text>
+              <!-- From sick: TP and FN -->
+              <line x1="245" y1="46" x2="310" y2="36" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="278" y="30" text-anchor="middle" font-size="8" fill="#ef4444">P(+|D)=0.99</text>
+              <line x1="245" y1="54" x2="310" y2="68" stroke="#64748b" stroke-width="1"/>
+              <text x="278" y="67" text-anchor="middle" font-size="8" fill="#64748b">P(−|D)=0.01</text>
+              <!-- TP box -->
+              <rect x="310" y="22" width="75" height="28" rx="5" fill="#ef4444"/>
+              <text x="347" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">99 TP</text>
+              <text x="347" y="46" text-anchor="middle" font-size="8" fill="#fee2e2">тест +</text>
+              <!-- FN box -->
+              <rect x="310" y="58" width="75" height="24" rx="5" fill="#fee2e2" stroke="#64748b" stroke-width="1"/>
+              <text x="347" y="73" text-anchor="middle" font-size="9" fill="#64748b">1 FN</text>
+              <!-- From healthy: FP and TN -->
+              <line x1="245" y1="108" x2="310" y2="100" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="278" y="96" text-anchor="middle" font-size="8" fill="#ef4444">P(+|¬D)=0.05</text>
+              <line x1="245" y1="120" x2="310" y2="136" stroke="#10b981" stroke-width="1.5"/>
+              <text x="278" y="141" text-anchor="middle" font-size="8" fill="#10b981">P(−|¬D)=0.95</text>
+              <!-- FP box -->
+              <rect x="310" y="86" width="75" height="28" rx="5" fill="#fbbf24"/>
+              <text x="347" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">495 FP</text>
+              <text x="347" y="110" text-anchor="middle" font-size="8" fill="#78350f">тест +</text>
+              <!-- TN box -->
+              <rect x="310" y="122" width="75" height="24" rx="5" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+              <text x="347" y="137" text-anchor="middle" font-size="9" fill="#065f46">9405 TN</text>
+              <!-- PPV label -->
+              <text x="393" y="60" font-size="9" fill="#334155" font-weight="600">PPV =</text>
+              <text x="393" y="72" font-size="9" fill="#334155">99/(99+495)</text>
+              <text x="393" y="84" font-size="10" fill="#ef4444" font-weight="700">≈ 16.7%</text>
+            </svg>
+            <div class="caption">Дерево вероятностей для 10 000 человек. При положительном тесте: 99 TP (реально больны) и 495 FP (здоровы, но тест ошибся). PPV = 16.7% — только каждый 6-й с положительным тестом реально болен.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>После 1 теста: P(болен|+) ≈ 16.7%. После 2 тестов: ≈ 80%. Контринтуитивно, но правильно: при редкой болезни даже точный тест часто ошибается (много FP).</p>

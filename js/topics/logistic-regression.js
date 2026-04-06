@@ -261,6 +261,49 @@ App.registerTopic({
             </div>
             <div class="why">На маленькой выборке идеальное разделение. В реальности данные с шумом, и модель не будет идеальной.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 430 165" xmlns="http://www.w3.org/2000/svg" style="max-width:430px;">
+              <text x="215" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Сигмоида: P(сдал) = σ(−4 + x)</text>
+              <!-- Axes -->
+              <line x1="50" y1="20" x2="50" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="50" y1="140" x2="410" y2="140" stroke="#64748b" stroke-width="1.5"/>
+              <text x="228" y="158" text-anchor="middle" font-size="10" fill="#64748b">Часов подготовки</text>
+              <text x="18" y="82" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,18,82)">P(сдал)</text>
+              <!-- X ticks: 1..8 → x=50 + h*45, h=1→95, 2→140, 3→185, 4→230, 5→275, 6→320, 7→365, 8→410 -->
+              <text x="95" y="152" text-anchor="middle" font-size="9" fill="#64748b">1</text>
+              <text x="140" y="152" text-anchor="middle" font-size="9" fill="#64748b">2</text>
+              <text x="185" y="152" text-anchor="middle" font-size="9" fill="#64748b">3</text>
+              <text x="230" y="152" text-anchor="middle" font-size="9" fill="#64748b">4</text>
+              <text x="275" y="152" text-anchor="middle" font-size="9" fill="#64748b">5</text>
+              <text x="320" y="152" text-anchor="middle" font-size="9" fill="#64748b">6</text>
+              <text x="365" y="152" text-anchor="middle" font-size="9" fill="#64748b">7</text>
+              <text x="408" y="152" text-anchor="middle" font-size="9" fill="#64748b">8</text>
+              <!-- Y ticks: 0, 0.5, 1.0 → y=140, 80, 20 -->
+              <text x="45" y="143" text-anchor="end" font-size="9" fill="#64748b">0</text>
+              <text x="45" y="83" text-anchor="end" font-size="9" fill="#64748b">0.5</text>
+              <text x="45" y="23" text-anchor="end" font-size="9" fill="#64748b">1.0</text>
+              <line x1="50" y1="80" x2="410" y2="80" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"/>
+              <!-- Sigmoid curve: P values → y = 140 - P*120 -->
+              <!-- x=1: P=0.047 → y=134, x=2: P=0.119→y=126, x=3: P=0.269→y=108, x=4: P=0.5→y=80, x=5: P=0.731→y=52, x=8: P=0.982→y=22 -->
+              <path d="M60,137 C80,135 100,130 140,126 C165,123 180,118 185,108 C200,92 215,85 230,80 C255,72 265,56 275,52 C300,38 340,26 410,22" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- Decision boundary at x=4 -->
+              <line x1="230" y1="20" x2="230" y2="140" stroke="#64748b" stroke-width="1" stroke-dasharray="5,3"/>
+              <text x="232" y="36" font-size="9" fill="#64748b">граница</text>
+              <text x="232" y="47" font-size="9" fill="#64748b">x=4ч</text>
+              <!-- Data dots: (1,0),(2,0),(3,0) → red; (4,1),(5,1),(8,1) → green -->
+              <circle cx="95" cy="140" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="140" cy="140" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="185" cy="140" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="230" cy="20" r="6" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="275" cy="20" r="6" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="408" cy="20" r="6" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+              <!-- Labels on points -->
+              <text x="95" y="156" text-anchor="middle" font-size="8" fill="#ef4444">не сдал</text>
+              <text x="275" y="13" text-anchor="middle" font-size="8" fill="#10b981">сдал</text>
+            </svg>
+            <div class="caption">Сигмоида плавно переходит от 0 к 1. Красные точки — не сдали, зелёные — сдали. Вертикальная пунктирная линия — граница решения (4 часа, P=0.5).</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Модель P = σ(−4 + x) показывает: при 4 часах занятий — 50% шанс, при 6 часах — σ(2) ≈ 88%, при 2 часах — лишь 12%. Граница решения: 4 часа.</p>

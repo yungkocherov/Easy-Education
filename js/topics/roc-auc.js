@@ -259,6 +259,50 @@ AUC = 0 + 0.0667 + 0 + 0.1333 + 0 + 0.6 = <b>0.80</b></div>
             <div class="why">AUC=0.80 означает: если случайно взять один положительный и один отрицательный пример, с вероятностью 80% модель правильно даст положительному более высокий score.</div>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">ROC-кривая по 8 точкам (AUC = 0.80)</text>
+              <!-- Axes -->
+              <line x1="55" y1="22" x2="55" y2="148" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="55" y1="148" x2="400" y2="148" stroke="#64748b" stroke-width="1.5"/>
+              <text x="228" y="165" text-anchor="middle" font-size="10" fill="#64748b">FPR</text>
+              <text x="20" y="88" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,20,88)">TPR</text>
+              <!-- Axis tick labels: FPR 0,0.2,0.4,0.6,0.8,1.0 -->
+              <text x="55" y="160" text-anchor="middle" font-size="8" fill="#64748b">0</text>
+              <text x="124" y="160" text-anchor="middle" font-size="8" fill="#64748b">0.2</text>
+              <text x="193" y="160" text-anchor="middle" font-size="8" fill="#64748b">0.4</text>
+              <text x="262" y="160" text-anchor="middle" font-size="8" fill="#64748b">0.6</text>
+              <text x="331" y="160" text-anchor="middle" font-size="8" fill="#64748b">0.8</text>
+              <text x="400" y="160" text-anchor="middle" font-size="8" fill="#64748b">1.0</text>
+              <!-- TPR 0,0.33,0.67,1.0 -->
+              <text x="50" y="151" text-anchor="end" font-size="8" fill="#64748b">0</text>
+              <text x="50" y="105" text-anchor="end" font-size="8" fill="#64748b">0.33</text>
+              <text x="50" y="60" text-anchor="end" font-size="8" fill="#64748b">0.67</text>
+              <text x="50" y="25" text-anchor="end" font-size="8" fill="#64748b">1.0</text>
+              <!-- Diagonal dashed -->
+              <line x1="55" y1="148" x2="400" y2="22" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,3"/>
+              <!-- AUC fill area under step-curve -->
+              <polygon points="55,148 55,105 124,105 124,60 193,60 193,22 400,22 400,148" fill="#3b82f6" fill-opacity="0.15"/>
+              <!-- Step-function ROC curve -->
+              <polyline points="55,148 55,105 124,105 124,60 193,60 193,22 400,22" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round"/>
+              <!-- Key points -->
+              <circle cx="55" cy="148" r="4" fill="#64748b"/>
+              <circle cx="55" cy="105" r="4" fill="#3b82f6"/>
+              <circle cx="124" cy="105" r="4" fill="#3b82f6"/>
+              <circle cx="124" cy="60" r="4" fill="#3b82f6"/>
+              <circle cx="193" cy="60" r="4" fill="#3b82f6"/>
+              <circle cx="193" cy="22" r="4" fill="#10b981"/>
+              <circle cx="400" cy="22" r="4" fill="#64748b"/>
+              <!-- Labels for key points -->
+              <text x="65" y="102" font-size="8" fill="#3b82f6">A(+)</text>
+              <text x="127" y="100" font-size="8" fill="#ef4444">B(−)</text>
+              <text x="130" y="57" font-size="8" fill="#3b82f6">C(+)</text>
+              <text x="196" y="55" font-size="8" fill="#ef4444">D(−)</text>
+              <text x="196" y="20" font-size="8" fill="#10b981">E(+)→ TPR=1</text>
+            </svg>
+            <div class="caption">Ступенчатая ROC-кривая: каждый положительный (A,C,E) тянет кривую вверх, каждый отрицательный (B,D) — вправо. Площадь AUC=0.80 закрашена синим.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>ROC-кривая построена по 9 точкам от (0,0) до (1,1).</p>

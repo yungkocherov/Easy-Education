@@ -276,6 +276,54 @@ App.registerTopic({
             </div>
             <div class="why">score ∈ (0, 1]. Чем ближе к 1 — тем больше аномалия. score ≈ 0.5 → нормальная точка. score > 0.7 → вероятная аномалия.</div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Isolation Forest: аномалия изолируется быстрее</text>
+              <!-- Main rectangle -->
+              <rect x="30" y="28" width="400" height="116" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+              <!-- First split: t1=50 (vertical line) -->
+              <line x1="175" y1="28" x2="175" y2="144" stroke="#3b82f6" stroke-width="2"/>
+              <text x="103" y="24" text-anchor="middle" font-size="9" fill="#3b82f6">t₁ = 50</text>
+              <!-- Left half label (normal cluster) -->
+              <rect x="35" y="34" width="133" height="104" rx="4" fill="#dbeafe" fill-opacity="0.4"/>
+              <text x="102" y="60" text-anchor="middle" font-size="9" fill="#64748b">Нормальные точки</text>
+              <text x="102" y="72" text-anchor="middle" font-size="9" fill="#64748b">P1..P9 (значения 1-9)</text>
+              <!-- Normal dots in left half -->
+              <circle cx="48" cy="95" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="62" cy="88" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="76" cy="100" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="90" cy="82" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="104" cy="95" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="118" cy="86" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="132" cy="100" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="146" cy="90" r="5" fill="#3b82f6" opacity="0.7"/>
+              <circle cx="160" cy="82" r="5" fill="#3b82f6" opacity="0.7"/>
+              <!-- Second split inside left: t2=5 -->
+              <line x1="103" y1="28" x2="103" y2="144" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <text x="70" y="126" text-anchor="middle" font-size="8" fill="#3b82f6">t₂=5</text>
+              <!-- Third split indication -->
+              <line x1="68" y1="68" x2="68" y2="144" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <text x="50" y="120" text-anchor="middle" font-size="7" fill="#64748b">t₃</text>
+              <text x="50" y="130" text-anchor="middle" font-size="7" fill="#64748b">t₄...</text>
+              <text x="50" y="140" text-anchor="middle" font-size="7" fill="#64748b">глубина~4</text>
+              <!-- Right half: anomaly isolated -->
+              <rect x="180" y="34" width="244" height="104" rx="4" fill="#fee2e2" fill-opacity="0.3"/>
+              <text x="302" y="60" text-anchor="middle" font-size="9" fill="#64748b">После первого сплита:</text>
+              <text x="302" y="72" text-anchor="middle" font-size="9" fill="#64748b">аномалия ОДНА</text>
+              <!-- Anomaly dot -->
+              <circle cx="302" cy="95" r="10" fill="#ef4444" stroke="#991b1b" stroke-width="2.5"/>
+              <text x="302" y="92" text-anchor="middle" font-size="8" fill="#fff">A</text>
+              <text x="302" y="107" text-anchor="middle" font-size="8" fill="#ef4444">100</text>
+              <!-- Isolation box around anomaly -->
+              <rect x="255" y="66" width="95" height="60" rx="4" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+              <text x="302" y="138" text-anchor="middle" font-size="8" fill="#ef4444">глубина = 1</text>
+              <!-- Labels -->
+              <text x="102" y="155" text-anchor="middle" font-size="9" fill="#3b82f6">score ≈ 0.55 (норм.)</text>
+              <text x="302" y="155" text-anchor="middle" font-size="9" fill="#ef4444">score ≈ 0.77 (аномалия)</text>
+            </svg>
+            <div class="caption">Прямоугольник — пространство данных. Первый сплит t₁=50 сразу изолирует аномалию A=100 (справа, глубина 1). Нормальные точки требуют ещё 3-4 сплита. Anomaly score пропорционален обратной глубине изоляции.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Аномалия A=100 изолируется за 1-2 шага (score≈0.77). Нормальные точки [1-9] изолируются за 3-4 шага (score≈0.55). Разница в глубинах — основа детекции аномалий.</p>

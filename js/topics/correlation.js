@@ -272,6 +272,42 @@ s_y = √(669.3/5) = √133.87 = <b>11.57</b></div>
             <p>r = <b>0.996</b> — почти идеальная линейная связь. r² = 0.992 — 99% вариации объяснено. Рост и вес очень сильно коррелируют.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Scatter: рост (см) vs вес (кг), r=0.996</text>
+              <!-- axes -->
+              <line x1="60" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="60" y1="130" x2="60" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Data: (158,52),(165,60),(170,65),(175,72),(180,78),(182,83) -->
+              <!-- x: 158..182 range=24, map to x=60..430, scale=370/24=15.4px/cm, x=60+(h-158)*15.4 -->
+              <!-- y: 52..83 range=31, map to y=130..20, scale=110/31=3.55px/kg, y=130-(w-52)*3.55 -->
+              <!-- (158,52)→(60,130) (165,60)→(168,101) (170,65)→(245,83) (175,72)→(322,65)... wait, need to re-scale -->
+              <!-- Let's map x 155..185=30 → 60..420=360px, scale=12px/cm; y 48..87=39 → 20..130=110px, scale=2.82/kg -->
+              <!-- x=60+(h-155)*12, y=130-(w-48)*2.82 -->
+              <!-- (158,52)→(96,118.7) (165,60)→(180,95.6) (170,65)→(240,81.5) (175,72)→(300,61.7) (180,78)→(360,44.8) (182,83)→(384,29.7) -->
+              <!-- dots -->
+              <circle cx="96"  cy="119" r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="180" cy="96"  r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="240" cy="82"  r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="300" cy="62"  r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="360" cy="45"  r="6" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="384" cy="30"  r="6" fill="#3b82f6" opacity="0.85"/>
+              <!-- fitted line (nearly through all points, from ~(60,140) to (420,17)) -->
+              <line x1="70" y1="135" x2="400" y2="24" stroke="#ef4444" stroke-width="2" opacity="0.75"/>
+              <!-- axis labels -->
+              <text x="60"  y="145" text-anchor="middle" font-size="9" fill="#64748b">155</text>
+              <text x="240" y="145" text-anchor="middle" font-size="9" fill="#64748b">170</text>
+              <text x="420" y="145" text-anchor="middle" font-size="9" fill="#64748b">185</text>
+              <text x="230" y="158" text-anchor="middle" font-size="10" fill="#64748b">Рост (см)</text>
+              <text x="48" y="130" text-anchor="end" font-size="9" fill="#64748b">52</text>
+              <text x="48" y="45"  text-anchor="end" font-size="9" fill="#64748b">83</text>
+              <text x="20" y="80" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,20,80)">Вес (кг)</text>
+              <!-- r annotation -->
+              <text x="340" y="120" font-size="11" font-weight="700" fill="#ef4444">r = 0.996</text>
+            </svg>
+            <div class="caption">Scatter plot роста и веса 6 человек. Точки почти идеально лежат на красной линии регрессии. Корреляция Пирсона r≈0.996 — почти идеальная положительная линейная связь.</div>
+          </div>
+
           <div class="lesson-box">Корреляция Пирсона считается в 5 шагов: средние → отклонения → ковариация → std → деление. Диапазон [-1, 1], знак показывает направление, модуль — силу.</div>
         `
       },
@@ -331,6 +367,40 @@ r = −275 / (√700 × √7617.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
             <p>r Пирсона = <b>−0.12</b> (почти ноль), но связь <b>очень сильная</b> — нелинейная (парабола). Корреляция Пирсона в этом случае бесполезна.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Нелинейная связь: r≈−0.12, но зависимость очевидна</text>
+              <!-- axes -->
+              <line x1="50" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="50" y1="130" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Data: temp 15,20,25,30,35,40,45 → x=50+(t-15)*380/30=50+(t-15)*12.67 -->
+              <!-- sales 20,50,90,100,85,40,10 → y=130-(s/100)*110 -->
+              <!-- (15,20)→(50,108) (20,50)→(113,75) (25,90)→(177,31) (30,100)→(240,20) (35,85)→(304,37) (40,40)→(367,86) (45,10)→(430,119) -->
+              <circle cx="50"  cy="108" r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="113" cy="75"  r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="177" cy="31"  r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="240" cy="20"  r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="304" cy="37"  r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="367" cy="86"  r="7" fill="#3b82f6" opacity="0.85"/>
+              <circle cx="430" cy="119" r="7" fill="#3b82f6" opacity="0.85"/>
+              <!-- inverted-U curve (parabola) -->
+              <path d="M50,108 C80,85 110,55 145,34 C175,17 205,14 240,16 C270,18 300,28 335,54 C368,78 395,100 430,119" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,3"/>
+              <!-- axis labels -->
+              <text x="50"  y="145" text-anchor="middle" font-size="9" fill="#64748b">15°</text>
+              <text x="240" y="145" text-anchor="middle" font-size="9" fill="#64748b">30°</text>
+              <text x="430" y="145" text-anchor="middle" font-size="9" fill="#64748b">45°C</text>
+              <text x="240" y="158" text-anchor="middle" font-size="10" fill="#64748b">Температура</text>
+              <text x="18" y="80" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,18,80)">Продажи</text>
+              <!-- r annotation -->
+              <text x="320" y="70" font-size="10" fill="#64748b">r Пирсона</text>
+              <text x="320" y="84" font-size="12" font-weight="700" fill="#ef4444">≈ −0.12</text>
+              <text x="320" y="98" font-size="9" fill="#ef4444">(≈ «нет связи»?)</text>
+              <!-- parabola label -->
+              <text x="240" y="10" text-anchor="middle" font-size="9" fill="#059669">реальная кривая — перевёрнутая U</text>
+            </svg>
+            <div class="caption">Несмотря на очевидную квадратичную зависимость (продажи растут до 30°C, потом падают), r Пирсона ≈ −0.12 — «почти ноль». Пирсон видит только линейный тренд; здесь его нет из-за симметрии кривой.</div>
+          </div>
+
           <div class="lesson-box">r = 0 не означает «нет связи». Это означает «нет ЛИНЕЙНОЙ связи». Визуализируй данные перед тем, как доверять числам. Если связь нелинейная — нужны другие инструменты (distance correlation, mutual information).</div>
         `
       },
@@ -380,6 +450,33 @@ r = −275 / (√700 × √7617.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Корреляция r = 0.87 <b>реальная</b>, но причинная связь <b>ложная</b>. Обе переменные зависят от третьей — температуры (confounding variable).</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Общая причина (confounder): жара объясняет оба явления</text>
+              <!-- Top node: Temperature (confounder) -->
+              <ellipse cx="230" cy="50" rx="60" ry="22" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="2"/>
+              <text x="230" y="47" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Температура</text>
+              <text x="230" y="62" text-anchor="middle" font-size="9" fill="#92400e">(конфаундер)</text>
+              <!-- Left node: Ice cream -->
+              <ellipse cx="100" cy="130" rx="60" ry="22" fill="#3b82f6" fill-opacity="0.18" stroke="#3b82f6" stroke-width="2"/>
+              <text x="100" y="127" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Мороженое</text>
+              <text x="100" y="142" text-anchor="middle" font-size="9" fill="#1e40af">↑ в жару</text>
+              <!-- Right node: Drownings -->
+              <ellipse cx="360" cy="130" rx="60" ry="22" fill="#ef4444" fill-opacity="0.18" stroke="#ef4444" stroke-width="2"/>
+              <text x="360" y="127" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">Утопления</text>
+              <text x="360" y="142" text-anchor="middle" font-size="9" fill="#991b1b">↑ в жару</text>
+              <!-- Arrows from temperature to both -->
+              <line x1="185" y1="65" x2="145" y2="110" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrY)"/>
+              <line x1="275" y1="65" x2="315" y2="110" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrY)"/>
+              <defs><marker id="arrY" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#f59e0b"/></marker></defs>
+              <!-- Spurious correlation line between ice cream and drownings (dashed red) -->
+              <line x1="162" y1="130" x2="298" y2="130" stroke="#ef4444" stroke-width="2" stroke-dasharray="7,4"/>
+              <text x="230" y="120" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">r=0.87</text>
+              <text x="230" y="155" text-anchor="middle" font-size="9" fill="#ef4444">ложная корреляция (не причинность!)</text>
+            </svg>
+            <div class="caption">Граф причинности: жара (конфаундер, янтарный) вызывает рост как продаж мороженого, так и числа утоплений. Красная пунктирная линия — ложная корреляция r=0.87, которая исчезает при контроле за температурой.</div>
           </div>
 
           <div class="lesson-box">«Correlation does not imply causation» — одно из важнейших правил статистики. Для причинно-следственных выводов нужны эксперименты (рандомизация) или методы causal inference (instrumental variables, difference-in-differences, DAGs).</div>

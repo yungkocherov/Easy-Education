@@ -395,6 +395,65 @@ Var(X) = E[X²] − (E[X])² = 15.17 − 3.5² = 15.17 − 12.25 = <b>2.92</b>
             <div class="answer-label">Ответ</div>
             <p>PMF: все по 1/6. P(X≤4) = <b>2/3</b>. P(2≤X≤5) = <b>2/3</b>. E[X] = <b>3.5</b>. σ ≈ <b>1.71</b>.</p>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <text x="230" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">CDF честного кубика (ступенчатая функция)</text>
+              <!-- axes -->
+              <line x1="50" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="50" y1="130" x2="50" y2="25" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- y-ticks: 0,1/6,2/6..6/6 mapped to y: 130→0, 25→1 -->
+              <!-- y = 130 - prob*105 -->
+              <!-- steps: x positions for dice values 1..6 spaced at 60px each starting at x=90 -->
+              <!-- before 1: F=0 -->
+              <line x1="50" y1="130" x2="90" y2="130" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 1 to 1/6 -->
+              <line x1="90" y1="130" x2="90" y2="112" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="90" cy="130" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="90" cy="112" r="3.5" fill="#3b82f6"/>
+              <line x1="90" y1="112" x2="150" y2="112" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 2 to 2/6 -->
+              <line x1="150" y1="112" x2="150" y2="95" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="150" cy="112" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="150" cy="95" r="3.5" fill="#3b82f6"/>
+              <line x1="150" y1="95" x2="210" y2="95" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 3 to 3/6=0.5 -->
+              <line x1="210" y1="95" x2="210" y2="77" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="210" cy="95" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="210" cy="77" r="3.5" fill="#3b82f6"/>
+              <line x1="210" y1="77" x2="270" y2="77" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 4 to 4/6 -->
+              <line x1="270" y1="77" x2="270" y2="60" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="270" cy="77" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="270" cy="60" r="3.5" fill="#3b82f6"/>
+              <line x1="270" y1="60" x2="330" y2="60" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 5 to 5/6 -->
+              <line x1="330" y1="60" x2="330" y2="42" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="330" cy="60" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="330" cy="42" r="3.5" fill="#3b82f6"/>
+              <line x1="330" y1="42" x2="390" y2="42" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- jump at 6 to 6/6=1 -->
+              <line x1="390" y1="42" x2="390" y2="25" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="390" cy="42" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="390" cy="25" r="3.5" fill="#3b82f6"/>
+              <line x1="390" y1="25" x2="430" y2="25" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- x labels -->
+              <text x="90"  y="145" text-anchor="middle" font-size="11" fill="#334155">1</text>
+              <text x="150" y="145" text-anchor="middle" font-size="11" fill="#334155">2</text>
+              <text x="210" y="145" text-anchor="middle" font-size="11" fill="#334155">3</text>
+              <text x="270" y="145" text-anchor="middle" font-size="11" fill="#334155">4</text>
+              <text x="330" y="145" text-anchor="middle" font-size="11" fill="#334155">5</text>
+              <text x="390" y="145" text-anchor="middle" font-size="11" fill="#334155">6</text>
+              <!-- y labels -->
+              <text x="44" y="133" text-anchor="end" font-size="9" fill="#64748b">0</text>
+              <text x="44" y="115" text-anchor="end" font-size="9" fill="#64748b">1/6</text>
+              <text x="44" y="80" text-anchor="end" font-size="9" fill="#64748b">1/2</text>
+              <text x="44" y="28" text-anchor="end" font-size="9" fill="#64748b">1</text>
+              <line x1="46" y1="77" x2="50" y2="77" stroke="#94a3b8" stroke-width="1"/>
+              <line x1="46" y1="25" x2="50" y2="25" stroke="#94a3b8" stroke-width="1"/>
+            </svg>
+            <div class="caption">CDF кубика — ступенчатая функция: на каждом значении 1..6 делает прыжок вверх на 1/6. F(3)=0.5 означает: вероятность выбросить 3 или меньше равна 50%.</div>
+          </div>
+
           <div class="lesson-box">CDF — накопленная сумма PMF. Вероятность интервала = разность CDF на концах.</div>
         `
       },
@@ -438,6 +497,41 @@ z₃ = (189 − 175) / 7 = +2.0</div>
             <div class="answer-label">Ответ</div>
             <p>P(168–182 см) ≈ <b>68.3%</b>. P(>189 см) ≈ <b>2.3%</b>. Всё через CDF стандартного нормального.</p>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <linearGradient id="shadeFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.55"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/>
+                </linearGradient>
+              </defs>
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">N(175, 7²): P(168 ≤ X ≤ 182) ≈ 68%</text>
+              <!-- axis -->
+              <line x1="30" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Bell curve: μ=175 centered at x=230, σ=7 → 1σ=40px, curve spans ±3σ=±120px -->
+              <!-- shaded region from x=168 to x=182 → x_svg = 230+(val-175)*40/7 -->
+              <!-- 168→230+(−7)*40/7=230−40=190, 182→230+(7)*40/7=230+40=270 -->
+              <path d="M190,130 L190,92 C200,78 210,64 220,55 C225,51 228,49 230,48 C232,49 235,51 240,55 C250,64 260,78 270,92 L270,130 Z" fill="url(#shadeFill)"/>
+              <!-- bell curve outline -->
+              <path d="M30,130 C60,130 90,128 110,120 C130,112 150,95 170,78 C180,67 185,57 190,52 C200,43 210,36 220,33 C225,31 228,30 230,29 C232,30 235,31 240,33 C250,36 260,43 270,52 C275,57 280,67 290,78 C310,95 330,112 350,120 C370,128 400,130 430,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- vertical dashed lines at 168 and 182 -->
+              <line x1="190" y1="52" x2="190" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="270" y1="52" x2="270" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <!-- μ line -->
+              <line x1="230" y1="29" x2="230" y2="130" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+              <!-- labels -->
+              <text x="190" y="145" text-anchor="middle" font-size="10" fill="#10b981">168</text>
+              <text x="230" y="145" text-anchor="middle" font-size="11" fill="#64748b">μ=175</text>
+              <text x="270" y="145" text-anchor="middle" font-size="10" fill="#10b981">182</text>
+              <!-- annotation -->
+              <text x="230" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">68%</text>
+              <!-- z scores -->
+              <text x="190" y="20" text-anchor="middle" font-size="10" fill="#10b981">z=−1</text>
+              <text x="270" y="20" text-anchor="middle" font-size="10" fill="#10b981">z=+1</text>
+            </svg>
+            <div class="caption">Нормальное распределение N(175, 7²): зелёная зона — P(168 ≤ X ≤ 182) = P(−1 ≤ Z ≤ +1) ≈ 68%. Примерно двое из трёх мужчин имеют рост в этом диапазоне.</div>
+          </div>
+
           <div class="lesson-box">Для нормального: стандартизуй через z = (x−μ)/σ, потом используй таблицу или функцию CDF. Вероятность интервала = F(b) − F(a).</div>
         `
       },
@@ -476,6 +570,47 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
             <div class="answer-label">Ответ</div>
             <p>Медиана = <b>1.39 сек</b>. p95 = <b>5.99 сек</b>. Среднее = 2 сек (больше медианы из-за правого скоса).</p>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <linearGradient id="expGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">CDF Exp(0.5): квантили p50 и p95</text>
+              <!-- axes -->
+              <line x1="50" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="50" y1="130" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- CDF curve F(t) = 1 - e^(-0.5t), t from 0 to 12 -->
+              <!-- map t→x: x=50+t*(380/12), F→y: y=130-F*110 -->
+              <!-- t=0→F=0, t=1.39→F=0.5, t=6→F=0.95, t=12→F≈0.998 -->
+              <path d="M50,130 C70,100 90,75 120,56 C150,39 180,30 210,24 C240,20 280,18 320,17 C360,16 400,16 430,16" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <!-- p50 line: F=0.5 → y=130-55=75, t=1.39 → x=50+1.39*31.67≈94 -->
+              <line x1="50" y1="75" x2="94" y2="75" stroke="#10b981" stroke-width="1.8" stroke-dasharray="5,3"/>
+              <line x1="94" y1="75" x2="94" y2="130" stroke="#10b981" stroke-width="1.8" stroke-dasharray="5,3"/>
+              <circle cx="94" cy="75" r="4" fill="#10b981"/>
+              <text x="44" y="78" text-anchor="end" font-size="10" font-weight="600" fill="#10b981">0.50</text>
+              <text x="94" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#10b981">1.39</text>
+              <!-- p95 line: F=0.95 → y=130-104.5=25.5, t=5.99 → x=50+5.99*31.67≈240 -->
+              <line x1="50" y1="25" x2="240" y2="25" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="5,3"/>
+              <line x1="240" y1="25" x2="240" y2="130" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="5,3"/>
+              <circle cx="240" cy="25" r="4" fill="#f59e0b"/>
+              <text x="44" y="28" text-anchor="end" font-size="10" font-weight="600" fill="#f59e0b">0.95</text>
+              <text x="240" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#f59e0b">5.99</text>
+              <!-- axis labels -->
+              <text x="44" y="133" text-anchor="end" font-size="9" fill="#64748b">0</text>
+              <text x="44" y="20" text-anchor="end" font-size="9" fill="#64748b">1</text>
+              <text x="240" y="158" text-anchor="middle" font-size="10" fill="#64748b">t (сек)</text>
+              <!-- legend -->
+              <rect x="280" y="48" width="12" height="3" fill="#10b981"/>
+              <text x="296" y="53" font-size="10" fill="#10b981">медиана p50 = 1.39 сек</text>
+              <rect x="280" y="65" width="12" height="3" fill="#f59e0b"/>
+              <text x="296" y="70" font-size="10" fill="#f59e0b">p95 = 5.99 сек</text>
+            </svg>
+            <div class="caption">CDF экспоненциального Exp(λ=0.5). Горизонтальные линии показывают вероятности 0.5 и 0.95, вертикальные — соответствующие квантили. p50≈1.39 сек (медиана), p95≈5.99 сек.</div>
+          </div>
+
           <div class="lesson-box">Квантиль = обратная CDF: F⁻¹(q). Для мониторинга систем p50/p95/p99 важнее среднего — они показывают «хвост» задержек.</div>
         `
       }

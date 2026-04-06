@@ -232,6 +232,67 @@ App.registerTopic({
             <p>Строки — токены («Кот», «сидит», «там»). Колонки — компоненты векторов.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <!-- 3x3 attention weight heatmap: values from the example -->
+              <!-- Row "Кот": 0.401, 0.198, 0.401 -->
+              <!-- Row "сидит": 0.401, 0.401, 0.198 -->
+              <!-- Row "там": 0.503, 0.248, 0.248 -->
+              <!-- Color scale: low=white, high=#3b82f6. We map 0.198→light, 0.503→dark -->
+              <!-- Map value v: opacity = (v-0.198)/(0.503-0.198)*0.9 + 0.1 -->
+              <!-- Кот→Кот=0.401: (0.401-0.198)/0.305=0.665*0.9+0.1=0.699 → #3b82f6 at 70% -->
+              <!-- Cell size 70px, starting at x=120,y=20 -->
+              <text x="80" y="20" font-size="11" fill="#64748b" font-weight="600">Attention matrix A (softmax)</text>
+              <!-- Column headers (Keys) -->
+              <text x="155" y="50" text-anchor="middle" font-size="10" fill="#64748b">Кот</text>
+              <text x="225" y="50" text-anchor="middle" font-size="10" fill="#64748b">сидит</text>
+              <text x="295" y="50" text-anchor="middle" font-size="10" fill="#64748b">там</text>
+              <!-- Row headers (Queries) -->
+              <text x="110" y="88" text-anchor="end" font-size="10" fill="#64748b">Кот</text>
+              <text x="110" y="123" text-anchor="end" font-size="10" fill="#64748b">сидит</text>
+              <text x="110" y="158" text-anchor="end" font-size="10" fill="#64748b">там</text>
+              <!-- Row 0 "Кот": 0.401, 0.198, 0.401 -->
+              <rect x="120" y="58" width="70" height="35" fill="#3b82f6" opacity="0.70" rx="3"/>
+              <text x="155" y="80" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.40</text>
+              <rect x="190" y="58" width="70" height="35" fill="#3b82f6" opacity="0.25" rx="3"/>
+              <text x="225" y="80" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.20</text>
+              <rect x="260" y="58" width="70" height="35" fill="#3b82f6" opacity="0.70" rx="3"/>
+              <text x="295" y="80" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.40</text>
+              <!-- Row 1 "сидит": 0.401, 0.401, 0.198 -->
+              <rect x="120" y="93" width="70" height="35" fill="#3b82f6" opacity="0.70" rx="3"/>
+              <text x="155" y="115" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.40</text>
+              <rect x="190" y="93" width="70" height="35" fill="#3b82f6" opacity="0.70" rx="3"/>
+              <text x="225" y="115" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.40</text>
+              <rect x="260" y="93" width="70" height="35" fill="#3b82f6" opacity="0.25" rx="3"/>
+              <text x="295" y="115" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.20</text>
+              <!-- Row 2 "там": 0.503, 0.248, 0.248 -->
+              <rect x="120" y="128" width="70" height="35" fill="#3b82f6" opacity="0.95" rx="3"/>
+              <text x="155" y="150" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">0.50</text>
+              <rect x="190" y="128" width="70" height="35" fill="#3b82f6" opacity="0.35" rx="3"/>
+              <text x="225" y="150" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.25</text>
+              <rect x="260" y="128" width="70" height="35" fill="#3b82f6" opacity="0.35" rx="3"/>
+              <text x="295" y="150" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="600">0.25</text>
+              <!-- Grid border -->
+              <rect x="120" y="58" width="210" height="105" fill="none" stroke="#64748b" stroke-width="1.5" rx="3"/>
+              <line x1="190" y1="58" x2="190" y2="163" stroke="#64748b" stroke-width="1"/>
+              <line x1="260" y1="58" x2="260" y2="163" stroke="#64748b" stroke-width="1"/>
+              <line x1="120" y1="93" x2="330" y2="93" stroke="#64748b" stroke-width="1"/>
+              <line x1="120" y1="128" x2="330" y2="128" stroke="#64748b" stroke-width="1"/>
+              <!-- Colorscale legend -->
+              <rect x="350" y="80" width="14" height="75" fill="url(#hm-grad)" rx="2"/>
+              <defs>
+                <linearGradient id="hm-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1"/>
+                </linearGradient>
+              </defs>
+              <text x="368" y="86" font-size="8" fill="#64748b">0.50</text>
+              <text x="368" y="158" font-size="8" fill="#64748b">0.20</text>
+              <text x="350" y="72" font-size="8" fill="#64748b">вес ↑</text>
+            </svg>
+            <div class="caption">Матрица attention весов A (3×3): строка i = «на кого смотрит токен i». «Там» (строка 3) уделяет 50% «Коту» — самый тёмный квадрат. Каждая строка суммируется в 1 (softmax).</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>Токен</th><th>$Q_i$</th><th>$K_i$</th><th>$V_i$</th></tr>

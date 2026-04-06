@@ -272,6 +272,53 @@ App.registerTopic({
               SVM максимизирует именно эту величину
             </div>
           </div>
+          <div class="illustration bordered">
+            <svg viewBox="0 0 400 165" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+              <text x="200" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SVM: 4 точки, разделяющая прямая и margin</text>
+              <!-- Axes -->
+              <line x1="45" y1="20" x2="45" y2="145" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="45" y1="145" x2="375" y2="145" stroke="#64748b" stroke-width="1.5"/>
+              <text x="375" y="157" font-size="9" fill="#64748b">x₁</text>
+              <text x="32" y="16" font-size="9" fill="#64748b">x₂</text>
+              <!-- Scale: x1=1..4 → x=45+x1*70; x2=1..3 → y=145-x2*42 -->
+              <!-- A(1,2)→(115,61), B(2,3)→(185,19), C(3,1)→(255,103), D(4,2)→(325,61) -->
+              <!-- Separating line: x2 = x1 - 1 → (x1=1,x2=0), (x1=4.5,x2=3.5) → screen: (115,145),(360,7) -->
+              <!-- Margin lines: x2=x1 (upper), x2=x1-2 (lower) -->
+              <!-- Upper margin: x2=x1: (1,1)→(115,103),(3,3)→(255,19) -->
+              <line x1="115" y1="103" x2="285" y2="19" stroke="#3b82f6" stroke-width="1" stroke-dasharray="5,3" opacity="0.7"/>
+              <!-- Lower margin: x2=x1-2: (2,0)→(185,145),(5,3)→(390,19) clipped -->
+              <line x1="185" y1="145" x2="375" y2="61" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5,3" opacity="0.7"/>
+              <!-- Separating line: x2=x1-1: (1,0)→(115,145),(4.5,3.5)→(360,7) -->
+              <line x1="115" y1="145" x2="360" y2="7" stroke="#ef4444" stroke-width="2.5"/>
+              <text x="362" y="10" font-size="9" fill="#ef4444">−x₁+x₂+1=0</text>
+              <!-- Margin area shading -->
+              <polygon points="115,103 285,19 360,7 185,145" fill="#ef4444" fill-opacity="0.07"/>
+              <!-- Data points -->
+              <circle cx="115" cy="61" r="9" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+              <text x="115" y="58" text-anchor="middle" font-size="8" fill="#fff">A</text>
+              <circle cx="185" cy="19" r="9" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+              <text x="185" y="16" text-anchor="middle" font-size="8" fill="#fff">B</text>
+              <!-- Support vectors: C, D on margin boundary; ring indicator -->
+              <circle cx="255" cy="103" r="9" fill="#f59e0b" stroke="#1d4ed8" stroke-width="2.5"/>
+              <text x="255" y="100" text-anchor="middle" font-size="8" fill="#1d4ed8">C</text>
+              <circle cx="255" cy="103" r="14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="325" cy="61" r="9" fill="#f59e0b" stroke="#1d4ed8" stroke-width="2.5"/>
+              <text x="325" y="58" text-anchor="middle" font-size="8" fill="#1d4ed8">D</text>
+              <circle cx="325" cy="61" r="14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <!-- Margin label -->
+              <line x1="210" y1="67" x2="248" y2="67" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+              <line x1="210" y1="67" x2="172" y2="67" stroke="#64748b" stroke-width="1.5"/>
+              <text x="210" y="80" text-anchor="middle" font-size="9" fill="#64748b">margin = √2</text>
+              <!-- Legend -->
+              <circle cx="48" cy="157" r="5" fill="#3b82f6"/>
+              <text x="57" y="161" font-size="8" fill="#3b82f6">класс +1 (A,B)</text>
+              <circle cx="138" cy="157" r="5" fill="#f59e0b"/>
+              <text x="147" y="161" font-size="8" fill="#f59e0b">класс −1 (C,D)</text>
+              <text x="225" y="161" font-size="8" fill="#f59e0b">○ опорные векторы</text>
+            </svg>
+            <div class="caption">Красная линия — разделяющая гиперплоскость. Пунктирные линии — границы margin. C и D (обведены кружком) — опорные векторы на margin. Ширина margin = √2 ≈ 1.41.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
             <p>Разделяющая прямая: −x₁ + x₂ + 1 = 0. Опорные векторы: C(3,1) и D(4,2). Margin = √2 ≈ 1.414. A и B тоже опорные (расстояние √2 с другой стороны).</p>

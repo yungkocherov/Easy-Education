@@ -205,6 +205,54 @@ App.registerTopic({
             <p>Обучить перцептрон функции AND. Данные: метки $+1$ (AND=1) и $-1$ (AND=0). Начальные веса $w_0 = w_1 = w_2 = 0$ (bias $w_0$). $\\eta = 1$. Правило: $w \\gets w + \\eta \\cdot y_i \\cdot x_i$ при ошибке.</p>
           </div>
 
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <defs>
+                <marker id="and-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+              </defs>
+              <!-- Axes -->
+              <line x1="50" y1="130" x2="310" y2="130" stroke="#64748b" stroke-width="1.5" marker-end="url(#and-arr)"/>
+              <line x1="50" y1="130" x2="50" y2="15" stroke="#64748b" stroke-width="1.5" marker-end="url(#and-arr)"/>
+              <text x="315" y="134" font-size="10" fill="#64748b">x₁</text>
+              <text x="42" y="12" font-size="10" fill="#64748b">x₂</text>
+              <!-- Tick marks and labels -->
+              <line x1="50" y1="130" x2="50" y2="125" stroke="#64748b" stroke-width="1"/>
+              <text x="47" y="140" font-size="9" fill="#64748b">0</text>
+              <line x1="170" y1="130" x2="170" y2="125" stroke="#64748b" stroke-width="1"/>
+              <text x="167" y="140" font-size="9" fill="#64748b">1</text>
+              <line x1="50" y1="130" x2="55" y2="130" stroke="#64748b" stroke-width="1"/>
+              <line x1="50" y1="50" x2="55" y2="50" stroke="#64748b" stroke-width="1"/>
+              <text x="35" y="54" font-size="9" fill="#64748b">1</text>
+              <!-- Points: (0,0)→-1 circle, (0,1)→-1 circle, (1,0)→-1 circle, (1,1)→+1 filled -->
+              <!-- x=50+x1*120, y=130-x2*80 -->
+              <circle cx="50" cy="130" r="7" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <text x="57" y="125" font-size="9" fill="#3b82f6">(0,0)</text>
+              <circle cx="50" cy="50" r="7" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <text x="57" y="45" font-size="9" fill="#3b82f6">(0,1)</text>
+              <circle cx="170" cy="130" r="7" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <text x="177" y="125" font-size="9" fill="#3b82f6">(1,0)</text>
+              <circle cx="170" cy="50" r="8" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+              <text x="177" y="45" font-size="9" fill="#ef4444">(1,1) AND=1</text>
+              <!-- Separating line: x1+x2=1.5, passes through (1.5,0)→(280,130) and (0,1.5)→(50,-40) approx -->
+              <!-- at x1=0: x2=1.5 → y=130-1.5*80=-40 (off screen top) -->
+              <!-- at x2=0: x1=1.5 → x=50+1.5*120=230 -->
+              <!-- at x1=0.5: x2=1 → draw from (80,50) to (260,130) is better -->
+              <!-- line: x1+x2=1.5. At x1=0.5,x2=1: px=(110,50). At x1=1.5,x2=0: px=(230,130) -->
+              <line x1="110" y1="50" x2="250" y2="130" stroke="#10b981" stroke-width="2" stroke-dasharray="7,3"/>
+              <text x="240" y="50" font-size="9" fill="#10b981">x₁+x₂=1.5</text>
+              <!-- Legend -->
+              <circle cx="330" cy="50" r="6" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <text x="340" y="54" font-size="9" fill="#3b82f6">AND=0</text>
+              <circle cx="330" cy="70" r="6" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+              <text x="340" y="74" font-size="9" fill="#ef4444">AND=1</text>
+              <line x1="320" y1="90" x2="345" y2="90" stroke="#10b981" stroke-width="2" stroke-dasharray="5,2"/>
+              <text x="350" y="94" font-size="9" fill="#10b981">граница</text>
+            </svg>
+            <div class="caption">AND в 2D: три класса 0 (круги) и один класс 1 (закрашен). Прямая x₁+x₂=1.5 разделяет их — данные линейно разделимы.</div>
+          </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>$(x_1, x_2)$</th><th>Метка $y$</th><th>$x^{(\\text{augm})}$ с bias</th></tr>
@@ -343,6 +391,49 @@ App.registerTopic({
           <div class="example-problem">
             <div class="problem-label">Задача</div>
             <p>Показать, что перцептрон <b>не может</b> выучить XOR — ни при каких весах. XOR: $y=+1$ если ровно один вход равен 1, иначе $y=-1$.</p>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <defs>
+                <marker id="xor-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                </marker>
+              </defs>
+              <!-- Axes -->
+              <line x1="50" y1="130" x2="310" y2="130" stroke="#64748b" stroke-width="1.5" marker-end="url(#xor-arr)"/>
+              <line x1="50" y1="130" x2="50" y2="15" stroke="#64748b" stroke-width="1.5" marker-end="url(#xor-arr)"/>
+              <text x="315" y="134" font-size="10" fill="#64748b">x₁</text>
+              <text x="42" y="12" font-size="10" fill="#64748b">x₂</text>
+              <text x="47" y="140" font-size="9" fill="#64748b">0</text>
+              <line x1="170" y1="130" x2="170" y2="125" stroke="#64748b" stroke-width="1"/>
+              <text x="167" y="140" font-size="9" fill="#64748b">1</text>
+              <line x1="50" y1="50" x2="55" y2="50" stroke="#64748b" stroke-width="1"/>
+              <text x="35" y="54" font-size="9" fill="#64748b">1</text>
+              <!-- XOR points: (0,0)→0 circle, (0,1)→1 filled, (1,0)→1 filled, (1,1)→0 circle -->
+              <circle cx="50" cy="130" r="8" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <text x="57" y="126" font-size="9" fill="#3b82f6">(0,0) XOR=0</text>
+              <circle cx="50" cy="50" r="8" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+              <text x="57" y="46" font-size="9" fill="#ef4444">(0,1) XOR=1</text>
+              <circle cx="170" cy="130" r="8" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+              <text x="177" y="126" font-size="9" fill="#ef4444">(1,0) XOR=1</text>
+              <circle cx="170" cy="50" r="8" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <text x="177" y="46" font-size="9" fill="#3b82f6">(1,1) XOR=0</text>
+              <!-- No line possible — show crossed-out attempt lines -->
+              <line x1="60" y1="140" x2="260" y2="40" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+              <line x1="50" y1="90" x2="250" y2="90" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+              <line x1="110" y1="140" x2="110" y2="20" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+              <!-- "no line" label -->
+              <text x="210" y="100" font-size="10" fill="#ef4444" font-weight="600">ни одна</text>
+              <text x="210" y="113" font-size="10" fill="#ef4444" font-weight="600">прямая</text>
+              <text x="210" y="126" font-size="10" fill="#ef4444" font-weight="600">не делит!</text>
+              <!-- Legend -->
+              <circle cx="330" cy="50" r="6" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <text x="340" y="54" font-size="9" fill="#3b82f6">XOR=0</text>
+              <circle cx="330" cy="70" r="6" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+              <text x="340" y="74" font-size="9" fill="#ef4444">XOR=1</text>
+            </svg>
+            <div class="caption">XOR в 2D: класс 0 — углы (0,0) и (1,1); класс 1 — углы (0,1) и (1,0). Никакая прямая не разделит их — данные нелинейно разделимы.</div>
           </div>
 
           <div class="example-data-table">
