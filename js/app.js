@@ -108,7 +108,7 @@ const App = (function () {
     const el = document.getElementById('tab-content');
     el.innerHTML = '';
     // Скроллим контент-область к началу при смене вкладки
-    document.getElementById('content').scrollTop = 0;
+    el.scrollTop = 0;
     const tabData = topic.tabs[currentTabKey];
     const pane = document.createElement('div');
     pane.className = 'tab-pane';

@@ -88,17 +88,27 @@ body {
 
 /* ========== Контент ========== */
 #content {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 0;
   min-width: 0;
   background: linear-gradient(180deg, #f0f4ff 0%, #faf5ff 50%, #fff1f2 100%);
-  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+}
+#topic-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+#welcome {
+  overflow-y: auto;
+  flex: 1;
 }
 .welcome {
   max-width: 660px;
-  margin: 100px auto;
-  padding: 0 40px;
+  margin: 0 auto;
+  padding: 100px 40px;
   text-align: center;
 }
 .welcome h2 { font-size: 30px; margin-bottom: 12px; color: #312e81; font-weight: 800; }
@@ -169,7 +179,10 @@ body {
 .tab-content {
   padding: 28px 40px 60px;
   max-width: 960px;
+  overflow-y: auto;
   overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
