@@ -19,7 +19,37 @@ App.registerTopic({
         <p>Три метрики измеряют разные стороны одной работы. И часто между ними приходится выбирать.</p>
       </div>
 
-      <h3>Зачем нужны метрики</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <!-- Title -->
+          <text x="250" y="20" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">Confusion Matrix</text>
+          <!-- Column headers -->
+          <text x="230" y="48" text-anchor="middle" font-size="10" fill="#64748b">Предсказано: Позитив</text>
+          <text x="390" y="48" text-anchor="middle" font-size="10" fill="#64748b">Предсказано: Негатив</text>
+          <!-- Row headers -->
+          <text x="90" y="105" text-anchor="middle" font-size="10" fill="#64748b">Реально: Позитив</text>
+          <text x="90" y="165" text-anchor="middle" font-size="10" fill="#64748b">Реально: Негатив</text>
+          <!-- TP cell (green) -->
+          <rect x="145" y="58" width="165" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+          <text x="228" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#065f46">TP</text>
+          <text x="228" y="100" text-anchor="middle" font-size="10" fill="#065f46">True Positive ✓</text>
+          <!-- FN cell (red) -->
+          <rect x="315" y="58" width="165" height="55" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+          <text x="398" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#991b1b">FN</text>
+          <text x="398" y="100" text-anchor="middle" font-size="10" fill="#991b1b">False Negative ✗</text>
+          <!-- FP cell (red) -->
+          <rect x="145" y="118" width="165" height="55" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+          <text x="228" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#991b1b">FP</text>
+          <text x="228" y="160" text-anchor="middle" font-size="10" fill="#991b1b">False Positive ✗</text>
+          <!-- TN cell (green) -->
+          <rect x="315" y="118" width="165" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+          <text x="398" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#065f46">TN</text>
+          <text x="398" y="160" text-anchor="middle" font-size="10" fill="#065f46">True Negative ✓</text>
+        </svg>
+        <div class="caption">Матрица ошибок (Confusion Matrix): TP и TN — верные предсказания (зелёные), FP и FN — ошибки (красные). Все метрики классификации строятся из этих 4 чисел.</div>
+      </div>
+
+      <h3>🎯 Зачем нужны метрики</h3>
       <p>Модель классификации предсказывает классы. Но <b>насколько хорошо</b> она это делает? Нужен способ измерения, чтобы:</p>
       <ul>
         <li>Сравнивать модели между собой и выбирать лучшую.</li>
@@ -29,7 +59,7 @@ App.registerTopic({
       </ul>
       <p>Но нет одной «правильной» метрики — выбор зависит от задачи и цены ошибок.</p>
 
-      <h3>Матрица ошибок — основа всего</h3>
+      <h3>📊 Матрица ошибок — основа всего</h3>
       <p><span class="term" data-tip="Confusion Matrix. Таблица, которая показывает, сколько предсказаний каждого класса оказались правильными, а сколько — ошибочными.">Confusion Matrix</span> — это таблица, где строки — реальные классы, столбцы — предсказанные. Для бинарной задачи получается 4 ячейки:</p>
 
       <table>
@@ -40,7 +70,7 @@ App.registerTopic({
 
       <p>Все метрики выводятся из этих 4 чисел. Разница между метриками — в том, какие комбинации ячеек они считают.</p>
 
-      <h3>Основные метрики — подробно</h3>
+      <h3>🧮 Основные метрики — подробно</h3>
 
       <h4>Accuracy (точность общая)</h4>
       <div class="math-block">$$\\text{Accuracy} = \\frac{TP + TN}{TP + TN + FP + FN}$$</div>
@@ -79,7 +109,7 @@ App.registerTopic({
         <li>β = 0.5 → F0.5 (precision важнее).</li>
       </ul>
 
-      <h3>Какую метрику выбрать</h3>
+      <h3>🎯 Какую метрику выбрать</h3>
 
       <table>
         <tr><th>Ситуация</th><th>Метрика</th><th>Пример</th></tr>
@@ -90,7 +120,7 @@ App.registerTopic({
         <tr><td>Порог ещё не выбран</td><td>ROC-AUC, PR-AUC</td><td>Сравнение моделей</td></tr>
       </table>
 
-      <h3>Порог решения — скрытый параметр</h3>
+      <h3>🔍 Порог решения — скрытый параметр</h3>
       <p>Большинство моделей выдают <b>вероятность</b>, а не класс. Класс получается применением порога:</p>
       <div class="math-block">$$\\hat{y} = \\begin{cases} 1, & p \\geq \\text{threshold} \\\\ 0, & p < \\text{threshold} \\end{cases}$$</div>
       <p>По умолчанию threshold = 0.5. Но он должен быть подобран под задачу:</p>
@@ -99,7 +129,7 @@ App.registerTopic({
         <li>Высокий порог → меньше FP, но и пропусков больше (высокий precision, низкий recall).</li>
       </ul>
 
-      <h3>Многоклассовая классификация</h3>
+      <h3>📊 Многоклассовая классификация</h3>
       <p>Если классов больше двух, метрики обобщаются через <b>усреднение</b>:</p>
       <ul>
         <li><b>Macro-average</b> — считаем метрику для каждого класса, усредняем. Равный вес каждому классу.</li>
@@ -108,7 +138,7 @@ App.registerTopic({
       </ul>
       <p>При дисбалансе: macro показывает качество на редких классах, micro «приятно выглядит», но скрывает проблемы.</p>
 
-      <h3>Метрики для регрессии (коротко)</h3>
+      <h3>📉 Метрики для регрессии (коротко)</h3>
       <p>Для задачи регрессии применяются другие метрики:</p>
       <ul>
         <li><b>MAE</b> (Mean Absolute Error) — средняя модуль ошибки. Устойчива к выбросам.</li>
@@ -118,7 +148,7 @@ App.registerTopic({
         <li><b>MAPE</b> — в процентах от истинного значения.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«Accuracy — хорошая метрика по умолчанию»</b> — только при сбалансированных классах. Иначе опасно.</li>
         <li><b>«F1 = 0.9 — значит модель хорошая»</b> — не всегда. Важен контекст: что сравниваем, какие есть alternatives.</li>

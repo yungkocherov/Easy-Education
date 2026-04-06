@@ -16,7 +16,47 @@ App.registerTopic({
         <p>Нужны специальные техники, чтобы модель «обращала внимание» на редкий класс. SMOTE — одна из них: синтезирует новых «отличников» на основе существующих, делая класс более заметным.</p>
       </div>
 
-      <h3>Проблема дисбаланса</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 500 195" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SMOTE: синтетические примеры меньшинства</text>
+          <!-- Background area -->
+          <rect x="30" y="25" width="440" height="155" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <!-- Majority class (blue dots) - many dots -->
+          <circle cx="60" cy="55" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="90" cy="80" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="75" cy="110" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="110" cy="60" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="55" cy="140" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="130" cy="130" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="145" cy="90" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="100" cy="155" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="160" cy="50" r="8" fill="#6366f1" opacity="0.7"/>
+          <circle cx="170" cy="140" r="8" fill="#6366f1" opacity="0.7"/>
+          <!-- Legend label for majority -->
+          <circle cx="50" cy="185" r="6" fill="#6366f1" opacity="0.7"/>
+          <text x="62" y="189" font-size="9" fill="#334155">большинство</text>
+          <!-- Minority class (red dots) - few -->
+          <circle cx="340" cy="65" r="9" fill="#ef4444"/>
+          <circle cx="390" cy="90" r="9" fill="#ef4444"/>
+          <circle cx="365" cy="135" r="9" fill="#ef4444"/>
+          <!-- Connecting lines between minority points -->
+          <line x1="340" y1="65" x2="390" y2="90" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+          <line x1="390" y1="90" x2="365" y2="135" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+          <line x1="340" y1="65" x2="365" y2="135" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+          <!-- Synthetic points (green triangles) on connecting lines -->
+          <polygon points="362,76 369,91 355,91" fill="#10b981"/>
+          <polygon points="379,111 386,126 372,126" fill="#10b981"/>
+          <polygon points="350,97 357,112 343,112" fill="#10b981"/>
+          <!-- Legend -->
+          <circle cx="145" cy="185" r="6" fill="#ef4444"/>
+          <text x="157" y="189" font-size="9" fill="#334155">меньшинство</text>
+          <polygon points="238,180 244,191 232,191" fill="#10b981"/>
+          <text x="250" y="189" font-size="9" fill="#334155">синтетические (SMOTE)</text>
+        </svg>
+        <div class="caption">SMOTE: синие точки — класс большинства, красные — меньшинство. Зелёные треугольники — синтетические примеры, сгенерированные между красными точками по отрезкам.</div>
+      </div>
+
+      <h3>📊 Проблема дисбаланса</h3>
       <p>Дисбаланс классов — это ситуация, когда один класс в данных встречается намного чаще другого:</p>
       <ul>
         <li><b>Fraud detection</b>: 99.9% обычных транзакций, 0.1% мошеннических.</li>
@@ -38,7 +78,7 @@ App.registerTopic({
         <p>При дисбалансе классов <b>никогда не смотри только на accuracy</b>. Модель «всегда 0» на 99% дисбалансе даёт 99% accuracy, но 0% recall на редком классе. Используй precision, recall, F1, AUPRC.</p>
       </div>
 
-      <h3>Три подхода к решению</h3>
+      <h3>🔧 Три подхода к решению</h3>
 
       <h4>1. Работа с данными (resampling)</h4>
       <p>Балансируем классы через изменение данных:</p>
@@ -79,7 +119,7 @@ App.registerTopic({
         <li>Stratified K-Fold CV обязательна.</li>
       </ul>
 
-      <h3>Как работает SMOTE подробно</h3>
+      <h3>🔍 Как работает SMOTE подробно</h3>
       <p><span class="term" data-tip="Synthetic Minority Over-sampling Technique. Алгоритм, создающий синтетические примеры меньшинства через интерполяцию между существующими.">SMOTE</span> (Synthetic Minority Over-sampling Technique) — классический алгоритм. Идея: вместо дублирования существующих примеров, создавать <b>новые</b> между ними.</p>
 
       <p>Алгоритм для каждого нового примера:</p>
@@ -95,7 +135,7 @@ App.registerTopic({
 
       <p><b>Почему это работает:</b> мы не копируем точки, а создаём новые «похожие» примеры в том же регионе пространства. Модель видит более полную картину класса.</p>
 
-      <h3>Варианты SMOTE</h3>
+      <h3>📐 Варианты SMOTE</h3>
       <ul>
         <li><b>BorderlineSMOTE</b> — генерирует примеры только около <b>границы</b> с другим классом. Фокус на «сложных» примерах.</li>
         <li><b>ADASYN</b> — Adaptive Synthetic Sampling. Больше синтетических примеров для «сложных» регионов (где соседи разного класса).</li>
@@ -105,7 +145,7 @@ App.registerTopic({
         <li><b>SMOTE-NC</b> — для <span class="term" data-tip="Nominal Continuous. Смешанные данные с категориальными и числовыми признаками. Обычный SMOTE работает только с числовыми.">смешанных данных</span> (категориальные + числовые).</li>
       </ul>
 
-      <h3>Важные правила применения SMOTE</h3>
+      <h3>⚠️ Важные правила применения SMOTE</h3>
 
       <div class="callout warn">⚠️ <b>SMOTE — только на train!</b> Никогда не применяй его к validation/test. Иначе синтетические точки утекут из train в test → завышенная оценка качества. Это грубая форма data leakage.</div>
 
@@ -119,7 +159,7 @@ App.registerTopic({
 
       <p>В sklearn это делается через <code>imblearn.pipeline.Pipeline</code>.</p>
 
-      <h3>Когда SMOTE плохо работает</h3>
+      <h3>🚫 Когда SMOTE плохо работает</h3>
       <ul>
         <li><b>Высокая размерность</b> — «проклятие размерности», соседи перестают быть похожими.</li>
         <li><b>Категориальные признаки</b> — интерполяция бессмысленна (нельзя на 0.7 соединить «Москва» и «Лондон»). Нужен SMOTE-NC.</li>
@@ -127,7 +167,7 @@ App.registerTopic({
         <li><b>Сильный overlap с большинством</b> — SMOTE усугубит, создавая точки внутри класса большинства.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«SMOTE всегда помогает»</b> — нет. Иногда простой <code>class_weight='balanced'</code> работает лучше.</li>
         <li><b>«Нужно балансировать до 50/50»</b> — не обязательно. Часто оптимум — 20-30% меньшинства.</li>

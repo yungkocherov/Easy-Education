@@ -16,7 +16,55 @@ App.registerTopic({
         <p>Но у vanilla RNN короткая память: она забывает события из далёкого прошлого. LSTM исправляет это: добавляет механизмы «что запомнить» и «что забыть», как умный читатель.</p>
       </div>
 
-      <h3>Проблема обработки последовательностей</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 540 185" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+          <defs>
+            <marker id="arrowR" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#6366f1"/>
+            </marker>
+            <marker id="arrowRG" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#10b981"/>
+            </marker>
+            <marker id="arrowRB" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#64748b"/>
+            </marker>
+          </defs>
+          <!-- Three RNN cells -->
+          <!-- Cell 1 -->
+          <rect x="60" y="75" width="70" height="45" rx="8" fill="#ede9fe" stroke="#6366f1" stroke-width="2.5"/>
+          <text x="95" y="103" text-anchor="middle" font-size="14" fill="#4f46e5" font-weight="700">h₁</text>
+          <!-- Cell 2 -->
+          <rect x="215" y="75" width="70" height="45" rx="8" fill="#ede9fe" stroke="#6366f1" stroke-width="2.5"/>
+          <text x="250" y="103" text-anchor="middle" font-size="14" fill="#4f46e5" font-weight="700">h₂</text>
+          <!-- Cell 3 -->
+          <rect x="370" y="75" width="70" height="45" rx="8" fill="#ede9fe" stroke="#6366f1" stroke-width="2.5"/>
+          <text x="405" y="103" text-anchor="middle" font-size="14" fill="#4f46e5" font-weight="700">h₃</text>
+          <!-- Horizontal arrows h1→h2, h2→h3 -->
+          <line x1="130" y1="97" x2="215" y2="97" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrowR)"/>
+          <line x1="285" y1="97" x2="370" y2="97" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrowR)"/>
+          <!-- Dots continuing right -->
+          <text x="460" y="102" font-size="18" fill="#6366f1" font-weight="700">···</text>
+          <!-- Input arrows x1, x2, x3 from below -->
+          <line x1="95" y1="140" x2="95" y2="120" stroke="#64748b" stroke-width="2" marker-end="url(#arrowRB)"/>
+          <text x="95" y="160" text-anchor="middle" font-size="12" fill="#334155" font-weight="600">x₁</text>
+          <line x1="250" y1="140" x2="250" y2="120" stroke="#64748b" stroke-width="2" marker-end="url(#arrowRB)"/>
+          <text x="250" y="160" text-anchor="middle" font-size="12" fill="#334155" font-weight="600">x₂</text>
+          <line x1="405" y1="140" x2="405" y2="120" stroke="#64748b" stroke-width="2" marker-end="url(#arrowRB)"/>
+          <text x="405" y="160" text-anchor="middle" font-size="12" fill="#334155" font-weight="600">x₃</text>
+          <!-- Output arrows y1, y2, y3 from above -->
+          <line x1="95" y1="75" x2="95" y2="50" stroke="#10b981" stroke-width="2" marker-end="url(#arrowRG)"/>
+          <text x="95" y="40" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">y₁</text>
+          <line x1="250" y1="75" x2="250" y2="50" stroke="#10b981" stroke-width="2" marker-end="url(#arrowRG)"/>
+          <text x="250" y="40" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">y₂</text>
+          <line x1="405" y1="75" x2="405" y2="50" stroke="#10b981" stroke-width="2" marker-end="url(#arrowRG)"/>
+          <text x="405" y="40" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">y₃</text>
+          <!-- Label -->
+          <text x="270" y="183" text-anchor="middle" font-size="10" fill="#64748b">Разворот RNN во времени: одни и те же веса на каждом шаге</text>
+        </svg>
+        <div class="caption">Развёрнутая во времени RNN: три копии одного блока h, связанные стрелками скрытого состояния. Входы x₁, x₂, x₃ подаются снизу, выходы y₁, y₂, y₃ выходят сверху.</div>
+      </div>
+
+      <h3>🎯 Проблема обработки последовательностей</h3>
       <p>Многие данные имеют <b>последовательную</b> природу:</p>
       <ul>
         <li>Тексты (слова в порядке).</li>
@@ -28,7 +76,7 @@ App.registerTopic({
 
       <p>Обычная полносвязная сеть (MLP) или CNN не умеют работать с последовательностями разной длины и не учитывают порядок. Нужен новый подход.</p>
 
-      <h3>Идея RNN: скрытое состояние</h3>
+      <h3>💡 Идея RNN: скрытое состояние</h3>
       <p>RNN обрабатывает последовательность <b>элемент за элементом</b>. На каждом шаге:</p>
       <ol>
         <li>Получает текущий вход $x_t$.</li>
@@ -46,7 +94,7 @@ App.registerTopic({
         <p>RNN применяет <b>одну и ту же</b> функцию к каждому элементу последовательности, передавая информацию через скрытое состояние. Это позволяет обрабатывать последовательности любой длины и учитывать весь прошлый контекст.</p>
       </div>
 
-      <h3>Разворачивание во времени</h3>
+      <h3>⏱️ Разворачивание во времени</h3>
       <p>RNN можно представить как <b>очень глубокую</b> сеть, где каждый слой — это один временной шаг:</p>
       <pre>x_1 → h_1 → h_2 → h_3 → ... → h_T → output
       ↑     ↑     ↑           ↑
@@ -54,12 +102,12 @@ App.registerTopic({
 
       <p>Все эти «слои» используют одни и те же веса. При обучении применяется <span class="term" data-tip="BPTT. Backpropagation Through Time. Алгоритм обратного распространения для RNN: разворачиваем сеть во времени и применяем обычный backprop.">backpropagation through time (BPTT)</span>.</p>
 
-      <h3>Проблема vanishing gradients</h3>
+      <h3>⚠️ Проблема vanishing gradients</h3>
       <p>Главная болезнь vanilla RNN. При BPTT через много шагов градиент умножается на $W_{hh}$ снова и снова. Если собственные значения меньше 1 — градиент <b>затухает</b> экспоненциально.</p>
       <p>Последствие: сеть <b>не может помнить далёкое прошлое</b>. Связи длиной больше 10-20 шагов почти не обучаются.</p>
       <p>Альтернатива — <b>exploding gradients</b>: если собственные значения > 1, градиенты взрываются. Решается gradient clipping.</p>
 
-      <h3>LSTM — революция в памяти</h3>
+      <h3>🏗️ LSTM — революция в памяти</h3>
       <p><span class="term" data-tip="Long Short-Term Memory. Специальная архитектура RNN с механизмом 'гейтов', решающая проблему vanishing gradients. Может помнить контекст на сотни шагов.">LSTM</span> (1997) решает проблему vanishing gradients через <b>cell state</b> — отдельный «канал памяти» с аддитивными обновлениями.</p>
 
       <p>LSTM добавляет три <b>гейта</b> (ворота), контролирующие информацию:</p>
@@ -81,7 +129,7 @@ App.registerTopic({
 
       <p>Ключевой момент: cell state обновляется <b>аддитивно</b> — то есть градиенты проходят через неё без экспоненциального затухания. Поэтому LSTM может помнить сотни шагов назад.</p>
 
-      <h3>GRU — упрощённая LSTM</h3>
+      <h3>🔧 GRU — упрощённая LSTM</h3>
       <p><span class="term" data-tip="Gated Recurrent Unit. Упрощённая версия LSTM с двумя гейтами вместо трёх. Меньше параметров, часто работает не хуже.">GRU</span> (2014) — более простая версия LSTM:</p>
       <ul>
         <li>2 гейта вместо 3 (update и reset).</li>
@@ -92,7 +140,7 @@ App.registerTopic({
 
       <p>На практике GRU и LSTM дают похожие результаты. Выбор — эмпирический.</p>
 
-      <h3>Типы задач с RNN</h3>
+      <h3>📋 Типы задач с RNN</h3>
       <ul>
         <li><b>Many-to-one:</b> вход — последовательность, выход — один. Классификация текста, sentiment analysis.</li>
         <li><b>Many-to-many (sync):</b> вход и выход одной длины. POS-tagging.</li>
@@ -100,10 +148,10 @@ App.registerTopic({
         <li><b>One-to-many:</b> один вход, много выходов. Image captioning.</li>
       </ul>
 
-      <h3>Bidirectional RNN</h3>
+      <h3>↔️ Bidirectional RNN</h3>
       <p>Для некоторых задач важен контекст <b>и справа, и слева</b>. Bidirectional RNN = две RNN: одна идёт вперёд, другая назад. Их hidden states объединяются.</p>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li>Обрабатывает последовательности переменной длины.</li>
@@ -120,7 +168,7 @@ App.registerTopic({
         <li><b>Уступает Transformer</b> в большинстве NLP задач.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«RNN помнит всё»</b> — vanilla RNN забывает быстро. LSTM помнит дольше, но тоже ограничен.</li>
         <li><b>«LSTM решает все проблемы RNN»</b> — частично. На очень длинных последовательностях (>1000) тоже проблемы.</li>
@@ -162,7 +210,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>MLP</b> — RNN это MLP с обратной связью.</li>
         <li><b>Transformer</b> — современная альтернатива для последовательностей.</li>

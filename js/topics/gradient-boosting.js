@@ -16,7 +16,47 @@ App.registerTopic({
         <p>Это кардинально отличается от Random Forest: там деревья независимы и работают параллельно. Здесь — последовательная цепочка, где каждое следующее дерево «стоит на плечах» предыдущих.</p>
       </div>
 
-      <h3>Основная идея</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+          <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Gradient Boosting: последовательное исправление ошибок</text>
+          <!-- Stage 1 box -->
+          <rect x="20" y="30" width="130" height="90" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
+          <text x="85" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">Дерево 1</text>
+          <text x="85" y="70" text-anchor="middle" font-size="9" fill="#475569">Исходные данные</text>
+          <text x="85" y="85" text-anchor="middle" font-size="9" fill="#475569">F₀ = среднее(y)</text>
+          <text x="85" y="108" text-anchor="middle" font-size="9" fill="#ef4444">Ошибка: большая</text>
+          <text x="85" y="133" text-anchor="middle" font-size="20">📊</text>
+          <!-- Plus sign -->
+          <text x="168" y="85" text-anchor="middle" font-size="24" font-weight="700" fill="#10b981">+</text>
+          <!-- Stage 2 box: residuals -->
+          <rect x="195" y="30" width="140" height="90" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="265" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#10b981">Дерево 2</text>
+          <text x="265" y="70" text-anchor="middle" font-size="9" fill="#475569">Учится на остатках</text>
+          <text x="265" y="85" text-anchor="middle" font-size="9" fill="#475569">r = y − F₀(x)</text>
+          <text x="265" y="108" text-anchor="middle" font-size="9" fill="#f59e0b">Ошибка: меньше</text>
+          <text x="265" y="133" text-anchor="middle" font-size="20">📉</text>
+          <!-- Plus sign -->
+          <text x="352" y="85" text-anchor="middle" font-size="24" font-weight="700" fill="#10b981">+</text>
+          <!-- Stage 3 box: smaller residuals -->
+          <rect x="375" y="30" width="140" height="90" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="445" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Дерево 3</text>
+          <text x="445" y="70" text-anchor="middle" font-size="9" fill="#475569">Учится на новых</text>
+          <text x="445" y="85" text-anchor="middle" font-size="9" fill="#475569">остатках r²</text>
+          <text x="445" y="108" text-anchor="middle" font-size="9" fill="#10b981">Ошибка: минимальна</text>
+          <text x="445" y="133" text-anchor="middle" font-size="20">✅</text>
+          <!-- Bottom result line -->
+          <line x1="85" y1="165" x2="85" y2="178" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="265" y1="165" x2="265" y2="178" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="445" y1="165" x2="445" y2="178" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="85" y1="178" x2="445" y2="178" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="265" y1="178" x2="265" y2="190" stroke="#64748b" stroke-width="1.5"/>
+          <rect x="165" y="188" width="200" height="18" rx="5" fill="#6366f1"/>
+          <text x="265" y="201" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">F_M = F₀ + η·h₁ + η·h₂ + ...</text>
+        </svg>
+        <div class="caption">Gradient Boosting: каждое следующее дерево обучается на остатках (ошибках) предыдущих. Финальная модель — взвешенная сумма всех деревьев.</div>
+      </div>
+
+      <h3>💡 Основная идея</h3>
       <p>Gradient Boosting — это ансамбль деревьев, где каждое следующее дерево обучается на <b>ошибках</b> предыдущих. Это принципиально отличается от Random Forest, где деревья независимы.</p>
 
       <p>Общая схема:</p>
@@ -38,14 +78,14 @@ App.registerTopic({
         <p>Boosting исправляет <b>bias</b> слабых моделей, объединяя их в сильную. Каждое дерево — небольшое улучшение, но много маленьких улучшений складываются в отличный результат.</p>
       </div>
 
-      <h3>Почему «градиентный»?</h3>
+      <h3>🔍 Почему «градиентный»?</h3>
       <p>На самом деле каждое новое дерево учится не на самих остатках, а на <b>отрицательном градиенте</b> функции потерь:</p>
       <div class="math-block">$$r_i^{(m)} = -\\left[\\frac{\\partial L(y_i, F(x_i))}{\\partial F(x_i)}\\right]_{F=F_{m-1}}$$</div>
 
       <p>Для MSE градиент = $y - F$, то есть обычный остаток. Но для других функций потерь (log-loss, Huber) градиент другой — и именно на нём учится новое дерево.</p>
       <p>Это и есть <b>gradient boosting</b>: мы делаем шаг в сторону уменьшения loss, «спускаясь по градиенту» в пространстве функций.</p>
 
-      <h3>Learning rate η — главный параметр</h3>
+      <h3>⚙️ Learning rate η — главный параметр</h3>
       <p>Без коэффициента $\\eta$ (learning rate) каждое новое дерево полностью заменяло бы ошибки предыдущих — это быстро переобучается. Поэтому мы «замедляем» обучение:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
 
@@ -57,7 +97,7 @@ App.registerTopic({
 
       <p><b>Правило:</b> меньше η → нужно больше деревьев M. Чаще всего η ∈ [0.01, 0.1].</p>
 
-      <h3>Как бороться с переобучением</h3>
+      <h3>🛡️ Как бороться с переобучением</h3>
       <p>Boosting склонен к переобучению. Инструменты борьбы:</p>
       <ul>
         <li><b>Learning rate</b> — главная ручка. Маленький η + много деревьев.</li>
@@ -68,7 +108,7 @@ App.registerTopic({
         <li><b>Регуляризация</b> — L1/L2 на листьях (XGBoost, LightGBM).</li>
       </ul>
 
-      <h3>Современные реализации</h3>
+      <h3>🚀 Современные реализации</h3>
       <p>Простой Gradient Boosting — медленный и базовый. На практике используют оптимизированные библиотеки:</p>
 
       <h4>XGBoost (2014)</h4>
@@ -95,7 +135,7 @@ App.registerTopic({
         <li>Симметричные деревья — быстрый inference.</li>
       </ul>
 
-      <h3>Бустинг vs Random Forest</h3>
+      <h3>⚖️ Бустинг vs Random Forest</h3>
       <table>
         <tr><th>Критерий</th><th>Random Forest</th><th>Gradient Boosting</th></tr>
         <tr><td>Построение</td><td>Параллельно</td><td>Последовательно</td></tr>
@@ -107,7 +147,7 @@ App.registerTopic({
         <tr><td>Параллелизация</td><td>Отличная</td><td>Слабая</td></tr>
       </table>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li><b>Обычно лучшее качество</b> на табличных данных.</li>
@@ -126,7 +166,7 @@ App.registerTopic({
         <li>Чувствителен к шуму в таргете.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«Чем больше M, тем лучше»</b> — нет, модель переобучится. Используй early stopping.</li>
         <li><b>«Boosting заменяет deep learning»</b> — на табличных данных да, на изображениях/тексте — нет.</li>
@@ -172,7 +212,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>Decision Tree</b> — базовый блок бустинга.</li>
         <li><b>Random Forest</b> — альтернативный ансамбль деревьев.</li>

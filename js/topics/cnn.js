@@ -16,7 +16,89 @@ App.registerTopic({
         <p>Это подражает тому, как работает зрительная кора человека: сначала простые элементы, потом их комбинации. Так машина «видит» картинку иерархически.</p>
       </div>
 
-      <h3>Проблема обычных сетей на изображениях</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 540 190" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+          <!-- Input image grid 5x5 -->
+          <text x="45" y="20" text-anchor="middle" font-size="11" fill="#334155" font-weight="600">Вход (5×5)</text>
+          <g id="input-grid">
+            <!-- Draw 5x5 cells at x=10, y=28, cell size 24 -->
+            <!-- Row 0 -->
+            <rect x="10" y="28" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="34" y="28" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="58" y="28" width="24" height="24" fill="#c7d2fe" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="82" y="28" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="106" y="28" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Row 1 -->
+            <rect x="10" y="52" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="34" y="52" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="58" y="52" width="24" height="24" fill="#c7d2fe" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="82" y="52" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="106" y="52" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Row 2 -->
+            <rect x="10" y="76" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="34" y="76" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="58" y="76" width="24" height="24" fill="#c7d2fe" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="82" y="76" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="106" y="76" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Row 3 -->
+            <rect x="10" y="100" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="34" y="100" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="58" y="100" width="24" height="24" fill="#c7d2fe" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="82" y="100" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="106" y="100" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Row 4 -->
+            <rect x="10" y="124" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="34" y="124" width="24" height="24" fill="#eff6ff" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="58" y="124" width="24" height="24" fill="#c7d2fe" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="82" y="124" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+            <rect x="106" y="124" width="24" height="24" fill="#6366f1" stroke="#94a3b8" stroke-width="1"/>
+          </g>
+          <!-- 3x3 sliding filter overlay (highlighted) -->
+          <rect x="10" y="28" width="72" height="72" fill="none" stroke="#f59e0b" stroke-width="3" rx="2"/>
+          <text x="46" y="115" text-anchor="middle" font-size="9" fill="#b45309" font-weight="600">3×3 фильтр</text>
+          <!-- Filter kernel box -->
+          <text x="215" y="20" text-anchor="middle" font-size="11" fill="#334155" font-weight="600">Фильтр (3×3)</text>
+          <rect x="175" y="28" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="188" y="45" text-anchor="middle" font-size="10" fill="#92400e">-1</text>
+          <rect x="201" y="28" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="214" y="45" text-anchor="middle" font-size="10" fill="#92400e">0</text>
+          <rect x="227" y="28" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="240" y="45" text-anchor="middle" font-size="10" fill="#92400e">+1</text>
+          <rect x="175" y="54" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="188" y="71" text-anchor="middle" font-size="10" fill="#92400e">-2</text>
+          <rect x="201" y="54" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="214" y="71" text-anchor="middle" font-size="10" fill="#92400e">0</text>
+          <rect x="227" y="54" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="240" y="71" text-anchor="middle" font-size="10" fill="#92400e">+2</text>
+          <rect x="175" y="80" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="188" y="97" text-anchor="middle" font-size="10" fill="#92400e">-1</text>
+          <rect x="201" y="80" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="214" y="97" text-anchor="middle" font-size="10" fill="#92400e">0</text>
+          <rect x="227" y="80" width="26" height="26" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/><text x="240" y="97" text-anchor="middle" font-size="10" fill="#92400e">+1</text>
+          <!-- Arrow → -->
+          <defs>
+            <marker id="arrowC" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#6366f1"/>
+            </marker>
+          </defs>
+          <line x1="270" y1="80" x2="315" y2="80" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrowC)"/>
+          <text x="292" y="73" text-anchor="middle" font-size="9" fill="#6366f1">свёртка</text>
+          <!-- Feature map 3x3 output -->
+          <text x="375" y="20" text-anchor="middle" font-size="11" fill="#334155" font-weight="600">Feature map (3×3)</text>
+          <rect x="330" y="28" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="345" y="48" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="360" y="28" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="375" y="48" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="390" y="28" width="30" height="30" rx="3" fill="#eff6ff" stroke="#10b981" stroke-width="1.5"/><text x="405" y="48" text-anchor="middle" font-size="11" fill="#065f46">0</text>
+          <rect x="330" y="58" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="345" y="78" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="360" y="58" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="375" y="78" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="390" y="58" width="30" height="30" rx="3" fill="#eff6ff" stroke="#10b981" stroke-width="1.5"/><text x="405" y="78" text-anchor="middle" font-size="11" fill="#065f46">0</text>
+          <rect x="330" y="88" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="345" y="108" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="360" y="88" width="30" height="30" rx="3" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/><text x="375" y="108" text-anchor="middle" font-size="11" fill="#065f46">4</text>
+          <rect x="390" y="88" width="30" height="30" rx="3" fill="#eff6ff" stroke="#10b981" stroke-width="1.5"/><text x="405" y="108" text-anchor="middle" font-size="11" fill="#065f46">0</text>
+          <!-- Sliding arrow hint -->
+          <path d="M82,100 C120,155 155,155 175,135" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrSlide)"/>
+          <defs>
+            <marker id="arrSlide" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0 0, 6 3, 0 6" fill="#f59e0b"/>
+            </marker>
+          </defs>
+          <text x="128" y="168" text-anchor="middle" font-size="9" fill="#b45309">скользит →</text>
+        </svg>
+        <div class="caption">Фильтр 3×3 скользит по входному изображению 5×5 (stride=1, без padding). В каждой позиции вычисляется свёрточная сумма → feature map 3×3. Высокие значения (4) там, где фильтр обнаружил вертикальную границу.</div>
+      </div>
+
+      <h3>🎯 Проблема обычных сетей на изображениях</h3>
       <p>Полносвязная сеть (MLP) для изображения 224×224×3 требует ~150 000 весов на <b>один</b> нейрон первого слоя. Для тысяч нейронов в сети — миллиарды параметров. Это:</p>
       <ul>
         <li>Огромный размер модели.</li>
@@ -27,7 +109,7 @@ App.registerTopic({
 
       <p>Проблема в том, что полносвязная сеть <b>не знает</b>, что соседние пиксели связаны. Пиксель (10, 10) и (11, 10) для неё такие же «разные», как (10, 10) и (200, 200).</p>
 
-      <h3>Три ключевых идеи CNN</h3>
+      <h3>💡 Три ключевых идеи CNN</h3>
 
       <h4>1. Локальные связи</h4>
       <p>Каждый нейрон смотрит только на небольшое <b>окно</b> изображения (например, 3×3 пикселя), а не на всю картинку. Это резко уменьшает число параметров.</p>
@@ -43,7 +125,7 @@ App.registerTopic({
         <p>Вместо обучения миллиардов весов между всеми пикселями, CNN обучает <b>маленькие фильтры</b> (3×3 или 5×5), которые скользят по изображению. Каждый фильтр ловит свой паттерн, и один и тот же фильтр применяется везде.</p>
       </div>
 
-      <h3>Операция свёртки</h3>
+      <h3>🔲 Операция свёртки</h3>
       <p><span class="term" data-tip="Convolution. Математическая операция скользящего окна: фильтр 'проходит' по изображению и в каждой позиции вычисляет взвешенную сумму пикселей под ним.">Свёртка</span> — базовая операция CNN. Небольшая матрица <span class="term" data-tip="Kernel / Filter. Маленькая матрица весов (обычно 3×3 или 5×5), которая 'скользит' по изображению и применяется в каждой позиции.">kernel</span> $K \\times K$ скользит по изображению. В каждой позиции:</p>
       <ol>
         <li>Умножаем значения фильтра на соответствующие пиксели окна.</li>
@@ -59,7 +141,7 @@ App.registerTopic({
 [-1  0  1]</pre>
       <p>Применив его к изображению, получим карту с высокими значениями там, где есть вертикальный перепад яркости.</p>
 
-      <h3>Параметры свёртки</h3>
+      <h3>⚙️ Параметры свёртки</h3>
       <ul>
         <li><b>Kernel size</b> — размер фильтра. Обычно 3×3 или 5×5.</li>
         <li><b>Stride</b> — шаг скольжения. Stride=1: пиксель за пикселем. Stride=2: через один.</li>
@@ -70,7 +152,7 @@ App.registerTopic({
       <p>Формула размера выхода:</p>
       <div class="math-block">$$H_{out} = \\left\\lfloor \\frac{H_{in} + 2p - k}{s} \\right\\rfloor + 1$$</div>
 
-      <h3>Pooling (агрегация)</h3>
+      <h3>🗜️ Pooling (агрегация)</h3>
       <p>После свёрток обычно делают <span class="term" data-tip="Pooling. Операция агрегации: из окна (обычно 2×2) берём одно значение — максимум или среднее. Уменьшает размер feature map.">pooling</span> — уменьшение размера feature map:</p>
       <ul>
         <li><b>MaxPooling</b> — берёт максимум из окна (обычно 2×2). Сохраняет самые сильные активации.</li>
@@ -84,7 +166,7 @@ App.registerTopic({
         <li>Увеличивает receptive field.</li>
       </ul>
 
-      <h3>Типичная архитектура CNN</h3>
+      <h3>🏗️ Типичная архитектура CNN</h3>
       <pre>Input (224×224×3)  ← исходное изображение
   → Conv 3×3, 64 filters → ReLU → MaxPool 2×2   (112×112×64)
   → Conv 3×3, 128 filters → ReLU → MaxPool 2×2  (56×56×128)
@@ -93,7 +175,7 @@ App.registerTopic({
 
       <p>Идея: <b>глубина растёт</b> (больше фильтров), <b>размер уменьшается</b> (pooling). Получаем компактное, но информативное представление.</p>
 
-      <h3>Иерархия признаков</h3>
+      <h3>🔍 Иерархия признаков</h3>
       <p>Вот в чём магия CNN. Разные слои выучивают <b>разные уровни</b> абстракции:</p>
 
       <ul>
@@ -105,11 +187,11 @@ App.registerTopic({
 
       <p>Это <b>автоматическое</b> обучение признаков — не нужно вручную описывать, что искать. CNN сама находит полезные паттерны.</p>
 
-      <h3>Receptive field</h3>
+      <h3>👁️ Receptive field</h3>
       <p><span class="term" data-tip="Receptive Field. Область входного изображения, которая влияет на один нейрон в глубоком слое. Растёт с глубиной сети.">Receptive field</span> — это область входного изображения, которая влияет на один нейрон. С глубиной он растёт: нейрон в 5-м слое «видит» большую область оригинальной картинки.</p>
       <p>Глубокие слои учат крупные паттерны, потому что у них большой receptive field.</p>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li><b>Отлично для изображений</b> — state-of-the-art долгое время.</li>
@@ -162,7 +244,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>MLP</b> — CNN это MLP с хитрыми ограничениями.</li>
         <li><b>Transfer Learning</b> — предобученные CNN используются как основа.</li>

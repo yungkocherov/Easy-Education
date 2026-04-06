@@ -16,7 +16,58 @@ App.registerTopic({
         <p>Результат: 10 групп похожих людей, каждая сгруппирована вокруг своего центра. Это и есть K-Means — простой, наглядный и часто эффективный алгоритм кластеризации.</p>
       </div>
 
-      <h3>Задача кластеризации</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 500 205" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">K-Means: три кластера с центроидами</text>
+          <!-- Background -->
+          <rect x="25" y="25" width="450" height="165" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <!-- Cluster 1: indigo dots + centroid -->
+          <circle cx="95" cy="70" r="7" fill="#6366f1" opacity="0.75"/>
+          <circle cx="75" cy="95" r="7" fill="#6366f1" opacity="0.75"/>
+          <circle cx="115" cy="100" r="7" fill="#6366f1" opacity="0.75"/>
+          <circle cx="85" cy="125" r="7" fill="#6366f1" opacity="0.75"/>
+          <circle cx="110" cy="65" r="7" fill="#6366f1" opacity="0.75"/>
+          <!-- Centroid 1 (large) -->
+          <circle cx="97" cy="92" r="13" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
+          <text x="97" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">C₁</text>
+          <!-- Dashed circle around cluster 1 -->
+          <circle cx="97" cy="92" r="48" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
+          <!-- Cluster 2: green dots + centroid -->
+          <circle cx="250" cy="55" r="7" fill="#10b981" opacity="0.75"/>
+          <circle cx="230" cy="80" r="7" fill="#10b981" opacity="0.75"/>
+          <circle cx="270" cy="80" r="7" fill="#10b981" opacity="0.75"/>
+          <circle cx="245" cy="110" r="7" fill="#10b981" opacity="0.75"/>
+          <circle cx="265" cy="52" r="7" fill="#10b981" opacity="0.75"/>
+          <!-- Centroid 2 -->
+          <circle cx="252" cy="78" r="13" fill="#10b981" stroke="#fff" stroke-width="2.5"/>
+          <text x="252" y="82" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">C₂</text>
+          <!-- Dashed circle around cluster 2 -->
+          <circle cx="252" cy="78" r="45" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
+          <!-- Cluster 3: amber dots + centroid -->
+          <circle cx="390" cy="105" r="7" fill="#f59e0b" opacity="0.75"/>
+          <circle cx="415" cy="85" r="7" fill="#f59e0b" opacity="0.75"/>
+          <circle cx="420" cy="140" r="7" fill="#f59e0b" opacity="0.75"/>
+          <circle cx="400" cy="160" r="7" fill="#f59e0b" opacity="0.75"/>
+          <circle cx="445" cy="110" r="7" fill="#f59e0b" opacity="0.75"/>
+          <!-- Centroid 3 -->
+          <circle cx="415" cy="120" r="13" fill="#f59e0b" stroke="#fff" stroke-width="2.5"/>
+          <text x="415" y="124" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">C₃</text>
+          <!-- Dashed circle around cluster 3 -->
+          <circle cx="415" cy="120" r="50" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
+          <!-- Legend -->
+          <circle cx="50" cy="200" r="5" fill="#6366f1"/>
+          <text x="62" y="204" font-size="9" fill="#334155">кластер 1</text>
+          <circle cx="140" cy="200" r="5" fill="#10b981"/>
+          <text x="152" y="204" font-size="9" fill="#334155">кластер 2</text>
+          <circle cx="230" cy="200" r="5" fill="#f59e0b"/>
+          <text x="242" y="204" font-size="9" fill="#334155">кластер 3</text>
+          <circle cx="320" cy="200" r="10" fill="#6366f1" stroke="#fff" stroke-width="2"/>
+          <text x="336" y="204" font-size="9" fill="#334155">центроид</text>
+        </svg>
+        <div class="caption">K-Means с k=3: большие круги с C₁/C₂/C₃ — центроиды, малые точки — данные, пунктирные окружности — границы кластерного назначения.</div>
+      </div>
+
+      <h3>📊 Задача кластеризации</h3>
       <p>У нас есть данные <b>без разметки</b> — только признаки, никаких классов. Хочется найти <b>естественные группы</b> среди этих точек: похожие объекты объединить, разные — разделить.</p>
       <p>Это задача <span class="term" data-tip="Unsupervised Learning. Обучение без учителя. Модель находит структуру в данных без размеченных ответов.">обучения без учителя</span> (unsupervised learning). Кластеризация — её главный представитель.</p>
 
@@ -31,7 +82,7 @@ App.registerTopic({
         <p>K-Means ищет $k$ точек (<span class="term" data-tip="Centroid. Центр кластера — точка, координаты которой равны среднему координат всех точек кластера.">центроидов</span>), которые «представляют» свои группы. Каждая точка данных относится к ближайшему центроиду. Центроиды оптимизируются так, чтобы суммарное расстояние точек до их центра было минимальным.</p>
       </div>
 
-      <h3>Алгоритм Ллойда (классический K-Means)</h3>
+      <h3>🔄 Алгоритм Ллойда (классический K-Means)</h3>
       <p>Простая итеративная процедура:</p>
       <ol>
         <li><b>Инициализация:</b> выбрать $k$ случайных центроидов.</li>
@@ -42,7 +93,7 @@ App.registerTopic({
 
       <p>Алгоритм гарантированно сходится за конечное число итераций (обычно 10-20).</p>
 
-      <h3>Что именно минимизирует K-Means</h3>
+      <h3>🧮 Что именно минимизирует K-Means</h3>
       <p>Формально K-Means минимизирует сумму квадратов расстояний от точек до их центроидов:</p>
       <div class="math-block">$$J = \\sum_{i=1}^{n} \\|x_i - \\mu_{c(i)}\\|^2$$</div>
 
@@ -50,7 +101,7 @@ App.registerTopic({
 
       <p><b>Важно:</b> это невыпуклая задача с локальными минимумами. Разные инициализации дают разные результаты.</p>
 
-      <h3>Инициализация — критически важна</h3>
+      <h3>⚙️ Инициализация — критически важна</h3>
       <p>Если начать со случайных точек, K-Means может попасть в плохой локальный минимум. Решение: <span class="term" data-tip="K-Means++. Умная инициализация центроидов: первый центр случайный, следующие выбираются с вероятностью, пропорциональной квадрату расстояния до ближайшего уже выбранного центра.">K-Means++</span>:</p>
 
       <ol>
@@ -61,7 +112,7 @@ App.registerTopic({
 
       <p>Центроиды получаются «далеко друг от друга» — лучше покрывают пространство. Это стандартная инициализация в sklearn.</p>
 
-      <h3>Выбор k — главный вопрос</h3>
+      <h3>🎯 Выбор k — главный вопрос</h3>
       <p>K-Means требует знать $k$ заранее. Как выбрать?</p>
 
       <h4>Elbow Method</h4>
@@ -82,7 +133,7 @@ App.registerTopic({
       <h4>Знание предметной области</h4>
       <p>Иногда $k$ диктуется задачей: «нам нужны 5 сегментов клиентов для маркетинга». Тогда выбор предопределён.</p>
 
-      <h3>Ограничения K-Means</h3>
+      <h3>⚠️ Ограничения K-Means</h3>
       <p>K-Means прост и быстр, но имеет серьёзные ограничения:</p>
 
       <h4>1. Ищет только сферические кластеры</h4>
@@ -103,7 +154,7 @@ App.registerTopic({
       <h4>6. Плохо с выбросами</h4>
       <p>Центроиды — средние, а среднее чувствительно к выбросам.</p>
 
-      <h3>Применения</h3>
+      <h3>🔧 Применения</h3>
       <ul>
         <li><b>Сегментация клиентов</b> — группировка по поведению (RFM-анализ).</li>
         <li><b>Сжатие изображений</b> — квантизация цветов.</li>
@@ -113,7 +164,7 @@ App.registerTopic({
         <li><b>Vector quantization</b> — в speech и image processing.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«K-Means универсален»</b> — нет, только для круглых кластеров.</li>
         <li><b>«Inertia — хорошая метрика качества»</b> — только при фиксированном k.</li>
@@ -156,7 +207,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>DBSCAN</b> — альтернатива для некруглых кластеров и с шумом.</li>
         <li><b>PCA</b> — часто применяется перед K-Means для снижения размерности.</li>

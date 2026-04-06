@@ -16,7 +16,53 @@ App.registerTopic({
         <p>Точки, которые <b>определяют</b> положение границы (самые близкие к ней) — «опорные векторы» (support vectors). Это и есть название метода.</p>
       </div>
 
-      <h3>Задача максимального зазора</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SVM: максимальный зазор между классами</text>
+          <!-- Background -->
+          <rect x="30" y="25" width="440" height="160" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <!-- Class 1 dots (blue / indigo) -->
+          <circle cx="100" cy="65" r="9" fill="#6366f1"/>
+          <circle cx="80" cy="100" r="9" fill="#6366f1"/>
+          <circle cx="120" cy="130" r="9" fill="#6366f1"/>
+          <circle cx="65" cy="148" r="9" fill="#6366f1"/>
+          <circle cx="140" cy="85" r="9" fill="#6366f1"/>
+          <!-- Class 2 dots (amber) -->
+          <circle cx="350" cy="55" r="9" fill="#f59e0b"/>
+          <circle cx="390" cy="85" r="9" fill="#f59e0b"/>
+          <circle cx="360" cy="120" r="9" fill="#f59e0b"/>
+          <circle cx="420" cy="140" r="9" fill="#f59e0b"/>
+          <circle cx="400" cy="55" r="9" fill="#f59e0b"/>
+          <!-- Support vectors (highlighted with stroke) -->
+          <circle cx="140" cy="85" r="9" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="120" cy="130" r="9" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="350" cy="55" r="9" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="360" cy="120" r="9" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
+          <!-- Decision boundary (solid) -->
+          <line x1="220" y1="30" x2="250" y2="175" stroke="#6366f1" stroke-width="2.5"/>
+          <!-- Margin lines (dashed) -->
+          <line x1="178" y1="30" x2="208" y2="175" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <line x1="262" y1="30" x2="292" y2="175" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <!-- Margin label -->
+          <text x="230" y="98" text-anchor="middle" font-size="10" fill="#64748b">margin</text>
+          <line x1="180" y1="103" x2="262" y2="103" stroke="#64748b" stroke-width="1" marker-end="url(#sv_arr)"/>
+          <!-- Labels -->
+          <text x="90" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">Класс A</text>
+          <text x="390" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Класс B</text>
+          <text x="235" y="45" text-anchor="middle" font-size="9" fill="#6366f1">граница</text>
+          <!-- Support vector label -->
+          <text x="450" y="88" font-size="8" fill="#ef4444">← опорные</text>
+          <text x="450" y="99" font-size="8" fill="#ef4444">   векторы</text>
+          <defs>
+            <marker id="sv_arr" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="#64748b"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="caption">SVM находит гиперплоскость (синяя линия) с максимальным зазором (margin) между классами. Пунктирные линии — границы margin. Точки с красной обводкой — опорные векторы.</div>
+      </div>
+
+      <h3>🎯 Задача максимального зазора</h3>
       <p>SVM (Support Vector Machine, Метод опорных векторов) решает задачу классификации с новой идеей: <b>не просто разделить</b> классы, а разделить их <b>максимально уверенно</b>.</p>
 
       <p>Если классы линейно разделимы, существует бесконечно много разделяющих прямых. Какая лучшая? Та, что дальше всего от обеих групп. Это даёт максимальный «зазор безопасности».</p>
@@ -30,7 +76,7 @@ App.registerTopic({
         <p>SVM ищет гиперплоскость, которая максимально удалена от обоих классов. Точки, лежащие прямо на границе margin, называются <span class="term" data-tip="Support Vectors. Точки, лежащие на границе margin. Только они определяют положение разделяющей гиперплоскости — остальные точки не влияют.">опорными векторами</span>. Только они определяют модель — остальные можно выкинуть, результат не изменится.</p>
       </div>
 
-      <h3>Soft margin: когда данные не идеально разделимы</h3>
+      <h3>🔧 Soft margin: когда данные не идеально разделимы</h3>
       <p>В реальности классы почти никогда не разделимы идеально. Решение: разрешить некоторым точкам нарушать margin, но <b>со штрафом</b>:</p>
 
       <div class="math-block">$$\\min_{w, b, \\xi} \\frac{1}{2}\\|w\\|^2 + C \\sum_i \\xi_i$$</div>
@@ -45,7 +91,7 @@ App.registerTopic({
 
       <p>C — главный гиперпараметр SVM, похожий на обратный коэффициент регуляризации.</p>
 
-      <h3>Ядерный трюк — секрет SVM</h3>
+      <h3>✨ Ядерный трюк — секрет SVM</h3>
       <p>Классическая SVM рисует <b>прямую линию</b> (линейную границу). Как работать с нелинейными данными (например, круги или спирали)?</p>
 
       <p>Ответ: <span class="term" data-tip="Kernel Trick. Техника неявного отображения данных в более высокую размерность через функцию ядра K(x, x'), без реального вычисления преобразования.">ядерный трюк</span>. Идея гениальная:</p>
@@ -57,7 +103,7 @@ App.registerTopic({
 
       <p><b>Магия:</b> никогда не вычисляем $\\phi(x)$ явно. Даже если $\\phi$ отображает в бесконечномерное пространство.</p>
 
-      <h3>Популярные ядра</h3>
+      <h3>📐 Популярные ядра</h3>
 
       <h4>Linear</h4>
       <div class="math-block">$$K(x, x') = x^T x'$$</div>
@@ -79,7 +125,7 @@ App.registerTopic({
       <div class="math-block">$$K(x, x') = \\tanh(\\gamma \\cdot x^T x' + r)$$</div>
       <p>Похоже на нейросеть. Используется редко.</p>
 
-      <h3>Настройка SVM</h3>
+      <h3>⚙️ Настройка SVM</h3>
       <p>Два главных параметра — C и γ (для RBF):</p>
       <ul>
         <li>Перебираем по <b>log-сетке</b>: C ∈ {0.001, 0.01, 0.1, 1, 10, 100}, γ ∈ аналогично.</li>
@@ -89,10 +135,10 @@ App.registerTopic({
 
       <p>В sklearn — <code>GridSearchCV</code> с <code>SVC</code>.</p>
 
-      <h3>Масштабирование обязательно</h3>
+      <h3>⚠️ Масштабирование обязательно</h3>
       <p>SVM использует расстояния между точками. Если один признак измеряется в метрах, другой — в граммах, SVM будет игнорировать первый. <b>Перед SVM всегда</b> StandardScaler.</p>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li>Хорошо работает на <b>маленьких/средних</b> датасетах.</li>
@@ -112,7 +158,7 @@ App.registerTopic({
         <li>Плохо работает при сильном дисбалансе классов.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«SVM всегда использует RBF»</b> — нет, linear часто быстрее и не хуже для текстов.</li>
         <li><b>«Больше C — всегда лучше»</b> — переобучение.</li>
@@ -151,7 +197,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>Логистическая регрессия</b> — тоже строит линейную границу, но с другим критерием.</li>
         <li><b>Перцептрон</b> — находит любую границу, SVM — с максимальным margin.</li>

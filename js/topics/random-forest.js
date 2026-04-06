@@ -16,7 +16,75 @@ App.registerTopic({
         <p>Random Forest делает именно это: строит <b>много деревьев</b>, специально делая их непохожими друг на друга (каждое учится на разных данных и смотрит на разные признаки), а потом усредняет предсказания. Это почти всегда лучше, чем одно дерево.</p>
       </div>
 
-      <h3>Проблема одного дерева</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+          <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Random Forest: ансамблирование деревьев</text>
+          <!-- Tree 1 -->
+          <rect x="30" y="30" width="130" height="110" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
+          <text x="95" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">Дерево 1</text>
+          <line x1="95" y1="55" x2="70" y2="75" stroke="#818cf8" stroke-width="1.2"/>
+          <line x1="95" y1="55" x2="120" y2="75" stroke="#818cf8" stroke-width="1.2"/>
+          <rect x="52" y="75" width="36" height="18" rx="3" fill="#ddd6fe" stroke="#6366f1" stroke-width="1"/>
+          <text x="70" y="88" text-anchor="middle" font-size="8" fill="#4c1d95">x₁>5?</text>
+          <rect x="102" y="75" width="36" height="18" rx="3" fill="#ddd6fe" stroke="#6366f1" stroke-width="1"/>
+          <text x="120" y="88" text-anchor="middle" font-size="8" fill="#4c1d95">x₃>2?</text>
+          <line x1="70" y1="93" x2="55" y2="110" stroke="#818cf8" stroke-width="1"/>
+          <line x1="70" y1="93" x2="85" y2="110" stroke="#818cf8" stroke-width="1"/>
+          <rect x="42" y="110" width="26" height="16" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+          <text x="55" y="122" text-anchor="middle" font-size="8" fill="#065f46">да</text>
+          <rect x="72" y="110" width="26" height="16" rx="3" fill="#fca5a5" stroke="#ef4444" stroke-width="1"/>
+          <text x="85" y="122" text-anchor="middle" font-size="8" fill="#991b1b">нет</text>
+          <text x="95" y="155" text-anchor="middle" font-size="9" fill="#64748b">выборка: bootstrap A</text>
+          <!-- Tree 2 -->
+          <rect x="200" y="30" width="130" height="110" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="265" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#10b981">Дерево 2</text>
+          <line x1="265" y1="55" x2="240" y2="75" stroke="#6ee7b7" stroke-width="1.2"/>
+          <line x1="265" y1="55" x2="290" y2="75" stroke="#6ee7b7" stroke-width="1.2"/>
+          <rect x="222" y="75" width="36" height="18" rx="3" fill="#a7f3d0" stroke="#10b981" stroke-width="1"/>
+          <text x="240" y="88" text-anchor="middle" font-size="8" fill="#065f46">x₂>8?</text>
+          <rect x="272" y="75" width="36" height="18" rx="3" fill="#a7f3d0" stroke="#10b981" stroke-width="1"/>
+          <text x="290" y="88" text-anchor="middle" font-size="8" fill="#065f46">x₁>3?</text>
+          <line x1="240" y1="93" x2="225" y2="110" stroke="#6ee7b7" stroke-width="1"/>
+          <line x1="240" y1="93" x2="255" y2="110" stroke="#6ee7b7" stroke-width="1"/>
+          <rect x="212" y="110" width="26" height="16" rx="3" fill="#fca5a5" stroke="#ef4444" stroke-width="1"/>
+          <text x="225" y="122" text-anchor="middle" font-size="8" fill="#991b1b">нет</text>
+          <rect x="242" y="110" width="26" height="16" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+          <text x="255" y="122" text-anchor="middle" font-size="8" fill="#065f46">да</text>
+          <text x="265" y="155" text-anchor="middle" font-size="9" fill="#64748b">выборка: bootstrap B</text>
+          <!-- Tree 3 -->
+          <rect x="370" y="30" width="130" height="110" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="435" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Дерево 3</text>
+          <line x1="435" y1="55" x2="410" y2="75" stroke="#fcd34d" stroke-width="1.2"/>
+          <line x1="435" y1="55" x2="460" y2="75" stroke="#fcd34d" stroke-width="1.2"/>
+          <rect x="392" y="75" width="36" height="18" rx="3" fill="#fde68a" stroke="#f59e0b" stroke-width="1"/>
+          <text x="410" y="88" text-anchor="middle" font-size="8" fill="#92400e">x₄>1?</text>
+          <rect x="442" y="75" width="36" height="18" rx="3" fill="#fde68a" stroke="#f59e0b" stroke-width="1"/>
+          <text x="460" y="88" text-anchor="middle" font-size="8" fill="#92400e">x₂>6?</text>
+          <line x1="410" y1="93" x2="395" y2="110" stroke="#fcd34d" stroke-width="1"/>
+          <line x1="410" y1="93" x2="425" y2="110" stroke="#fcd34d" stroke-width="1"/>
+          <rect x="382" y="110" width="26" height="16" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+          <text x="395" y="122" text-anchor="middle" font-size="8" fill="#065f46">да</text>
+          <rect x="412" y="110" width="26" height="16" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+          <text x="425" y="122" text-anchor="middle" font-size="8" fill="#065f46">да</text>
+          <text x="435" y="155" text-anchor="middle" font-size="9" fill="#64748b">выборка: bootstrap C</text>
+          <!-- Arrows down to vote box -->
+          <line x1="95" y1="165" x2="200" y2="192" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="265" y1="165" x2="265" y2="190" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="435" y1="165" x2="330" y2="192" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Vote box -->
+          <rect x="165" y="188" width="200" height="20" rx="5" fill="#6366f1"/>
+          <text x="265" y="202" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">ГОЛОСОВАНИЕ / УСРЕДНЕНИЕ</text>
+          <!-- Arrow markers -->
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="caption">Random Forest: три дерева обучаются на разных bootstrap-выборках и смотрят на разные признаки. Затем их предсказания объединяются голосованием (классификация) или усреднением (регрессия).</div>
+      </div>
+
+      <h3>⚠️ Проблема одного дерева</h3>
       <p>Одиночное решающее дерево имеет серьёзный недостаток — <span class="term" data-tip="High variance. Высокая чувствительность к обучающим данным: разные выборки дают сильно разные деревья.">высокую variance</span>. Чуть-чуть изменил данные → совершенно другое дерево. Оно либо переобучается, либо слишком упрощённое.</p>
       <p>Как решить? Закон больших чисел: <b>усреднение многих шумных оценок</b> даёт более стабильную и точную оценку. Если построить 100 разных деревьев и усреднить — ошибки разных деревьев скомпенсируются.</p>
 
@@ -25,7 +93,7 @@ App.registerTopic({
         <p>Random Forest строит большое число деревьев так, чтобы они были <b>максимально непохожими друг на друга</b>, а потом усредняет их предсказания. Ключ — в «разнообразии» деревьев.</p>
       </div>
 
-      <h3>Как создаётся разнообразие деревьев</h3>
+      <h3>🔀 Как создаётся разнообразие деревьев</h3>
       <p>Random Forest использует <b>два</b> источника разнообразия:</p>
 
       <h4>1. Bagging (Bootstrap Aggregation)</h4>
@@ -46,7 +114,7 @@ App.registerTopic({
       </ul>
       <p>Это заставляет деревья смотреть на разные признаки и находить разные закономерности. Без этого все деревья бы построили почти одинаковые splits на самом сильном признаке.</p>
 
-      <h3>Как делается предсказание</h3>
+      <h3>🗳️ Как делается предсказание</h3>
       <p>Для новой точки каждое из $T$ деревьев выдаёт своё предсказание, а финальный ответ формируется голосованием:</p>
 
       <ul>
@@ -55,7 +123,7 @@ App.registerTopic({
         <li><b>Вероятности:</b> доля деревьев, проголосовавших за класс.</li>
       </ul>
 
-      <h3>Математика ансамбля</h3>
+      <h3>🧮 Математика ансамбля</h3>
       <p>Почему усреднение помогает? Формула дисперсии ансамбля:</p>
       <div class="math-block">$$\\text{Var}(\\bar{h}) = \\rho \\sigma^2 + \\frac{1-\\rho}{T}\\sigma^2$$</div>
 
@@ -68,11 +136,11 @@ App.registerTopic({
 
       <p><b>Вывод:</b> увеличивая $T$, мы убираем второе слагаемое — ошибка падает. Но первое остаётся: оно зависит от $\\rho$ — корреляции деревьев. Именно поэтому RF специально добавляет случайность — чтобы $\\rho$ было маленьким.</p>
 
-      <h3>OOB оценка (Out-of-Bag)</h3>
+      <h3>📊 OOB оценка (Out-of-Bag)</h3>
       <p>Бонус bagging: для каждого примера есть деревья, которые <b>не видели</b> его в обучении (~37% деревьев). Можно усреднить предсказания только этих деревьев — получится <b>честная</b> оценка качества без отдельной валидационной выборки.</p>
       <p><span class="term" data-tip="Out-of-Bag score. Оценка качества ансамбля, основанная на предсказаниях только тех деревьев, которые не видели данный пример. Бесплатная валидация.">OOB score</span> — встроенный инструмент RF для оценки без CV. В sklearn: <code>oob_score=True</code>.</p>
 
-      <h3>Важные гиперпараметры</h3>
+      <h3>⚙️ Важные гиперпараметры</h3>
       <table>
         <tr><th>Параметр</th><th>Эффект</th><th>Типичное значение</th></tr>
         <tr><td>n_estimators</td><td>Число деревьев. Больше → лучше, но медленнее.</td><td>100-500</td></tr>
@@ -82,13 +150,13 @@ App.registerTopic({
         <tr><td>max_samples</td><td>Размер bootstrap. Меньше → больше разнообразия.</td><td>1.0 (=n)</td></tr>
       </table>
 
-      <h3>Feature Importance</h3>
+      <h3>🔍 Feature Importance</h3>
       <p>Random Forest автоматически выдаёт <b>важность признаков</b>. Для каждого признака суммируется уменьшение impurity во всех splits, где он использовался.</p>
       <p>Это очень полезный «побочный эффект»: RF не только предсказывает, но и показывает, какие признаки важны.</p>
 
       <p><b>Ограничения:</b> встроенная важность смещена в пользу признаков с большим числом уникальных значений. Более надёжная альтернатива — <span class="term" data-tip="Permutation Importance. Измерение важности признака через то, насколько падает качество модели при случайной перестановке его значений. Более честная оценка.">permutation importance</span>.</p>
 
-      <h3>Почему Random Forest так популярен</h3>
+      <h3>🏆 Почему Random Forest так популярен</h3>
       <ul>
         <li><b>Работает «из коробки»</b> — почти не требует настройки.</li>
         <li><b>Сложно сделать хуже</b> — даже плохая настройка даёт приличный результат.</li>
@@ -97,7 +165,7 @@ App.registerTopic({
         <li><b>Параллелится</b> — каждое дерево независимо от других.</li>
       </ul>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li>Почти не требует настройки.</li>
@@ -116,7 +184,7 @@ App.registerTopic({
         <li>Не лучший выбор для экстраполяции в регрессии.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«Random Forest не переобучается»</b> — не совсем. Не переобучается с ростом T, но может при слишком глубоких деревьях.</li>
         <li><b>«Больше деревьев всегда лучше»</b> — после 300-500 эффект насыщается, только замедляет.</li>
@@ -164,7 +232,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>Decision Tree</b> — базовый блок Random Forest.</li>
         <li><b>Gradient Boosting</b> — альтернативный ансамбль деревьев.</li>

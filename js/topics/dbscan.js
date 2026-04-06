@@ -16,7 +16,52 @@ App.registerTopic({
         <p>Это принципиально другой подход, чем у K-Means. Там кластеры — круглые «горки» вокруг центров, и число кластеров задаётся заранее. У DBSCAN — любая форма, а количество определяется по данным.</p>
       </div>
 
-      <h3>Что такое DBSCAN</h3>
+      <div class="illustration bordered">
+        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">DBSCAN: ядра, границы, шум</text>
+          <!-- Background -->
+          <rect x="25" y="25" width="450" height="160" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <!-- Cluster 1: core points (large, indigo) -->
+          <circle cx="100" cy="85" r="13" fill="#6366f1" opacity="0.9"/>
+          <circle cx="130" cy="105" r="13" fill="#6366f1" opacity="0.9"/>
+          <circle cx="105" cy="130" r="13" fill="#6366f1" opacity="0.9"/>
+          <circle cx="145" cy="75" r="13" fill="#6366f1" opacity="0.9"/>
+          <!-- Cluster 1: border points (medium, lighter) -->
+          <circle cx="80" cy="55" r="9" fill="#818cf8" opacity="0.8"/>
+          <circle cx="165" cy="125" r="9" fill="#818cf8" opacity="0.8"/>
+          <!-- Cluster 2: core points (green) -->
+          <circle cx="310" cy="80" r="13" fill="#10b981" opacity="0.9"/>
+          <circle cx="340" cy="100" r="13" fill="#10b981" opacity="0.9"/>
+          <circle cx="320" cy="125" r="13" fill="#10b981" opacity="0.9"/>
+          <!-- Cluster 2: border points -->
+          <circle cx="290" cy="130" r="9" fill="#6ee7b7" opacity="0.8"/>
+          <circle cx="365" cy="75" r="9" fill="#6ee7b7" opacity="0.8"/>
+          <!-- eps circle around one core point -->
+          <circle cx="130" cy="105" r="45" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>
+          <text x="130" y="58" text-anchor="middle" font-size="8" fill="#6366f1">ε-окрестность</text>
+          <!-- Noise points (small gray) -->
+          <circle cx="215" cy="60" r="6" fill="#94a3b8" opacity="0.7"/>
+          <circle cx="235" cy="155" r="6" fill="#94a3b8" opacity="0.7"/>
+          <circle cx="440" cy="55" r="6" fill="#94a3b8" opacity="0.7"/>
+          <circle cx="460" cy="150" r="6" fill="#94a3b8" opacity="0.7"/>
+          <!-- Labels -->
+          <text x="115" y="165" text-anchor="middle" font-size="9" fill="#6366f1" font-weight="600">Кластер 1</text>
+          <text x="330" y="165" text-anchor="middle" font-size="9" fill="#10b981" font-weight="600">Кластер 2</text>
+          <text x="450" y="100" text-anchor="middle" font-size="9" fill="#94a3b8">шум</text>
+          <!-- Legend -->
+          <circle cx="40" cy="195" r="8" fill="#6366f1"/>
+          <text x="54" y="199" font-size="9" fill="#334155">ядро</text>
+          <circle cx="105" cy="195" r="6" fill="#818cf8"/>
+          <text x="117" y="199" font-size="9" fill="#334155">граница</text>
+          <circle cx="185" cy="195" r="4" fill="#94a3b8"/>
+          <text x="195" y="199" font-size="9" fill="#334155">шум</text>
+          <circle cx="250" cy="195" r="15" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="280" y="199" font-size="9" fill="#334155">ε-радиус</text>
+        </svg>
+        <div class="caption">DBSCAN: большие точки — ядровые (много соседей в ε-радиусе), средние — граничные (сами не ядровые, но рядом с ядровыми), маленькие серые — шум.</div>
+      </div>
+
+      <h3>🔍 Что такое DBSCAN</h3>
       <p>DBSCAN = <b>D</b>ensity-<b>B</b>ased <b>S</b>patial <b>C</b>lustering of <b>A</b>pplications with <b>N</b>oise. «Плотностная кластеризация с шумом».</p>
       <p>Главные идеи:</p>
       <ul>
@@ -30,7 +75,7 @@ App.registerTopic({
         <p>DBSCAN не нужно знать число кластеров заранее — он сам их найдёт. Он может находить кластеры <b>любой формы</b> (не только круглые) и автоматически <b>выделяет шум</b>. Это делает его мощным инструментом, где K-Means бессилен.</p>
       </div>
 
-      <h3>Два параметра</h3>
+      <h3>⚙️ Два параметра</h3>
       <p>У DBSCAN всего два параметра, но их правильный выбор критически важен:</p>
 
       <ul>
@@ -40,7 +85,7 @@ App.registerTopic({
 
       <p>Эти параметры вместе определяют <b>порог плотности</b>: «плотная область» = место, где в радиусе ε есть как минимум min_samples точек.</p>
 
-      <h3>Три типа точек</h3>
+      <h3>🔵 Три типа точек</h3>
       <p>Алгоритм классифицирует каждую точку в один из трёх типов:</p>
 
       <h4>Core point (ядровая точка)</h4>
@@ -52,7 +97,7 @@ App.registerTopic({
       <h4>Noise point (шум)</h4>
       <p>Не core и не border. Изолированная точка. Это выброс или просто одиночка.</p>
 
-      <h3>Алгоритм</h3>
+      <h3>🔄 Алгоритм</h3>
       <ol>
         <li>Для каждой точки находим соседей в радиусе ε.</li>
         <li>Если соседей ≥ min_samples → она <b>core</b>. Создаём новый кластер (если она ещё не в кластере).</li>
@@ -62,7 +107,7 @@ App.registerTopic({
 
       <p>Результат: каждая точка помечена как принадлежащая кластеру #1, #2, ..., или помечена как шум (−1).</p>
 
-      <h3>Как выбрать параметры</h3>
+      <h3>🎯 Как выбрать параметры</h3>
 
       <h4>min_samples</h4>
       <p>Эвристика: <b>2 × размерность</b>. Для 2D данных — 4. Для 10D — 20.</p>
@@ -79,7 +124,7 @@ App.registerTopic({
 
       <p>Идея: точки на «полке» графика — внутри кластеров (близкие соседи). Точки на «стене» — шум или граница. Колено разделяет их.</p>
 
-      <h3>Сравнение с K-Means</h3>
+      <h3>⚖️ Сравнение с K-Means</h3>
       <table>
         <tr><th>Критерий</th><th>K-Means</th><th>DBSCAN</th></tr>
         <tr><td>Форма кластеров</td><td>Только сферические</td><td>Любая</td></tr>
@@ -90,7 +135,7 @@ App.registerTopic({
         <tr><td>Скорость</td><td>Очень быстро</td><td>Средне</td></tr>
       </table>
 
-      <h3>Плюсы и ограничения</h3>
+      <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li><b>Не нужно</b> знать число кластеров.</li>
@@ -108,7 +153,7 @@ App.registerTopic({
         <li>Граничные точки могут быть отнесены к разным кластерам (недетерминированность).</li>
       </ul>
 
-      <h3>Применения</h3>
+      <h3>🔧 Применения</h3>
       <ul>
         <li><b>Geospatial</b> — кластеры такси, магазинов, пожаров.</li>
         <li><b>Anomaly detection</b> — точки, помеченные как шум.</li>
@@ -117,7 +162,7 @@ App.registerTopic({
         <li><b>Астрономия</b> — поиск звёздных скоплений.</li>
       </ul>
 
-      <h3>Частые заблуждения</h3>
+      <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«DBSCAN универсальный»</b> — плохо с разной плотностью и в высоких размерностях.</li>
         <li><b>«DBSCAN не требует настройки»</b> — всё равно нужно выбрать ε и min_samples.</li>
@@ -161,7 +206,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>Как это связано с другими темами</h3>
+      <h3>🔗 Как это связано с другими темами</h3>
       <ul>
         <li><b>K-Means</b> — альтернатива для сферических кластеров.</li>
         <li><b>Isolation Forest</b> — специализированный метод для anomaly detection.</li>
