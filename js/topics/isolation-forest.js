@@ -621,6 +621,96 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: Isolation Forest</h3>
+      <p>sklearn.IsolationForest эффективно обнаруживает аномалии без меток. score_samples возвращает аномальность каждой точки.</p>
+
+      <h4>1. Isolation Forest: базовое использование</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+
+# Нормальные данные + аномалии
+np.random.seed(42)
+X_normal = np.random.randn(300, 2)
+X_outliers = np.random.uniform(-5, 5, (30, 2))  # разбросанные выбросы
+X_all = np.vstack([X_normal, X_outliers])
+
+# contamination — ожидаемая доля аномалий
+iso = IsolationForest(n_estimators=100, contamination=0.09,
+                      random_state=42, n_jobs=-1)
+iso.fit(X_all)
+labels = iso.predict(X_all)       # +1 нормальный, -1 аномалия
+scores = iso.score_samples(X_all) # чем ниже, тем аномальнее
+
+print(f'Обнаружено аномалий: {(labels == -1).sum()}')
+print(f'Score range: [{scores.min():.3f}, {scores.max():.3f}]')
+
+# Визуализация
+plt.scatter(X_all[labels==1, 0], X_all[labels==1, 1], alpha=0.4, label='Normal')
+plt.scatter(X_all[labels==-1, 0], X_all[labels==-1, 1],
+            c='red', s=60, label='Anomaly')
+plt.title('Isolation Forest: обнаружение аномалий')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>2. Тепловая карта anomaly score</h4>
+      <pre><code># Визуализируем anomaly score на сетке
+xx, yy = np.meshgrid(np.linspace(-6, 6, 200), np.linspace(-6, 6, 200))
+Z = iso.score_samples(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
+plt.figure(figsize=(8, 6))
+plt.contourf(xx, yy, Z, levels=20, cmap='RdYlGn')
+plt.colorbar(label='Anomaly Score (ниже = аномальнее)')
+plt.scatter(X_normal[:, 0], X_normal[:, 1], s=15, alpha=0.5, c='blue', label='Normal')
+plt.scatter(X_outliers[:, 0], X_outliers[:, 1], s=50, c='black', marker='x', label='Outliers')
+plt.title('Isolation Forest: карта аномальности')
+plt.legend()
+plt.show()
+
+# Гистограмма score: нормальные vs аномалии
+true_labels = np.array([1]*300 + [-1]*30)
+plt.hist(scores[true_labels==1], bins=30, alpha=0.6, label='Normal')
+plt.hist(scores[true_labels==-1], bins=10, alpha=0.6, label='Outlier')
+plt.xlabel('Anomaly Score')
+plt.title('Распределение score: Normal vs Outlier')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. Подбор contamination и оценка качества</h4>
+      <pre><code>from sklearn.metrics import f1_score, roc_auc_score
+
+# Синтетический датасет с известными метками
+np.random.seed(0)
+X_n = np.random.randn(400, 5)                    # нормальные
+X_a = np.random.uniform(-4, 4, (40, 5))          # аномалии
+X = np.vstack([X_n, X_a])
+y_true = np.array([0]*400 + [1]*40)              # 1 = аномалия
+
+# Перебираем contamination
+contaminations = [0.02, 0.05, 0.08, 0.10, 0.15]
+f1_scores = []
+
+for cont in contaminations:
+    iso = IsolationForest(n_estimators=200, contamination=cont, random_state=42)
+    preds = iso.fit_predict(X)
+    y_pred = (preds == -1).astype(int)            # -1 → 1 (аномалия)
+    f1_scores.append(f1_score(y_true, y_pred, zero_division=0))
+
+# Anomaly score → ROC-AUC (без порога)
+iso_roc = IsolationForest(n_estimators=200, contamination=0.09, random_state=42)
+iso_roc.fit(X)
+scores_roc = -iso_roc.score_samples(X)           # инвертируем: выше = аномальнее
+print(f'ROC-AUC: {roc_auc_score(y_true, scores_roc):.4f}')
+
+plt.plot(contaminations, f1_scores, 'o-')
+plt.xlabel('contamination')
+plt.ylabel('F1 Score')
+plt.title('Isolation Forest: подбор contamination')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

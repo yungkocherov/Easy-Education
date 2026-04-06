@@ -591,6 +591,103 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: метод главных компонент (PCA)</h3>
+      <p>sklearn.PCA вычисляет главные компоненты. explained_variance_ratio_ показывает долю объяснённой дисперсии. Scree plot помогает выбрать число компонент.</p>
+
+      <h4>1. PCA и визуализация данных</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+
+data = load_breast_cancer()
+X, y = data.data, data.target
+
+# Обязательно масштабируем перед PCA
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Понижение до 2D для визуализации
+pca = PCA(n_components=2, random_state=42)
+X_pca = pca.fit_transform(X_scaled)
+
+print(f'Объяснённая дисперсия: {pca.explained_variance_ratio_.round(3)}')
+print(f'Суммарно: {pca.explained_variance_ratio_.sum():.3f}')
+
+plt.figure(figsize=(8, 6))
+for label, name in enumerate(data.target_names):
+    mask = y == label
+    plt.scatter(X_pca[mask, 0], X_pca[mask, 1], alpha=0.6, label=name, s=30)
+plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%})')
+plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%})')
+plt.title('PCA: 2D проекция Breast Cancer')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>2. Scree plot и выбор числа компонент</h4>
+      <pre><code># Обучаем PCA с полным числом компонент
+pca_full = PCA(random_state=42)
+pca_full.fit(X_scaled)
+
+explained = pca_full.explained_variance_ratio_
+cumulative = np.cumsum(explained)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Scree plot
+ax1.bar(range(1, 11), explained[:10] * 100)
+ax1.set_xlabel('Компонента')
+ax1.set_ylabel('Объяснённая дисперсия, %')
+ax1.set_title('Scree plot')
+
+# Кумулятивная объяснённая дисперсия
+ax2.plot(range(1, len(cumulative)+1), cumulative * 100, 'o-')
+ax2.axhline(95, color='red', linestyle='--', label='95%')
+ax2.set_xlabel('Число компонент')
+ax2.set_ylabel('Кумулятивная, %')
+ax2.set_title('Объяснённая дисперсия')
+ax2.legend()
+plt.tight_layout()
+plt.show()
+
+n_95 = np.argmax(cumulative >= 0.95) + 1
+print(f'Компонент для 95% дисперсии: {n_95} из {X.shape[1]}')</code></pre>
+
+      <h4>3. PCA как предобработка + влияние на качество модели</h4>
+      <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+
+# Сравниваем качество классификатора: с PCA и без
+results = {}
+for n_comp in [2, 5, 10, 20, None]:
+    if n_comp is not None:
+        pipe = Pipeline([
+            ('scaler', StandardScaler()),
+            ('pca', PCA(n_components=n_comp, random_state=42)),
+            ('lr', LogisticRegression(max_iter=1000)),
+        ])
+        label = f'PCA({n_comp})'
+    else:
+        pipe = Pipeline([
+            ('scaler', StandardScaler()),
+            ('lr', LogisticRegression(max_iter=1000)),
+        ])
+        label = 'Без PCA'
+
+    scores = cross_val_score(pipe, X, y, cv=5, scoring='roc_auc')
+    results[label] = scores.mean()
+    print(f'{label:12s}: ROC-AUC = {scores.mean():.4f} ± {scores.std():.4f}')
+
+plt.bar(list(results.keys()), list(results.values()))
+plt.ylabel('CV ROC-AUC')
+plt.title('PCA: влияние на качество классификации')
+plt.tight_layout()
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

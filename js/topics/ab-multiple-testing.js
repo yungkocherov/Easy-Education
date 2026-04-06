@@ -410,6 +410,88 @@ BH (FDR=0.05):
       },
     ],
 
+    python: `
+      <h3>📊 Коррекция множественных сравнений</h3>
+      <pre><code>from statsmodels.stats.multitest import multipletests
+import numpy as np
+
+# p-значения из нескольких тестов (5 метрик одновременно)
+p_values = np.array([0.03, 0.04, 0.01, 0.15, 0.08])
+metric_names = ['Конверсия', 'ARPU', 'Retention D1', 'Время сессии', 'CTR']
+
+# Бонферрони — самый строгий
+reject_bonf, pvals_bonf, _, _ = multipletests(p_values, alpha=0.05, method='bonferroni')
+
+# Холм (Holm) — ступенчатый, менее строгий
+reject_holm, pvals_holm, _, _ = multipletests(p_values, alpha=0.05, method='holm')
+
+# BH (Benjamini-Hochberg) — контроль FDR
+reject_bh, pvals_bh, _, _ = multipletests(p_values, alpha=0.05, method='fdr_bh')
+
+print(f"{'Метрика':<15} {'p':>6} {'Bonf':>8} {'Holm':>8} {'BH':>8}")
+print("-" * 50)
+for i, name in enumerate(metric_names):
+    print(f"{name:<15} {p_values[i]:>6.3f} "
+          f"{'✓' if reject_bonf[i] else '✗':>8} "
+          f"{'✓' if reject_holm[i] else '✗':>8} "
+          f"{'✓' if reject_bh[i] else '✗':>8}")</code></pre>
+
+      <h3>📋 Скорректированные p-значения</h3>
+      <pre><code>from statsmodels.stats.multitest import multipletests
+import numpy as np
+
+p_values = np.array([0.03, 0.04, 0.01, 0.15, 0.08])
+names = ['Конверсия', 'ARPU', 'Ret D1', 'Время', 'CTR']
+
+methods = ['bonferroni', 'holm', 'fdr_bh']
+print(f"{'Метрика':<12} {'p_raw':>7}", end="")
+for m in methods:
+    print(f" {m:>12}", end="")
+print()
+print("-" * 55)
+
+results = {}
+for m in methods:
+    _, pvals_adj, _, _ = multipletests(p_values, alpha=0.05, method=m)
+    results[m] = pvals_adj
+
+for i, name in enumerate(names):
+    print(f"{name:<12} {p_values[i]:>7.4f}", end="")
+    for m in methods:
+        print(f" {results[m][i]:>12.4f}", end="")
+    print()</code></pre>
+
+      <h3>🎯 Симуляция: почему коррекция важна</h3>
+      <pre><code>import numpy as np
+from scipy import stats
+
+np.random.seed(42)
+n_simulations = 10_000
+n_metrics = 5
+alpha = 0.05
+
+false_positive_count = 0
+
+for _ in range(n_simulations):
+    # Генерируем данные, где эффекта НЕТ (H₀ верна для всех метрик)
+    p_vals = [stats.ttest_ind(
+        np.random.normal(0, 1, 500),
+        np.random.normal(0, 1, 500)
+    ).pvalue for _ in range(n_metrics)]
+
+    # Хотя бы одно значимое без коррекции?
+    if any(p < alpha for p in p_vals):
+        false_positive_count += 1
+
+fpr = false_positive_count / n_simulations
+theory = 1 - (1 - alpha) ** n_metrics
+
+print(f"Вероятность ≥1 ложного срабатывания:")
+print(f"  Эмпирическая: {fpr:.1%}")
+print(f"  Теоретическая: {theory:.1%}")
+print(f"  (при α={alpha} и {n_metrics} метриках)")</code></pre>
+    `,
+
     math: `
       <h3>Основные формулы</h3>
 

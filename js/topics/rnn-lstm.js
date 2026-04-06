@@ -663,6 +663,131 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>RNN и LSTM на Python (PyTorch)</h3>
+      <p>Используем nn.LSTM и nn.GRU для предсказания последовательностей. Показываем pack/pad для переменной длины.</p>
+
+      <h4>1. nn.LSTM: предсказание следующего значения в синусе</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Генерируем обучающие данные: предсказываем sin(t+1) по sin(t)
+t      = np.linspace(0, 4 * np.pi, 500)
+signal = np.sin(t).astype(np.float32)
+
+# Создаём пары (вход, таргет): сдвиг на 1 шаг вперёд
+seq_len = 20      # длина входного окна
+X, y = [], []
+for i in range(len(signal) - seq_len):
+    X.append(signal[i : i + seq_len])
+    y.append(signal[i + seq_len])   # следующее значение после окна
+
+X = torch.tensor(X).unsqueeze(-1)   # [N, seq_len, 1] — добавляем признак
+y = torch.tensor(y).unsqueeze(-1)   # [N, 1]
+
+# Модель: LSTM → линейный выход
+class LSTMPredictor(nn.Module):
+    def __init__(self, input_size=1, hidden_size=32, num_layers=2):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers,
+                            batch_first=True,   # вход: [batch, seq, features]
+                            dropout=0.1)
+        self.fc   = nn.Linear(hidden_size, 1)
+
+    def forward(self, x):
+        out, (h, c) = self.lstm(x)    # out: [batch, seq, hidden]
+        return self.fc(out[:, -1, :]) # берём только последний шаг
+
+model     = LSTMPredictor()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+loss_fn   = nn.MSELoss()
+
+# Обучение
+for epoch in range(100):
+    model.train()
+    optimizer.zero_grad()
+    pred = model(X)
+    loss = loss_fn(pred, y)
+    loss.backward()
+    optimizer.step()
+    if epoch % 20 == 0:
+        print(f"Epoch {epoch:3d}: MSE={loss.item():.5f}")
+</code></pre>
+
+      <h4>2. nn.GRU vs LSTM — сравнение архитектур</h4>
+      <pre><code>import torch
+import torch.nn as nn
+
+# GRU — упрощённый вариант LSTM (меньше параметров, часто не хуже)
+class GRUModel(nn.Module):
+    def __init__(self, input_size=1, hidden_size=32):
+        super().__init__()
+        self.gru = nn.GRU(input_size, hidden_size, batch_first=True)
+        self.fc  = nn.Linear(hidden_size, 1)
+
+    def forward(self, x):
+        out, h = self.gru(x)          # GRU не имеет cell state (только h)
+        return self.fc(out[:, -1, :])
+
+# Сравниваем количество параметров
+lstm_model = nn.LSTM(1, 32, batch_first=True)
+gru_model  = nn.GRU(1,  32, batch_first=True)
+
+lstm_params = sum(p.numel() for p in lstm_model.parameters())
+gru_params  = sum(p.numel() for p in gru_model.parameters())
+
+print(f"LSTM параметров: {lstm_params}")  # ~4 ворота * (32+1)*32 + 32
+print(f"GRU  параметров: {gru_params}")   # ~3 ворота — на 25% меньше
+
+# Скорость прямого прохода
+x = torch.randn(32, 50, 1)  # батч 32, длина 50, 1 признак
+import time
+for name, m in [('LSTM', lstm_model), ('GRU', gru_model)]:
+    start = time.time()
+    for _ in range(1000):
+        _ = m(x)
+    print(f"{name}: {(time.time()-start)*1000:.1f} ms за 1000 прогонов")
+</code></pre>
+
+      <h4>3. Pack/Pad: работа с последовательностями разной длины</h4>
+      <pre><code>import torch
+import torch.nn as nn
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
+
+# Последовательности разной длины (как в NLP — предложения разной длины)
+seqs = [
+    torch.randn(5, 4),   # последовательность длины 5, 4 признака
+    torch.randn(3, 4),   # длины 3
+    torch.randn(8, 4),   # длины 8
+]
+
+# Паддинг: дополняем нулями до максимальной длины
+padded = pad_sequence(seqs, batch_first=True)   # [3, 8, 4]
+lengths = torch.tensor([5, 3, 8])               # реальные длины
+
+# Сортируем по убыванию длины (требование pack_padded_sequence)
+lengths, sort_idx = lengths.sort(descending=True)
+padded = padded[sort_idx]
+
+# Pack: убираем лишние нули — LSTM не обрабатывает паддинг
+packed = pack_padded_sequence(padded, lengths, batch_first=True)
+
+lstm = nn.LSTM(4, 16, batch_first=True)
+packed_out, (h, c) = lstm(packed)
+
+# Unpack: восстанавливаем форму [batch, seq, hidden]
+output, out_lengths = pad_packed_sequence(packed_out, batch_first=True)
+print(f"Выход после unpack: {output.shape}")     # [3, 8, 16]
+print(f"Последний hidden:   {h.shape}")          # [1, 3, 16]
+
+# Для классификации берём h последнего реального шага
+last_hidden = h[-1]   # [batch, hidden]
+print(f"Для классификации: {last_hidden.shape}")
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

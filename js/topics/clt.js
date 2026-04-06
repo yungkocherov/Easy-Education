@@ -558,6 +558,59 @@ s = 300 руб (выборочное std)
       },
     },
 
+    python: `
+      <h3>📊 Симуляция ЦПТ в Python</h3>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+# Исходное распределение — экспоненциальное (явно НЕ нормальное)
+np.random.seed(42)
+population = np.random.exponential(scale=5, size=100_000)
+
+print(f"Популяция: μ={population.mean():.2f}, σ={population.std():.2f}")
+
+# Берём 2000 выборок по n наблюдений и считаем средние
+sample_sizes = [5, 30, 100]
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+for ax, n in zip(axes, sample_sizes):
+    means = [np.random.choice(population, n).mean() for _ in range(2000)]
+    ax.hist(means, bins=40, density=True, alpha=0.7)
+    ax.set_title(f"n = {n}, std = {np.std(means):.2f}")
+    ax.axvline(np.mean(means), color='red', linestyle='--')
+
+plt.suptitle("ЦПТ: распределение выборочных средних")
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h3>📈 Проверка σ/√n</h3>
+      <pre><code>import numpy as np
+
+pop = np.random.exponential(5, 100_000)
+sigma = pop.std()
+
+for n in [10, 30, 100, 500]:
+    means = [np.random.choice(pop, n).mean() for _ in range(5000)]
+    se_theory = sigma / np.sqrt(n)
+    se_actual = np.std(means)
+    print(f"n={n:>3d}: теория σ/√n={se_theory:.3f}, "
+          f"факт={se_actual:.3f}, "
+          f"отклонение={abs(se_theory-se_actual)/se_theory:.1%}")</code></pre>
+
+      <h3>🎯 Доверительный интервал для среднего</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+sample = np.random.exponential(5, size=50)
+mean = sample.mean()
+se = stats.sem(sample)  # стандартная ошибка среднего
+
+# 95% доверительный интервал
+ci = stats.t.interval(0.95, df=len(sample)-1, loc=mean, scale=se)
+print(f"Среднее: {mean:.2f}")
+print(f"95% ДИ: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

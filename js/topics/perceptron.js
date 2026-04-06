@@ -635,6 +635,106 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Перцептрон на Python</h3>
+      <p>Реализуем перцептрон вручную на numpy (10 строк), затем используем sklearn. Проверяем AND и XOR.</p>
+
+      <h4>1. Ручная реализация перцептрона на numpy</h4>
+      <pre><code>import numpy as np
+
+class Perceptron:
+    def __init__(self, lr=0.1, n_epochs=100):
+        self.lr = lr
+        self.n_epochs = n_epochs
+
+    def fit(self, X, y):
+        # Инициализируем веса нулями (+ смещение как первый вес)
+        self.w = np.zeros(X.shape[1] + 1)
+        for epoch in range(self.n_epochs):
+            errors = 0
+            for xi, yi in zip(X, y):
+                xi_aug = np.r_[1, xi]              # добавляем bias = 1
+                pred   = int(self.w @ xi_aug >= 0) # шаговая функция активации
+                delta  = self.lr * (yi - pred)     # правило обновления перцептрона
+                self.w += delta * xi_aug            # обновляем веса
+                errors += int(delta != 0)
+            if errors == 0:
+                print(f"Сошлось на эпохе {epoch+1}"); break
+
+    def predict(self, X):
+        return (np.c_[np.ones(len(X)), X] @ self.w >= 0).astype(int)
+
+# Данные для логического AND
+X_and = np.array([[0,0],[0,1],[1,0],[1,1]])
+y_and = np.array([0, 0, 0, 1])            # AND: истина только 1 и 1
+
+p = Perceptron(lr=0.1, n_epochs=50)
+p.fit(X_and, y_and)
+print("AND predictions:", p.predict(X_and))   # [0 0 0 1] — верно!
+
+# XOR — линейно неразделим, перцептрон не справится
+X_xor = np.array([[0,0],[0,1],[1,0],[1,1]])
+y_xor = np.array([0, 1, 1, 0])            # XOR: истина, когда биты разные
+
+p_xor = Perceptron(lr=0.1, n_epochs=100)
+p_xor.fit(X_xor, y_xor)
+print("XOR predictions:", p_xor.predict(X_xor))  # НЕ [0 1 1 0] — провал!
+</code></pre>
+
+      <h4>2. sklearn: Perceptron — промышленная реализация</h4>
+      <pre><code>from sklearn.linear_model import Perceptron
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# Генерируем линейно разделимые данные
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0,
+                            n_clusters_per_class=1, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Обучаем перцептрон sklearn
+clf = Perceptron(max_iter=100, eta0=0.1, random_state=42)
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.2%}")
+print(f"Веса: {clf.coef_[0]}")
+print(f"Bias: {clf.intercept_[0]:.4f}")
+</code></pre>
+
+      <h4>3. Визуализация: AND vs XOR — почему XOR невозможен</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+
+for ax, (y, title) in zip(axes, [
+    (np.array([0,0,0,1]), 'AND (линейно разделим)'),
+    (np.array([0,1,1,0]), 'XOR (НЕ разделим)')
+]):
+    colors = ['red' if yi == 0 else 'blue' for yi in y]
+    ax.scatter(X[:,0], X[:,1], c=colors, s=200, zorder=5)
+    # Подписи точек
+    for xi, yi in zip(X, y):
+        ax.annotate(str(yi), xi, textcoords="offset points",
+                    xytext=(8, 5), fontsize=12)
+    # Разделяющая прямая для AND: w1*x + w2*y + b = 0
+    if title.startswith('AND'):
+        xline = np.linspace(-0.5, 1.5, 100)
+        ax.plot(xline, 1.5 - xline, 'g--', label='граница решения')
+        ax.legend()
+    ax.set_xlim(-0.5, 1.5); ax.set_ylim(-0.5, 1.5)
+    ax.set_title(title); ax.grid(True, alpha=0.3)
+    ax.set_xlabel('x₁'); ax.set_ylabel('x₂')
+
+plt.tight_layout(); plt.show()
+# Вывод: XOR требует нелинейной границы → нужна нейросеть (MLP)
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

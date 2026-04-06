@@ -682,6 +682,102 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Transformer на Python (PyTorch + HuggingFace)</h3>
+      <p>Строим TransformerEncoder вручную на PyTorch, затем используем HuggingFace pipeline в 3 строки.</p>
+
+      <h4>1. PyTorch: nn.TransformerEncoder для классификации текста</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import math
+
+class TransformerClassifier(nn.Module):
+    def __init__(self, vocab_size=1000, d_model=128, nhead=4,
+                 num_layers=2, num_classes=2, max_len=64):
+        super().__init__()
+        # Эмбеддинги: токены → векторы размера d_model
+        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=0)
+        # Позиционное кодирование (обучаемое — проще nn.Embedding)
+        self.pos_emb   = nn.Embedding(max_len, d_model)
+
+        # Ядро Transformer: стопка слоёв self-attention + FFN
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=nhead,          # количество голов внимания
+            dim_feedforward=256,  # размер FFN внутри каждого слоя
+            dropout=0.1,
+            batch_first=True      # вход: [batch, seq, features]
+        )
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.classifier  = nn.Linear(d_model, num_classes)
+
+    def forward(self, x, mask=None):
+        seq_len = x.size(1)
+        # Складываем токен-эмбеддинги и позиционные
+        pos  = torch.arange(seq_len, device=x.device).unsqueeze(0)
+        emb  = self.embedding(x) + self.pos_emb(pos)   # [B, seq, d_model]
+        out  = self.transformer(emb, src_key_padding_mask=mask)  # [B, seq, d_model]
+        # Агрегируем по всем позициям (mean pooling)
+        out  = out.mean(dim=1)                          # [B, d_model]
+        return self.classifier(out)                     # [B, num_classes]
+
+# Тест: батч из 4 предложений длиной 32 токена
+model = TransformerClassifier()
+x_dummy = torch.randint(1, 1000, (4, 32))     # 4 предложения, 32 токена
+logits  = model(x_dummy)
+print(f"Логиты: {logits.shape}")              # [4, 2]
+print(f"Параметров: {sum(p.numel() for p in model.parameters()):,}")
+</code></pre>
+
+      <h4>2. HuggingFace pipeline — классификация в 3 строки</h4>
+      <pre><code>from transformers import pipeline
+
+# Один вызов — скачивает модель, токенизирует, выдаёт результат
+clf = pipeline("text-classification", model="distilbert-base-uncased-finetuned-sst-2-english")
+
+# Классификация тональности (sentiment analysis)
+texts = [
+    "This movie was absolutely fantastic!",
+    "I hated every minute of this film.",
+    "It was okay, nothing special.",
+]
+results = clf(texts)
+for text, res in zip(texts, results):
+    print(f"{res['label']:8s} ({res['score']:.2%}): {text}")
+</code></pre>
+
+      <h4>3. Токенизатор HuggingFace — основы</h4>
+      <pre><code>from transformers import AutoTokenizer
+import torch
+
+# Загружаем токенизатор BERT
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+# Токенизируем пару предложений
+text1 = "The cat sat on the mat."
+text2 = "I like cats and dogs."
+
+# Автоматически добавляет [CLS], [SEP], паддинг и attention mask
+encoded = tokenizer(
+    [text1, text2],
+    padding=True,          # дополняем до одной длины
+    truncation=True,       # обрезаем если длиннее max_length
+    max_length=32,
+    return_tensors="pt"    # возвращаем PyTorch тензоры
+)
+
+print("input_ids shape:      ", encoded["input_ids"].shape)       # [2, 32]
+print("attention_mask shape: ", encoded["attention_mask"].shape)  # [2, 32]
+
+# Декодируем обратно в текст
+decoded = tokenizer.decode(encoded["input_ids"][0], skip_special_tokens=True)
+print("Декодировано:", decoded)
+
+# Словарь: количество токенов
+print(f"Размер словаря: {tokenizer.vocab_size:,}")   # ~30 000 у BERT
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

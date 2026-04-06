@@ -641,6 +641,91 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: метод опорных векторов (SVM)</h3>
+      <p>sklearn.SVC поддерживает ядра RBF, polynomial и linear. GridSearchCV помогает подобрать C и gamma.</p>
+
+      <h4>1. SVC с разными ядрами</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_moons, load_breast_cancer
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, roc_auc_score
+
+# make_moons — нелинейно разделимый датасет
+X, y = make_moons(n_samples=400, noise=0.2, random_state=42)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+
+kernels = ['linear', 'rbf', 'poly']
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+for ax, kernel in zip(axes, kernels):
+    svc = SVC(kernel=kernel, C=1.0, probability=True)
+    svc.fit(X_train, y_train)
+    acc = svc.score(X_test, y_test)
+
+    xx, yy = np.meshgrid(np.linspace(-3, 3, 200), np.linspace(-3, 3, 200))
+    Z = svc.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    ax.contourf(xx, yy, Z, alpha=0.3, cmap='RdBu')
+    ax.scatter(X_test[:, 0], X_test[:, 1], c=y_test, cmap='RdBu', edgecolors='k', s=30)
+    ax.set_title(f'{kernel} (acc={acc:.3f})')
+
+plt.suptitle('SVM с разными ядрами')
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h4>2. GridSearchCV для C и gamma</h4>
+      <pre><code>from sklearn.model_selection import GridSearchCV
+
+# RBF: C контролирует margin, gamma — ширину ядра
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'gamma': ['scale', 'auto', 0.01, 0.1],
+    'kernel': ['rbf'],
+}
+
+grid = GridSearchCV(SVC(probability=True), param_grid,
+                    cv=5, scoring='roc_auc', n_jobs=-1, verbose=0)
+grid.fit(X_train, y_train)
+
+print(f'Лучшие параметры: {grid.best_params_}')
+print(f'CV ROC-AUC: {grid.best_score_:.4f}')
+print(f'Test ROC-AUC: {roc_auc_score(y_test, grid.best_estimator_.predict_proba(X_test)[:,1]):.4f}')
+
+# Тепловая карта результатов
+import pandas as pd
+results = pd.DataFrame(grid.cv_results_)
+pivot = results.pivot_table(values='mean_test_score',
+                             index='param_C', columns='param_gamma')
+import seaborn as sns
+sns.heatmap(pivot, annot=True, fmt='.3f', cmap='YlOrRd')
+plt.title('GridSearchCV: ROC-AUC (C vs gamma)')
+plt.show()</code></pre>
+
+      <h4>3. SVM на реальных данных и опорные векторы</h4>
+      <pre><code>data = load_breast_cancer()
+X_r, y_r = data.data, data.target
+X_tr, X_te, y_tr, y_te = train_test_split(X_r, y_r, test_size=0.2, random_state=42)
+
+scaler2 = StandardScaler()
+X_tr_s = scaler2.fit_transform(X_tr)
+X_te_s = scaler2.transform(X_te)
+
+svc_best = SVC(kernel='rbf', C=10, gamma='scale', probability=True)
+svc_best.fit(X_tr_s, y_tr)
+
+print(f'Test Accuracy: {svc_best.score(X_te_s, y_te):.4f}')
+print(f'ROC-AUC: {roc_auc_score(y_te, svc_best.predict_proba(X_te_s)[:,1]):.4f}')
+print(f'Число опорных векторов: {svc_best.n_support_}')
+print(f'Всего опорных векторов: {svc_best.support_vectors_.shape[0]} из {len(X_tr)}')
+
+print(classification_report(y_te, svc_best.predict(X_te_s), target_names=data.target_names))</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

@@ -667,6 +667,44 @@ Max = 120 (выброс!)</div>
       },
     },
 
+    python: `
+      <h3>📊 Описательная статистика в Python</h3>
+      <pre><code># NumPy — базовые статистики
+import numpy as np
+
+data = np.array([60, 65, 70, 75, 80, 85, 90, 450])
+
+print(f"Среднее:  {np.mean(data):.1f}")      # 121.9
+print(f"Медиана:  {np.median(data):.1f}")     # 77.5
+print(f"Std:      {np.std(data, ddof=1):.1f}")# ddof=1 для выборочной
+print(f"Q1:       {np.quantile(data, 0.25):.1f}")
+print(f"Q3:       {np.quantile(data, 0.75):.1f}")
+print(f"IQR:      {np.quantile(data,0.75) - np.quantile(data,0.25):.1f}")</code></pre>
+
+      <h3>📋 Pandas — одна строка для всего</h3>
+      <pre><code>import pandas as pd
+
+s = pd.Series([60, 65, 70, 75, 80, 85, 90, 450], name="Зарплата")
+print(s.describe())
+# count      8.0
+# mean     121.9
+# std      130.7
+# min       60.0
+# 25%       68.75
+# 50%       77.5   ← медиана
+# 75%       86.25
+# max      450.0</code></pre>
+
+      <h3>📈 Boxplot в Matplotlib</h3>
+      <pre><code>import matplotlib.pyplot as plt
+
+data = [60, 65, 70, 75, 80, 85, 90, 450]
+plt.boxplot(data, vert=False)
+plt.title("Boxplot зарплат")
+plt.xlabel("тыс. руб.")
+plt.show()  # Выброс 450 виден как отдельная точка</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

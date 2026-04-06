@@ -670,6 +670,105 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: K-Means кластеризация</h3>
+      <p>sklearn.KMeans прост и быстр. Метод локтя и silhouette_score помогают выбрать оптимальное число кластеров.</p>
+
+      <h4>1. KMeans и визуализация кластеров</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# Генерируем 4 кластера в 2D
+X, y_true = make_blobs(n_samples=400, centers=4, cluster_std=0.8, random_state=42)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+kmeans = KMeans(n_clusters=4, n_init=10, random_state=42)
+labels = kmeans.fit_predict(X_scaled)
+
+# Визуализация
+colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+for k in range(4):
+    mask = labels == k
+    plt.scatter(X_scaled[mask, 0], X_scaled[mask, 1], s=30, alpha=0.6, label=f'Кластер {k}')
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1],
+            s=200, c='black', marker='x', linewidths=2, label='Центроиды')
+plt.title(f'K-Means (k=4), inertia={kmeans.inertia_:.1f}')
+plt.legend()
+plt.show()
+
+print(f'Silhouette Score: {silhouette_score(X_scaled, labels):.4f}')</code></pre>
+
+      <h4>2. Метод локтя и silhouette для выбора k</h4>
+      <pre><code>k_range = range(2, 11)
+inertias = []
+silhouettes = []
+
+for k in k_range:
+    km = KMeans(n_clusters=k, n_init=10, random_state=42)
+    labels_k = km.fit_predict(X_scaled)
+    inertias.append(km.inertia_)
+    silhouettes.append(silhouette_score(X_scaled, labels_k))
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Метод локтя
+ax1.plot(k_range, inertias, 'o-')
+ax1.set_xlabel('k')
+ax1.set_ylabel('Inertia (WCSS)')
+ax1.set_title('Метод локтя')
+
+# Silhouette
+ax2.plot(k_range, silhouettes, 's-', color='orange')
+ax2.axvline(4, color='red', linestyle='--', label='Оптимум')
+ax2.set_xlabel('k')
+ax2.set_ylabel('Silhouette Score')
+ax2.set_title('Silhouette Score')
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+print(f'Лучшее k по silhouette: {k_range[silhouettes.index(max(silhouettes))]}')</code></pre>
+
+      <h4>3. K-Means для сегментации клиентов (RFM)</h4>
+      <pre><code>import pandas as pd
+
+# Синтетические RFM данные (Recency, Frequency, Monetary)
+np.random.seed(42)
+n = 500
+rfm = pd.DataFrame({
+    'Recency':   np.random.exponential(30, n).astype(int) + 1,   # дней с последней покупки
+    'Frequency': np.random.poisson(5, n) + 1,                     # число покупок
+    'Monetary':  np.random.exponential(1000, n) + 50,             # сумма покупок
+})
+
+# Нормализация
+rfm_scaled = StandardScaler().fit_transform(rfm)
+
+# K-Means с k=4 сегментами
+km_rfm = KMeans(n_clusters=4, n_init=20, random_state=42)
+rfm['Сегмент'] = km_rfm.fit_predict(rfm_scaled)
+
+# Профиль каждого сегмента
+profile = rfm.groupby('Сегмент').agg({
+    'Recency': 'mean', 'Frequency': 'mean', 'Monetary': 'mean', 'Сегмент': 'count'
+}).rename(columns={'Сегмент': 'Размер'}).round(1)
+print(profile)
+
+# Scatter plot: Frequency vs Monetary
+plt.scatter(rfm['Frequency'], rfm['Monetary'],
+            c=rfm['Сегмент'], cmap='tab10', alpha=0.5)
+plt.xlabel('Frequency')
+plt.ylabel('Monetary')
+plt.title('RFM-сегментация клиентов')
+plt.colorbar(label='Сегмент')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

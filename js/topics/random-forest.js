@@ -664,6 +664,89 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: случайный лес</h3>
+      <p>sklearn.RandomForestClassifier — мощный ансамбль с OOB-оценкой и встроенной важностью признаков.</p>
+
+      <h4>1. Обучение и OOB-оценка</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, roc_auc_score
+
+data = load_breast_cancer()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# oob_score=True — оценка без отдельной тест-выборки (бесплатно)
+rf = RandomForestClassifier(n_estimators=200, max_depth=None,
+                             min_samples_split=2, max_features='sqrt',
+                             oob_score=True, n_jobs=-1, random_state=42)
+rf.fit(X_train, y_train)
+
+y_pred = rf.predict(X_test)
+y_proba = rf.predict_proba(X_test)[:, 1]
+
+print(f'OOB Score:    {rf.oob_score_:.4f}')
+print(f'Test Accuracy: {rf.score(X_test, y_test):.4f}')
+print(f'ROC-AUC:      {roc_auc_score(y_test, y_proba):.4f}')
+print(classification_report(y_test, y_pred, target_names=data.target_names))</code></pre>
+
+      <h4>2. Важность признаков</h4>
+      <pre><code>import pandas as pd
+
+# feature_importances_ — среднее снижение impurity по всем деревьям
+importances = pd.Series(rf.feature_importances_, index=data.feature_names)
+top15 = importances.sort_values(ascending=False).head(15)
+
+plt.figure(figsize=(8, 6))
+top15.plot(kind='barh')
+plt.xlabel('Feature Importance (Mean Impurity Decrease)')
+plt.title('Random Forest: важность признаков')
+plt.tight_layout()
+plt.show()
+
+# Permutation importance — более честная оценка
+from sklearn.inspection import permutation_importance
+result = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
+perm_df = pd.DataFrame({'importance': result.importances_mean,
+                         'std': result.importances_std},
+                        index=data.feature_names).sort_values('importance', ascending=False)
+print(perm_df.head(10).round(4))</code></pre>
+
+      <h4>3. Влияние числа деревьев и настройка</h4>
+      <pre><code># Как меняется OOB и test accuracy от числа деревьев
+n_trees = [5, 10, 20, 50, 100, 200]
+oob_scores, test_scores = [], []
+
+for n in n_trees:
+    model = RandomForestClassifier(n_estimators=n, oob_score=True,
+                                    n_jobs=-1, random_state=42)
+    model.fit(X_train, y_train)
+    oob_scores.append(model.oob_score_)
+    test_scores.append(model.score(X_test, y_test))
+
+plt.plot(n_trees, oob_scores, 'o-', label='OOB Score')
+plt.plot(n_trees, test_scores, 's-', label='Test Score')
+plt.xlabel('Число деревьев')
+plt.ylabel('Accuracy')
+plt.title('Random Forest: сходимость с ростом деревьев')
+plt.legend()
+plt.show()
+
+# GridSearchCV для ключевых параметров
+from sklearn.model_selection import GridSearchCV
+param_grid = {'n_estimators': [100], 'max_features': ['sqrt', 'log2', 0.5],
+              'max_depth': [None, 10, 20]}
+grid = GridSearchCV(RandomForestClassifier(oob_score=False, random_state=42),
+                    param_grid, cv=5, scoring='roc_auc', n_jobs=-1)
+grid.fit(X_train, y_train)
+print(f'Лучшие параметры: {grid.best_params_}')
+print(f'CV ROC-AUC: {grid.best_score_:.4f}')</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

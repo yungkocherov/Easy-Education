@@ -561,6 +561,90 @@ F1        = 2*0.625*1.0/(0.625+1.0) = <b>0.769</b></div>
       },
     },
 
+    python: `
+      <h3>Python: метрики классификации</h3>
+      <p>sklearn.metrics предоставляет полный набор метрик — от матрицы ошибок до полного отчёта по каждому классу.</p>
+
+      <h4>1. Матрица ошибок и classification_report</h4>
+      <pre><code>import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report, f1_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Генерируем несбалансированный датасет
+X, y = make_classification(n_samples=1000, n_features=10,
+                            weights=[0.85, 0.15], random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+# Матрица ошибок
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Pred 0', 'Pred 1'],
+            yticklabels=['True 0', 'True 1'])
+plt.title('Матрица ошибок')
+plt.show()
+
+# Полный отчёт по классам
+print(classification_report(y_test, y_pred, target_names=['Класс 0', 'Класс 1']))</code></pre>
+
+      <h4>2. F1-score и выбор порога</h4>
+      <pre><code>from sklearn.metrics import f1_score, precision_score, recall_score
+
+# Стандартный порог 0.5
+y_proba = model.predict_proba(X_test)[:, 1]
+
+# Перебираем пороги и смотрим на F1
+thresholds = np.arange(0.1, 0.9, 0.05)
+f1_scores = []
+for thr in thresholds:
+    y_thr = (y_proba >= thr).astype(int)
+    f1_scores.append(f1_score(y_test, y_thr, zero_division=0))
+
+best_thr = thresholds[np.argmax(f1_scores)]
+print(f'Лучший порог: {best_thr:.2f}, F1 = {max(f1_scores):.3f}')
+
+plt.plot(thresholds, f1_scores, marker='o')
+plt.axvline(best_thr, color='red', linestyle='--', label=f'Best thr={best_thr:.2f}')
+plt.xlabel('Порог')
+plt.ylabel('F1-score')
+plt.title('F1 в зависимости от порога')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. Сравнение метрик нескольких моделей</h4>
+      <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score, roc_auc_score
+
+models = {
+    'Logistic Regression': LogisticRegression(),
+    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'SVM': SVC(probability=True),
+}
+
+results = []
+for name, clf in models.items():
+    clf.fit(X_train, y_train)
+    y_p = clf.predict(X_test)
+    y_pr = clf.predict_proba(X_test)[:, 1]
+    results.append({
+        'Модель': name,
+        'F1': f1_score(y_test, y_p),
+        'ROC-AUC': roc_auc_score(y_test, y_pr),
+    })
+
+import pandas as pd
+df = pd.DataFrame(results).set_index('Модель')
+print(df.round(3))</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

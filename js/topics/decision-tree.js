@@ -618,6 +618,98 @@ else:
       },
     },
 
+    python: `
+      <h3>Python: дерево решений</h3>
+      <p>sklearn.DecisionTreeClassifier позволяет обучить дерево, визуализировать его и проанализировать важность признаков.</p>
+
+      <h4>1. Обучение и визуализация дерева</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+data = load_iris()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+# max_depth ограничивает сложность — борьба с переобучением
+tree = DecisionTreeClassifier(max_depth=3, min_samples_split=10,
+                               criterion='gini', random_state=42)
+tree.fit(X_train, y_train)
+
+print(f'Train accuracy: {tree.score(X_train, y_train):.4f}')
+print(f'Test accuracy:  {tree.score(X_test, y_test):.4f}')
+print(classification_report(y_test, tree.predict(X_test),
+      target_names=data.target_names))
+
+# Визуализация дерева
+plt.figure(figsize=(14, 6))
+plot_tree(tree, feature_names=data.feature_names,
+          class_names=data.target_names,
+          filled=True, rounded=True, fontsize=10)
+plt.title('Дерево решений (Iris, depth=3)')
+plt.show()</code></pre>
+
+      <h4>2. Важность признаков и влияние глубины</h4>
+      <pre><code># Важность признаков через feature_importances_
+importances = tree.feature_importances_
+plt.barh(data.feature_names, importances)
+plt.xlabel('Feature Importance (Gini)')
+plt.title('Важность признаков')
+plt.tight_layout()
+plt.show()
+
+# Как меняется качество от глубины
+train_scores, test_scores = [], []
+depths = range(1, 15)
+for d in depths:
+    dt = DecisionTreeClassifier(max_depth=d, random_state=42)
+    dt.fit(X_train, y_train)
+    train_scores.append(dt.score(X_train, y_train))
+    test_scores.append(dt.score(X_test, y_test))
+
+plt.plot(depths, train_scores, 'o-', label='Train')
+plt.plot(depths, test_scores, 's-', label='Test')
+plt.xlabel('max_depth')
+plt.ylabel('Accuracy')
+plt.title('Переобучение: accuracy vs глубина дерева')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. Подбор параметров и cost-complexity pruning</h4>
+      <pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'max_depth': [2, 3, 4, 5, None],
+    'min_samples_split': [2, 5, 10, 20],
+    'criterion': ['gini', 'entropy'],
+}
+
+grid = GridSearchCV(DecisionTreeClassifier(random_state=42),
+                    param_grid, cv=5, scoring='accuracy')
+grid.fit(X_train, y_train)
+print(f'Лучшие параметры: {grid.best_params_}')
+print(f'CV Accuracy: {grid.best_score_:.4f}')
+
+# Post-pruning через cost complexity
+path = DecisionTreeClassifier(random_state=42).cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas = path.ccp_alphas[::5]  # берём каждый 5-й для скорости
+
+scores = []
+for alpha in ccp_alphas:
+    dt = DecisionTreeClassifier(ccp_alpha=alpha, random_state=42)
+    dt.fit(X_train, y_train)
+    scores.append(dt.score(X_test, y_test))
+
+plt.plot(ccp_alphas, scores, 'o-')
+plt.xlabel('ccp_alpha')
+plt.ylabel('Test Accuracy')
+plt.title('Cost-Complexity Pruning')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

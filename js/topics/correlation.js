@@ -586,6 +586,70 @@ r = −275 / (√700 × √7617.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
       },
     },
 
+    python: `
+      <h3>📊 Корреляция в NumPy и SciPy</h3>
+      <pre><code>import numpy as np
+from scipy import stats
+
+# Данные: рост и вес
+height = np.array([160, 165, 170, 175, 180, 185, 190])
+weight = np.array([55, 62, 68, 72, 78, 85, 92])
+
+# Пирсон (линейная зависимость)
+r_pearson, p_pearson = stats.pearsonr(height, weight)
+print(f"Пирсон:  r={r_pearson:.4f}, p={p_pearson:.4f}")
+
+# Спирмен (монотонная зависимость)
+r_spearman, p_spearman = stats.spearmanr(height, weight)
+print(f"Спирмен: r={r_spearman:.4f}, p={p_spearman:.4f}")
+
+# Кендалл (ранговая)
+r_kendall, p_kendall = stats.kendalltau(height, weight)
+print(f"Кендалл: τ={r_kendall:.4f}, p={p_kendall:.4f}")
+
+# Матрица корреляций через NumPy
+corr_matrix = np.corrcoef(height, weight)
+print(f"\\nМатрица корреляций:\\n{corr_matrix.round(4)}")</code></pre>
+
+      <h3>📈 Scatter plot + линия тренда</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+height = np.array([160, 165, 170, 175, 180, 185, 190])
+weight = np.array([55, 62, 68, 72, 78, 85, 92])
+
+# Линия регрессии
+slope, intercept, r, p, se = stats.linregress(height, weight)
+x_line = np.linspace(155, 195, 100)
+y_line = slope * x_line + intercept
+
+plt.scatter(height, weight, s=80, zorder=3)
+plt.plot(x_line, y_line, 'r--', label=f'y={slope:.1f}x+{intercept:.0f}, r={r:.3f}')
+plt.xlabel("Рост (см)")
+plt.ylabel("Вес (кг)")
+plt.title("Корреляция: рост vs вес")
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()</code></pre>
+
+      <h3>🔍 Корреляционная матрица в Pandas</h3>
+      <pre><code>import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({
+    'Рост': [160, 165, 170, 175, 180, 185, 190],
+    'Вес':  [55, 62, 68, 72, 78, 85, 92],
+    'Возраст': [22, 25, 30, 28, 35, 40, 45]
+})
+
+corr = df.corr()
+sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+plt.title("Матрица корреляций")
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

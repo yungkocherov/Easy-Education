@@ -75,6 +75,7 @@ const App = (function () {
     theory: 'Теория',
     examples: 'Примеры',
     simulation: 'Симуляция',
+    python: '🐍 Python',
     applications: 'Применение',
     proscons: 'Плюсы / Минусы',
     math: 'Математика',

@@ -594,6 +594,84 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: градиентный бустинг</h3>
+      <p>sklearn.GradientBoostingClassifier и XGBoost — наиболее популярные реализации. Early stopping предотвращает переобучение.</p>
+
+      <h4>1. sklearn GradientBoostingClassifier</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score, classification_report
+
+data = load_breast_cancer()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+gb = GradientBoostingClassifier(
+    n_estimators=200,    # число итераций бустинга
+    learning_rate=0.1,   # шаг обучения
+    max_depth=3,         # глубина каждого дерева
+    subsample=0.8,       # stochastic GB — снижает variance
+    random_state=42,
+)
+gb.fit(X_train, y_train)
+
+y_proba = gb.predict_proba(X_test)[:, 1]
+print(f'ROC-AUC: {roc_auc_score(y_test, y_proba):.4f}')
+print(classification_report(y_test, gb.predict(X_test), target_names=data.target_names))</code></pre>
+
+      <h4>2. Early stopping и staged_predict</h4>
+      <pre><code># staged_predict позволяет видеть качество на каждой итерации
+train_scores = [roc_auc_score(y_train, p[:, 1])
+                for p in gb.staged_predict_proba(X_train)]
+test_scores  = [roc_auc_score(y_test, p[:, 1])
+                for p in gb.staged_predict_proba(X_test)]
+
+best_n = np.argmax(test_scores) + 1
+print(f'Лучшее число итераций: {best_n}, ROC-AUC={test_scores[best_n-1]:.4f}')
+
+plt.plot(train_scores, label='Train ROC-AUC')
+plt.plot(test_scores, label='Test ROC-AUC')
+plt.axvline(best_n - 1, color='red', linestyle='--', label=f'Best iter={best_n}')
+plt.xlabel('Число итераций')
+plt.ylabel('ROC-AUC')
+plt.title('Gradient Boosting: кривая обучения')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. XGBoost с early stopping</h4>
+      <pre><code># pip install xgboost
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+
+X_tr, X_val, y_tr, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=0)
+
+# XGBoost — более быстрая и гибкая реализация GB
+xgb_model = xgb.XGBClassifier(
+    n_estimators=1000,
+    learning_rate=0.05,
+    max_depth=4,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    eval_metric='auc',
+    early_stopping_rounds=20,   # останавливаемся если нет улучшения
+    random_state=42,
+    verbosity=0,
+)
+xgb_model.fit(X_tr, y_tr, eval_set=[(X_val, y_val)])
+
+print(f'Best iteration: {xgb_model.best_iteration}')
+print(f'Test ROC-AUC: {roc_auc_score(y_test, xgb_model.predict_proba(X_test)[:,1]):.4f}')
+
+# Важность признаков
+xgb.plot_importance(xgb_model, max_num_features=10)
+plt.tight_layout()
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

@@ -616,6 +616,70 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
       }
     ],
 
+    python: `
+      <h3>📊 Вероятность и распределения в Python</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+# Нормальное распределение N(μ=100, σ=15)
+norm = stats.norm(loc=100, scale=15)
+
+# PDF — плотность в точке
+print(f"PDF(100): {norm.pdf(100):.4f}")  # максимум в μ
+print(f"PDF(85):  {norm.pdf(85):.4f}")
+
+# CDF — вероятность P(X ≤ x)
+print(f"P(X ≤ 115): {norm.cdf(115):.4f}")  # ~84.1%
+print(f"P(X > 130):  {1 - norm.cdf(130):.4f}")  # ~2.3%
+
+# PPF — обратная CDF (квантиль)
+print(f"Квантиль 95%: {norm.ppf(0.95):.1f}")
+print(f"Квантиль 99%: {norm.ppf(0.99):.1f}")</code></pre>
+
+      <h3>📈 Визуализация PDF и CDF</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+norm = stats.norm(loc=100, scale=15)
+x = np.linspace(50, 150, 300)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# PDF
+ax1.plot(x, norm.pdf(x), 'b-', lw=2)
+ax1.fill_between(x, norm.pdf(x), where=(x >= 85) & (x <= 115),
+                 alpha=0.3, label='μ ± σ (68.3%)')
+ax1.set_title("PDF — плотность вероятности")
+ax1.legend()
+
+# CDF
+ax2.plot(x, norm.cdf(x), 'r-', lw=2)
+ax2.axhline(0.5, color='gray', linestyle='--', alpha=0.5)
+ax2.axvline(100, color='gray', linestyle='--', alpha=0.5)
+ax2.set_title("CDF — функция распределения")
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h3>🎲 Условная вероятность и Байес</h3>
+      <pre><code># Теорема Байеса: тест на болезнь
+# P(болезнь) = 1%, чувствительность = 95%, специфичность = 90%
+
+p_disease = 0.01
+sensitivity = 0.95  # P(+|болезнь)
+specificity = 0.90  # P(-|здоров)
+
+# P(+ тест)
+p_positive = sensitivity * p_disease + (1 - specificity) * (1 - p_disease)
+
+# P(болезнь | + тест) — теорема Байеса
+p_disease_given_pos = (sensitivity * p_disease) / p_positive
+
+print(f"P(болезнь | +тест) = {p_disease_given_pos:.1%}")
+# Всего ~8.8%! Даже с хорошим тестом</code></pre>
+    `,
+
     math: `
       <h3>Сводка формул</h3>
 

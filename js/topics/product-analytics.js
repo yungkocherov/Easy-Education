@@ -497,6 +497,69 @@ LTV/CAC = 26 250 / 12 000 = <b>2.19</b>  ← ниже нормы (≥3)
       },
     ],
 
+    python: `
+      <h3>📊 Когортный анализ Retention в Pandas</h3>
+      <pre><code>import pandas as pd
+import numpy as np
+
+# Симулируем данные регистраций и визитов
+np.random.seed(42)
+dates = pd.date_range('2024-01-01', periods=90, freq='D')
+users = []
+
+for day in dates[:30]:  # Когорты за первый месяц
+    n_new = np.random.randint(80, 150)
+    for uid in range(n_new):
+        reg_date = day
+        # Генерируем визиты с убывающей вероятностью
+        for d in range(90):
+            visit_date = reg_date + pd.Timedelta(days=d)
+            prob = 0.5 * np.exp(-0.03 * d)  # экспоненциальное затухание
+            if np.random.random() < prob or d == 0:
+                users.append({'user_id': f'{day.date()}_{uid}',
+                             'reg_date': reg_date,
+                             'visit_date': visit_date})
+
+df = pd.DataFrame(users)
+df['cohort'] = df['reg_date'].dt.to_period('W')   # недельные когорты
+df['day_n'] = (df['visit_date'] - df['reg_date']).dt.days
+
+print(f"Всего записей: {len(df)}")
+print(f"Уникальных пользователей: {df['user_id'].nunique()}")
+print(f"Когорт: {df['cohort'].nunique()}")</code></pre>
+
+      <h3>📋 Pivot-таблица Retention</h3>
+      <pre><code># Считаем Retention по когортам
+cohort_sizes = df.groupby('cohort')['user_id'].nunique()
+
+retention = (df.groupby(['cohort', 'day_n'])['user_id']
+             .nunique()
+             .unstack(fill_value=0))
+
+# Берём ключевые дни
+key_days = [0, 1, 3, 7, 14, 30]
+retention_pct = retention[key_days].div(cohort_sizes, axis=0) * 100
+
+print("Retention (%) по когортам:")
+print(retention_pct.round(1).head(8))
+print(f"\\nСредний Ret D1:  {retention_pct[1].mean():.1f}%")
+print(f"Средний Ret D7:  {retention_pct[7].mean():.1f}%")
+print(f"Средний Ret D30: {retention_pct[30].mean():.1f}%")</code></pre>
+
+      <h3>📈 Heatmap Retention</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.heatmap(retention_pct.round(1), annot=True, fmt='.1f',
+            cmap='YlOrRd_r', vmin=0, vmax=100, ax=ax)
+ax.set_title("Retention (%) по когортам")
+ax.set_xlabel("День после регистрации")
+ax.set_ylabel("Когорта (неделя)")
+plt.tight_layout()
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>Основные формулы</h3>
 

@@ -449,6 +449,68 @@ p-value:      0.005       &lt;&lt;0.001     0.007
       }
     ],
 
+    python: `
+      <h3>📊 t-тест для A/B теста средних</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+np.random.seed(42)
+
+# Данные: средний чек (выручка на пользователя)
+group_A = np.random.normal(loc=1200, scale=400, size=500)
+group_B = np.random.normal(loc=1280, scale=420, size=500)
+
+# Двухвыборочный t-тест (тест Уэлча — не требует равных дисперсий)
+t_stat, p_value = stats.ttest_ind(group_A, group_B, equal_var=False)
+
+print(f"Среднее A: {group_A.mean():.1f} руб.")
+print(f"Среднее B: {group_B.mean():.1f} руб.")
+print(f"Разница:   {group_B.mean() - group_A.mean():.1f} руб.")
+print(f"\\nt-stat = {t_stat:.4f}")
+print(f"p-value = {p_value:.4f}")
+print(f"\\n{'Значимо!' if p_value < 0.05 else 'Не значимо'} (α=0.05)")</code></pre>
+
+      <h3>📋 Cohen's d — размер эффекта</h3>
+      <pre><code>import numpy as np
+
+def cohens_d(group1, group2):
+    """Вычисляет Cohen's d для двух групп"""
+    n1, n2 = len(group1), len(group2)
+    var1, var2 = group1.var(ddof=1), group2.var(ddof=1)
+    # Pooled standard deviation
+    pooled_std = np.sqrt(((n1-1)*var1 + (n2-1)*var2) / (n1+n2-2))
+    return (group2.mean() - group1.mean()) / pooled_std
+
+d = cohens_d(group_A, group_B)
+print(f"Cohen's d = {d:.3f}")
+
+# Интерпретация
+if abs(d) < 0.2:
+    print("Эффект: незначительный")
+elif abs(d) < 0.5:
+    print("Эффект: малый")
+elif abs(d) < 0.8:
+    print("Эффект: средний")
+else:
+    print("Эффект: большой")</code></pre>
+
+      <h3>📈 Визуализация распределений групп</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+fig, ax = plt.subplots(figsize=(10, 5))
+
+ax.hist(group_A, bins=30, alpha=0.5, label=f'A (μ={group_A.mean():.0f})', color='blue')
+ax.hist(group_B, bins=30, alpha=0.5, label=f'B (μ={group_B.mean():.0f})', color='green')
+ax.axvline(group_A.mean(), color='blue', linestyle='--', lw=2)
+ax.axvline(group_B.mean(), color='green', linestyle='--', lw=2)
+ax.set_xlabel("Средний чек (руб.)")
+ax.set_ylabel("Количество пользователей")
+ax.set_title("A/B тест: распределение среднего чека")
+ax.legend()
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>t-тест для средних — полная математика</h3>
 

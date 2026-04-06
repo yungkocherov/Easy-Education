@@ -605,6 +605,82 @@ k=3 vs k=5: одинаковый Mean и Std!
       },
     },
 
+    python: `
+      <h3>Python: кросс-валидация и подбор гиперпараметров</h3>
+      <p>sklearn.model_selection содержит инструменты для надёжной оценки моделей и автоматического подбора параметров.</p>
+
+      <h4>1. cross_val_score и StratifiedKFold</h4>
+      <pre><code>import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+
+X, y = make_classification(n_samples=1000, n_features=10,
+                            weights=[0.8, 0.2], random_state=42)
+
+# StratifiedKFold сохраняет баланс классов в каждом фолде
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+model = LogisticRegression()
+
+scores = cross_val_score(model, X, y, cv=cv, scoring='roc_auc')
+print(f'ROC-AUC по фолдам: {scores.round(3)}')
+print(f'Среднее: {scores.mean():.3f} ± {scores.std():.3f}')
+
+# Оцениваем несколько метрик сразу
+from sklearn.model_selection import cross_validate
+results = cross_validate(model, X, y, cv=cv,
+                         scoring=['roc_auc', 'f1', 'precision', 'recall'])
+for metric, vals in results.items():
+    if metric.startswith('test_'):
+        print(f'{metric}: {vals.mean():.3f} ± {vals.std():.3f}')</code></pre>
+
+      <h4>2. GridSearchCV — поиск по сетке гиперпараметров</h4>
+      <pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+
+param_grid = {
+    'C': [0.01, 0.1, 1, 10],
+    'kernel': ['linear', 'rbf'],
+    'gamma': ['scale', 'auto'],
+}
+
+grid_search = GridSearchCV(
+    SVC(probability=True),
+    param_grid,
+    cv=StratifiedKFold(5, shuffle=True, random_state=42),
+    scoring='roc_auc',
+    n_jobs=-1,        # используем все ядра
+    verbose=1,
+)
+grid_search.fit(X, y)
+
+print(f'Лучшие параметры: {grid_search.best_params_}')
+print(f'Лучший ROC-AUC: {grid_search.best_score_:.4f}')
+
+import pandas as pd
+cv_results = pd.DataFrame(grid_search.cv_results_)
+print(cv_results[['params', 'mean_test_score', 'std_test_score']].sort_values(
+    'mean_test_score', ascending=False).head(5))</code></pre>
+
+      <h4>3. Nested CV — честная оценка после подбора параметров</h4>
+      <pre><code>from sklearn.model_selection import cross_val_score, GridSearchCV, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+# Nested CV: внешний цикл — оценка, внутренний — подбор параметров
+inner_cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=1)
+outer_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+pipe = Pipeline([('scaler', StandardScaler()), ('svc', SVC(probability=True))])
+param_grid = {'svc__C': [0.1, 1, 10], 'svc__kernel': ['linear', 'rbf']}
+
+clf = GridSearchCV(pipe, param_grid, cv=inner_cv, scoring='roc_auc')
+
+# Внешние фолды дают честную оценку обобщения
+nested_scores = cross_val_score(clf, X, y, cv=outer_cv, scoring='roc_auc')
+print(f'Nested CV ROC-AUC: {nested_scores.mean():.3f} ± {nested_scores.std():.3f}')</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

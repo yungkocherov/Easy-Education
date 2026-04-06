@@ -433,6 +433,67 @@ P(хотя бы одно ложное срабатывание) = 1 − (1 − 0
       }
     ],
 
+    python: `
+      <h3>📊 Расчёт размера выборки</h3>
+      <pre><code>from statsmodels.stats.power import NormalIndPower
+
+power_analysis = NormalIndPower()
+
+# Параметры: MDE, alpha, power
+# effect_size = MDE / pooled_std (для пропорций ≈ MDE / sqrt(p*(1-p)))
+baseline_cr = 0.10   # текущая конверсия 10%
+mde = 0.02           # хотим увидеть +2 п.п. (до 12%)
+
+# Для пропорций: effect_size (Cohen's h)
+import numpy as np
+h = 2 * np.arcsin(np.sqrt(baseline_cr + mde)) - 2 * np.arcsin(np.sqrt(baseline_cr))
+
+n_per_group = power_analysis.solve_power(
+    effect_size=h,
+    alpha=0.05,       # уровень значимости
+    power=0.80,       # мощность 80%
+    alternative='two-sided'
+)
+print(f"Cohen's h: {h:.4f}")
+print(f"Нужно на группу: {int(np.ceil(n_per_group))}")
+print(f"Всего участников: {int(np.ceil(n_per_group)) * 2}")</code></pre>
+
+      <h3>📈 График зависимости выборки от MDE</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from statsmodels.stats.power import NormalIndPower
+
+power_analysis = NormalIndPower()
+baseline = 0.10
+
+mde_range = np.arange(0.005, 0.06, 0.005)
+sample_sizes = []
+
+for mde in mde_range:
+    h = 2 * np.arcsin(np.sqrt(baseline + mde)) - 2 * np.arcsin(np.sqrt(baseline))
+    n = power_analysis.solve_power(effect_size=h, alpha=0.05, power=0.80)
+    sample_sizes.append(int(np.ceil(n)))
+
+plt.plot(mde_range * 100, sample_sizes, 'bo-')
+plt.xlabel("MDE (процентные пункты)")
+plt.ylabel("Размер выборки на группу")
+plt.title("Размер выборки vs MDE (baseline=10%)")
+plt.grid(alpha=0.3)
+plt.show()</code></pre>
+
+      <h3>🎯 Быстрая оценка длительности теста</h3>
+      <pre><code># Сколько дней нужно для теста?
+daily_traffic = 5000       # визитов в день
+n_per_group = 3900         # из расчёта выше
+n_groups = 2               # A и B
+traffic_share = 1.0        # 100% трафика в тест
+
+days = (n_per_group * n_groups) / (daily_traffic * traffic_share)
+print(f"Нужно дней: {np.ceil(days):.0f}")
+print(f"Рекомендация: минимум {max(7, int(np.ceil(days)))} дней")
+print("(не менее 7 дней для учёта дня-недели эффекта)")</code></pre>
+    `,
+
     math: `
       <h3>Ключевые формулы A/B тестирования</h3>
 

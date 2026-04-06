@@ -617,6 +617,85 @@ ROC-AUC у дисбалансированного ЛУЧШЕ, хотя в абс
       },
     },
 
+    python: `
+      <h3>Python: ROC-кривая и AUC</h3>
+      <p>sklearn.metrics позволяет построить ROC-кривую, вычислить AUC и сравнить несколько моделей на одном графике.</p>
+
+      <h4>1. Построение ROC-кривой</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_curve, auc, roc_auc_score
+
+X, y = make_classification(n_samples=1000, n_features=10,
+                            weights=[0.8, 0.2], random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+y_proba = model.predict_proba(X_test)[:, 1]
+
+# Вычисляем точки ROC-кривой
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(7, 5))
+plt.plot(fpr, tpr, lw=2, label=f'ROC (AUC = {roc_auc:.3f})')
+plt.plot([0, 1], [0, 1], '--', color='grey', label='Random')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC-кривая')
+plt.legend()
+plt.show()
+
+print(f'ROC-AUC (sklearn): {roc_auc_score(y_test, y_proba):.4f}')</code></pre>
+
+      <h4>2. Сравнение нескольких моделей</h4>
+      <pre><code>from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+
+models = {
+    'Logistic Regression': LogisticRegression(),
+    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'Gradient Boosting': GradientBoostingClassifier(random_state=42),
+}
+
+plt.figure(figsize=(8, 6))
+for name, clf in models.items():
+    clf.fit(X_train, y_train)
+    proba = clf.predict_proba(X_test)[:, 1]
+    fpr, tpr, _ = roc_curve(y_test, proba)
+    score = auc(fpr, tpr)
+    plt.plot(fpr, tpr, lw=2, label=f'{name} (AUC={score:.3f})')
+
+plt.plot([0, 1], [0, 1], '--', color='grey')
+plt.xlabel('FPR')
+plt.ylabel('TPR')
+plt.title('Сравнение ROC-кривых')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. Precision-Recall AUC (лучше при сильном дисбалансе)</h4>
+      <pre><code>from sklearn.metrics import precision_recall_curve, average_precision_score
+
+y_proba = model.predict_proba(X_test)[:, 1]
+precision, recall, _ = precision_recall_curve(y_test, y_proba)
+ap = average_precision_score(y_test, y_proba)
+
+plt.figure(figsize=(7, 5))
+plt.plot(recall, precision, lw=2, label=f'PR-кривая (AP={ap:.3f})')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall кривая')
+plt.legend()
+plt.show()
+
+# При дисбалансе 1:9 случайный классификатор даёт AP ~ 0.1
+# ROC-AUC всегда 0.5 у случайного — но менее информативен
+print(f'Average Precision: {ap:.4f}')</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

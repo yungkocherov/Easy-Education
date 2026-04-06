@@ -565,6 +565,89 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: логистическая регрессия</h3>
+      <p>sklearn.LogisticRegression поддерживает мультикласс, регуляризацию и выдачу вероятностей через predict_proba.</p>
+
+      <h4>1. Бинарная классификация и predict_proba</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, roc_auc_score
+
+# Датасет рак молочной железы: 569 наблюдений, 30 признаков
+data = load_breast_cancer()
+X, y = data.data, data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+                                                       stratify=y, random_state=42)
+
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
+
+model = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
+model.fit(X_train_s, y_train)
+
+# predict_proba возвращает [P(класс=0), P(класс=1)]
+y_proba = model.predict_proba(X_test_s)[:, 1]
+y_pred = model.predict(X_test_s)
+
+print(f'ROC-AUC: {roc_auc_score(y_test, y_proba):.4f}')
+print(classification_report(y_test, y_pred,
+      target_names=data.target_names))</code></pre>
+
+      <h4>2. Анализ коэффициентов</h4>
+      <pre><code>import pandas as pd
+
+# Коэффициенты показывают вклад каждого признака в log-odds
+coef_df = pd.DataFrame({
+    'признак': data.feature_names,
+    'коэффициент': model.coef_[0],
+}).sort_values('коэффициент')
+
+plt.figure(figsize=(8, 8))
+plt.barh(coef_df['признак'], coef_df['коэффициент'])
+plt.axvline(0, color='black', linewidth=0.8)
+plt.xlabel('Коэффициент (log-odds)')
+plt.title('Логистическая регрессия: важность признаков')
+plt.tight_layout()
+plt.show()
+
+# Интерпретация через odds ratio
+odds_ratio = np.exp(model.coef_[0])
+top5 = pd.Series(odds_ratio, index=data.feature_names).sort_values(ascending=False).head(5)
+print('Top-5 признаков (odds ratio):')
+print(top5.round(3))</code></pre>
+
+      <h4>3. Мультиклассовая классификация</h4>
+      <pre><code>from sklearn.datasets import load_iris
+from sklearn.metrics import ConfusionMatrixDisplay
+
+iris = load_iris()
+X_i, y_i = iris.data, iris.target
+X_tr, X_te, y_tr, y_te = train_test_split(X_i, y_i, test_size=0.25, random_state=42)
+
+# multi_class='multinomial' — softmax вместо one-vs-rest
+model_multi = LogisticRegression(multi_class='multinomial', solver='lbfgs',
+                                   C=1.0, max_iter=500)
+model_multi.fit(X_tr, y_tr)
+print(f'Accuracy: {model_multi.score(X_te, y_te):.4f}')
+
+# Вероятности для каждого класса
+proba = model_multi.predict_proba(X_te[:5])
+print('Вероятности первых 5 примеров (3 класса):')
+print(proba.round(3))
+
+ConfusionMatrixDisplay.from_estimator(model_multi, X_te, y_te,
+                                       display_labels=iris.target_names)
+plt.title('Матрица ошибок: Iris (3 класса)')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

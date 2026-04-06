@@ -414,6 +414,69 @@ p-value = 2×(1 − Φ(3.935)) ≈ <b>0.000083</b> ≪ 0.001</div>
       }
     ],
 
+    python: `
+      <h3>📊 z-тест для пропорций в Python</h3>
+      <pre><code>from statsmodels.stats.proportion import proportions_ztest
+import numpy as np
+
+# Данные A/B теста
+n_A, n_B = 5000, 5000       # размеры групп
+conv_A, conv_B = 500, 560   # конверсии
+
+# z-тест для двух пропорций
+count = np.array([conv_A, conv_B])
+nobs = np.array([n_A, n_B])
+
+z_stat, p_value = proportions_ztest(count, nobs, alternative='two-sided')
+print(f"p_A = {conv_A/n_A:.4f} ({conv_A/n_A:.2%})")
+print(f"p_B = {conv_B/n_B:.4f} ({conv_B/n_B:.2%})")
+print(f"z = {z_stat:.4f}")
+print(f"p-value = {p_value:.4f}")
+print(f"\\n{'Значимо!' if p_value < 0.05 else 'Не значимо'} (α=0.05)")</code></pre>
+
+      <h3>📋 Доверительный интервал разности</h3>
+      <pre><code>import numpy as np
+from scipy import stats
+
+n_A, n_B = 5000, 5000
+p_A, p_B = 500/5000, 560/5000
+
+# Разность пропорций
+diff = p_B - p_A
+se = np.sqrt(p_A*(1-p_A)/n_A + p_B*(1-p_B)/n_B)
+
+# 95% доверительный интервал
+z_crit = stats.norm.ppf(0.975)
+ci_lower = diff - z_crit * se
+ci_upper = diff + z_crit * se
+
+print(f"Разность: {diff:.4f} ({diff:.2%})")
+print(f"SE: {se:.4f}")
+print(f"95% ДИ: [{ci_lower:.4f}, {ci_upper:.4f}]")
+print(f"        [{ci_lower:.2%}, {ci_upper:.2%}]")
+print(f"\\n0 {'НЕ входит' if ci_lower > 0 else 'входит'} в ДИ")</code></pre>
+
+      <h3>📈 Визуализация результата</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+p_A, p_B = 0.100, 0.112
+diff = p_B - p_A
+se = np.sqrt(p_A*0.9/5000 + p_B*0.888/5000)
+
+x = np.linspace(diff - 4*se, diff + 4*se, 200)
+y = stats.norm(diff, se).pdf(x)
+
+plt.plot(x, y, 'b-', lw=2)
+plt.axvline(0, color='red', linestyle='--', label='H₀: diff=0')
+plt.fill_between(x, y, where=(x > 0), alpha=0.3, color='green')
+plt.title(f"Распределение разности пропорций (diff={diff:.3f})")
+plt.xlabel("p_B − p_A")
+plt.legend()
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>z-тест для двух пропорций — полная математика</h3>
 

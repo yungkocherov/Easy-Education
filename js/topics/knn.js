@@ -552,6 +552,100 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: k ближайших соседей</h3>
+      <p>sklearn.KNeighborsClassifier прост в использовании. GridSearchCV поможет найти оптимальное k и метрику расстояния.</p>
+
+      <h4>1. KNeighborsClassifier и визуализация границы решений</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+
+# Простой 2D датасет для визуализации
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0,
+                            n_clusters_per_class=1, random_state=42)
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+print(f'Accuracy: {knn.score(X_test, y_test):.4f}')
+print(classification_report(y_test, knn.predict(X_test)))
+
+# Граница решений
+xx, yy = np.meshgrid(np.linspace(-3, 3, 200), np.linspace(-3, 3, 200))
+Z = knn.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+plt.contourf(xx, yy, Z, alpha=0.3, cmap='RdBu')
+plt.scatter(X_test[:, 0], X_test[:, 1], c=y_test, cmap='RdBu', edgecolors='k')
+plt.title('KNN (k=5): граница решений')
+plt.show()</code></pre>
+
+      <h4>2. GridSearchCV для k и метрики расстояния</h4>
+      <pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'n_neighbors': range(1, 31),
+    'weights': ['uniform', 'distance'],
+    'metric': ['euclidean', 'manhattan'],
+}
+
+grid = GridSearchCV(KNeighborsClassifier(), param_grid,
+                    cv=5, scoring='accuracy', n_jobs=-1)
+grid.fit(X_train, y_train)
+
+print(f'Лучшие параметры: {grid.best_params_}')
+print(f'CV Accuracy: {grid.best_score_:.4f}')
+print(f'Test Accuracy: {grid.best_estimator_.score(X_test, y_test):.4f}')
+
+# Как меняется accuracy от k
+import pandas as pd
+results = pd.DataFrame(grid.cv_results_)
+for metric in ['euclidean', 'manhattan']:
+    subset = results[results['param_metric'] == metric]
+    k_vals = subset['param_n_neighbors'].astype(int)
+    plt.plot(k_vals, subset['mean_test_score'], label=metric)
+plt.xlabel('k')
+plt.ylabel('CV Accuracy')
+plt.title('KNN: accuracy от k')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>3. KNN для регрессии и поиск аномалий</h4>
+      <pre><code>from sklearn.neighbors import KNeighborsRegressor, LocalOutlierFactor
+
+# KNN регрессия
+from sklearn.datasets import load_diabetes
+data = load_diabetes()
+X_r, y_r = data.data, data.target
+X_tr, X_te, y_tr, y_te = train_test_split(X_r, y_r, test_size=0.2, random_state=42)
+
+knn_reg = KNeighborsRegressor(n_neighbors=7)
+knn_reg.fit(X_tr, y_tr)
+from sklearn.metrics import r2_score
+print(f'KNN Regression R²: {r2_score(y_te, knn_reg.predict(X_te)):.4f}')
+
+# LOF — поиск аномалий через плотность соседей
+X_anom, _ = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=0)
+# Добавляем выбросы
+outliers = np.random.uniform(-4, 4, (20, 2))
+X_all = np.vstack([X_anom, outliers])
+
+lof = LocalOutlierFactor(n_neighbors=20)
+labels = lof.fit_predict(X_all)  # -1 = аномалия
+
+plt.scatter(X_all[labels==1, 0], X_all[labels==1, 1], label='Normal', alpha=0.5)
+plt.scatter(X_all[labels==-1, 0], X_all[labels==-1, 1], c='red', label='Outlier', s=80)
+plt.title('LOF: обнаружение аномалий')
+plt.legend()
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

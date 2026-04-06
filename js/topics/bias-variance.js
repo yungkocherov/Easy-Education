@@ -676,6 +676,104 @@ Train error низкий → bias не катастрофический
       },
     },
 
+    python: `
+      <h3>Python: диагностика bias-variance</h3>
+      <p>Полиномиальные признаки помогают наглядно показать переобучение и недообучение через кривые обучения.</p>
+
+      <h4>1. Влияние степени полинома на train/test ошибку</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+
+# Генерируем нелинейные данные с шумом
+np.random.seed(42)
+X = np.sort(np.random.uniform(-3, 3, 100)).reshape(-1, 1)
+y = 0.5 * X.ravel()**2 - X.ravel() + np.random.randn(100) * 1.5
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+degrees = range(1, 12)
+train_errors, test_errors = [], []
+
+for d in degrees:
+    pipe = Pipeline([('poly', PolynomialFeatures(d)), ('lr', LinearRegression())])
+    pipe.fit(X_train, y_train)
+    train_errors.append(mean_squared_error(y_train, pipe.predict(X_train)))
+    test_errors.append(mean_squared_error(y_test, pipe.predict(X_test)))
+
+plt.semilogy(degrees, train_errors, 'o-', label='Train MSE')
+plt.semilogy(degrees, test_errors, 's-', label='Test MSE')
+plt.xlabel('Степень полинома')
+plt.ylabel('MSE (log)')
+plt.title('Bias-Variance: train vs test')
+plt.legend()
+plt.show()</code></pre>
+
+      <h4>2. Кривые обучения (learning curves)</h4>
+      <pre><code>from sklearn.model_selection import learning_curve
+
+def plot_learning_curve(estimator, X, y, title=''):
+    train_sizes, train_scores, val_scores = learning_curve(
+        estimator, X, y, cv=5, scoring='neg_mean_squared_error',
+        train_sizes=np.linspace(0.1, 1.0, 10), random_state=42)
+
+    train_mean = -train_scores.mean(axis=1)
+    val_mean = -val_scores.mean(axis=1)
+
+    plt.plot(train_sizes, train_mean, 'o-', label='Train MSE')
+    plt.plot(train_sizes, val_mean, 's-', label='Val MSE')
+    plt.xlabel('Размер обучающей выборки')
+    plt.ylabel('MSE')
+    plt.title(title)
+    plt.legend()
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+plt.sca(axes[0])
+plot_learning_curve(
+    Pipeline([('poly', PolynomialFeatures(1)), ('lr', LinearRegression())]),
+    X, y, title='Underfitting (степень=1)')
+
+plt.sca(axes[1])
+plot_learning_curve(
+    Pipeline([('poly', PolynomialFeatures(10)), ('lr', LinearRegression())]),
+    X, y, title='Overfitting (степень=10)')
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h4>3. Оценка bias и variance через bootstrap</h4>
+      <pre><code>from sklearn.utils import resample
+
+# Оцениваем разброс предсказаний (variance) через bootstrap
+X_test_single = np.array([[1.5]])  # одна точка для предсказания
+predictions = []
+
+for _ in range(200):
+    X_b, y_b = resample(X_train, y_train, random_state=None)
+    pipe = Pipeline([('poly', PolynomialFeatures(8)), ('lr', LinearRegression())])
+    pipe.fit(X_b, y_b)
+    predictions.append(pipe.predict(X_test_single)[0])
+
+predictions = np.array(predictions)
+true_val = 0.5 * 1.5**2 - 1.5  # истинное значение
+
+print(f'Истинное значение: {true_val:.3f}')
+print(f'Среднее предсказание: {predictions.mean():.3f}  (bias = {predictions.mean()-true_val:.3f})')
+print(f'Std предсказаний: {predictions.std():.3f}  (variance)')
+
+plt.hist(predictions, bins=30, alpha=0.7)
+plt.axvline(true_val, color='red', label='True value')
+plt.axvline(predictions.mean(), color='green', linestyle='--', label='Mean pred')
+plt.legend()
+plt.title('Bootstrap: распределение предсказаний (сложная модель)')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется идея</h3>
       <ul>

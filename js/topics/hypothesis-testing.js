@@ -586,6 +586,60 @@ p-value < 0.001</div>
       },
     },
 
+    python: `
+      <h3>📊 t-тесты в scipy.stats</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+# Одновыборочный t-тест: среднее = 500?
+sample = np.array([510, 495, 520, 505, 530, 498, 515, 490, 525, 508])
+stat, p = stats.ttest_1samp(sample, popmean=500)
+print(f"One-sample t-test: t={stat:.3f}, p={p:.4f}")
+print("Отвергаем H₀" if p < 0.05 else "Не отвергаем H₀")
+
+# Двухвыборочный t-тест
+group_a = np.array([78, 82, 85, 79, 88, 91, 76, 84])
+group_b = np.array([85, 89, 92, 88, 95, 87, 90, 93])
+stat, p = stats.ttest_ind(group_a, group_b, equal_var=True)
+print(f"\\nTwo-sample t-test: t={stat:.3f}, p={p:.4f}")
+
+# Парный t-тест (до/после)
+before = np.array([120, 135, 128, 140, 132])
+after  = np.array([115, 125, 122, 130, 128])
+stat, p = stats.ttest_rel(before, after)
+print(f"\\nPaired t-test: t={stat:.3f}, p={p:.4f}")</code></pre>
+
+      <h3>📋 Хи-квадрат тест</h3>
+      <pre><code>from scipy.stats import chi2_contingency
+import numpy as np
+
+# Таблица сопряжённости: пол × предпочтение
+#            Чай   Кофе  Сок
+observed = np.array([
+    [30, 50, 20],   # Мужчины
+    [45, 35, 25]    # Женщины
+])
+
+chi2, p, dof, expected = chi2_contingency(observed)
+print(f"χ² = {chi2:.2f}, p = {p:.4f}, df = {dof}")
+print(f"\\nОжидаемые частоты:\\n{expected.round(1)}")</code></pre>
+
+      <h3>🔍 Выбор теста — шпаргалка</h3>
+      <pre><code># Нормальность → параметрический тест
+from scipy import stats
+
+data = np.random.normal(0, 1, 100)
+_, p_shapiro = stats.shapiro(data)
+
+if p_shapiro > 0.05:
+    print("Данные нормальные → t-тест / ANOVA")
+    # stats.ttest_ind(a, b)
+else:
+    print("Данные НЕ нормальные → Манн-Уитни / Краскел-Уоллис")
+    # stats.mannwhitneyu(a, b)
+    # stats.kruskal(a, b, c)</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

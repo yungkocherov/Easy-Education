@@ -554,6 +554,100 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: Байесовские методы</h3>
+      <p>sklearn.GaussianNB — быстрый наивный Байес. scipy.stats.beta позволяет работать с бета-распределением для байесовского обновления.</p>
+
+      <h4>1. GaussianNB — наивный Байес</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
+
+data = load_iris()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+gnb = GaussianNB()
+gnb.fit(X_train, y_train)
+y_pred = gnb.predict(X_test)
+
+print(f'Accuracy: {accuracy_score(y_test, y_pred):.4f}')
+print(classification_report(y_test, y_pred, target_names=data.target_names))
+
+# Параметры модели — средние и дисперсии каждого признака
+print('Средние по классам:')
+print(np.round(gnb.theta_, 2))  # shape: (n_classes, n_features)
+print('Дисперсии по классам:')
+print(np.round(gnb.var_, 2))</code></pre>
+
+      <h4>2. Байесовское обновление с бета-распределением</h4>
+      <pre><code>from scipy import stats
+
+# Монета: наблюдаем орлы и решки, обновляем belief о P(орёл)
+# Prior: Beta(alpha=2, beta=2) — слабое prior вокруг 0.5
+alpha_prior, beta_prior = 2, 2
+
+# Данные: 7 орлов из 10 бросков
+heads, tails = 7, 3
+
+# Posterior: Beta(alpha + heads, beta + tails)
+alpha_post = alpha_prior + heads
+beta_post = beta_prior + tails
+
+x = np.linspace(0, 1, 200)
+prior = stats.beta.pdf(x, alpha_prior, beta_prior)
+likelihood = stats.binom.pmf(heads, heads + tails, x)
+likelihood = likelihood / likelihood.max() * prior.max()
+posterior = stats.beta.pdf(x, alpha_post, beta_post)
+
+plt.plot(x, prior, '--', label=f'Prior Beta({alpha_prior},{beta_prior})')
+plt.plot(x, likelihood, ':', label='Правдоподобие (scaled)')
+plt.plot(x, posterior, '-', lw=2, label=f'Posterior Beta({alpha_post},{beta_post})')
+plt.xlabel('P(орёл)')
+plt.ylabel('Плотность')
+plt.title('Байесовское обновление: бета-распределение')
+plt.legend()
+plt.show()
+
+print(f'MAP оценка: {(alpha_post-1)/(alpha_post+beta_post-2):.3f}')
+print(f'95% HDI: [{stats.beta.ppf(0.025, alpha_post, beta_post):.3f}, '
+      f'{stats.beta.ppf(0.975, alpha_post, beta_post):.3f}]')</code></pre>
+
+      <h4>3. Байесовский A/B тест — сравнение конверсий</h4>
+      <pre><code>from scipy import stats
+
+# Конверсия варианта A: 120 успехов из 1000
+# Конверсия варианта B: 135 успехов из 1000
+a_success, a_total = 120, 1000
+b_success, b_total = 135, 1000
+
+# Posterior distributions
+alpha_A = 1 + a_success;  beta_A = 1 + a_total - a_success
+alpha_B = 1 + b_success;  beta_B = 1 + b_total - b_success
+
+# P(B > A) через Монте-Карло
+n_samples = 100_000
+samples_A = stats.beta.rvs(alpha_A, beta_A, size=n_samples, random_state=42)
+samples_B = stats.beta.rvs(alpha_B, beta_B, size=n_samples, random_state=42)
+prob_B_better = (samples_B > samples_A).mean()
+
+print(f'Конверсия A: {a_success/a_total:.2%}')
+print(f'Конверсия B: {b_success/b_total:.2%}')
+print(f'P(B > A): {prob_B_better:.4f}')
+
+x = np.linspace(0.05, 0.25, 300)
+plt.fill_between(x, stats.beta.pdf(x, alpha_A, beta_A), alpha=0.5, label='Вариант A')
+plt.fill_between(x, stats.beta.pdf(x, alpha_B, beta_B), alpha=0.5, label='Вариант B')
+plt.xlabel('Конверсия')
+plt.ylabel('Плотность')
+plt.title(f'Байесовский A/B тест: P(B>A)={prob_B_better:.3f}')
+plt.legend()
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

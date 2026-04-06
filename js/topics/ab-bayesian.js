@@ -403,6 +403,71 @@ Monte Carlo (N=100000):
       },
     ],
 
+    python: `
+      <h3>📊 Байесовский A/B тест в Python</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+# Данные теста
+conv_A, n_A = 120, 5000   # группа A
+conv_B, n_B = 155, 5000   # группа B
+
+# Априорное распределение: Beta(1, 1) — неинформативное
+alpha_prior, beta_prior = 1, 1
+
+# Апостериорные распределения: Beta(alpha + conversions, beta + non-conversions)
+post_A = stats.beta(alpha_prior + conv_A, beta_prior + n_A - conv_A)
+post_B = stats.beta(alpha_prior + conv_B, beta_prior + n_B - conv_B)
+
+print(f"Posterior A: Beta({alpha_prior+conv_A}, {beta_prior+n_A-conv_A})")
+print(f"  Среднее: {post_A.mean():.4f}, 95% ДИ: [{post_A.ppf(0.025):.4f}, {post_A.ppf(0.975):.4f}]")
+print(f"\\nPosterior B: Beta({alpha_prior+conv_B}, {beta_prior+n_B-conv_B})")
+print(f"  Среднее: {post_B.mean():.4f}, 95% ДИ: [{post_B.ppf(0.025):.4f}, {post_B.ppf(0.975):.4f}]")</code></pre>
+
+      <h3>🎲 Monte Carlo: P(B > A)</h3>
+      <pre><code>import numpy as np
+from scipy import stats
+
+# Генерируем сэмплы из апостериорных распределений
+n_samples = 100_000
+samples_A = stats.beta(121, 4881).rvs(n_samples)
+samples_B = stats.beta(156, 4846).rvs(n_samples)
+
+# P(B > A) — просто доля сэмплов, где B лучше
+prob_B_wins = (samples_B > samples_A).mean()
+print(f"P(B > A) = {prob_B_wins:.4f} ({prob_B_wins:.1%})")
+
+# Ожидаемый lift
+lift = (samples_B - samples_A) / samples_A
+print(f"Ожидаемый lift: {lift.mean():.2%}")
+print(f"95% ДИ lift: [{np.percentile(lift, 2.5):.2%}, {np.percentile(lift, 97.5):.2%}]")
+
+# Риск (expected loss)
+loss_A = np.maximum(samples_B - samples_A, 0).mean()
+loss_B = np.maximum(samples_A - samples_B, 0).mean()
+print(f"\\nExpected loss если выбрать A: {loss_A:.5f}")
+print(f"Expected loss если выбрать B: {loss_B:.5f}")</code></pre>
+
+      <h3>📈 Визуализация апостериорных распределений</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+x = np.linspace(0.015, 0.045, 1000)
+post_A = stats.beta(121, 4881)
+post_B = stats.beta(156, 4846)
+
+plt.plot(x, post_A.pdf(x), 'b-', lw=2, label=f'A: {post_A.mean():.4f}')
+plt.plot(x, post_B.pdf(x), 'g-', lw=2, label=f'B: {post_B.mean():.4f}')
+plt.fill_between(x, post_A.pdf(x), alpha=0.2, color='blue')
+plt.fill_between(x, post_B.pdf(x), alpha=0.2, color='green')
+plt.xlabel("Конверсия")
+plt.ylabel("Плотность")
+plt.title("Апостериорные распределения конверсий")
+plt.legend()
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>Основные формулы</h3>
 

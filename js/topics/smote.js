@@ -643,6 +643,89 @@ Recall = 100%! Но Precision упала, и 3 ложные тревоги.</div
       },
     },
 
+    python: `
+      <h3>Python: SMOTE и балансировка классов</h3>
+      <p>imbalanced-learn предоставляет SMOTE и другие методы oversampling. sklearn поддерживает class_weight для встроенной балансировки.</p>
+
+      <h4>1. SMOTE: синтетическая генерация примеров</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from collections import Counter
+
+# pip install imbalanced-learn
+from imblearn.over_sampling import SMOTE
+
+# Несбалансированный датасет: 90% vs 10%
+X, y = make_classification(n_samples=1000, n_features=2, n_redundant=0,
+                            n_clusters_per_class=1, weights=[0.9, 0.1],
+                            random_state=42)
+
+print('До SMOTE:', Counter(y))
+
+smote = SMOTE(sampling_strategy='auto', k_neighbors=5, random_state=42)
+X_res, y_res = smote.fit_resample(X, y)
+print('После SMOTE:', Counter(y_res))
+
+# Визуализация
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+for ax, X_p, y_p, title in [(axes[0], X, y, 'До SMOTE'),
+                              (axes[1], X_res, y_res, 'После SMOTE')]:
+    ax.scatter(X_p[y_p==0, 0], X_p[y_p==0, 1], alpha=0.3, label='Класс 0')
+    ax.scatter(X_p[y_p==1, 0], X_p[y_p==1, 1], alpha=0.6, label='Класс 1')
+    ax.set_title(title)
+    ax.legend()
+plt.show()</code></pre>
+
+      <h4>2. Сравнение стратегий: без балансировки, SMOTE, class_weight</h4>
+      <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, classification_report
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,
+                                                       stratify=y, random_state=42)
+
+strategies = {
+    'Без балансировки': LogisticRegression(),
+    'class_weight=balanced': LogisticRegression(class_weight='balanced'),
+    'SMOTE + LR': ImbPipeline([
+        ('smote', SMOTE(random_state=42)),
+        ('lr', LogisticRegression()),
+    ]),
+}
+
+for name, clf in strategies.items():
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    f1 = f1_score(y_test, y_pred)
+    print(f'{name}: F1 = {f1:.3f}')
+
+# Подробный отчёт по лучшей стратегии
+best = strategies['SMOTE + LR']
+print(classification_report(y_test, best.predict(X_test)))</code></pre>
+
+      <h4>3. Undersampling и комбинированные методы</h4>
+      <pre><code>from imblearn.under_sampling import RandomUnderSampler, TomekLinks
+from imblearn.combine import SMOTETomek
+
+# SMOTETomek — oversample + удалить граничные примеры
+smt = SMOTETomek(random_state=42)
+X_res2, y_res2 = smt.fit_resample(X_train, y_train)
+print('SMOTETomek:', Counter(y_res2))
+
+lr = LogisticRegression()
+lr.fit(X_res2, y_res2)
+print('SMOTETomek F1:', f1_score(y_test, lr.predict(X_test), average='macro').round(3))
+
+# Только undersampling — быстро, но теряет данные
+rus = RandomUnderSampler(random_state=42)
+X_under, y_under = rus.fit_resample(X_train, y_train)
+lr.fit(X_under, y_under)
+print('UnderSampling F1:', f1_score(y_test, lr.predict(X_test), average='macro').round(3))</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

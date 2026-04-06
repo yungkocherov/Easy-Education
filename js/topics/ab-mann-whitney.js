@@ -359,6 +359,68 @@ p-value (двусторонний) ≈ <b>0.003</b></div>
       },
     ],
 
+    python: `
+      <h3>📊 Тест Манна-Уитни в Python</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+np.random.seed(42)
+
+# Данные: время на сайте (секунды) — скошенное распределение
+group_A = np.random.exponential(scale=120, size=300)  # контроль
+group_B = np.random.exponential(scale=140, size=300)  # тест
+
+# Тест Манна-Уитни (непараметрический)
+u_stat, p_value = stats.mannwhitneyu(group_A, group_B, alternative='two-sided')
+
+print(f"Медиана A: {np.median(group_A):.1f} сек")
+print(f"Медиана B: {np.median(group_B):.1f} сек")
+print(f"\\nU-статистика = {u_stat:.0f}")
+print(f"p-value = {p_value:.4f}")
+print(f"\\n{'Значимо!' if p_value < 0.05 else 'Не значимо'} (α=0.05)")</code></pre>
+
+      <h3>📋 Когда использовать Манна-Уитни vs t-тест</h3>
+      <pre><code>from scipy import stats
+import numpy as np
+
+# Проверяем нормальность данных
+_, p_shapiro_A = stats.shapiro(group_A[:50])  # берём подвыборку
+_, p_shapiro_B = stats.shapiro(group_B[:50])
+
+print(f"Shapiro-Wilk A: p={p_shapiro_A:.4f}")
+print(f"Shapiro-Wilk B: p={p_shapiro_B:.4f}")
+
+if p_shapiro_A > 0.05 and p_shapiro_B > 0.05:
+    print("\\n→ Данные нормальные → используйте t-тест")
+    t, p = stats.ttest_ind(group_A, group_B)
+    print(f"  t-тест: t={t:.3f}, p={p:.4f}")
+else:
+    print("\\n→ Данные НЕ нормальные → используйте Манна-Уитни")
+    u, p = stats.mannwhitneyu(group_A, group_B)
+    print(f"  Манн-Уитни: U={u:.0f}, p={p:.4f}")</code></pre>
+
+      <h3>📈 Визуализация распределений</h3>
+      <pre><code>import matplotlib.pyplot as plt
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Гистограммы
+ax1.hist(group_A, bins=30, alpha=0.5, label='A', color='blue')
+ax1.hist(group_B, bins=30, alpha=0.5, label='B', color='green')
+ax1.axvline(np.median(group_A), color='blue', linestyle='--')
+ax1.axvline(np.median(group_B), color='green', linestyle='--')
+ax1.set_title("Распределения (скошенные)")
+ax1.legend()
+
+# Boxplot
+ax2.boxplot([group_A, group_B], labels=['A', 'B'])
+ax2.set_title("Boxplot: A vs B")
+ax2.set_ylabel("Время (сек)")
+
+plt.tight_layout()
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>Основные формулы</h3>
 

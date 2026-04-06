@@ -827,6 +827,126 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>CNN на Python (PyTorch)</h3>
+      <p>Строим свёрточную сеть для MNIST: nn.Conv2d + nn.MaxPool2d. Показываем архитектуру и torchvision transforms.</p>
+
+      <h4>1. Архитектура CNN для MNIST (28×28 → 10 классов)</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class SimpleCNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Свёрточные блоки: извлекаем признаки из изображения
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)  # 1 канал → 32 фильтра
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1) # 32 → 64 фильтра
+        self.pool  = nn.MaxPool2d(2, 2)                           # уменьшаем в 2 раза
+        self.dropout = nn.Dropout(0.25)
+
+        # Полносвязные слои: классификация на основе признаков
+        # После 2 пулингов: 28→14→7; итого 64*7*7 = 3136
+        self.fc1 = nn.Linear(64 * 7 * 7, 128)
+        self.fc2 = nn.Linear(128, 10)              # 10 классов цифр
+
+    def forward(self, x):
+        # Блок 1: свёртка → ReLU → пулинг
+        x = self.pool(F.relu(self.conv1(x)))       # [B,32,14,14]
+        # Блок 2: свёртка → ReLU → пулинг
+        x = self.pool(F.relu(self.conv2(x)))       # [B,64,7,7]
+        x = self.dropout(x)
+        x = x.view(x.size(0), -1)                 # разворачиваем в вектор
+        x = F.relu(self.fc1(x))
+        return self.fc2(x)                         # логиты (без softmax)
+
+model = SimpleCNN()
+print(model)
+
+# Считаем количество параметров
+total = sum(p.numel() for p in model.parameters())
+print(f"Параметров: {total:,}")
+
+# Проверяем форму: батч из 4 изображений 28×28
+x_dummy = torch.randn(4, 1, 28, 28)
+out = model(x_dummy)
+print(f"Выход: {out.shape}")   # torch.Size([4, 10])
+</code></pre>
+
+      <h4>2. torchvision: загрузка MNIST и аугментации</h4>
+      <pre><code>import torch
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+# Трансформации: нормализация и аугментация для обучения
+train_transform = transforms.Compose([
+    transforms.RandomRotation(10),          # случайный поворот ±10°
+    transforms.RandomAffine(0, translate=(0.1, 0.1)),  # случайный сдвиг
+    transforms.ToTensor(),                  # PIL Image → FloatTensor [0,1]
+    transforms.Normalize((0.1307,), (0.3081,)),  # нормализация (mean, std) MNIST
+])
+
+# Для теста — только нормализация, без аугментаций
+test_transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.1307,), (0.3081,)),
+])
+
+# Загружаем датасеты (скачивает автоматически)
+train_ds = datasets.MNIST('./data', train=True,  download=True, transform=train_transform)
+test_ds  = datasets.MNIST('./data', train=False, download=True, transform=test_transform)
+
+train_loader = DataLoader(train_ds, batch_size=64, shuffle=True,  num_workers=2)
+test_loader  = DataLoader(test_ds,  batch_size=256, shuffle=False, num_workers=2)
+
+print(f"Обучающих батчей: {len(train_loader)}")   # 60000/64 ≈ 938
+print(f"Тестовых батчей:  {len(test_loader)}")    # 10000/256 ≈ 40
+</code></pre>
+
+      <h4>3. Полный цикл обучения CNN</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model  = SimpleCNN().to(device)               # переносим на GPU если есть
+
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+loss_fn   = nn.CrossEntropyLoss()
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
+
+def train_epoch(loader):
+    model.train()
+    total_loss, correct = 0, 0
+    for imgs, labels in loader:
+        imgs, labels = imgs.to(device), labels.to(device)
+        optimizer.zero_grad()
+        out  = model(imgs)
+        loss = loss_fn(out, labels)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+        correct    += (out.argmax(1) == labels).sum().item()
+    return total_loss / len(loader), correct / len(loader.dataset)
+
+def eval_epoch(loader):
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for imgs, labels in loader:
+            imgs, labels = imgs.to(device), labels.to(device)
+            correct += (model(imgs).argmax(1) == labels).sum().item()
+    return correct / len(loader.dataset)
+
+for epoch in range(10):
+    loss, train_acc = train_epoch(train_loader)
+    test_acc        = eval_epoch(test_loader)
+    scheduler.step()                          # снижаем lr каждые 5 эпох
+    print(f"Ep {epoch+1:2d}: loss={loss:.3f}, train={train_acc:.2%}, test={test_acc:.2%}")
+# Типичный результат: test accuracy ~99% за 10 эпох
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

@@ -612,6 +612,107 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: DBSCAN</h3>
+      <p>sklearn.DBSCAN находит кластеры произвольной формы и помечает выбросы. k-distance plot помогает выбрать epsilon.</p>
+
+      <h4>1. DBSCAN на нелинейных данных</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_moons, make_circles
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn.preprocessing import StandardScaler
+
+# DBSCAN прекрасно работает там, где K-Means провалится
+X_moons, _ = make_moons(n_samples=300, noise=0.05, random_state=42)
+X_circles, _ = make_circles(n_samples=300, noise=0.05, factor=0.5, random_state=42)
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+for row, (X, title) in enumerate([(X_moons, 'Луны'), (X_circles, 'Кольца')]):
+    X_s = StandardScaler().fit_transform(X)
+
+    # K-Means
+    km = KMeans(n_clusters=2, random_state=42)
+    axes[row, 0].scatter(X_s[:, 0], X_s[:, 1], c=km.fit_predict(X_s), cmap='tab10', s=20)
+    axes[row, 0].set_title(f'K-Means: {title}')
+
+    # DBSCAN
+    db = DBSCAN(eps=0.3, min_samples=5)
+    labels = db.fit_predict(X_s)
+    noise_mask = labels == -1
+    axes[row, 1].scatter(X_s[~noise_mask, 0], X_s[~noise_mask, 1],
+                         c=labels[~noise_mask], cmap='tab10', s=20)
+    axes[row, 1].scatter(X_s[noise_mask, 0], X_s[noise_mask, 1],
+                         c='red', s=30, marker='x', label='Шум')
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    axes[row, 1].set_title(f'DBSCAN: {title}, кластеров={n_clusters}')
+    axes[row, 1].legend()
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h4>2. k-distance plot для подбора epsilon</h4>
+      <pre><code>from sklearn.neighbors import NearestNeighbors
+
+X, _ = make_moons(n_samples=300, noise=0.07, random_state=42)
+X_s = StandardScaler().fit_transform(X)
+
+# k-distance plot: сортируем расстояния до k-го соседа
+k = 5  # min_samples
+nbrs = NearestNeighbors(n_neighbors=k).fit(X_s)
+distances, _ = nbrs.kneighbors(X_s)
+k_distances = np.sort(distances[:, -1])[::-1]  # расстояние до k-го соседа
+
+plt.plot(k_distances)
+plt.xlabel('Точки (отсортированы)')
+plt.ylabel(f'Расстояние до {k}-го соседа')
+plt.title('k-distance plot: ищем "локоть" для eps')
+plt.axhline(0.25, color='red', linestyle='--', label='eps=0.25')
+plt.legend()
+plt.show()
+
+# Применяем выбранный eps
+db = DBSCAN(eps=0.25, min_samples=k)
+labels = db.fit_predict(X_s)
+n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+n_noise = (labels == -1).sum()
+print(f'Кластеров: {n_clusters}, шумовых точек: {n_noise}')</code></pre>
+
+      <h4>3. DBSCAN как детектор аномалий</h4>
+      <pre><code>from sklearn.datasets import load_breast_cancer
+from sklearn.decomposition import PCA
+from sklearn.metrics import classification_report
+import pandas as pd
+
+# Генерируем данные с выбросами
+np.random.seed(42)
+X_normal = np.random.randn(500, 2)
+X_outliers = np.random.uniform(-5, 5, (30, 2))
+X_all = np.vstack([X_normal, X_outliers])
+true_labels = np.array([1]*500 + [-1]*30)  # -1 = аномалия
+
+db = DBSCAN(eps=0.5, min_samples=10)
+pred_labels = db.fit_predict(X_all)
+# DBSCAN: -1 шум, >=0 кластеры
+is_anomaly = (pred_labels == -1).astype(int)
+is_true_anomaly = (true_labels == -1).astype(int)
+
+# Оцениваем как детектор аномалий
+from sklearn.metrics import f1_score
+f1 = f1_score(is_true_anomaly, is_anomaly)
+print(f'F1 (anomaly detection): {f1:.4f}')
+
+plt.scatter(X_normal[:, 0], X_normal[:, 1], alpha=0.3, label='Normal')
+plt.scatter(X_outliers[:, 0], X_outliers[:, 1], c='red', s=60, label='True Outliers')
+detected = X_all[is_anomaly == 1]
+plt.scatter(detected[:, 0], detected[:, 1], facecolors='none',
+            edgecolors='orange', s=120, linewidths=2, label='DBSCAN Noise')
+plt.legend()
+plt.title(f'DBSCAN как детектор аномалий (F1={f1:.3f})')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

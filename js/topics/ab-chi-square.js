@@ -461,6 +461,65 @@ p_Fisher = 0.00067+0.01293+0.08289+0.08289+0.01293+0.00067
       }
     ],
 
+    python: `
+      <h3>📊 Хи-квадрат тест для A/B</h3>
+      <pre><code>from scipy.stats import chi2_contingency
+import numpy as np
+
+# Таблица сопряжённости: строки — группы, столбцы — конверсия/нет
+#              Конв.  Не конв.
+observed = np.array([
+    [120, 4880],    # Группа A: 120 из 5000
+    [155, 4845]     # Группа B: 155 из 5000
+])
+
+chi2, p_value, dof, expected = chi2_contingency(observed)
+
+print(f"CR_A = {120/5000:.2%}")
+print(f"CR_B = {155/5000:.2%}")
+print(f"\\nχ² = {chi2:.4f}")
+print(f"df = {dof}")
+print(f"p-value = {p_value:.4f}")
+print(f"\\nОжидаемые частоты:\\n{expected.round(1)}")
+print(f"\\n{'Значимо!' if p_value < 0.05 else 'Не значимо'} (α=0.05)")</code></pre>
+
+      <h3>📋 Точный тест Фишера (малые выборки)</h3>
+      <pre><code>from scipy.stats import fisher_exact
+import numpy as np
+
+# Маленькая выборка — χ² может быть неточным
+#              Конв.  Не конв.
+table = np.array([
+    [8, 42],    # Группа A
+    [15, 35]    # Группа B
+])
+
+odds_ratio, p_value = fisher_exact(table, alternative='two-sided')
+
+print(f"CR_A = {8/50:.1%}")
+print(f"CR_B = {15/50:.1%}")
+print(f"\\nOdds Ratio = {odds_ratio:.3f}")
+print(f"p-value = {p_value:.4f}")
+print(f"\\n{'Значимо!' if p_value < 0.05 else 'Не значимо'} (α=0.05)")
+print(f"\\nПравило: используйте Фишера, если ожидаемая частота < 5")</code></pre>
+
+      <h3>📈 Визуализация</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+groups = ['A (контроль)', 'B (тест)']
+conversions = [120/5000*100, 155/5000*100]
+colors = ['#4A90D9', '#67B86A']
+
+plt.bar(groups, conversions, color=colors, width=0.5)
+plt.ylabel("Конверсия (%)")
+plt.title("A/B тест: конверсия по группам (χ²-тест)")
+for i, v in enumerate(conversions):
+    plt.text(i, v + 0.05, f"{v:.2f}%", ha='center', fontweight='bold')
+plt.ylim(0, max(conversions) * 1.3)
+plt.show()</code></pre>
+    `,
+
     math: `
       <h3>Хи-квадрат тест — полная математика</h3>
 

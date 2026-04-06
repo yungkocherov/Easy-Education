@@ -598,6 +598,121 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Градиентный спуск на Python</h3>
+      <p>Реализуем GD вручную через numpy, затем используем оптимизаторы PyTorch — SGD и Adam.</p>
+
+      <h4>1. Ручной градиентный спуск на numpy (функция y = x²)</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+# Функция и её производная
+def f(x):
+    return x ** 2
+
+def grad_f(x):
+    return 2 * x
+
+# Параметры обучения
+x = 10.0          # начальная точка
+lr = 0.1          # скорость обучения (learning rate)
+n_steps = 30      # количество шагов
+
+history = [x]
+
+for step in range(n_steps):
+    g = grad_f(x)          # вычисляем градиент
+    x = x - lr * g         # шаг в сторону антиградиента
+    history.append(x)
+    if step % 5 == 0:
+        print(f"Шаг {step:3d}: x={x:.4f}, f(x)={f(x):.6f}")
+
+print(f"Минимум найден: x={x:.6f}, f(x)={f(x):.2e}")
+
+# Визуализация сходимости
+plt.figure(figsize=(10, 4))
+plt.subplot(1, 2, 1)
+xs = np.linspace(-11, 11, 300)
+plt.plot(xs, xs**2, 'b-', label='f(x)=x²')
+plt.scatter(history, [f(h) for h in history], c='red', s=30, zorder=5)
+plt.title('Траектория спуска'); plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot([f(h) for h in history], 'r-o', markersize=4)
+plt.xlabel('Шаг'); plt.ylabel('f(x)'); plt.title('Сходимость')
+plt.tight_layout(); plt.show()
+</code></pre>
+
+      <h4>2. Сравнение SGD и Adam через PyTorch</h4>
+      <pre><code>import torch
+import torch.optim as optim
+import matplotlib.pyplot as plt
+
+def run_optimizer(opt_class, **kwargs):
+    """Запускаем оптимизатор и возвращаем историю потерь."""
+    x = torch.tensor([10.0], requires_grad=True)  # параметр
+    opt = opt_class([x], **kwargs)
+    losses = []
+
+    for _ in range(50):
+        opt.zero_grad()           # обнуляем градиенты
+        loss = x ** 2             # f(x) = x² — наша функция потерь
+        loss.backward()           # автодифференцирование
+        opt.step()                # обновляем x
+        losses.append(loss.item())
+
+    return losses
+
+# Запускаем оба оптимизатора
+losses_sgd  = run_optimizer(optim.SGD,  lr=0.1)
+losses_adam = run_optimizer(optim.Adam, lr=0.5)
+
+# Сравниваем сходимость
+plt.plot(losses_sgd,  label='SGD  lr=0.1')
+plt.plot(losses_adam, label='Adam lr=0.5')
+plt.xlabel('Шаг'); plt.ylabel('Потеря f(x)')
+plt.title('SGD vs Adam на f(x)=x²')
+plt.legend(); plt.yscale('log'); plt.show()
+</code></pre>
+
+      <h4>3. Мини-батчевый SGD на линейной регрессии</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import TensorDataset, DataLoader
+
+# Генерируем данные: y = 3x + 2 + шум
+torch.manual_seed(42)
+X = torch.randn(200, 1)
+y = 3 * X + 2 + 0.5 * torch.randn(200, 1)
+
+# DataLoader для мини-батчей
+dataset = TensorDataset(X, y)
+loader  = DataLoader(dataset, batch_size=32, shuffle=True)
+
+# Линейная модель и оптимизатор
+model   = nn.Linear(1, 1)
+opt     = optim.SGD(model.parameters(), lr=0.05, momentum=0.9)
+loss_fn = nn.MSELoss()
+
+# Цикл обучения
+for epoch in range(20):
+    total_loss = 0
+    for xb, yb in loader:           # итерируем по мини-батчам
+        opt.zero_grad()
+        pred = model(xb)
+        loss = loss_fn(pred, yb)
+        loss.backward()
+        opt.step()
+        total_loss += loss.item()
+    if epoch % 5 == 0:
+        print(f"Epoch {epoch:2d}: loss={total_loss/len(loader):.4f}")
+
+w, b = model.weight.item(), model.bias.item()
+print(f"Найдены: w={w:.3f} (истинное 3), b={b:.3f} (истинное 2)")
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

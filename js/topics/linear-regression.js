@@ -573,6 +573,96 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Python: линейная регрессия</h3>
+      <p>sklearn.LinearRegression реализует МНК, а numpy позволяет воспроизвести OLS вручную через матричные операции.</p>
+
+      <h4>1. sklearn LinearRegression и оценка качества</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.datasets import load_diabetes
+
+# Датасет о диабете — регрессионная задача
+data = load_diabetes()
+X, y = data.data, data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print(f'R²: {r2_score(y_test, y_pred):.4f}')
+print(f'RMSE: {mean_squared_error(y_test, y_pred)**0.5:.2f}')
+print(f'Коэффициенты: {dict(zip(data.feature_names, model.coef_.round(1)))}')
+print(f'Intercept: {model.intercept_:.2f}')
+
+# Предсказанные vs реальные
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+plt.xlabel('Реальные значения')
+plt.ylabel('Предсказанные')
+plt.title('Linear Regression: pred vs true')
+plt.show()</code></pre>
+
+      <h4>2. Ручной МНК через numpy</h4>
+      <pre><code># Формула МНК: w = (X^T X)^{-1} X^T y
+np.random.seed(42)
+X_simple = np.random.randn(100, 1)
+y_simple = 3.5 * X_simple.ravel() + 2.0 + np.random.randn(100) * 0.5
+
+# Добавляем столбец из единиц для intercept
+X_aug = np.column_stack([np.ones(len(X_simple)), X_simple])
+
+# OLS в матричной форме
+w = np.linalg.inv(X_aug.T @ X_aug) @ X_aug.T @ y_simple
+print(f'Intercept (ручной): {w[0]:.4f}')
+print(f'Slope (ручной):     {w[1]:.4f}')
+
+# Сравниваем с sklearn
+lr = LinearRegression().fit(X_simple, y_simple)
+print(f'Intercept (sklearn): {lr.intercept_:.4f}')
+print(f'Slope (sklearn):     {lr.coef_[0]:.4f}')
+
+# Визуализация
+x_line = np.linspace(-3, 3, 100)
+plt.scatter(X_simple, y_simple, alpha=0.4)
+plt.plot(x_line, w[0] + w[1]*x_line, 'r-', label='OLS (numpy)')
+plt.legend()
+plt.title('Линейная регрессия: ручной МНК')
+plt.show()</code></pre>
+
+      <h4>3. Множественная регрессия с анализом остатков</h4>
+      <pre><code>from sklearn.preprocessing import StandardScaler
+
+# Масштабируем для сравнимости коэффициентов
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(data.data)
+model2 = LinearRegression().fit(X_scaled, data.target)
+
+# Важность признаков по абсолютному коэффициенту
+importance = sorted(zip(data.feature_names, np.abs(model2.coef_)),
+                    key=lambda x: x[1], reverse=True)
+names, vals = zip(*importance)
+plt.barh(names, vals)
+plt.xlabel('|коэффициент|')
+plt.title('Важность признаков (стандартизованные)')
+plt.tight_layout()
+plt.show()
+
+# Анализ остатков
+residuals = data.target - model2.predict(X_scaled)
+plt.scatter(model2.predict(X_scaled), residuals, alpha=0.4)
+plt.axhline(0, color='red', linestyle='--')
+plt.xlabel('Предсказанные')
+plt.ylabel('Остатки')
+plt.title('График остатков')
+plt.show()</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

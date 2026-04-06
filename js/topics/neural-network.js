@@ -737,6 +737,113 @@ App.registerTopic({
       },
     },
 
+    python: `
+      <h3>Нейронные сети на Python</h3>
+      <p>Строим MLP на PyTorch через nn.Sequential с полным циклом обучения, а затем сравниваем с sklearn MLPClassifier.</p>
+
+      <h4>1. PyTorch: MLP для классификации (nn.Sequential)</h4>
+      <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Данные: два полумесяца (нелинейно разделимые)
+X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
+X = StandardScaler().fit_transform(X)          # нормализация обязательна
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Преобразуем в тензоры PyTorch
+X_tr = torch.FloatTensor(X_train)
+y_tr = torch.LongTensor(y_train)
+X_te = torch.FloatTensor(X_test)
+y_te = torch.LongTensor(y_test)
+
+# Архитектура: 2 → 64 → 32 → 2 (два класса)
+model = nn.Sequential(
+    nn.Linear(2, 64),    # входной слой
+    nn.ReLU(),           # нелинейность
+    nn.Linear(64, 32),   # скрытый слой
+    nn.ReLU(),
+    nn.Dropout(0.2),     # регуляризация: случайно отключаем нейроны
+    nn.Linear(32, 2),    # выходной слой (логиты для 2 классов)
+)
+
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+loss_fn   = nn.CrossEntropyLoss()              # для классификации
+
+# Цикл обучения
+for epoch in range(100):
+    model.train()
+    optimizer.zero_grad()
+    logits = model(X_tr)
+    loss   = loss_fn(logits, y_tr)
+    loss.backward()
+    optimizer.step()
+
+    if epoch % 20 == 0:
+        model.eval()
+        with torch.no_grad():
+            acc = (model(X_te).argmax(1) == y_te).float().mean()
+        print(f"Epoch {epoch:3d}: loss={loss:.4f}, test_acc={acc:.2%}")
+</code></pre>
+
+      <h4>2. sklearn: MLPClassifier — один вызов fit()</h4>
+      <pre><code>from sklearn.neural_network import MLPClassifier
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+
+X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
+X = StandardScaler().fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Архитектура: два скрытых слоя 64 и 32 нейрона
+mlp = MLPClassifier(
+    hidden_layer_sizes=(64, 32),  # скрытые слои
+    activation='relu',            # функция активации
+    solver='adam',                # оптимизатор
+    max_iter=200,
+    random_state=42
+)
+mlp.fit(X_train, y_train)
+
+print(classification_report(y_test, mlp.predict(X_test)))
+print(f"Количество итераций: {mlp.n_iter_}")
+</code></pre>
+
+      <h4>3. Визуализация границы решения MLP</h4>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+# Строим сетку для визуализации (используем обученную модель из блока 1)
+xx, yy = np.meshgrid(np.linspace(-3, 3, 200), np.linspace(-3, 3, 200))
+grid   = torch.FloatTensor(np.c_[xx.ravel(), yy.ravel()])
+
+model.eval()
+with torch.no_grad():
+    Z = model(grid).argmax(1).numpy().reshape(xx.shape)
+
+plt.figure(figsize=(8, 6))
+plt.contourf(xx, yy, Z, alpha=0.4, cmap='RdBu')
+
+# Данные тестовой выборки
+X_np = X_test                             # numpy-массив
+plt.scatter(X_np[y_test==0, 0], X_np[y_test==0, 1],
+            c='red', label='Класс 0', edgecolors='k')
+plt.scatter(X_np[y_test==1, 0], X_np[y_test==1, 1],
+            c='blue', label='Класс 1', edgecolors='k')
+plt.title('Нелинейная граница решения MLP')
+plt.legend(); plt.show()
+</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>

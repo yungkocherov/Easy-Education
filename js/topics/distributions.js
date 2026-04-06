@@ -685,6 +685,63 @@ T ~ Exp(λ = 4), в часах</div>
       },
     },
 
+    python: `
+      <h3>📊 Распределения в scipy.stats</h3>
+      <pre><code>import numpy as np
+from scipy import stats
+
+# Нормальное распределение N(μ=170, σ=10)
+norm = stats.norm(loc=170, scale=10)
+print(f"PDF(170): {norm.pdf(170):.4f}")   # плотность в точке
+print(f"CDF(180): {norm.cdf(180):.4f}")   # P(X ≤ 180)
+print(f"PPF(0.95): {norm.ppf(0.95):.1f}") # квантиль 95%
+sample = norm.rvs(size=1000)               # генерация выборки
+
+# Биномиальное B(n=100, p=0.3)
+binom = stats.binom(n=100, p=0.3)
+print(f"P(X=30): {binom.pmf(30):.4f}")
+print(f"P(X≤25): {binom.cdf(25):.4f}")
+
+# Пуассоновское Pois(λ=5)
+poisson = stats.poisson(mu=5)
+print(f"P(X=3): {poisson.pmf(3):.4f}")</code></pre>
+
+      <h3>📈 Визуализация распределений</h3>
+      <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+# Нормальное
+x = np.linspace(140, 200, 200)
+axes[0].plot(x, stats.norm(170, 10).pdf(x))
+axes[0].set_title("Нормальное N(170, 10)")
+
+# Биномиальное
+k = np.arange(0, 50)
+axes[1].bar(k, stats.binom(100, 0.3).pmf(k), width=0.8)
+axes[1].set_title("Биномиальное B(100, 0.3)")
+
+# Экспоненциальное
+x2 = np.linspace(0, 5, 200)
+axes[2].plot(x2, stats.expon(scale=1).pdf(x2))
+axes[2].set_title("Экспоненциальное Exp(λ=1)")
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+      <h3>🔍 Проверка нормальности</h3>
+      <pre><code>from scipy import stats
+
+data = np.random.normal(100, 15, size=200)
+
+# Тест Шапиро-Уилка
+stat, p = stats.shapiro(data)
+print(f"Shapiro-Wilk: stat={stat:.4f}, p={p:.4f}")
+print("Нормальное" if p > 0.05 else "Не нормальное")</code></pre>
+    `,
+
     applications: `
       <h3>Где применяется</h3>
       <ul>
