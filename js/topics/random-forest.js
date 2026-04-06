@@ -174,35 +174,181 @@ App.registerTopic({
       </ul>
     `,
 
-    examples: `
-      <h3>Пример 1: как работает голосование</h3>
-      <div class="example-card">
-        <p>5 деревьев предсказывают класс для новой точки:</p>
-        <div class="example-data">Tree 1: класс A
-Tree 2: класс B
-Tree 3: класс A
-Tree 4: класс A
-Tree 5: класс B</div>
-        <p>Голоса: A=3, B=2 → ансамбль предсказывает <b>A</b>.</p>
-        <p>Вероятность A: 3/5 = 0.6, вероятность B: 0.4.</p>
-      </div>
-
-      <h3>Пример 2: bootstrap sample</h3>
-      <div class="example-card">
-        <p>Исходный датасет: [1, 2, 3, 4, 5].</p>
-        <p>Bootstrap sample того же размера с возвращением:</p>
-        <div class="example-data">[3, 1, 3, 5, 2]  — дерево 1
-[4, 4, 2, 1, 5]  — дерево 2
-[1, 3, 2, 4, 2]  — дерево 3</div>
-        <p>Не попавшие в bootstrap — <b>out-of-bag (OOB)</b> примеры, используются для оценки качества без отдельного валидационного набора.</p>
-      </div>
-
-      <h3>Пример 3: выбор признаков</h3>
-      <div class="example-card">
-        <p>Датасет имеет 16 признаков. Для классификации √16 = 4.</p>
-        <p>В каждом узле случайно выбираются 4 признака из 16, и только среди них ищется лучшее разбиение. Это делает деревья разнообразнее.</p>
-      </div>
-    `,
+    examples: [
+      {
+        title: 'Bootstrap выборка: пошагово',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Показать, как bootstrap-выборки создают разнообразные деревья, и что такое OOB (out-of-bag) примеры.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Индекс</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+              <tr><th>Метка</th><td>A</td><td>B</td><td>A</td><td>B</td><td>A</td><td>A</td><td>B</td><td>A</td><td>B</td><td>A</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: создать bootstrap-выборку для дерева 1</h4>
+            <div class="calc">
+              n=10 → тянем 10 раз с возвращением (равновероятно)<br>
+              Выборка: [3, 7, 3, 1, 9, 2, 5, 3, 8, 1]<br>
+              Уникальные: {1,2,3,5,7,8,9} — 7 из 10<br>
+              OOB для дерева 1: {4, 6, 10} — 3 примера не попали
+            </div>
+            <div class="why">В среднем bootstrap оставляет за бортом ≈ 36.8% = (1−1/n)ⁿ → e⁻¹ ≈ 0.368 примеров.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: bootstrap-выборки для 5 деревьев</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Дерево</th><th>Bootstrap индексы</th><th>OOB индексы</th></tr>
+                <tr><td>1</td><td>3,7,3,1,9,2,5,3,8,1</td><td>4,6,10</td></tr>
+                <tr><td>2</td><td>5,2,8,4,1,5,9,6,2,4</td><td>3,7,10</td></tr>
+                <tr><td>3</td><td>10,4,7,1,6,3,10,2,5,8</td><td>9 (и др.)</td></tr>
+                <tr><td>4</td><td>6,9,3,7,2,4,8,1,6,9</td><td>5,10 (и др.)</td></tr>
+                <tr><td>5</td><td>1,3,5,2,7,9,4,6,3,1</td><td>8,10 (и др.)</td></tr>
+              </table>
+            </div>
+            <div class="why">Каждое дерево видит разные данные → деревья разнообразны → ансамбль лучше одного дерева.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: случайный выбор признаков (max_features)</h4>
+            <div class="calc">
+              Датасет: 16 признаков<br>
+              Классификация: max_features = √16 = 4<br>
+              В каждом узле случайно выбираем 4 признака из 16<br>
+              Ищем лучшее разбиение только среди этих 4<br>
+              → Деревья видят разные признаки в каждом узле<br>
+              → Корреляция деревьев снижается → ансамбль лучше
+            </div>
+            <div class="why">Если не ограничивать признаки — доминирующий признак попадёт в корень всех деревьев, и они станут похожими. Разнообразие ключевое для Random Forest.</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Bootstrap + random features = два уровня рандомизации. Вместе они гарантируют разнообразие деревьев и снижают variance ансамбля по сравнению с одним деревом.</p>
+          </div>
+          <div class="lesson-box">
+            Теорема: ошибка случайного леса ≤ ρ̄·σ²/s², где ρ̄ — средняя корреляция между деревьями, σ² — дисперсия отдельного дерева, s — точность дерева. Чем меньше ρ̄ и чем точнее деревья — тем лучше лес.
+          </div>
+        `,
+      },
+      {
+        title: 'Голосование 5 деревьев',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>5 деревьев предсказывают класс нового объекта. Сравнить majority voting и probability averaging.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Дерево</th><th>Предсказание</th><th>P(класс A)</th><th>P(класс B)</th></tr>
+              <tr><td>Дерево 1</td><td>A</td><td>0.80</td><td>0.20</td></tr>
+              <tr><td>Дерево 2</td><td>B</td><td>0.35</td><td>0.65</td></tr>
+              <tr><td>Дерево 3</td><td>A</td><td>0.70</td><td>0.30</td></tr>
+              <tr><td>Дерево 4</td><td>A</td><td>0.55</td><td>0.45</td></tr>
+              <tr><td>Дерево 5</td><td>B</td><td>0.40</td><td>0.60</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: majority voting (hard voting)</h4>
+            <div class="calc">
+              A: 3 голоса (Деревья 1, 3, 4)<br>
+              B: 2 голоса (Деревья 2, 5)<br>
+              Результат: <b>класс A</b> (большинством 3:2)
+            </div>
+            <div class="why">Простое голосование: каждое дерево имеет 1 голос. Стандарт для классификации.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: probability averaging (soft voting)</h4>
+            <div class="calc">
+              P̄(A) = (0.80 + 0.35 + 0.70 + 0.55 + 0.40) / 5<br>
+                    = 2.80 / 5 = <b>0.560</b><br>
+              P̄(B) = (0.20 + 0.65 + 0.30 + 0.45 + 0.60) / 5<br>
+                    = 2.20 / 5 = <b>0.440</b><br>
+              Результат: <b>класс A</b> (P=0.56 > 0.5)
+            </div>
+            <div class="why">Soft voting учитывает уверенность дерева. Лучше когда деревья хорошо откалиброваны. Обычно soft voting точнее.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: когда они расходятся?</h4>
+            <div class="calc">
+              Пример: Дерево 2 даёт P(B)=0.95 (очень уверено)<br>
+              Дерево 3 даёт P(A)=0.51 (едва за A)<br>
+              Hard: A побеждает голосованием<br>
+              Soft: P̄(B) может победить, если дерево 2 очень уверено<br><br>
+              Если P(A) = [0.51, 0.51, 0.51, 0.35, 0.35]:<br>
+              Hard: 3:2 → A<br>
+              Soft: P̄(A) = 2.23/5 = 0.446 → B!
+            </div>
+            <div class="why">Soft voting может отличаться от hard voting, когда меньшинство деревьев очень уверено.</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Оба метода предсказывают класс A. Soft voting (P=0.56) предпочтительнее: учитывает неопределённость каждого дерева. В sklearn: voting='soft' требует predict_proba у каждой модели.</p>
+          </div>
+          <div class="lesson-box">
+            Feature importance в Random Forest: важность признака = суммарное снижение Gini при разбиениях по этому признаку, усреднённое по всем деревьям. Это MDI (mean decrease in impurity).
+          </div>
+        `,
+      },
+      {
+        title: 'OOB оценка качества',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Показать, как out-of-bag примеры позволяют оценить качество случайного леса без отдельного валидационного набора.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Пример</th><th>Факт</th><th>OOB дерево 1</th><th>OOB дерево 2</th><th>OOB дерево 4</th><th>OOB голос</th><th>Правильно?</th></tr>
+              <tr><td>№4</td><td>B</td><td>B (0.65)</td><td>—</td><td>B (0.70)</td><td>B</td><td>Да</td></tr>
+              <tr><td>№6</td><td>A</td><td>—</td><td>A (0.80)</td><td>—</td><td>A</td><td>Да</td></tr>
+              <tr><td>№10</td><td>A</td><td>B (0.55)</td><td>B (0.60)</td><td>A (0.52)</td><td>B</td><td>Нет</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: принцип OOB оценки</h4>
+            <div class="calc">
+              Каждый пример xᵢ пропущен ≈ 37% деревьев (OOB деревья)<br>
+              Для xᵢ: собираем предсказания только OOB деревьев<br>
+              Голосование среди этих деревьев → OOB предсказание<br>
+              Сравниваем с истинной меткой → OOB ошибка
+            </div>
+            <div class="why">OOB деревья «не видели» этот пример при обучении → честная оценка без data leakage.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: вычислить OOB accuracy</h4>
+            <div class="calc">
+              Всего примеров: 10<br>
+              OOB предсказания:<br>
+              №1: A ✓, №2: B ✓, №3: A ✓, №4: B ✓<br>
+              №5: A ✓, №6: A ✓, №7: B ✓, №8: A ✓<br>
+              №9: B ✓, №10: B (факт A) ✗<br><br>
+              OOB Accuracy = 9/10 = <b>90%</b>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: сравнение с CV</h4>
+            <div class="calc">
+              5-fold CV Accuracy: 88.5%<br>
+              OOB Accuracy: 90%<br>
+              Test Accuracy (hold-out 20%): 89%<br><br>
+              OOB ≈ CV при большом числе деревьев (≥100)<br>
+              OOB быстрее: не нужно переобучать n_folds раз
+            </div>
+            <div class="why">OOB — «бесплатная» оценка: вычисляется вместе с обучением леса. При n_estimators=100+ очень надёжна.</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>OOB Score = 90%. Преимущество: не тратим данные на validation set и не нужна кросс-валидация. В sklearn: RandomForestClassifier(oob_score=True) → model.oob_score_</p>
+          </div>
+          <div class="lesson-box">
+            При малом числе деревьев OOB нестабилен: каждый пример оценивается мало деревьями. При n_estimators ≥ 100 OOB Score практически совпадает с Leave-One-Out CV и обычно достаточен для выбора гиперпараметров.
+          </div>
+        `,
+      },
+    ],
 
     simulation: {
       html: `

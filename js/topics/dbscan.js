@@ -171,28 +171,205 @@ App.registerTopic({
       </ul>
     `,
 
-    examples: `
-      <h3>Пример 1: выбор параметров</h3>
-      <div class="example-card">
-        <p><b>Эвристика для min_samples</b>: 2 · dim (2D → min_samples=4).</p>
-        <p><b>Эвристика для ε</b>: построить k-distance график (расстояние до k-го соседа, отсортировать). Искать «колено».</p>
-      </div>
-
-      <h3>Пример 2: разбор точек</h3>
-      <div class="example-card">
-        <p>min_samples=3, ε=1:</p>
-        <ul>
-          <li>Точка A в окрестности 5 точек → core.</li>
-          <li>Точка B в окрестности 2 точек, но одна из них core A → border (принадлежит кластеру A).</li>
-          <li>Точка C в окрестности 0 точек → noise.</li>
-        </ul>
-      </div>
-
-      <h3>Пример 3: DBSCAN на двух лунах</h3>
-      <div class="example-card">
-        <p>K-Means проведёт прямую границу между лунами и разрежет их. DBSCAN найдёт обе луны, следуя форме плотности.</p>
-      </div>
-    `,
+    examples: [
+      {
+        title: 'DBSCAN на 10 точках: Core/Border/Noise',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Классифицировать 10 точек как Core, Border или Noise при eps=1.5, minPts=3.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Точка</th><th>x</th><th>y</th></tr>
+              <tr><td>P1</td><td>1.0</td><td>1.0</td></tr>
+              <tr><td>P2</td><td>1.5</td><td>1.5</td></tr>
+              <tr><td>P3</td><td>2.0</td><td>1.0</td></tr>
+              <tr><td>P4</td><td>2.0</td><td>2.5</td></tr>
+              <tr><td>P5</td><td>5.0</td><td>5.0</td></tr>
+              <tr><td>P6</td><td>5.5</td><td>5.5</td></tr>
+              <tr><td>P7</td><td>6.0</td><td>5.0</td></tr>
+              <tr><td>P8</td><td>5.5</td><td>4.5</td></tr>
+              <tr><td>P9</td><td>9.0</td><td>1.0</td></tr>
+              <tr><td>P10</td><td>3.0</td><td>4.0</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: найти ε-соседей каждой точки (eps=1.5)</h4>
+            <div class="calc">
+              P1(1,1): соседи в радиусе 1.5<br>
+              d(P1,P2)=√(0.25+0.25)=0.71 ✓, d(P1,P3)=1.0 ✓, d(P1,P4)=√(1+2.25)=1.80 ✗<br>
+              Соседи P1: {P2, P3} → 2 соседа (не считая себя)<br><br>
+              P2(1.5,1.5): d(P1)=0.71✓, d(P3)=√(0.25+0.25)=0.71✓, d(P4)=√(0.25+1)=1.12✓<br>
+              Соседи P2: {P1, P3, P4} → 3 соседа<br><br>
+              P5(5,5): d(P6)=0.71✓, d(P7)=1.0✓, d(P8)=√(0.25+0.25)=0.71✓<br>
+              Соседи P5: {P6, P7, P8} → 3 соседа
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: классифицировать точки</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Точка</th><th>Соседей в eps</th><th>minPts=3?</th><th>Тип</th></tr>
+                <tr><td>P1</td><td>2 (P2,P3)</td><td>Нет</td><td>Border (сосед core P2)</td></tr>
+                <tr><td>P2</td><td>3 (P1,P3,P4)</td><td>Да</td><td><b>Core</b></td></tr>
+                <tr><td>P3</td><td>2 (P1,P2)</td><td>Нет</td><td>Border (сосед core P2)</td></tr>
+                <tr><td>P4</td><td>1 (P2)</td><td>Нет</td><td>Border (сосед core P2)</td></tr>
+                <tr><td>P5</td><td>3 (P6,P7,P8)</td><td>Да</td><td><b>Core</b></td></tr>
+                <tr><td>P6</td><td>3 (P5,P7,P8)</td><td>Да</td><td><b>Core</b></td></tr>
+                <tr><td>P7</td><td>3 (P5,P6,P8)</td><td>Да</td><td><b>Core</b></td></tr>
+                <tr><td>P8</td><td>3 (P5,P6,P7)</td><td>Да</td><td><b>Core</b></td></tr>
+                <tr><td>P9</td><td>0</td><td>Нет</td><td><b>Noise</b></td></tr>
+                <tr><td>P10</td><td>0</td><td>Нет</td><td><b>Noise</b></td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: построить кластеры</h4>
+            <div class="calc">
+              Кластер 1: начать с core P2<br>
+              P2 → достижимы: P1 (border), P3 (border), P4 (border)<br>
+              Кластер 1 = {P1, P2, P3, P4}<br><br>
+              Кластер 2: начать с core P5<br>
+              P5 → достижимы: P6, P7, P8 (все core — связаны)<br>
+              Кластер 2 = {P5, P6, P7, P8}<br><br>
+              Шум: {P9, P10} — не принадлежат ни одному кластеру
+            </div>
+            <div class="why">Border точки принадлежат кластеру ближайшей Core точки. Noise точки не достижимы ни из одной Core точки.</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>2 кластера. Кластер 1: {P1-P4}. Кластер 2: {P5-P8}. Шум: {P9, P10}. Core точки: P2, P5, P6, P7, P8. Border: P1, P3, P4.</p>
+          </div>
+          <div class="lesson-box">
+            Ключевое отличие от K-Means: DBSCAN не требует задавать k, автоматически находит шум, работает с произвольными формами кластеров. Но параметры eps и minPts нужно подбирать.
+          </div>
+        `,
+      },
+      {
+        title: 'Выбор eps через k-distance graph',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Подобрать оптимальный eps для DBSCAN с помощью графика k-расстояний (k=minPts=4).</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Ранг точки</th><th>4-е расстояние (k-dist)</th><th>Интерпретация</th></tr>
+              <tr><td>1–30</td><td>0.08–0.12</td><td>Плотные кластеры</td></tr>
+              <tr><td>31–60</td><td>0.13–0.18</td><td>Плотные кластеры</td></tr>
+              <tr><td>61–80</td><td>0.19–0.25</td><td>Граница кластеров</td></tr>
+              <tr><td>81–90</td><td>0.35–0.55</td><td>Шум (резкий скачок)</td></tr>
+              <tr><td>91–100</td><td>0.70–1.20</td><td>Явные выбросы</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: построить k-distance graph</h4>
+            <div class="calc">
+              Для каждой точки xᵢ: вычислить расстояние до её k-го соседа<br>
+              (k = minPts = 4)<br><br>
+              Отсортировать расстояния по убыванию и построить график<br>
+              Ось X: ранг точки (от 1 до n)<br>
+              Ось Y: k-расстояние<br><br>
+              Из таблицы: 80 точек имеют k-dist ≤ 0.25<br>
+              На ранге 80–81 резкий скачок: 0.25 → 0.35+
+            </div>
+            <div class="why">Точки с малым k-расстоянием — внутри плотных кластеров. Точки с большим — на краю или шум.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: найти «колено»</h4>
+            <div class="calc">
+              «Колено» — точка резкого увеличения k-расстояния<br>
+              В нашем случае: между рангами 80 и 81<br>
+              k-distance на «колене» ≈ 0.25–0.30<br><br>
+              Рекомендация: eps = значение k-dist в «колене»<br>
+              Выбираем: eps = <b>0.25</b><br><br>
+              Проверка: при eps=0.25, minPts=4<br>
+              → ~80 точек попадают в кластеры<br>
+              → ~20 точек = шум (рейтинг 81-100)
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: тонкая настройка eps</h4>
+            <div class="calc">
+              eps=0.20: слишком строго → много шума, кластеры дробятся<br>
+              eps=0.25: «колено» → хороший баланс<br>
+              eps=0.40: слишком мягко → кластеры сливаются<br>
+              eps=1.0: почти всё один кластер<br><br>
+              Практический совет: попробовать eps ∈ {0.20, 0.25, 0.30}<br>
+              Оценить: число кластеров, % шума, Silhouette Score
+            </div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Оптимальный eps ≈ 0.25 (значение k-dist в «колене» графика). minPts = 2·dim = 4 (для 2D). При этих параметрах 80% точек в кластерах, 20% — шум.</p>
+          </div>
+          <div class="lesson-box">
+            Эвристика minPts: для 2D данных minPts=4, для d-мерных — 2d. Более шумные данные → больший minPts. Если данных мало — minPts=3. Метод колена на k-distance graph — стандартный способ выбора eps.
+          </div>
+        `,
+      },
+      {
+        title: 'DBSCAN vs K-Means на «лунах»',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Сравнить K-Means и DBSCAN на данных в форме двух полумесяцев («лун») — классический пример нелинейных кластеров.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Метод</th><th>Кластер 1 (точек)</th><th>Кластер 2 (точек)</th><th>Шум</th><th>Accuracy*</th></tr>
+              <tr><td>K-Means (k=2)</td><td>Половина каждой луны</td><td>Другая половина</td><td>0%</td><td>≈50%</td></tr>
+              <tr><td>DBSCAN (eps=0.3)</td><td>Верхняя луна (50 т.)</td><td>Нижняя луна (50 т.)</td><td>2-5 т.</td><td>≈97%</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: почему K-Means провалится</h4>
+            <div class="calc">
+              K-Means ищет выпуклые кластеры вокруг центроидов<br><br>
+              Верхний полумесяц: центр ≈ (0, 0.5)<br>
+              Нижний полумесяц: центр ≈ (1, −0.5)<br><br>
+              K-Means разделит плоскость по линии, равноудалённой от центров<br>
+              Эта линия разрежет оба полумесяца пополам<br>
+              Левая половина верхней луны → кластер 1<br>
+              Правая половина нижней луны → кластер 1 (ошибка!)
+            </div>
+            <div class="why">K-Means предполагает шаровидные кластеры. Луны не шаровидные — граница Вороного не соответствует истинной границе.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: почему DBSCAN справится</h4>
+            <div class="calc">
+              DBSCAN следует плотности данных<br><br>
+              Точка на верхнем полумесяце: её eps-соседи — другие точки<br>
+              того же полумесяца (они близко вдоль кривой)<br><br>
+              Точки разных лун: расстояние между ними > eps<br>
+              (луны «не касаются» в пространстве)<br><br>
+              Алгоритм: начать с любой core-точки, расширять кластер<br>
+              по density-reachability → обходит весь полумесяц<br>
+              но не перепрыгивает на другой (gap > eps)
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: выбор eps критичен</h4>
+            <div class="calc">
+              eps = 0.1 (слишком мало): луны разбиваются на много мелких кластеров<br>
+              eps = 0.3 (оптимум): две луны, 2-5 шумовых точек<br>
+              eps = 0.5 (слишком много): обе луны сливаются в один кластер<br><br>
+              Типичный разрыв между лунами: 0.15–0.25<br>
+              eps должен быть меньше разрыва, но больше внутрикластерного расстояния
+            </div>
+            <div class="why">DBSCAN чувствителен к eps. На данных с разной плотностью кластеров нужен HDBSCAN (иерархический вариант).</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>K-Means: ~50% accuracy (разрезает луны). DBSCAN (eps=0.3, minPts=5): ~97% accuracy. DBSCAN идеален для произвольных форм. K-Means — только для шаровидных кластеров.</p>
+          </div>
+          <div class="lesson-box">
+            DBSCAN vs K-Means: DBSCAN лучше при произвольных формах, шуме, неизвестном k. K-Means быстрее O(n·k·iter) vs O(n²) у DBSCAN. Для больших данных: HDBSCAN (иерархический) или ANN-ускоренный DBSCAN.
+          </div>
+        `,
+      },
+    ],
 
     simulation: {
       html: `
