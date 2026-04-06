@@ -16,6 +16,30 @@ App.registerTopic({
         <p>Результат: огромные языковые модели (GPT, Claude, Gemini), которые понимают контекст, пишут тексты, переводят, отвечают на вопросы. Transformer — архитектура современной эпохи ИИ.</p>
       </div>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <!-- Tokens -->
+          <rect x="20" y="130" width="70" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/><text x="55" y="150" text-anchor="middle" font-size="11" fill="#1e40af">Кот</text>
+          <rect x="110" y="130" width="70" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/><text x="145" y="150" text-anchor="middle" font-size="11" fill="#1e40af">сидел</text>
+          <rect x="200" y="130" width="70" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/><text x="235" y="150" text-anchor="middle" font-size="11" fill="#1e40af">на</text>
+          <rect x="290" y="130" width="70" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/><text x="325" y="150" text-anchor="middle" font-size="11" fill="#1e40af">коврике</text>
+          <!-- Attention arrows to "сидел" -->
+          <path d="M145,130 C145,80 55,80 55,130" fill="none" stroke="#ef4444" stroke-width="2.5" opacity="0.7"/>
+          <text x="90" y="78" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">0.45</text>
+          <path d="M145,130 C145,95 145,95 145,130" fill="none" stroke="#94a3b8" stroke-width="1" opacity="0.5"/>
+          <path d="M145,130 C145,80 235,80 235,130" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+          <text x="195" y="78" text-anchor="middle" font-size="9" fill="#92400e">0.15</text>
+          <path d="M145,130 C145,60 325,60 325,130" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+          <text x="260" y="55" text-anchor="middle" font-size="9" fill="#065f46" font-weight="600">0.30</text>
+          <!-- Label -->
+          <text x="420" y="70" font-size="11" fill="#334155">← Attention от «сидел»:</text>
+          <text x="420" y="88" font-size="10" fill="#64748b">на кого смотрит это слово?</text>
+          <text x="420" y="106" font-size="10" fill="#64748b">Больше всего — на «кот»</text>
+          <text x="420" y="124" font-size="10" fill="#64748b">и «коврике» (субъект + место).</text>
+        </svg>
+        <div class="caption">Self-attention: каждое слово «смотрит» на все остальные с разными весами. «Сидел» обращает внимание на «кот» (кто?) и «коврике» (где?).</div>
+      </div>
+
       <h3>Почему Transformer победил RNN</h3>
       <p>RNN имеют несколько фундаментальных проблем:</p>
       <ol>

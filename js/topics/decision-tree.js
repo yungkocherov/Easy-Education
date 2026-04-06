@@ -17,6 +17,44 @@ App.registerTopic({
         <p>Компьютер строит такое дерево автоматически: смотрит на данные и находит <b>какой вопрос</b> лучше всего разделяет группы, потом рекурсивно строит дерево для каждой подгруппы. В итоге — готовая система правил, которую можно прочитать и понять.</p>
       </div>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+          <!-- Root -->
+          <rect x="160" y="10" width="160" height="32" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+          <text x="240" y="31" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Зарплата > 50к?</text>
+          <!-- Left branch -->
+          <line x1="200" y1="42" x2="120" y2="72" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="148" y="58" font-size="9" fill="#64748b">нет</text>
+          <rect x="40" y="72" width="160" height="32" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+          <text x="120" y="93" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Возраст > 25?</text>
+          <!-- Right branch -->
+          <line x1="280" y1="42" x2="360" y2="72" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="330" y="58" font-size="9" fill="#64748b">да</text>
+          <rect x="290" y="72" width="140" height="32" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+          <text x="360" y="93" text-anchor="middle" font-size="11" font-weight="600" fill="#065f46">Одобрить ✓</text>
+          <!-- Left-left -->
+          <line x1="80" y1="104" x2="50" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="53" y="125" font-size="9" fill="#64748b">нет</text>
+          <rect x="5" y="140" width="90" height="32" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+          <text x="50" y="161" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">Отказ ✗</text>
+          <!-- Left-right -->
+          <line x1="160" y1="104" x2="190" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="186" y="125" font-size="9" fill="#64748b">да</text>
+          <rect x="145" y="140" width="130" height="32" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+          <text x="210" y="161" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Поручитель?</text>
+          <!-- Left-right leaves -->
+          <line x1="180" y1="172" x2="150" y2="198" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="155" y="190" font-size="9" fill="#64748b">нет</text>
+          <rect x="110" y="192" width="80" height="24" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="150" y="208" text-anchor="middle" font-size="10" fill="#991b1b">Отказ ✗</text>
+          <line x1="240" y1="172" x2="280" y2="198" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="270" y="190" font-size="9" fill="#64748b">да</text>
+          <rect x="240" y="192" width="100" height="24" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="290" y="208" text-anchor="middle" font-size="10" fill="#065f46">Одобрить ✓</text>
+        </svg>
+        <div class="caption">Дерево решений для одобрения кредита: на каждом уровне задаётся вопрос, ответ ведёт к следующему вопросу или решению.</div>
+      </div>
+
       <h3>Идея алгоритма</h3>
       <p>Дерево решений — это серия вложенных вопросов о признаках, которые приводят к предсказанию. Каждый <b>внутренний узел</b> задаёт вопрос (например, «x > 5?»), каждый <b>лист</b> содержит ответ.</p>
       <p>Обучение: рекурсивно выбирать такие вопросы, которые <b>лучше всего разделяют</b> данные на однородные группы. Идём сверху вниз, делая на каждом шаге локально оптимальный выбор.</p>
@@ -181,45 +219,202 @@ else:
       </ul>
     `,
 
-    examples: `
-      <h3>Пример 1: классификация на 4 точках</h3>
-      <div class="example-card">
-        <div class="example-data">x=1,y=1 → 0
-x=1,y=5 → 1
-x=5,y=1 → 1
-x=5,y=5 → 0</div>
-        <p>Это XOR. Одно разбиение не поможет. Нужны два уровня:</p>
-        <pre>if x < 3:
-    if y < 3: class 0
-    else: class 1
-else:
-    if y < 3: class 1
-    else: class 0</pre>
-      </div>
-
-      <h3>Пример 2: расчёт Gini для разбиения</h3>
-      <div class="example-card">
-        <p>В узле 10 примеров: 7 класса A, 3 класса B.</p>
-        <div class="math-block">$$\\text{Gini} = 1 - (0.7^2 + 0.3^2) = 1 - 0.58 = 0.42$$</div>
-        <p>Разбили на две группы: [4A, 1B] и [3A, 2B]:</p>
-        <ul>
-          <li>Левая: Gini = 1 − (0.8² + 0.2²) = 0.32</li>
-          <li>Правая: Gini = 1 − (0.6² + 0.4²) = 0.48</li>
-          <li>Взвешенный Gini = 5/10 · 0.32 + 5/10 · 0.48 = 0.40</li>
-        </ul>
-        <p><b>Выигрыш:</b> 0.42 − 0.40 = 0.02. Разбиение слабое.</p>
-      </div>
-
-      <h3>Пример 3: предсказание</h3>
-      <div class="example-card">
-        <p>Новый пример проходит по дереву от корня к листу, отвечая на вопросы. В листе:</p>
-        <ul>
-          <li><b>Классификация</b>: мажоритарный класс.</li>
-          <li><b>Регрессия</b>: среднее таргетов в листе.</li>
-          <li><b>Вероятности</b>: распределение классов в листе.</li>
-        </ul>
-      </div>
-    `,
+    examples: [
+      {
+        title: 'Одобрение кредита: строим дерево',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>По 6 заявителям построить дерево решений для выдачи кредита. Найти лучшее первое разбиение по индексу Gini.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>№</th><th>Зарплата (тыс.)</th><th>Стаж (лет)</th><th>Долги?</th><th>Решение</th></tr>
+              <tr><td>1</td><td>80</td><td>5</td><td>Нет</td><td>Одобрить (1)</td></tr>
+              <tr><td>2</td><td>40</td><td>2</td><td>Да</td><td>Отказать (0)</td></tr>
+              <tr><td>3</td><td>60</td><td>8</td><td>Нет</td><td>Одобрить (1)</td></tr>
+              <tr><td>4</td><td>30</td><td>1</td><td>Нет</td><td>Отказать (0)</td></tr>
+              <tr><td>5</td><td>90</td><td>3</td><td>Да</td><td>Отказать (0)</td></tr>
+              <tr><td>6</td><td>70</td><td>10</td><td>Нет</td><td>Одобрить (1)</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: Gini корневого узла (все 6 примеров)</h4>
+            <div class="calc">
+              Одобрено: 3 (№1,3,6), Отказано: 3 (№2,4,5)<br>
+              p₁ = 3/6 = 0.5, p₀ = 3/6 = 0.5<br>
+              Gini = 1 − (0.5² + 0.5²) = 1 − 0.5 = <b>0.50</b>
+            </div>
+            <div class="why">Gini = 0.5 — максимальное загрязнение. Идеальный чистый узел имеет Gini = 0.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: разбиение «Долги = Да?»</h4>
+            <div class="calc">
+              Левая (Долги=Нет): №1,3,4,6 → Одобрено:3, Отказано:1<br>
+              Gini_лев = 1 − ((3/4)² + (1/4)²) = 1 − (0.5625 + 0.0625) = <b>0.375</b><br><br>
+              Правая (Долги=Да): №2,5 → Одобрено:0, Отказано:2<br>
+              Gini_прав = 1 − ((0/2)² + (2/2)²) = 1 − 1 = <b>0.000</b> (чистый!)<br><br>
+              Взвешенный Gini = (4/6)·0.375 + (2/6)·0.0 = <b>0.250</b><br>
+              Gain = 0.50 − 0.250 = <b>0.250</b>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: разбиение «Зарплата ≥ 65?»</h4>
+            <div class="calc">
+              Левая (Зарплата &lt; 65): №2,3,4 → Одобрено:1, Отказано:2<br>
+              Gini_лев = 1 − ((1/3)² + (2/3)²) = 1 − 0.556 = <b>0.444</b><br><br>
+              Правая (Зарплата ≥ 65): №1,5,6 → Одобрено:2, Отказано:1<br>
+              Gini_прав = 1 − ((2/3)² + (1/3)²) = <b>0.444</b><br><br>
+              Взвешенный Gini = 0.5·0.444 + 0.5·0.444 = <b>0.444</b><br>
+              Gain = 0.50 − 0.444 = <b>0.056</b>
+            </div>
+          </div>
+          <div class="step" data-step="4">
+            <h4>Шаг 4: выбрать лучшее разбиение</h4>
+            <div class="calc">
+              Gain(Долги): 0.250 — лучшее!<br>
+              Gain(Зарплата≥65): 0.056<br>
+              Gain(Стаж≥5): ≈0.167<br><br>
+              Структура дерева:<br>
+              Долги = Да? → Да: Отказать (лист, Gini=0)<br>
+              → Нет: продолжить на 4 примерах (Gini=0.375)
+            </div>
+            <div class="why">Признак «Долги» лучше всех: правая ветка абсолютно чистая. Правило жёсткое и понятное.</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Первое разбиение: «Есть долги?». Да → Отказать. Нет → второй уровень. Дерево глубиной 2 классифицирует все 6 примеров без ошибок.</p>
+          </div>
+          <div class="lesson-box">
+            Алгоритм CART перебирает все признаки и все пороги, выбирая пару (признак, порог) с минимальным взвешенным Gini. Сложность O(n·d·log n) на уровень.
+          </div>
+        `,
+      },
+      {
+        title: 'Gini: пошаговый расчёт',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Детально разобрать Gini Impurity и Information Gain для двух кандидатных разбиений, сравнить их.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Узел</th><th>Класс A</th><th>Класс B</th><th>Всего</th><th>Gini</th></tr>
+              <tr><td>Родитель</td><td>10</td><td>10</td><td>20</td><td>?</td></tr>
+              <tr><td>Разбиение 1 — Левый</td><td>8</td><td>2</td><td>10</td><td>?</td></tr>
+              <tr><td>Разбиение 1 — Правый</td><td>2</td><td>8</td><td>10</td><td>?</td></tr>
+              <tr><td>Разбиение 2 — Левый</td><td>6</td><td>4</td><td>10</td><td>?</td></tr>
+              <tr><td>Разбиение 2 — Правый</td><td>4</td><td>6</td><td>10</td><td>?</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: Gini родительского узла</h4>
+            <div class="calc">
+              p_A = 10/20 = 0.5, p_B = 10/20 = 0.5<br>
+              Gini = 1 − (p_A² + p_B²) = 1 − (0.25 + 0.25) = <b>0.500</b>
+            </div>
+            <div class="why">Gini максимален (0.5) при двух равных классах. Чем чище узел, тем меньше Gini.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: Gini разбиения 1 (хорошее)</h4>
+            <div class="calc">
+              Левый [8A, 2B]: p_A=0.8, p_B=0.2<br>
+              Gini_лев = 1 − (0.64 + 0.04) = <b>0.320</b><br><br>
+              Правый [2A, 8B]: p_A=0.2, p_B=0.8<br>
+              Gini_прав = 1 − (0.04 + 0.64) = <b>0.320</b><br><br>
+              Взвешенный = (10/20)·0.320 + (10/20)·0.320 = <b>0.320</b><br>
+              Gain₁ = 0.500 − 0.320 = <b>0.180</b>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: Gini разбиения 2 (слабое)</h4>
+            <div class="calc">
+              Левый [6A, 4B]: p_A=0.6, p_B=0.4<br>
+              Gini_лев = 1 − (0.36 + 0.16) = <b>0.480</b><br><br>
+              Правый [4A, 6B]: Gini_прав = <b>0.480</b><br><br>
+              Взвешенный = 0.5·0.480 + 0.5·0.480 = <b>0.480</b><br>
+              Gain₂ = 0.500 − 0.480 = <b>0.020</b>
+            </div>
+            <div class="why">Разбиение 2 почти не помогает: оба узла остались почти такими же смешанными. Дерево выберет разбиение 1.</div>
+          </div>
+          <div class="step" data-step="4">
+            <h4>Шаг 4: идеальное разбиение</h4>
+            <div class="calc">
+              Левый [10A, 0B]: Gini = 1 − (1² + 0²) = <b>0.0</b> — идеально!<br>
+              Правый [0A, 10B]: Gini = <b>0.0</b><br>
+              Взвешенный Gini = 0 → Gain = 0.500 — максимально возможный
+            </div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Разбиение 1: Gain=0.180. Разбиение 2: Gain=0.020. Дерево выберет разбиение 1 как корневое условие.</p>
+          </div>
+          <div class="lesson-box">
+            Энтропия (ID3): −Σp·log₂(p). Gini (CART): 1−Σp². Оба критерия дают схожие результаты, Gini быстрее вычислять. Для регрессии используют variance reduction.
+          </div>
+        `,
+      },
+      {
+        title: 'Переобучение при depth=∞',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Показать, как неограниченная глубина дерева приводит к переобучению, и как правильно регуляризовать.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Глубина</th><th>Train Accuracy</th><th>Val Accuracy</th><th>Листьев</th><th>Диагноз</th></tr>
+              <tr><td>1</td><td>62%</td><td>60%</td><td>2</td><td>Underfitting</td></tr>
+              <tr><td>2</td><td>78%</td><td>75%</td><td>4</td><td>Нормально</td></tr>
+              <tr><td>3</td><td>85%</td><td>83%</td><td>8</td><td>Оптимум</td></tr>
+              <tr><td>5</td><td>94%</td><td>80%</td><td>32</td><td>Начало переобуч.</td></tr>
+              <tr><td>10</td><td>100%</td><td>71%</td><td>~200</td><td>Переобучение</td></tr>
+              <tr><td>∞</td><td>100%</td><td>68%</td><td>n</td><td>Полное переобуч.</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: что происходит при depth=∞</h4>
+            <div class="calc">
+              n=100 примеров → до 100 листьев при depth=∞<br>
+              Каждый лист ≈ 1 обучающий пример<br>
+              Train Accuracy = 100% — дерево запомнило всё<br>
+              Новый объект x_new попадает в лист с 1 примером<br>
+              → предсказание = метка этого 1 примера с шумом<br>
+              → любой шум в данных = ошибка на тесте
+            </div>
+            <div class="why">Дерево без ограничений — это lookup table, а не обобщающая модель.</div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: методы регуляризации</h4>
+            <div class="calc">
+              max_depth=3 → ограничить глубину напрямую<br>
+              min_samples_split=10 → делить узел, только если ≥10 примеров<br>
+              min_samples_leaf=5 → каждый лист ≥5 примеров<br>
+              max_leaf_nodes=20 → не более 20 листьев<br>
+              min_impurity_decrease=0.01 → делить, только если Gain ≥ 0.01
+            </div>
+            <div class="why">min_samples_leaf часто эффективнее max_depth: не даёт создавать листья с очень малым числом примеров.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: cost-complexity pruning</h4>
+            <div class="calc">
+              Loss(T) = Gini(T) + α · |leaves(T)|<br>
+              α=0 → полное дерево<br>
+              α → ∞ → только корень<br>
+              Оптимальный α: перебрать сетку, выбрать max Val Accuracy<br>
+              В sklearn: DecisionTreeClassifier(ccp_alpha=0.01)
+            </div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Оптимальная глубина = 3 (Val 83%). Правило: min_samples_leaf ≈ 1–5% от датасета. Строй кривые обучения (train vs val по глубине) для диагностики.</p>
+          </div>
+          <div class="lesson-box">
+            Кривая обучения: val score растёт с глубиной, достигает пика, затем падает (переобучение). Пик — оптимум. Train score монотонно растёт. Если они близки — underfitting, если расходятся — overfitting.
+          </div>
+        `,
+      },
+    ],
 
     simulation: {
       html: `

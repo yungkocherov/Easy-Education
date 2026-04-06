@@ -17,6 +17,39 @@ App.registerTopic({
         <p>Идеал — целиться в центр и не дрожать (низкий bias + низкая variance). Но в ML есть фундаментальный компромисс: уменьшая одно, часто увеличиваешь другое. Выбираем «золотую середину».</p>
       </div>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" style="max-width:640px;">
+          <circle cx="100" cy="100" r="70" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="45" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="20" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="3" fill="#dc2626"/>
+          <circle cx="140" cy="65" r="4" fill="#3b82f6"/><circle cx="145" cy="72" r="4" fill="#3b82f6"/>
+          <circle cx="138" cy="60" r="4" fill="#3b82f6"/><circle cx="143" cy="68" r="4" fill="#3b82f6"/>
+          <circle cx="136" cy="70" r="4" fill="#3b82f6"/>
+          <text x="100" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">High Bias</text>
+          <text x="100" y="202" text-anchor="middle" font-size="10" fill="#64748b">Low Variance</text>
+          <circle cx="320" cy="100" r="70" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="320" cy="100" r="45" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="320" cy="100" r="20" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="320" cy="100" r="3" fill="#dc2626"/>
+          <circle cx="290" cy="70" r="4" fill="#3b82f6"/><circle cx="355" cy="130" r="4" fill="#3b82f6"/>
+          <circle cx="310" cy="140" r="4" fill="#3b82f6"/><circle cx="340" cy="60" r="4" fill="#3b82f6"/>
+          <circle cx="300" cy="115" r="4" fill="#3b82f6"/>
+          <text x="320" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Low Bias</text>
+          <text x="320" y="202" text-anchor="middle" font-size="10" fill="#64748b">High Variance</text>
+          <circle cx="540" cy="100" r="70" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="540" cy="100" r="45" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="540" cy="100" r="20" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+          <circle cx="540" cy="100" r="3" fill="#dc2626"/>
+          <circle cx="537" cy="97" r="4" fill="#10b981"/><circle cx="543" cy="103" r="4" fill="#10b981"/>
+          <circle cx="535" cy="102" r="4" fill="#10b981"/><circle cx="541" cy="96" r="4" fill="#10b981"/>
+          <circle cx="539" cy="100" r="4" fill="#10b981"/>
+          <text x="540" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">Low Bias</text>
+          <text x="540" y="202" text-anchor="middle" font-size="10" fill="#065f46">Low Variance</text>
+        </svg>
+        <div class="caption">Слева: прицел сбит, кучно не в центр (underfit). Центр: прицел верный, но дрожат руки (overfit). Справа: идеал.</div>
+      </div>
+
       <h3>Зачем знать про bias-variance</h3>
       <p>Это главный компромисс в машинном обучении. Он объясняет:</p>
       <ul>
