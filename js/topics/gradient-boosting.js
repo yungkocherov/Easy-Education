@@ -555,7 +555,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' } },
-              scales: { x: { type: 'linear', title: { display: true, text: 'x' } }, y: { title: { display: true, text: 'y' } } },
+              scales: { x: { type: 'linear', title: { display: true, text: 'x' }, min: 0, max: 10 }, y: { title: { display: true, text: 'y' }, min: -3, max: 6 } },
             },
           });
           App.registerChart(chart);

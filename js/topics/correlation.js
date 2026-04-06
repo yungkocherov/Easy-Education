@@ -459,8 +459,8 @@ r = −275 / (√700 × √7617.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { display: false } },
               scales: {
-                x: { title: { display: true, text: 'X' } },
-                y: { title: { display: true, text: 'Y' } },
+                x: { title: { display: true, text: 'X' }, min: -4, max: 4 },
+                y: { title: { display: true, text: 'Y' }, min: -4, max: 4 },
               },
             },
           });

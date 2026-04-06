@@ -472,7 +472,7 @@ p-value < 0.001</div>
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { display: false }, title: { display: true, text: 'Распределение p-значений (красное — отвергаем H₀)' } },
-              scales: { x: { title: { display: true, text: 'p-value' } }, y: { beginAtZero: true } },
+              scales: { x: { title: { display: true, text: 'p-value' } }, y: { beginAtZero: true, min: 0, max: 200 } },
             },
           });
           App.registerChart(chart);

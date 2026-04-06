@@ -468,7 +468,7 @@ T ~ Exp(λ = 4), в часах</div>
               maintainAspectRatio: false,
               plugins: { legend: { display: false } },
               scales: {
-                x: { title: { display: true, text: 'Значение' } },
+                x: { title: { display: true, text: 'Значение' }, min: -30, max: 60 },
                 y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
               },
             },

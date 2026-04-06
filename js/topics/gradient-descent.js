@@ -493,7 +493,7 @@ App.registerTopic({
             window._gdLossChart = new Chart(lossCtx, {
               type: 'line',
               data: { labels: [], datasets: [{ label: 'Loss', data: [], borderColor: '#16a34a', borderWidth: 2, pointRadius: 0, fill: false }] },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss' } }, scales: { y: { type: 'logarithmic' } } },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss' } }, scales: { y: { type: 'logarithmic', min: 0.001 } } },
             });
             App.registerChart(window._gdLossChart);
           }

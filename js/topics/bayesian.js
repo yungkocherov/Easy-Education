@@ -471,7 +471,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' }, title: { display: true, text: `Истинное p = ${pTrue}` } },
-              scales: { x: { title: { display: true, text: 'p (вероятность «орёл»)' }, ticks: { maxTicksLimit: 10 } }, y: { title: { display: true, text: 'плотность' } } },
+              scales: { x: { title: { display: true, text: 'p (вероятность «орёл»)' }, ticks: { maxTicksLimit: 10 }, min: 0, max: 1 }, y: { title: { display: true, text: 'плотность' }, min: 0, max: 12 } },
             },
           });
           App.registerChart(chart);

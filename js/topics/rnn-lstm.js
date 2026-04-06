@@ -566,7 +566,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' } },
-              scales: { x: { type: 'linear', title: { display: true, text: 't' } }, y: { title: { display: true, text: 'x(t)' } } },
+              scales: { x: { type: 'linear', title: { display: true, text: 't' }, min: 0, max: 200 }, y: { title: { display: true, text: 'x(t)' }, min: -2.5, max: 2.5 } },
             },
           });
           App.registerChart(chart);
@@ -576,7 +576,7 @@ App.registerTopic({
           lossChart = new Chart(ctx2, {
             type: 'line',
             data: { labels: lossHistory.map((_, i) => i), datasets: [{ label: 'Loss', data: lossHistory, borderColor: '#16a34a', borderWidth: 1, pointRadius: 0, fill: false }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss (MSE)' } } },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss (MSE)' } }, scales: { y: { min: 0 } } },
           });
           App.registerChart(lossChart);
 

@@ -512,7 +512,7 @@ Max = 120 (выброс!)</div>
                 tooltip: { callbacks: { title: (items) => 'x ≈ ' + items[0].label } },
               },
               scales: {
-                x: { title: { display: true, text: 'Значение' } },
+                x: { title: { display: true, text: 'Значение' }, min: -20, max: 250 },
                 y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
               },
             },
