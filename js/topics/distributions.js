@@ -446,15 +446,23 @@ T ~ Exp(λ = 4), в часах</div>
           else data = App.Util.expSample(n, p1);
 
           const isDiscrete = type === 'binomial' || type === 'poisson';
-          const bins = isDiscrete ? Math.min(50, Math.max(...data) - Math.min(...data) + 1) : 40;
-          const hist = App.Util.histogram(data, bins);
+          // Фиксированный range гистограммы по типу распределения
+          const fixedRange = {
+            normal: [-30, 60],
+            uniform: [-25, 55],
+            binomial: [0, Math.round(p1) + 1],
+            poisson: [0, 40],
+            exp: [0, 15],
+          }[type];
+          const bins = isDiscrete ? Math.min(50, fixedRange[1] - fixedRange[0] + 1) : 50;
+          const hist = App.Util.histogram(data, bins, fixedRange);
 
           const ctx = container.querySelector('#dist-chart').getContext('2d');
           if (chart) chart.destroy();
           chart = new Chart(ctx, {
             type: 'bar',
             data: {
-              labels: hist.centers.map((c) => App.Util.round(c, 2)),
+              labels: hist.centers.map((c) => App.Util.round(c, 1)),
               datasets: [{
                 label: 'Частота',
                 data: hist.counts,
@@ -468,8 +476,8 @@ T ~ Exp(λ = 4), в часах</div>
               maintainAspectRatio: false,
               plugins: { legend: { display: false } },
               scales: {
-                x: { title: { display: true, text: 'Значение' }, min: -30, max: 60 },
-                y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
+                x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 15 } },
+                y: { title: { display: true, text: 'Частота' }, min: 0, max: Math.round(n * 0.35), beginAtZero: true },
               },
             },
           });

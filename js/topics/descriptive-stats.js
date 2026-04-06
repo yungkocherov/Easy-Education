@@ -485,8 +485,9 @@ Max = 120 (выброс!)</div>
           const q3 = App.Util.quantile(data, 0.75);
           const iqr = q3 - q1;
 
-          // Гистограмма
-          const hist = App.Util.histogram(data, 30);
+          // Гистограмма с фиксированным range
+          const histRange = [-20, Math.max(outVal + 20, 120)];
+          const hist = App.Util.histogram(data, 40, histRange);
           const ctx = container.querySelector('#dstat-chart').getContext('2d');
           if (chart) chart.destroy();
           chart = new Chart(ctx, {
@@ -512,8 +513,8 @@ Max = 120 (выброс!)</div>
                 tooltip: { callbacks: { title: (items) => 'x ≈ ' + items[0].label } },
               },
               scales: {
-                x: { title: { display: true, text: 'Значение' }, min: -20, max: 250 },
-                y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
+                x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 15 } },
+                y: { title: { display: true, text: 'Частота' }, min: 0, max: Math.round(n * 0.3), beginAtZero: true },
               },
             },
           });
