@@ -110,8 +110,9 @@ body {
 .hidden { display: none !important; }
 
 .topic-header {
-  padding: 28px 40px 16px;
-  background: white;
+  padding: 32px 0 16px;
+  max-width: 780px;
+  margin: 0 auto;
   border-bottom: 1px solid #e5e7eb;
 }
 .breadcrumb {
@@ -137,13 +138,13 @@ body {
 .tabs {
   display: flex;
   gap: 4px;
-  padding: 0 40px;
-  background: white;
+  max-width: 780px;
+  margin: 0 auto;
   border-bottom: 1px solid #e5e7eb;
   overflow-x: auto;
 }
 .tab {
-  padding: 12px 18px;
+  padding: 12px 16px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -156,8 +157,8 @@ body {
 .tab.active { color: #1e40af; border-bottom-color: #3b82f6; }
 
 .tab-content {
-  padding: 28px 40px 60px;
-  max-width: 1000px;
+  padding: 28px 0 60px;
+  max-width: 780px;
   margin: 0 auto;
   overflow-x: hidden;
   word-wrap: break-word;
