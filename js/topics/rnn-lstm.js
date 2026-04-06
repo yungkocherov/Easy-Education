@@ -171,35 +171,214 @@ App.registerTopic({
       </ul>
     `,
 
-    examples: `
-      <h3>Пример 1: предсказание следующего символа</h3>
-      <div class="example-card">
-        <p>Вход: "hell" → предсказать "o".</p>
-        <p>Каждый символ one-hot: h=[1,0,0,0], e=[0,1,0,0], l=[0,0,1,0], o=[0,0,0,1].</p>
-        <ul>
-          <li>$h_1 = \\tanh(W_x \\cdot h + W_h \\cdot 0)$</li>
-          <li>$h_2 = \\tanh(W_x \\cdot e + W_h \\cdot h_1)$</li>
-          <li>$h_3 = \\tanh(W_x \\cdot l + W_h \\cdot h_2)$</li>
-          <li>$h_4 = \\tanh(W_x \\cdot l + W_h \\cdot h_3)$</li>
-          <li>$y = \\text{softmax}(W_y \\cdot h_4)$ → «o»</li>
-        </ul>
-      </div>
+    examples: [
+      {
+        title: 'RNN forward на 3 шагах',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Прогнать последовательность $x = (1,\; 0,\; -1)$ через простую RNN с размером hidden state $h = 1$ (скалярный). Веса: $W_{xh} = 0{,}5$, $W_{hh} = 0{,}8$, $b_h = 0{,}1$. Начальное состояние $h_0 = 0$. Вычислить $h_1, h_2, h_3$.</p>
+          </div>
 
-      <h3>Пример 2: гейты LSTM — интуиция</h3>
-      <div class="example-card">
-        <p>Читаем текст: «Маша пошла в магазин. Она купила яблоки.»</p>
-        <ul>
-          <li>На слове «Маша» — <b>input gate</b> открывается, записываем «субъект: Маша, женского рода».</li>
-          <li>На слове «Она» — обращаемся к памяти через <b>output gate</b>, используем «женского рода».</li>
-          <li>На новом предложении — <b>forget gate</b> может сбросить контекст.</li>
-        </ul>
-      </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>Шаг $t$</th><th>Вход $x_t$</th><th>Предыдущее $h_{t-1}$</th><th>$z_t = W_{xh}x_t + W_{hh}h_{t-1} + b$</th><th>$h_t = \\tanh(z_t)$</th></tr>
+              <tr><td>1</td><td>1</td><td>0</td><td>$0{,}5\\cdot1 + 0{,}8\\cdot0 + 0{,}1 = 0{,}6$</td><td>$\\tanh(0{,}6) = 0{,}537$</td></tr>
+              <tr><td>2</td><td>0</td><td>0,537</td><td>$0{,}5\\cdot0 + 0{,}8\\cdot0{,}537 + 0{,}1 = 0{,}530$</td><td>$\\tanh(0{,}530) = 0{,}485$</td></tr>
+              <tr><td>3</td><td>−1</td><td>0,485</td><td>$0{,}5\\cdot(-1) + 0{,}8\\cdot0{,}485 + 0{,}1 = -0{,}012$</td><td>$\\tanh(-0{,}012) = -0{,}012$</td></tr>
+            </table>
+          </div>
 
-      <h3>Пример 3: bidirectional RNN</h3>
-      <div class="example-card">
-        <p>«Он положил *яблоко* в корзину» — нужно знать контекст и слева, и справа. Bidirectional RNN = две RNN (forward + backward), их состояния объединяются.</p>
-      </div>
-    `,
+          <div class="step" data-step="1">
+            <h4>Шаг 1: входной сигнал $x_1 = 1$</h4>
+            <div class="calc">$z_1 = W_{xh} \\cdot x_1 + W_{hh} \\cdot h_0 + b_h = 0{,}5 \\cdot 1 + 0{,}8 \\cdot 0 + 0{,}1 = 0{,}6$</div>
+            <div class="calc">$h_1 = \\tanh(0{,}6) \\approx 0{,}537$</div>
+            <div class="why">В начале $h_0 = 0$ — нет прошлой памяти. На первом шаге hidden state определяется только текущим входом. $\\tanh$ сжимает вывод в $(-1, 1)$ — это и есть «представление прошлого».</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Шаг 2: нулевой вход $x_2 = 0$, но есть память $h_1$</h4>
+            <div class="calc">$z_2 = 0{,}5 \\cdot 0 + 0{,}8 \\cdot 0{,}537 + 0{,}1 = 0 + 0{,}430 + 0{,}1 = 0{,}530$</div>
+            <div class="calc">$h_2 = \\tanh(0{,}530) \\approx 0{,}485$</div>
+            <div class="why">Вход нулевой, но $h_2 \approx 0{,}485$ — всё ещё положительный! Это «эхо» от $x_1=1$: через рекуррентную связь $W_{hh} = 0{,}8$ память сохраняется. Коэффициент 0,8 — «сила памяти».</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Шаг 3: отрицательный вход $x_3 = -1$ борется с памятью</h4>
+            <div class="calc">$z_3 = 0{,}5 \\cdot (-1) + 0{,}8 \\cdot 0{,}485 + 0{,}1 = -0{,}5 + 0{,}388 + 0{,}1 = -0{,}012$</div>
+            <div class="calc">$h_3 = \\tanh(-0{,}012) \\approx -0{,}012$</div>
+            <div class="why">Отрицательный вход $(-0{,}5)$ почти скомпенсировал положительную память $(+0{,}388)$ и bias $(+0{,}1)$. Итог близок к нулю: «сигнал от прошлого почти вытеснен». RNN учится балансировать прошлое и настоящее.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Как затухает память: математика</h4>
+            <div class="calc">
+              Если $x_t = 0$ для всех $t > 1$, то $h_t = \\tanh(W_{hh} \\cdot h_{t-1})$<br>
+              При малых значениях $\\tanh(z) \\approx z$, поэтому $h_t \\approx W_{hh}^{t-1} \\cdot h_1 = 0{,}8^{t-1} \\cdot 0{,}537$<br>
+              $t=1$: 0,537; $t=5$: $0{,}8^4 \\cdot 0{,}537 \\approx 0{,}22$; $t=10$: $0{,}8^9 \\cdot 0{,}537 \\approx 0{,}07$; $t=20$: $0{,}8^{19} \\approx 0{,}008$
+            </div>
+            <div class="why">Через 20 шагов от $h_1$ осталось менее 1,5%! Это экспоненциальное затухание памяти в vanilla RNN. Для длинных зависимостей нужен LSTM.</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>$h_1 = 0{,}537$, $h_2 = 0{,}485$, $h_3 = -0{,}012$. Hidden state аккумулирует информацию о прошлых входах через рекуррентный вес $W_{hh}=0{,}8$. Память затухает как $0{,}8^t$ — экспоненциально быстро для далёких событий.</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Физический смысл $W_{hh}$:</b> если $|W_{hh}| < 1$ — память затухает (vanishing gradient). Если $|W_{hh}| > 1$ — память растёт (exploding gradient). Идеально $|W_{hh}| = 1$, но тогда нет избирательной памяти. LSTM решает это через гейты.
+          </div>
+        `
+      },
+      {
+        title: 'Vanishing gradient числами',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Показать, как градиент затухает при обратном распространении через 10 шагов RNN. Веса $W_{hh} = 0{,}8$, функция активации $\\tanh$ (производная: $\\tanh'(z) = 1 - \\tanh^2(z) \\leq 1$). Начальный градиент с конца: $\\delta_T = 1$.</p>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th>Шаг назад</th><th>Градиент $\\delta_t$</th><th>Остаток от начального</th></tr>
+              <tr><td>$T$ (конец)</td><td>$1{,}000$</td><td>100%</td></tr>
+              <tr><td>$T-1$</td><td>$\\approx 0{,}640$</td><td>64%</td></tr>
+              <tr><td>$T-2$</td><td>$\\approx 0{,}410$</td><td>41%</td></tr>
+              <tr><td>$T-5$</td><td>$\\approx 0{,}107$</td><td>11%</td></tr>
+              <tr><td>$T-10$</td><td>$\\approx 0{,}011$</td><td>1,1%</td></tr>
+              <tr><td>$T-20$</td><td>$\\approx 0{,}0001$</td><td>0,01%</td></tr>
+            </table>
+          </div>
+
+          <div class="step" data-step="1">
+            <h4>Формула backpropagation through time</h4>
+            <p>При BPTT градиент на шаге $t$ связан с шагом $t+1$ через:</p>
+            <div class="math-block">$$\\delta_t = \\delta_{t+1} \\cdot W_{hh} \\cdot (1 - h_t^2)$$</div>
+            <div class="why">Каждый шаг назад умножает градиент на $W_{hh}$ и на $\\tanh'(z_t) = (1-h_t^2)$. Оба множителя меньше 1 (при типичных активациях). Произведение стремительно уменьшается.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Оценка одного шага: типичный случай</h4>
+            <div class="calc">
+              Предположим $h_t \\approx 0{,}5$ (умеренная активация), тогда $\\tanh'(z_t) = 1 - 0{,}5^2 = 0{,}75$<br>
+              Один шаг назад: $\\delta_t \\approx \\delta_{t+1} \\times 0{,}8 \\times 0{,}75 = \\delta_{t+1} \\times 0{,}60$
+            </div>
+            <div class="why">Каждый шаг назад: градиент умножается на ~0,6. Это геометрически убывающая прогрессия.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Через 10 шагов назад</h4>
+            <div class="calc">$\\delta_{T-10} \\approx 0{,}60^{10} \\cdot \\delta_T = 0{,}006 \\cdot \\delta_T$</div>
+            <div class="why">Меньше 1% от исходного! Параметры на шагах $T-10$ и ранее почти не обучаются — их градиент фактически ноль. Если полезная информация была на шаге $T-10$, модель её «не слышит».</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Сравнение: что делает LSTM</h4>
+            <p>В LSTM cell state обновляется аддитивно:</p>
+            <div class="math-block">$$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$$</div>
+            <div class="calc">
+              Градиент по $c_{t-1}$: $\\partial L / \\partial c_{t-1} = (\\partial L / \\partial c_t) \\cdot f_t$<br>
+              Если $f_t \\approx 1$ (forget gate открыт): градиент проходит НЕТРОНУТЫМ!<br>
+              После 10 шагов: $\\delta_{T-10} \\approx f^{10} \\cdot \\delta_T \\approx 1{,}0^{10} \\cdot \\delta_T = \\delta_T$
+            </div>
+            <div class="why">Это «магия» LSTM: аддитивное обновление cell state создаёт «шоссе» для градиента. Он не умножается на матрицы снова и снова — он просто «течёт» через forget gate с минимальным затуханием.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Когда vanishing gradient не страшен</h4>
+            <div class="calc">
+              Если нужная зависимость — длиной 3-5 шагов: $0{,}6^5 \\approx 0{,}08$ — 8%, обучится<br>
+              Если длиной 10 шагов: $0{,}6^{10} \\approx 0{,}006$ — 0,6%, трудно<br>
+              Если длиной 50 шагов: $0{,}6^{50} \\approx 10^{-11}$ — невозможно
+            </div>
+            <div class="why">Практическое правило для vanilla RNN: надёжно работает на зависимостях до 5–10 шагов. Для более длинных нужны LSTM/GRU (до 100–200), или Transformer (любая длина за 1 шаг).</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>При $W_{hh} = 0{,}8$ и $\\tanh'(z) \\approx 0{,}75$ за 10 шагов назад градиент уменьшается в ~170 раз (до ~0,6%). LSTM решает проблему через аддитивное обновление cell state с forget gate близким к 1 — градиент течёт без экспоненциального затухания.</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Интуиция:</b> vanishing gradient — это «забывание», exploding gradient — «паника». Vanilla RNN страдает от обоих. LSTM — это умный фильтр памяти: он решает, что помнить долго (c через forget gate), а что — только сейчас (h через output gate).
+          </div>
+        `
+      },
+      {
+        title: 'LSTM гейты интуитивно',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Проследить работу LSTM-гейтов при чтении предложения «Маша любит кошек, а Дима — собак». Для каждого слова — объяснить, что открывается и закрывается. Числа упрощённые, для иллюстрации идеи.</p>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th>Слово</th><th>Forget gate $f_t$</th><th>Input gate $i_t$</th><th>Output gate $o_t$</th><th>Что в памяти $c_t$</th></tr>
+              <tr><td>Маша</td><td>0,1 (сбрасываем старое)</td><td>0,9 (запоминаем субъект)</td><td>0,7 (выдаём)</td><td>«субъект: Маша, жен. р.»</td></tr>
+              <tr><td>любит</td><td>0,9 (сохраняем субъект)</td><td>0,8 (добавляем глагол)</td><td>0,5</td><td>«Маша, любит»</td></tr>
+              <tr><td>кошек</td><td>0,9</td><td>0,7 (объект 1)</td><td>0,6</td><td>«Маша любит кошек»</td></tr>
+              <tr><td>, а</td><td>0,3 (частичный сброс)</td><td>0,2 (союз)</td><td>0,2</td><td>«любит, противопост.»</td></tr>
+              <tr><td>Дима</td><td>0,2 (новый субъект!)</td><td>0,9 (новый субъект)</td><td>0,8</td><td>«субъект: Дима, муж. р.»</td></tr>
+              <tr><td>собак</td><td>0,9</td><td>0,7</td><td>0,7</td><td>«Дима любит собак»</td></tr>
+            </table>
+          </div>
+
+          <div class="step" data-step="1">
+            <h4>Forget gate: «что забыть»</h4>
+            <div class="calc">$f_t = \\sigma(W_f [h_{t-1}, x_t] + b_f) \\in (0, 1)$</div>
+            <div class="calc">$c_t^{\\text{new}} \\leftarrow f_t \\odot c_{t-1}$</div>
+            <div class="why">$f_t$ близко к 0 → «стереть» информацию. $f_t$ близко к 1 → «сохранить». При чтении «а» — частичный сброс (0,3): мы помним, что было предложение, но готовимся к новому субъекту. При «Дима» — $f_t \approx 0{,}2$: сбрасываем «Маша» из активной памяти.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Input gate: «что запомнить»</h4>
+            <div class="calc">$i_t = \\sigma(W_i [h_{t-1}, x_t] + b_i) \\in (0, 1)$</div>
+            <div class="calc">$\\tilde{c}_t = \\tanh(W_c [h_{t-1}, x_t] + b_c) \\in (-1, 1)$</div>
+            <div class="calc">$c_t^{\\text{add}} \\leftarrow i_t \\odot \\tilde{c}_t$ (новая информация)</div>
+            <div class="why">$i_t$ решает, насколько сильно записать новый сигнал $\\tilde{c}_t$. При слове «Маша» (начало предложения): $i_t \approx 0{,}9$ — важно запомнить субъект. При союзе «а»: $i_t \approx 0{,}2$ — служебное слово, мало полезного.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Cell state: аддитивное обновление (ключ к долгой памяти)</h4>
+            <div class="calc">$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$</div>
+            <div class="calc">
+              На шаге «Маша»: $c_1 = 0{,}1 \\cdot c_0 + 0{,}9 \\cdot \\tilde{c}_1 \\approx 0 + 0{,}9 \\cdot c_{\\text{Маша}}$<br>
+              На шаге «любит»: $c_2 = 0{,}9 \\cdot c_1 + 0{,}8 \\cdot c_{\\text{любит}} \\approx 0{,}81 c_{\\text{Маша}} + 0{,}8 c_{\\text{любит}}$<br>
+              На шаге «кошек»: $c_3 \\approx 0{,}73 c_{\\text{Маша}} + 0{,}72 c_{\\text{любит}} + 0{,}7 c_{\\text{кошек}}$
+            </div>
+            <div class="why">«Маша» всё ещё присутствует в памяти через 3 шага с весом ~0,73! В vanilla RNN: $0{,}6^3 \\approx 0{,}22$. LSTM сохраняет информацию в 3 раза лучше за те же шаги, а при $f \approx 1$ — практически без потерь.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Output gate: «что показать»</h4>
+            <div class="calc">$o_t = \\sigma(W_o [h_{t-1}, x_t] + b_o)$</div>
+            <div class="calc">$h_t = o_t \\odot \\tanh(c_t)$</div>
+            <div class="why">$h_t$ — это «видимая» часть памяти, которая передаётся следующему слою и в следующий шаг. $c_t$ — «внутренняя» долгосрочная память. Output gate фильтрует: показать всё или только часть. Например, при «Она» — output gate для «Маша, жен. р.» открывается.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Числовой пример: разрешение местоимения «она»</h4>
+            <div class="calc">
+              Предположим: «субъект:Маша» кодируется как $c_{\\text{fem}} = +1$, «субъект:Дима» — $c_{\\text{masc}} = -1$<br>
+              После «Маша»: $c_t[\\text{gender}] \\approx +0{,}9$<br>
+              Через 4 слова («кошек, а Дима»): $c_t[\\text{gender}] \\approx 0{,}9^3 \\cdot (+0{,}9) = +0{,}66$ (всё ещё женский!)<br>
+              После «Дима»: $f_t = 0{,}2$, $c_t[\\text{gender}] = 0{,}2 \\cdot 0{,}66 + 0{,}9 \\cdot (-0{,}9) = +0{,}13 - 0{,}81 = -0{,}68$ (теперь мужской)
+            </div>
+            <div class="why">Вот как LSTM разрешает кореференции: информация о роде субъекта хранится в cell state, обновляется при появлении нового субъекта. Это то, что NLP-модели учат автоматически из текста!</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>LSTM управляет памятью через три гейта: forget (что стереть), input (что записать), output (что показать). Cell state — долгосрочная память, hidden state — оперативная. При чтении текста: субъект запоминается при появлении, сохраняется через предложение, используется при разрешении местоимения.</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Аналогия с RAM/ROM:</b> cell state $c_t$ — это жёсткий диск (долгосрочное хранение), hidden state $h_t$ — оперативная память (то, с чем работаем прямо сейчас). Forget gate — «delete», input gate — «write», output gate — «read». Три операции управления памятью.
+          </div>
+        `
+      },
+    ],
 
     simulation: {
       html: `

@@ -171,32 +171,252 @@ App.registerTopic({
       </ul>
     `,
 
-    examples: `
-      <h3>Пример 1: свёртка 3×3 для детекции границ</h3>
-      <div class="example-card">
-        <p>Фильтр Собеля (вертикальные границы):</p>
-        <pre>[-1  0  1]
-[-2  0  2]
-[-1  0  1]</pre>
-        <p>Применяя к изображению, получаем карту с сильным откликом на вертикальные границы.</p>
-      </div>
+    examples: [
+      {
+        title: 'Свёртка 3×3 вручную',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Применить фильтр детекции вертикальных границ к фрагменту изображения 5×5. Вычислить вручную все элементы feature map 3×3 (без padding, stride=1). Фильтр Собеля:</p>
+            <div class="math-block">$$K = \\begin{pmatrix}-1 & 0 & 1 \\\\ -2 & 0 & 2 \\\\ -1 & 0 & 1\\end{pmatrix}$$</div>
+          </div>
 
-      <h3>Пример 2: подсчёт параметров</h3>
-      <div class="example-card">
-        <p>Conv слой: вход 28×28×1, 32 фильтра 3×3:</p>
-        <div class="example-data">Параметров = 3·3·1·32 + 32 (bias) = 320
-Выход: 26×26×32 (без padding)</div>
-        <p>Для сравнения, FC между 28×28 и 32 нейронами: 784·32 + 32 = 25120 параметров.</p>
-      </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th colspan="5">Изображение $I$ (5×5)</th></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+            </table>
+          </div>
 
-      <h3>Пример 3: размеры выходов</h3>
-      <div class="example-card">
-        <p>Формула:</p>
-        <div class="math-block">$$H_{out} = \\frac{H_{in} + 2p - k}{s} + 1$$</div>
-        <p>Вход 32×32, kernel 3, stride 1, padding 1 → выход 32×32 (same padding).</p>
-        <p>MaxPool 2×2, stride 2: 32×32 → 16×16.</p>
-      </div>
-    `,
+          <div class="step" data-step="1">
+            <h4>Размер выходной feature map</h4>
+            <div class="calc">$H_{out} = \\dfrac{H_{in} - k}{s} + 1 = \\dfrac{5 - 3}{1} + 1 = 3$</div>
+            <div class="why">Выход 3×3. Фильтр 3×3 на изображении 5×5 без padding даёт уменьшение на $k-1=2$ пикселя по каждому краю.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Элемент $(1,1)$: окно в левом верхнем углу</h4>
+            <p>Фрагмент изображения под окном позиции (0,0)–(2,2):</p>
+            <div class="calc">
+              $\\begin{pmatrix}0&0&1\\\\0&0&1\\\\0&0&1\\end{pmatrix}$, перемножаем поэлементно с $K$ и суммируем:<br><br>
+              $(-1)\\cdot0 + 0\\cdot0 + 1\\cdot1$<br>
+              $+ (-2)\\cdot0 + 0\\cdot0 + 2\\cdot1$<br>
+              $+ (-1)\\cdot0 + 0\\cdot0 + 1\\cdot1 = 0+0+1+0+0+2+0+0+1 = 4$
+            </div>
+            <div class="why">Значение $4$ — сильный отклик! В этом окне есть вертикальная граница: слева 0, справа 1. Фильтр Собеля именно для этого и предназначен.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Элемент $(1,2)$: окно сдвинуто на 1 вправо</h4>
+            <p>Фрагмент: столбцы 1–3, строки 0–2:</p>
+            <div class="calc">
+              $\\begin{pmatrix}0&1&1\\\\0&1&1\\\\0&1&1\\end{pmatrix}$, умножаем на $K$:<br><br>
+              $(-1)\\cdot0 + 0\\cdot1 + 1\\cdot1 + (-2)\\cdot0 + 0\\cdot1 + 2\\cdot1 + (-1)\\cdot0 + 0\\cdot1 + 1\\cdot1 = 1+2+1 = 4$
+            </div>
+            <div class="why">Снова $4$: граница всё ещё в поле зрения этого окна (столбец 1 — нули, столбец 3 — единицы, контраст есть).</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Элемент $(1,3)$: окно уехало вправо от границы</h4>
+            <p>Фрагмент: столбцы 2–4, строки 0–2:</p>
+            <div class="calc">
+              $\\begin{pmatrix}1&1&1\\\\1&1&1\\\\1&1&1\\end{pmatrix}$, умножаем на $K$:<br><br>
+              $(-1)\\cdot1 + 0\\cdot1 + 1\\cdot1 + (-2)\\cdot1 + 0\\cdot1 + 2\\cdot1 + (-1)\\cdot1 + 0\\cdot1 + 1\\cdot1$<br>
+              $= (-1+1) + (-2+2) + (-1+1) = 0$
+            </div>
+            <div class="why">Значение $0$: окно полностью внутри однородной области (все пиксели = 1). Нет границы — нет отклика. Это и есть смысл свёртки!</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Итоговая feature map</h4>
+            <div class="calc">
+              Из соображений симметрии (изображение однородно по вертикали):<br><br>
+              $\\text{Feature map} = \\begin{pmatrix}4 & 4 & 0 \\\\ 4 & 4 & 0 \\\\ 4 & 4 & 0\\end{pmatrix}$
+            </div>
+            <div class="why">Левые столбцы feature map «загорелись» — там фильтр нашёл вертикальную границу. Правый столбец нулевой — однородная область. Так работает детекция признаков в CNN.</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Feature map 3×3 с нулями справа и четвёрками слева. Применяя ReLU к этому выходу, получаем активационную карту: фильтр «нашёл» вертикальную границу в позиции между столбцами 0 и 1.</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Ключевая идея:</b> фильтр — это «детектор паттерна». Высокое значение в feature map = «паттерн нашёлся здесь». Разные фильтры ищут разные паттерны. В глубокой CNN первые слои — края, потом — текстуры, потом — объекты.
+          </div>
+        `
+      },
+      {
+        title: 'Подсчёт параметров',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Подсчитать число параметров в мини-CNN: Conv(3×3, 8 фильтров) → MaxPool(2×2) → FC(→10). Вход: 28×28×1 (например, MNIST). Сравнить с полносвязной сетью.</p>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th>Слой</th><th>Размер выхода</th><th>Параметров</th></tr>
+              <tr><td>Вход</td><td>28×28×1</td><td>—</td></tr>
+              <tr><td>Conv 3×3, 8 фильтров</td><td>26×26×8</td><td>$3\\cdot3\\cdot1\\cdot8 + 8 = 80$</td></tr>
+              <tr><td>MaxPool 2×2</td><td>13×13×8</td><td>$0$</td></tr>
+              <tr><td>Flatten</td><td>1352</td><td>—</td></tr>
+              <tr><td>FC → 10</td><td>10</td><td>$1352\\cdot10 + 10 = 13530$</td></tr>
+              <tr><td><b>Итого</b></td><td>—</td><td><b>13 610</b></td></tr>
+            </table>
+          </div>
+
+          <div class="step" data-step="1">
+            <h4>Параметры Conv-слоя</h4>
+            <div class="calc">
+              Один фильтр 3×3×1: $3 \\times 3 \\times 1 = 9$ весов $+ 1$ bias $= 10$ параметров<br>
+              8 фильтров: $8 \\times 10 = 80$ параметров
+            </div>
+            <div class="why">Параметры фильтра умножаются на число входных каналов (здесь 1 для grayscale). Для RGB-изображения (3 канала): $3\\times3\\times3\\times8+8 = 224$ параметра.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Размер выхода Conv-слоя</h4>
+            <div class="calc">$H_{out} = \\dfrac{28 - 3}{1} + 1 = 26$, значит выход $26 \\times 26 \\times 8$</div>
+            <div class="why">Без padding фильтр 3×3 уменьшает размер на 2 (по 1 с каждого края). С padding=1 размер сохранился бы: 28×28×8.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>MaxPool(2×2) — без параметров!</h4>
+            <div class="calc">$H_{out} = \\dfrac{26}{2} = 13$, выход $13 \\times 13 \\times 8$</div>
+            <div class="why">Pooling — это фиксированная операция (max или avg), у неё нет обучаемых параметров. Она только уменьшает размер в 2 раза. После flatten: $13 \\times 13 \\times 8 = 1352$ нейрона.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Сравнение с полносвязной сетью на том же входе</h4>
+            <div class="calc">
+              FC от $28 \\times 28 = 784$ входов к первому слою из 100 нейронов: $784 \\times 100 + 100 = 78 500$ пар.<br>
+              FC 100→10: $100 \\times 10 + 10 = 1010$ пар.<br>
+              Итого FC: $79 510$ параметров
+            </div>
+            <div class="calc">
+              CNN (наш): $13 610$ параметров — в <b>5,8 раз меньше</b> при той же задаче!
+            </div>
+            <div class="why">Главное преимущество CNN: weight sharing. Один фильтр применяется ко всем 26×26 позициям, но весов всего 9. В FC каждый нейрон имеет отдельный вес к каждому пикселю — расточительно.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Более глубокая сеть: Conv→Conv→Pool→FC</h4>
+            <div class="calc">
+              Слой 1: Conv(3×3, 32 фильтра, padding=1): вход 28×28×1 → выход 28×28×32<br>
+              Параметров: $3\\times3\\times1\\times32 + 32 = 320$<br><br>
+              Слой 2: Conv(3×3, 64 фильтра, padding=1): вход 28×28×32 → выход 28×28×64<br>
+              Параметров: $3\\times3\\times32\\times64 + 64 = 18 496$<br><br>
+              MaxPool: 28×28×64 → 14×14×64 = 12 544 нейрона<br>
+              FC → 10: $12 544 \\times 10 + 10 = 125 450$<br>
+              Итого: $320 + 18496 + 125450 = 144 266$ параметров
+            </div>
+            <div class="why">Второй Conv-слой имеет больше параметров, потому что входных каналов 32 (а не 1). Но FC всё равно доминирует! Поэтому в современных CNN используют Global Average Pooling вместо FC для резкого уменьшения числа параметров.</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Простая CNN (28×28→Conv8→Pool→FC10): 13 610 параметров. Это в 5,8 раз меньше аналогичной FC-сети (79 510 пар.). Conv-слои экономят параметры через weight sharing, но FC остаётся «бутылочным горлышком».</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Правило подсчёта Conv-слоя:</b> $k \\times k \\times C_{in} \\times C_{out} + C_{out}$. Параметры растут с числом фильтров $C_{out}$ и числом входных каналов $C_{in}$, но НЕ с размером изображения $H \\times W$ — это и есть weight sharing.
+          </div>
+        `
+      },
+      {
+        title: 'MaxPooling 2×2',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Применить MaxPooling 2×2 (stride=2) к feature map 4×4 после ReLU. Понять, что теряется и что сохраняется. Сравнить с AvgPooling.</p>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th colspan="4">Feature map $A$ (после ReLU, 4×4)</th></tr>
+              <tr><td>3</td><td>1</td><td>0</td><td>5</td></tr>
+              <tr><td>0</td><td>4</td><td>2</td><td>1</td></tr>
+              <tr><td>2</td><td>0</td><td>6</td><td>0</td></tr>
+              <tr><td>1</td><td>3</td><td>0</td><td>4</td></tr>
+            </table>
+          </div>
+
+          <div class="step" data-step="1">
+            <h4>MaxPooling: берём максимум из каждого окна 2×2</h4>
+            <p>Разбиваем 4×4 на четыре блока 2×2 (без перекрытия, stride=2):</p>
+            <div class="calc">
+              Блок (0,0)–(1,1): $\\begin{pmatrix}3&1\\\\0&4\\end{pmatrix}$ → $\\max = 4$<br>
+              Блок (0,2)–(1,3): $\\begin{pmatrix}0&5\\\\2&1\\end{pmatrix}$ → $\\max = 5$<br>
+              Блок (2,0)–(3,1): $\\begin{pmatrix}2&0\\\\1&3\\end{pmatrix}$ → $\\max = 3$<br>
+              Блок (2,2)–(3,3): $\\begin{pmatrix}6&0\\\\0&4\\end{pmatrix}$ → $\\max = 6$
+            </div>
+            <div class="calc">
+              $\\text{MaxPool}(A) = \\begin{pmatrix}4 & 5 \\\\ 3 & 6\\end{pmatrix}$
+            </div>
+            <div class="why">Выход 2×2: в 4 раза меньше пикселей. Сохранены самые сильные активации — «где фильтр сработал сильнее всего в этом регионе».</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>AvgPooling: берём среднее из каждого окна</h4>
+            <div class="calc">
+              Блок (0,0)–(1,1): $(3+1+0+4)/4 = 2{,}0$<br>
+              Блок (0,2)–(1,3): $(0+5+2+1)/4 = 2{,}0$<br>
+              Блок (2,0)–(3,1): $(2+0+1+3)/4 = 1{,}5$<br>
+              Блок (2,2)–(3,3): $(6+0+0+4)/4 = 2{,}5$
+            </div>
+            <div class="calc">$\\text{AvgPool}(A) = \\begin{pmatrix}2{,}0 & 2{,}0 \\\\ 1{,}5 & 2{,}5\\end{pmatrix}$</div>
+            <div class="why">AvgPool «размазывает» информацию. MaxPool «вытаскивает» самую яркую активацию. Для задач классификации MaxPool обычно лучше: «был ли этот паттерн где-то в регионе?»</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Что теряется при pooling?</h4>
+            <div class="calc">
+              MaxPool сохраняет: где паттерн был (грубо) и насколько сильно<br>
+              MaxPool теряет: точное положение внутри окна 2×2 (translation invariance!)
+            </div>
+            <div class="why">Кот в левом углу и кот в правом углу блока 2×2 дадут одинаковый MaxPool-результат. Это translation invariance — полезное свойство: кот остаётся котом, сдвинутый на 1 пиксель.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Receptive field после Conv+Pool</h4>
+            <div class="calc">
+              Conv 3×3: receptive field = 3×3 пикселя входного изображения<br>
+              MaxPool 2×2: receptive field удваивается → 6×6 пикселя оригинала<br>
+              Следующий Conv 3×3: receptive field растёт → 10×10<br>
+              После ещё одного Pool → 20×20
+            </div>
+            <div class="why">Глубокие нейроны «видят» всё большую область оригинального изображения. Ранние нейроны — локальные паттерны (края), поздние — глобальные (объекты). Это иерархия признаков.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Global Average Pooling (GAP) — современная альтернатива</h4>
+            <div class="calc">
+              Для нашей 4×4 feature map:<br>
+              $\\text{GAP} = \\dfrac{3+1+0+5+0+4+2+1+2+0+6+0+1+3+0+4}{16} = \\dfrac{32}{16} = 2{,}0$
+            </div>
+            <div class="calc">
+              Обычный путь: Conv → Flatten(4×4×64 = 1024) → FC → Softmax: нужно 1024×num_classes параметров<br>
+              С GAP: Conv → GAP(64) → Softmax: нужно только 64×num_classes — в 16 раз меньше!
+            </div>
+            <div class="why">GAP сжимает всю feature map до одного числа на канал. Используется в ResNet, MobileNet и других современных архитектурах для уменьшения параметров FC-слоя.</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>MaxPool(2×2) на 4×4 feature map даёт 2×2 с максимумами каждого блока: $(4, 5; 3, 6)$. AvgPool даёт усреднённый результат $(2{,}0, 2{,}0; 1{,}5, 2{,}5)$. MaxPool сохраняет самые сильные активации и уменьшает размер в 4 раза, внося translation invariance.</p>
+          </div>
+
+          <div class="lesson-box">
+            <b>Почему MaxPool популярнее AvgPool:</b> в задачах классификации важно «был ли паттерн» (Max), а не «насколько он в среднем был» (Avg). После ReLU большинство значений — нули, Max сохраняет ненулевые активации. Но AvgPool лучше для Global Average Pooling.
+          </div>
+        `
+      },
+    ],
 
     simulation: {
       html: `
