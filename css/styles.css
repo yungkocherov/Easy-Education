@@ -84,8 +84,7 @@ body {
 
 /* ========== Контент ========== */
 #content {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 0;
   min-width: 0;
 }
@@ -94,6 +93,8 @@ body {
   margin: 80px auto;
   padding: 0 40px;
   text-align: center;
+  overflow-y: auto;
+  height: 100%;
 }
 .welcome h2 { font-size: 32px; margin-bottom: 14px; color: #0f172a; }
 .welcome p { color: #475569; margin-bottom: 10px; }
@@ -109,13 +110,16 @@ body {
 
 .hidden { display: none !important; }
 
+#topic-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .topic-header {
   padding: 28px 40px 16px;
   background: white;
   border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 .breadcrumb {
   font-size: 12px;
@@ -144,9 +148,7 @@ body {
   background: white;
   border-bottom: 1px solid #e5e7eb;
   overflow-x: auto;
-  position: sticky;
-  top: 0;
-  z-index: 9;
+  flex-shrink: 0;
 }
 .tab {
   padding: 12px 18px;
@@ -165,6 +167,9 @@ body {
   padding: 28px 40px 60px;
   max-width: 1000px;
   overflow-x: hidden;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
