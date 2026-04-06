@@ -52,6 +52,7 @@ const App = (function () {
   function selectTopic(id) {
     destroyCharts();
     currentTopicId = id;
+    currentTabKey = 'theory';
     currentSubTabIdx = 0;
     const topic = topics.find((t) => t.id === id);
     if (!topic) return;
