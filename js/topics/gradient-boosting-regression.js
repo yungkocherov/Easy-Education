@@ -66,7 +66,7 @@ App.registerTopic({
             </marker>
           </defs>
         </svg>
-        <div class="caption">Gradient Boosting регрессия: $F_0 = \bar{y}$, затем каждое дерево $h_t$ обучается предсказывать остатки $r_t = y - F_{t-1}(x)$. Финальная модель — сумма всех деревьев с шагом $\eta$.</div>
+        <div class="caption">Gradient Boosting регрессия: $F_0 = \\bar{y}$, затем каждое дерево $h_t$ обучается предсказывать остатки $r_t = y - F_{t-1}(x)$. Финальная модель — сумма всех деревьев с шагом $\\eta$.</div>
       </div>
 
       <h3>📐 Алгоритм: шаг за шагом</h3>
@@ -706,11 +706,11 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
       <h3>Функции потерь и псевдо-остатки</h3>
       <div class="example-data-table">
         <table>
-          <tr><th>Loss</th><th>L(y, F)</th><th>Псевдо-остаток $-\partial L / \partial F$</th></tr>
+          <tr><th>Loss</th><th>L(y, F)</th><th>Псевдо-остаток $-\\partial L / \\partial F$</th></tr>
           <tr><td>MSE</td><td>$(y-F)^2/2$</td><td>$y - F$</td></tr>
-          <tr><td>MAE</td><td>$|y-F|$</td><td>$\text{sign}(y - F)$</td></tr>
-          <tr><td>Huber</td><td>$(r^2/2$ if $|r|\\leq\delta)$</td><td>$r$ if $|r|\\leq\delta$, else $\delta\\cdot\text{sign}(r)$</td></tr>
-          <tr><td>Quantile (α)</td><td>Pinball</td><td>$\alpha$ if $r>0$, else $\alpha - 1$</td></tr>
+          <tr><td>MAE</td><td>$|y-F|$</td><td>$\\text{sign}(y - F)$</td></tr>
+          <tr><td>Huber</td><td>$(r^2/2$ if $|r|\\leq\\delta)$</td><td>$r$ if $|r|\\leq\\delta$, else $\\delta\\cdot\\text{sign}(r)$</td></tr>
+          <tr><td>Quantile (α)</td><td>Pinball</td><td>$\\alpha$ if $r>0$, else $\\alpha - 1$</td></tr>
         </table>
       </div>
 
