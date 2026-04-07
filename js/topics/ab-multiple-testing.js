@@ -410,6 +410,62 @@ BH (FDR=0.05):
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Инфляция ложных срабатываний</h3>
+        <p>Чем больше тестов проводим — тем чаще «находим» несуществующий эффект.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abmult-controls"></div>
+          <div class="sim-buttons"><button class="btn" id="abmult-run">🔄 Запустить</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abmult-chart"></canvas></div>
+            <div class="sim-stats" id="abmult-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abmult-controls');
+        const cM = App.makeControl('range', 'abmult-m', 'Количество тестов m', { min: 1, max: 50, step: 1, value: 20 });
+        const cAlpha = App.makeControl('range', 'abmult-a', 'α', { min: 0.01, max: 0.1, step: 0.01, value: 0.05 });
+        const cSim = App.makeControl('range', 'abmult-sim', 'Симуляций', { min: 100, max: 2000, step: 100, value: 500 });
+        [cM, cAlpha, cSim].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function run() {
+          const m = +cM.input.value, alpha = +cAlpha.input.value, nSim = +cSim.input.value;
+          // Для каждой симуляции: m тестов на null-данных, считаем сколько p < α
+          const fpCounts = new Array(m + 1).fill(0);
+          let anyFP = 0;
+          for (let s = 0; s < nSim; s++) {
+            let fp = 0;
+            for (let t = 0; t < m; t++) {
+              // Под H0: z ~ N(0,1)
+              const z = App.Util.randn();
+              const p = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+              if (p < alpha) fp++;
+            }
+            fpCounts[fp]++;
+            if (fp > 0) anyFP++;
+          }
+          const fwer = anyFP / nSim;
+          const theoretical = 1 - Math.pow(1 - alpha, m);
+          const bonf = Math.min(1, alpha / m);
+          const labels = []; const data = [];
+          for (let i = 0; i <= Math.min(m, 10); i++) { labels.push(i.toString()); data.push(fpCounts[i]); }
+          const ctx = container.querySelector('#abmult-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar', data: { labels, datasets: [{ label: 'Частота', data, backgroundColor: data.map((_, i) => i === 0 ? 'rgba(16,185,129,0.6)' : 'rgba(239,68,68,0.6)') }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Сколько ложных срабатываний за эксперимент (из ' + m + ' тестов)' } }, scales: { x: { title: { display: true, text: 'Число ложных срабатываний' } }, y: { beginAtZero: true } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abmult-stats').innerHTML = '<div class="stat-card"><div class="stat-label">Наблюдаемый FWER</div><div class="stat-value">' + (fwer*100).toFixed(1) + '%</div></div><div class="stat-card"><div class="stat-label">Теоретический FWER</div><div class="stat-value">' + (theoretical*100).toFixed(1) + '%</div></div><div class="stat-card"><div class="stat-label">α (без коррекции)</div><div class="stat-value">' + (alpha*100).toFixed(0) + '%</div></div><div class="stat-card"><div class="stat-label">α Бонферрони</div><div class="stat-value">' + (bonf*100).toFixed(2) + '%</div></div>';
+        }
+        [cM, cAlpha, cSim].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#abmult-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Коррекция множественных сравнений</h3>
       <pre><code>from statsmodels.stats.multitest import multipletests

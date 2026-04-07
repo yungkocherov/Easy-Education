@@ -449,6 +449,57 @@ p-value:      0.005       &lt;&lt;0.001     0.007
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Сравнение средних двух групп</h3>
+        <p>Генерируем две группы с разными средними и смотрим, найдёт ли t-тест разницу.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abt-controls"></div>
+          <div class="sim-buttons"><button class="btn" id="abt-run">🔄 Новый тест</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abt-chart"></canvas></div>
+            <div class="sim-stats" id="abt-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abt-controls');
+        const cN = App.makeControl('range', 'abt-n', 'n на группу', { min: 10, max: 500, step: 10, value: 50 });
+        const cMA = App.makeControl('range', 'abt-ma', 'μ(A)', { min: 10, max: 100, step: 1, value: 50 });
+        const cMB = App.makeControl('range', 'abt-mb', 'μ(B)', { min: 10, max: 100, step: 1, value: 55 });
+        const cS = App.makeControl('range', 'abt-s', 'σ', { min: 1, max: 30, step: 1, value: 15 });
+        [cN, cMA, cMB, cS].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function run() {
+          const n = +cN.input.value, muA = +cMA.input.value, muB = +cMB.input.value, sigma = +cS.input.value;
+          const A = App.Util.normalSample(n, muA, sigma);
+          const B = App.Util.normalSample(n, muB, sigma);
+          const mA = App.Util.mean(A), mB = App.Util.mean(B);
+          const vA = App.Util.variance(A), vB = App.Util.variance(B);
+          const se = Math.sqrt(vA / n + vB / n);
+          const t = se > 0 ? (mB - mA) / se : 0;
+          const df = n + n - 2;
+          const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(t)));
+          const d = (mB - mA) / Math.sqrt((vA + vB) / 2);
+          const sig = pVal < 0.05;
+          const hA = App.Util.histogram(A, 20, [0, 120]);
+          const hB = App.Util.histogram(B, 20, [0, 120]);
+          const ctx = container.querySelector('#abt-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar', data: { labels: hA.centers.map(c => c.toFixed(0)),
+              datasets: [{ label: 'A', data: hA.counts, backgroundColor: 'rgba(59,130,246,0.4)' }, { label: 'B', data: hB.counts, backgroundColor: 'rgba(16,185,129,0.4)' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: sig ? '✅ Разница значима' : '❌ Не значима' } }, scales: { y: { beginAtZero: true } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abt-stats').innerHTML = '<div class="stat-card"><div class="stat-label">x̄(A)</div><div class="stat-value">' + mA.toFixed(1) + '</div></div><div class="stat-card"><div class="stat-label">x̄(B)</div><div class="stat-value">' + mB.toFixed(1) + '</div></div><div class="stat-card"><div class="stat-label">t</div><div class="stat-value">' + t.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div><div class="stat-card"><div class="stat-label">Cohen d</div><div class="stat-value">' + d.toFixed(2) + '</div></div>';
+        }
+        [cN, cMA, cMB, cS].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#abt-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 t-тест для A/B теста средних</h3>
       <pre><code>from scipy import stats

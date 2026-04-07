@@ -414,6 +414,54 @@ p-value = 2×(1 − Φ(3.935)) ≈ <b>0.000083</b> ≪ 0.001</div>
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция z-теста для пропорций</h3>
+        <p>Задай истинные конверсии и размер выборки — увидишь, обнаружит ли тест разницу.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abz-controls"></div>
+          <div class="sim-buttons"><button class="btn" id="abz-run">🔄 Новый тест</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abz-chart"></canvas></div>
+            <div class="sim-stats" id="abz-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abz-controls');
+        const cNA = App.makeControl('range', 'abz-na', 'n группы A', { min: 100, max: 10000, step: 100, value: 2000 });
+        const cNB = App.makeControl('range', 'abz-nb', 'n группы B', { min: 100, max: 10000, step: 100, value: 2000 });
+        const cPA = App.makeControl('range', 'abz-pa', 'Истинная p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
+        const cPB = App.makeControl('range', 'abz-pb', 'Истинная p(B) %', { min: 1, max: 20, step: 0.5, value: 6.5 });
+        [cNA, cNB, cPA, cPB].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function run() {
+          const nA = +cNA.input.value, nB = +cNB.input.value;
+          const pA = +cPA.input.value / 100, pB = +cPB.input.value / 100;
+          let sA = 0, sB = 0;
+          for (let i = 0; i < nA; i++) if (Math.random() < pA) sA++;
+          for (let i = 0; i < nB; i++) if (Math.random() < pB) sB++;
+          const crA = sA / nA, crB = sB / nB;
+          const pPool = (sA + sB) / (nA + nB);
+          const se = Math.sqrt(pPool * (1 - pPool) * (1 / nA + 1 / nB));
+          const z = se > 0 ? (crB - crA) / se : 0;
+          const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+          const sig = pVal < 0.05;
+          const ctx = container.querySelector('#abz-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar', data: { labels: ['A', 'B'], datasets: [{ data: [crA * 100, crB * 100], backgroundColor: ['rgba(59,130,246,0.6)', sig ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.5)'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Разница значима (p < 0.05)' : '❌ Разница НЕ значима' } }, scales: { y: { min: 0, max: 15, title: { display: true, text: 'Конверсия %' } } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abz-stats').innerHTML = '<div class="stat-card"><div class="stat-label">CR(A)</div><div class="stat-value">' + (crA*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">CR(B)</div><div class="stat-value">' + (crB*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">z-статистика</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>';
+        }
+        [cNA, cNB, cPA, cPB].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#abz-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 z-тест для пропорций в Python</h3>
       <pre><code>from statsmodels.stats.proportion import proportions_ztest

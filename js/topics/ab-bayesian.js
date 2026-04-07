@@ -403,6 +403,61 @@ Monte Carlo (N=100000):
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Байесовский A/B: апостериорные распределения</h3>
+        <p>Задай данные обеих групп — увидишь posteriors и P(B лучше A).</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abbay-controls"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abbay-chart"></canvas></div>
+            <div class="sim-stats" id="abbay-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abbay-controls');
+        const cNA = App.makeControl('range', 'abbay-na', 'Показов A', { min: 50, max: 5000, step: 50, value: 1000 });
+        const cSA = App.makeControl('range', 'abbay-sa', 'Конверсий A', { min: 1, max: 500, step: 1, value: 50 });
+        const cNB = App.makeControl('range', 'abbay-nb', 'Показов B', { min: 50, max: 5000, step: 50, value: 1000 });
+        const cSB = App.makeControl('range', 'abbay-sb', 'Конверсий B', { min: 1, max: 500, step: 1, value: 65 });
+        [cNA, cSA, cNB, cSB].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function betaPdf(x, a, b) { return x <= 0 || x >= 1 ? 0 : Math.pow(x, a-1) * Math.pow(1-x, b-1); }
+        function run() {
+          const nA = +cNA.input.value, sA = Math.min(+cSA.input.value, nA);
+          const nB = +cNB.input.value, sB = Math.min(+cSB.input.value, nB);
+          const aA = 1 + sA, bA = 1 + nA - sA;
+          const aB = 1 + sB, bB = 1 + nB - sB;
+          const xs = App.Util.linspace(0.001, 0.2, 200);
+          const pdfA = xs.map(x => betaPdf(x, aA, bA));
+          const pdfB = xs.map(x => betaPdf(x, aB, bB));
+          const normA = pdfA.reduce((s,v) => s+v, 0) * (xs[1]-xs[0]);
+          const normB = pdfB.reduce((s,v) => s+v, 0) * (xs[1]-xs[0]);
+          // Monte Carlo P(B>A)
+          let wins = 0; const mc = 10000;
+          for (let i = 0; i < mc; i++) {
+            let sa = 0; for (let j = 0; j < aA; j++) sa -= Math.log(Math.random()); let ra = 0; for (let j = 0; j < bA; j++) ra -= Math.log(Math.random()); const pA = sa / (sa + ra);
+            let sb = 0; for (let j = 0; j < aB; j++) sb -= Math.log(Math.random()); let rb = 0; for (let j = 0; j < bB; j++) rb -= Math.log(Math.random()); const pB = sb / (sb + rb);
+            if (pB > pA) wins++;
+          }
+          const probBwins = wins / mc;
+          const ctx = container.querySelector('#abbay-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line', data: { labels: xs.map(x => (x*100).toFixed(1)),
+              datasets: [{ label: 'Posterior A', data: pdfA.map((v,i) => v/normA), borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false },
+                         { label: 'Posterior B', data: pdfB.map((v,i) => v/normB), borderColor: '#10b981', borderWidth: 2, pointRadius: 0, fill: false }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'P(B лучше A) = ' + (probBwins*100).toFixed(1) + '%' } }, scales: { x: { title: { display: true, text: 'Конверсия %' }, ticks: { maxTicksLimit: 10 } }, y: { title: { display: true, text: 'Плотность' } } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abbay-stats').innerHTML = '<div class="stat-card"><div class="stat-label">P(B лучше A)</div><div class="stat-value">' + (probBwins*100).toFixed(1) + '%</div></div><div class="stat-card"><div class="stat-label">CR(A)</div><div class="stat-value">' + (sA/nA*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">CR(B)</div><div class="stat-value">' + (sB/nB*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">Posterior mean A</div><div class="stat-value">' + (aA/(aA+bA)*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">Posterior mean B</div><div class="stat-value">' + (aB/(aB+bB)*100).toFixed(2) + '%</div></div>';
+        }
+        [cNA, cSA, cNB, cSB].forEach(c => c.input.addEventListener('input', run));
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Байесовский A/B тест в Python</h3>
       <pre><code>from scipy import stats

@@ -461,6 +461,54 @@ p_Fisher = 0.00067+0.01293+0.08289+0.08289+0.01293+0.00067
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>χ²-тест для A/B/C</h3>
+        <p>Три варианта дизайна — есть ли разница в конверсиях?</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abchi-controls"></div>
+          <div class="sim-buttons"><button class="btn" id="abchi-run">🔄 Новый тест</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abchi-chart"></canvas></div>
+            <div class="sim-stats" id="abchi-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abchi-controls');
+        const cN = App.makeControl('range', 'abchi-n', 'n на вариант', { min: 100, max: 5000, step: 100, value: 1000 });
+        const cPA = App.makeControl('range', 'abchi-pa', 'p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
+        const cPB = App.makeControl('range', 'abchi-pb', 'p(B) %', { min: 1, max: 20, step: 0.5, value: 6 });
+        const cPC = App.makeControl('range', 'abchi-pc', 'p(C) %', { min: 1, max: 20, step: 0.5, value: 7 });
+        [cN, cPA, cPB, cPC].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function run() {
+          const n = +cN.input.value;
+          const ps = [+cPA.input.value/100, +cPB.input.value/100, +cPC.input.value/100];
+          const obs = ps.map(p => { let s=0; for(let i=0;i<n;i++) if(Math.random()<p) s++; return s; });
+          const crs = obs.map(o => o/n);
+          const total = obs.reduce((a,b)=>a+b,0);
+          const pPool = total/(n*3);
+          const exp = n * pPool;
+          let chi2 = 0;
+          obs.forEach(o => { chi2 += (o-exp)**2/exp; chi2 += ((n-o)-(n-exp))**2/(n-exp); });
+          const pVal = chi2 > 10.83 ? 0.001 : chi2 > 5.99 ? 0.03 : chi2 > 4.61 ? 0.08 : 0.5;
+          const sig = pVal < 0.05;
+          const ctx = container.querySelector('#abchi-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar', data: { labels: ['A', 'B', 'C'], datasets: [{ label: 'Конверсия %', data: crs.map(c=>c*100), backgroundColor: ['rgba(59,130,246,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Есть значимая разница' : '❌ Разница не значима' } }, scales: { y: { min: 0, max: 15 } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abchi-stats').innerHTML = '<div class="stat-card"><div class="stat-label">χ²</div><div class="stat-value">' + chi2.toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">df</div><div class="stat-value">2</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">≈' + pVal.toFixed(3) + '</div></div>';
+        }
+        [cN, cPA, cPB, cPC].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#abchi-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Хи-квадрат тест для A/B</h3>
       <pre><code>from scipy.stats import chi2_contingency

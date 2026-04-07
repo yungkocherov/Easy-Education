@@ -433,6 +433,77 @@ P(хотя бы одно ложное срабатывание) = 1 − (1 − 0
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Калькулятор размера выборки</h3>
+        <p>Меняй параметры и смотри, сколько пользователей нужно для обнаружения эффекта.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abintro-controls"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abintro-chart"></canvas></div>
+            <div class="sim-stats" id="abintro-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abintro-controls');
+        const cBase = App.makeControl('range', 'abintro-base', 'Базовая конверсия %', { min: 1, max: 20, step: 0.5, value: 5 });
+        const cMDE = App.makeControl('range', 'abintro-mde', 'MDE (мин. эффект) %', { min: 0.5, max: 5, step: 0.1, value: 1 });
+        const cAlpha = App.makeControl('range', 'abintro-alpha', 'α', { min: 0.01, max: 0.1, step: 0.01, value: 0.05 });
+        const cPower = App.makeControl('range', 'abintro-power', 'Мощность (1−β)', { min: 0.7, max: 0.99, step: 0.01, value: 0.8 });
+        [cBase, cMDE, cAlpha, cPower].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+
+        function zFromAlpha(a) { return a <= 0.01 ? 2.576 : a <= 0.025 ? 1.96 : a <= 0.05 ? 1.645 : 1.28; }
+        function zFromPower(p) { return p >= 0.99 ? 2.326 : p >= 0.95 ? 1.645 : p >= 0.9 ? 1.282 : p >= 0.8 ? 0.842 : 0.524; }
+
+        function run() {
+          const p = +cBase.input.value / 100;
+          const delta = +cMDE.input.value / 100;
+          const alpha = +cAlpha.input.value;
+          const power = +cPower.input.value;
+          const za = zFromAlpha(alpha / 2);
+          const zb = zFromPower(power);
+          const n = Math.ceil(2 * p * (1 - p) * ((za + zb) / delta) ** 2);
+
+          // Показываем n при разных MDE
+          const mdes = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5].map(m => m / 100);
+          const ns = mdes.map(d => Math.ceil(2 * p * (1 - p) * ((za + zb) / d) ** 2));
+
+          const ctx = container.querySelector('#abintro-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: mdes.map(d => (d * 100).toFixed(1) + '%'),
+              datasets: [{
+                label: 'Размер выборки на группу',
+                data: ns,
+                backgroundColor: mdes.map(d => Math.abs(d - delta) < 0.001 ? 'rgba(59,130,246,0.8)' : 'rgba(59,130,246,0.3)'),
+              }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false }, title: { display: true, text: 'Размер выборки vs MDE' } },
+              scales: { x: { title: { display: true, text: 'MDE' } }, y: { title: { display: true, text: 'n на группу' }, beginAtZero: true } },
+            },
+          });
+          App.registerChart(chart);
+
+          const days = Math.ceil(n * 2 / 1000);
+          container.querySelector('#abintro-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">n на группу</div><div class="stat-value">' + n.toLocaleString() + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Всего участников</div><div class="stat-value">' + (n * 2).toLocaleString() + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Дней (при 1000/день)</div><div class="stat-value">' + days + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">MDE</div><div class="stat-value">' + cMDE.input.value + '%</div></div>';
+        }
+
+        [cBase, cMDE, cAlpha, cPower].forEach(c => c.input.addEventListener('input', run));
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Расчёт размера выборки</h3>
       <pre><code>from statsmodels.stats.power import NormalIndPower

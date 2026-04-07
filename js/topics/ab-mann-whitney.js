@@ -359,6 +359,215 @@ p-value (двусторонний) ≈ <b>0.003</b></div>
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Ранговый тест: симуляция Манна-Уитни</h3>
+        <p>Сгенерируй две выборки с разными распределениями и посмотри, как тест реагирует на реальный сдвиг.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="mw-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="mw-run">▶ Провести тест</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="mw-chart"></canvas></div>
+            <div class="sim-stats" id="mw-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#mw-controls');
+        const cN    = App.makeControl('range',  'mw-n',    'n в каждой группе',     { min: 10, max: 100, step: 5,   value: 30  });
+        const cMuA  = App.makeControl('range',  'mw-muA',  'Сдвиг группы A (μ_A)',  { min: 0,  max: 10,  step: 0.5, value: 3   });
+        const cMuB  = App.makeControl('range',  'mw-muB',  'Сдвиг группы B (μ_B)',  { min: 0,  max: 10,  step: 0.5, value: 5   });
+        const cDist = App.makeControl('select', 'mw-dist', 'Тип распределения', {
+          options: [
+            { value: 'normal',      label: 'Нормальное' },
+            { value: 'exponential', label: 'Экспоненциальное' },
+            { value: 'uniform',     label: 'Равномерное' },
+          ],
+          value: 'exponential',
+        });
+        [cN, cMuA, cMuB, cDist].forEach((c) => controls.appendChild(c.wrap));
+
+        let chart = null;
+
+        function generateSample(n, mu, dist) {
+          if (dist === 'normal')      return App.Util.normalSample(n, mu, 2);
+          if (dist === 'exponential') return App.Util.expSample(n, 1 / (mu + 0.01));
+          if (dist === 'uniform')     return App.Util.uniformSample(n, mu * 0.5, mu * 1.5 + 1);
+          return App.Util.normalSample(n, mu, 2);
+        }
+
+        function mannWhitneyU(a, b) {
+          // Compute U via rank-sum
+          const n1 = a.length, n2 = b.length;
+          const combined = [
+            ...a.map((v) => ({ v, g: 0 })),
+            ...b.map((v) => ({ v, g: 1 })),
+          ].sort((x, y) => x.v - y.v);
+          // Assign ranks with tie correction
+          const ranks = new Array(combined.length);
+          let i = 0;
+          while (i < combined.length) {
+            let j = i;
+            while (j < combined.length && combined[j].v === combined[i].v) j++;
+            const avgRank = (i + j + 1) / 2; // 1-based average rank
+            for (let k = i; k < j; k++) ranks[k] = avgRank;
+            i = j;
+          }
+          let r1 = 0;
+          combined.forEach((item, idx) => { if (item.g === 0) r1 += ranks[idx]; });
+          const u1 = r1 - n1 * (n1 + 1) / 2;
+          const u2 = n1 * n2 - u1;
+          const u  = Math.min(u1, u2);
+          const mu = n1 * n2 / 2;
+          const sigma = Math.sqrt(n1 * n2 * (n1 + n2 + 1) / 12);
+          const z = (u - mu) / sigma;
+          const p = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+          const r = (u1 - u2) / (n1 * n2);
+          return { u, u1, u2, z, p, r };
+        }
+
+        function run() {
+          const n    = +cN.input.value;
+          const muA  = +cMuA.input.value;
+          const muB  = +cMuB.input.value;
+          const dist = cDist.input.value;
+
+          const sampA = generateSample(n, muA, dist);
+          const sampB = generateSample(n, muB, dist);
+          const result = mannWhitneyU(sampA, sampB);
+
+          // Histograms overlaid
+          const allVals = [...sampA, ...sampB];
+          const lo = App.Util.min(allVals);
+          const hi = App.Util.max(allVals);
+          const bins = 20;
+          const histA = App.Util.histogram(sampA, bins, [lo, hi]);
+          const histB = App.Util.histogram(sampB, bins, [lo, hi]);
+
+          const ctx = container.querySelector('#mw-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: histA.centers.map((c) => App.Util.round(c, 1)),
+              datasets: [
+                {
+                  label: 'Группа A',
+                  data: histA.counts,
+                  backgroundColor: 'rgba(59,130,246,0.55)',
+                  borderColor: 'rgba(59,130,246,1)',
+                  borderWidth: 1,
+                },
+                {
+                  label: 'Группа B',
+                  data: histB.counts,
+                  backgroundColor: 'rgba(16,185,129,0.55)',
+                  borderColor: 'rgba(16,185,129,1)',
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Перекрытые гистограммы A и B' },
+              },
+              scales: {
+                x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } },
+                y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          const statsEl = container.querySelector('#mw-stats');
+          statsEl.innerHTML = '';
+          const sig = result.p < 0.05;
+          const rAbs = Math.abs(result.r);
+          const effLabel = rAbs < 0.1 ? 'пренебрежимый' : rAbs < 0.3 ? 'малый' : rAbs < 0.5 ? 'средний' : 'большой';
+          [
+            ['U-статистика',  App.Util.round(result.u, 0)],
+            ['z',             App.Util.round(result.z, 3)],
+            ['p-value',       App.Util.round(result.p, 4)],
+            ['Значимо?',      sig ? '✓ Да (p<0.05)' : '✗ Нет (p≥0.05)'],
+            ['Ранг-бисер. r', App.Util.round(result.r, 3)],
+            ['Размер эффекта', effLabel],
+            ['Медиана A',     App.Util.round(App.Util.median(sampA), 2)],
+            ['Медиана B',     App.Util.round(App.Util.median(sampB), 2)],
+          ].forEach(([label, val]) => {
+            const card = document.createElement('div');
+            card.className = 'stat-card';
+            card.innerHTML = `<div class="stat-label">${label}</div><div class="stat-value">${val}</div>`;
+            statsEl.appendChild(card);
+          });
+        }
+
+        [cN, cMuA, cMuB, cDist].forEach((c) => c.input.addEventListener('change', run));
+        [cN, cMuA, cMuB].forEach((c) => c.input.addEventListener('input', run));
+        container.querySelector('#mw-run').onclick = run;
+        run();
+      },
+    },
+
+    simulation: {
+      html: `
+        <h3>Ранговый тест Манна-Уитни</h3>
+        <p>Сравни две группы с разными распределениями. Тест работает даже на скошенных данных.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="abmw-controls"></div>
+          <div class="sim-buttons"><button class="btn" id="abmw-run">🔄 Новый тест</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="abmw-chart"></canvas></div>
+            <div class="sim-stats" id="abmw-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#abmw-controls');
+        const cN = App.makeControl('range', 'abmw-n', 'n на группу', { min: 10, max: 200, step: 5, value: 30 });
+        const cMA = App.makeControl('range', 'abmw-ma', 'Сдвиг A', { min: 0, max: 10, step: 0.5, value: 3 });
+        const cMB = App.makeControl('range', 'abmw-mb', 'Сдвиг B', { min: 0, max: 10, step: 0.5, value: 5 });
+        const cDist = App.makeControl('select', 'abmw-dist', 'Распределение', { options: [{ value: 'exp', label: 'Экспоненциальное (скошенное)' }, { value: 'normal', label: 'Нормальное' }, { value: 'uniform', label: 'Равномерное' }], value: 'exp' });
+        [cN, cMA, cMB, cDist].forEach(c => controls.appendChild(c.wrap));
+        let chart = null;
+        function run() {
+          const n = +cN.input.value, shA = +cMA.input.value, shB = +cMB.input.value, dist = cDist.input.value;
+          let A, B;
+          if (dist === 'exp') { A = App.Util.expSample(n, 1).map(v => v + shA); B = App.Util.expSample(n, 1).map(v => v + shB); }
+          else if (dist === 'normal') { A = App.Util.normalSample(n, shA, 2); B = App.Util.normalSample(n, shB, 2); }
+          else { A = App.Util.uniformSample(n, shA, shA + 4); B = App.Util.uniformSample(n, shB, shB + 4); }
+          // Mann-Whitney U
+          const all = A.map(v => ({ v, g: 0 })).concat(B.map(v => ({ v, g: 1 })));
+          all.sort((a, b) => a.v - b.v);
+          all.forEach((x, i) => x.rank = i + 1);
+          const RA = all.filter(x => x.g === 0).reduce((s, x) => s + x.rank, 0);
+          const U = RA - n * (n + 1) / 2;
+          const mu = n * n / 2;
+          const sigma = Math.sqrt(n * n * (2 * n + 1) / 12);
+          const z = sigma > 0 ? (U - mu) / sigma : 0;
+          const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+          const sig = pVal < 0.05;
+          const hA = App.Util.histogram(A, 20, [0, 15]);
+          const hB = App.Util.histogram(B, 20, [0, 15]);
+          const ctx = container.querySelector('#abmw-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar', data: { labels: hA.centers.map(c => c.toFixed(1)),
+              datasets: [{ label: 'A', data: hA.counts, backgroundColor: 'rgba(59,130,246,0.4)' }, { label: 'B', data: hB.counts, backgroundColor: 'rgba(245,158,11,0.4)' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: sig ? '✅ Группы различаются (U-тест)' : '❌ Различий не найдено' } }, scales: { y: { beginAtZero: true } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#abmw-stats').innerHTML = '<div class="stat-card"><div class="stat-label">U</div><div class="stat-value">' + U.toFixed(0) + '</div></div><div class="stat-card"><div class="stat-label">z</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div><div class="stat-card"><div class="stat-label">Медиана A</div><div class="stat-value">' + App.Util.median(A).toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">Медиана B</div><div class="stat-value">' + App.Util.median(B).toFixed(2) + '</div></div>';
+        }
+        [cN, cMA, cMB, cDist].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#abmw-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Тест Манна-Уитни в Python</h3>
       <pre><code>from scipy import stats
