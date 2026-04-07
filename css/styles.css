@@ -90,13 +90,33 @@ body {
   min-width: 0;
 }
 .welcome {
-  max-width: 760px;
-  margin: 80px auto;
+  max-width: 660px;
+  margin: 60px auto;
   padding: 0 40px;
   text-align: center;
 }
-.welcome h2 { font-size: 32px; margin-bottom: 14px; color: #0f172a; }
+.welcome h2 { font-size: 32px; margin-bottom: 8px; color: #0f172a; font-weight: 700; }
+.welcome-tagline { color: #64748b; font-size: 16px; margin-bottom: 32px; }
 .welcome p { color: #475569; margin-bottom: 10px; }
+.welcome-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+  margin: 24px 0;
+}
+.welcome-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #334155;
+}
+.welcome-icon { font-size: 20px; flex-shrink: 0; }
 .welcome .hint {
   margin-top: 24px;
   padding: 14px 18px;
@@ -105,7 +125,20 @@ body {
   border-radius: 8px;
   color: #1e40af;
   font-size: 14px;
+  text-align: center;
 }
+.welcome-footer {
+  margin-top: 28px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+.welcome-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+.welcome-footer a:hover { text-decoration: underline; }
+.welcome-footer span { margin: 0 8px; }
 
 .hidden { display: none !important; }
 

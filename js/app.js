@@ -339,11 +339,20 @@ const App = (function () {
   }
 
   /* ---------- Init ---------- */
+  function goHome() {
+    currentTopicId = null;
+    document.getElementById('welcome').classList.remove('hidden');
+    document.getElementById('topic-view').classList.add('hidden');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('content').scrollTop = 0;
+  }
+
   function init() {
     renderNav();
     document.getElementById('search').addEventListener('input', (e) => {
       renderNav(e.target.value);
     });
+    document.getElementById('brand').addEventListener('click', goHome);
   }
 
   return {

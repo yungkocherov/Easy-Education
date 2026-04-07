@@ -17,7 +17,7 @@
 <body>
   <div id="app">
     <aside id="sidebar">
-      <div class="brand">
+      <div class="brand" id="brand" style="cursor:pointer;">
         <h1>Easy Education</h1>
         <p class="subtitle">DS · ML · DL — наглядно</p>
       </div>
@@ -29,9 +29,43 @@
 
     <main id="content">
       <div id="welcome" class="welcome">
-        <h2>Добро пожаловать</h2>
-        <p>Выберите тему слева. Каждая тема содержит теорию, числовые примеры, интерактивную симуляцию, области применения, плюсы и минусы, математическую постановку и дополнительные материалы.</p>
-        <p class="hint">💡 Начните с <b>Описательной статистики</b>, если вы новичок, или сразу переходите к интересующей модели.</p>
+        <h2>Easy Education</h2>
+        <p class="welcome-tagline">Интерактивный учебник по Data Science, Machine Learning и Deep Learning</p>
+
+        <div class="welcome-features">
+          <div class="welcome-feature">
+            <div class="welcome-icon">📚</div>
+            <div><b>51 тема</b> — от статистики до трансформеров</div>
+          </div>
+          <div class="welcome-feature">
+            <div class="welcome-icon">🎮</div>
+            <div><b>Интерактивные симуляции</b> — крути слайдеры, смотри результат</div>
+          </div>
+          <div class="welcome-feature">
+            <div class="welcome-icon">📝</div>
+            <div><b>Пошаговые примеры</b> — каждое действие объяснено</div>
+          </div>
+          <div class="welcome-feature">
+            <div class="welcome-icon">🐍</div>
+            <div><b>Python-код</b> — готовые примеры на sklearn, PyTorch, statsmodels</div>
+          </div>
+          <div class="welcome-feature">
+            <div class="welcome-icon">🧮</div>
+            <div><b>Формулы</b> — математика с KaTeX, понятно и красиво</div>
+          </div>
+          <div class="welcome-feature">
+            <div class="welcome-icon">🤖</div>
+            <div><b>Создано с помощью AI</b> — контент сгенерирован Claude (Anthropic)</div>
+          </div>
+        </div>
+
+        <p class="hint">💡 Начните с <b>Описательной статистики</b>, если вы новичок, или сразу переходите к интересующей модели в меню слева.</p>
+
+        <div class="welcome-footer">
+          <a href="https://github.com/yungkocherov/Easy-Education" target="_blank">GitHub</a>
+          <span>·</span>
+          <a href="https://t.me/yan_kocherov" target="_blank">Telegram @yan_kocherov</a>
+        </div>
       </div>
       <div id="topic-view" class="hidden">
         <header class="topic-header">
