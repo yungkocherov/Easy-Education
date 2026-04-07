@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'random-forest',
-  category: 'ml',
+  category: 'ml-cls',
   title: 'Random Forest',
   summary: 'Ансамбль разнообразных деревьев, голосующих большинством.',
 

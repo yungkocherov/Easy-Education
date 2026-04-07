@@ -9,7 +9,9 @@ const App = (function () {
     { id: 'stats', name: 'Статистика' },
     { id: 'ab', name: 'A/B тесты и аналитика' },
     { id: 'ml-basics', name: 'Основы ML' },
-    { id: 'ml', name: 'Модели ML' },
+    { id: 'ml-reg', name: 'Регрессия' },
+    { id: 'ml-cls', name: 'Классификация' },
+    { id: 'ml-unsup', name: 'Кластеризация и снижение размерности' },
     { id: 'dl', name: 'Нейронные сети' },
   ];
   let currentTopicId = null;

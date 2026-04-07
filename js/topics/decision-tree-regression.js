@@ -1,0 +1,481 @@
+/* ==========================================================================
+   Дерево решений для регрессии
+   ========================================================================== */
+App.registerTopic({
+  id: 'decision-tree-reg',
+  category: 'ml-reg',
+  title: 'Дерево решений для регрессии',
+  summary: 'Разбиваем пространство на прямоугольники, в каждом предсказываем среднее.',
+
+  tabs: {
+    theory: `
+      <div class="intuition">
+        <div class="intuition-title">Аналогия</div>
+        <p>Представь, что ты оценщик недвижимости. Тебя просят назвать цену квартиры. Ты рассуждаешь: «Площадь больше 80 м²? Да — скорее всего дорогая. Больше 120 м²? Да — элитная.» Ты делишь весь рынок на несколько <b>ценовых сегментов</b> через последовательные вопросы.</p>
+        <p>Дерево регрессии делает то же самое: рекурсивно делит пространство признаков на прямоугольные <b>регионы</b>. В каждом регионе предсказывает <b>среднее значение y</b> всех обучающих примеров, попавших в этот регион.</p>
+        <p>Критически: дерево регрессии <b>не рисует прямую линию</b>. Оно строит ступенчатую, кусочно-постоянную аппроксимацию. Это мощно для нелинейных зависимостей, но плохо для экстраполяции — за пределами обучающих данных дерево просто «застывает».</p>
+      </div>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 520 215" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+          <text x="260" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево регрессии: разбиение пространства</text>
+          <!-- Left panel: tree structure -->
+          <rect x="10" y="25" width="230" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="125" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Структура дерева</text>
+          <!-- Root node -->
+          <rect x="60" y="50" width="130" height="28" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="125" y="68" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Площадь ≤ 70 м²?</text>
+          <!-- Branches -->
+          <line x1="95" y1="78" x2="60" y2="105" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="68" y="96" font-size="9" fill="#10b981">да</text>
+          <line x1="155" y1="78" x2="190" y2="105" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="175" y="96" font-size="9" fill="#ef4444">нет</text>
+          <!-- Left subtree -->
+          <rect x="20" y="105" width="90" height="28" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="65" y="123" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Этаж ≤ 5?</text>
+          <line x1="45" y1="133" x2="30" y2="155" stroke="#94a3b8" stroke-width="1.3"/>
+          <text x="30" y="148" font-size="9" fill="#10b981">да</text>
+          <line x1="85" y1="133" x2="100" y2="155" stroke="#94a3b8" stroke-width="1.3"/>
+          <text x="93" y="148" font-size="9" fill="#ef4444">нет</text>
+          <rect x="8" y="155" width="55" height="24" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="35" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">7.2 млн</text>
+          <rect x="73" y="155" width="55" height="24" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="100" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">8.8 млн</text>
+          <!-- Right subtree -->
+          <rect x="148" y="105" width="90" height="28" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="193" y="123" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Пл. ≤ 100?</text>
+          <line x1="168" y1="133" x2="153" y2="155" stroke="#94a3b8" stroke-width="1.3"/>
+          <text x="152" y="148" font-size="9" fill="#10b981">да</text>
+          <line x1="218" y1="133" x2="228" y2="155" stroke="#94a3b8" stroke-width="1.3"/>
+          <text x="220" y="148" font-size="9" fill="#ef4444">нет</text>
+          <rect x="128" y="155" width="55" height="24" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="155" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">12.4 млн</text>
+          <rect x="203" y="155" width="55" height="24" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+          <text x="230" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">18.1 млн</text>
+          <text x="125" y="205" text-anchor="middle" font-size="9" fill="#64748b">Листья = среднее y в регионе</text>
+          <!-- Right panel: scatter + steps -->
+          <rect x="260" y="25" width="250" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="385" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Ступенчатая аппроксимация</text>
+          <!-- Axes -->
+          <line x1="280" y1="50" x2="280" y2="190" stroke="#64748b" stroke-width="1.2"/>
+          <line x1="280" y1="190" x2="500" y2="190" stroke="#64748b" stroke-width="1.2"/>
+          <text x="390" y="205" text-anchor="middle" font-size="9" fill="#64748b">Площадь (м²)</text>
+          <text x="270" y="120" text-anchor="middle" font-size="9" fill="#64748b" transform="rotate(-90,270,120)">Цена</text>
+          <!-- Points scattered -->
+          <circle cx="295" cy="175" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="305" cy="168" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="315" cy="160" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="330" cy="155" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="345" cy="145" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="360" cy="138" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="375" cy="118" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="390" cy="108" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="405" cy="95" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="420" cy="82" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="440" cy="68" r="4" fill="#6366f1" opacity="0.8"/>
+          <circle cx="460" cy="58" r="4" fill="#6366f1" opacity="0.8"/>
+          <!-- Step function (tree predictions) -->
+          <line x1="280" y1="168" x2="350" y2="168" stroke="#ef4444" stroke-width="2"/>
+          <line x1="350" y1="168" x2="350" y2="142" stroke="#ef4444" stroke-width="2" stroke-dasharray="3,3"/>
+          <line x1="350" y1="142" x2="395" y2="142" stroke="#ef4444" stroke-width="2"/>
+          <line x1="395" y1="142" x2="395" y2="92" stroke="#ef4444" stroke-width="2" stroke-dasharray="3,3"/>
+          <line x1="395" y1="92" x2="500" y2="92" stroke="#ef4444" stroke-width="2"/>
+          <!-- X labels -->
+          <text x="350" y="200" text-anchor="middle" font-size="8" fill="#94a3b8">70</text>
+          <text x="395" y="200" text-anchor="middle" font-size="8" fill="#94a3b8">100</text>
+          <!-- Split lines -->
+          <line x1="350" y1="50" x2="350" y2="190" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>
+          <line x1="395" y1="50" x2="395" y2="190" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>
+          <!-- Legend -->
+          <circle cx="292" cy="210" r="4" fill="#6366f1"/>
+          <text x="300" y="213" font-size="9" fill="#334155">данные</text>
+          <line x1="345" y1="210" x2="360" y2="210" stroke="#ef4444" stroke-width="2"/>
+          <text x="365" y="213" font-size="9" fill="#334155">предсказание дерева</text>
+        </svg>
+        <div class="caption">Дерево регрессии делит ось площади на 3 региона (до 70, 70-100, после 100 м²). В каждом предсказывает среднее — получается ступенчатая аппроксимация. За пределами обучения кривая «застывает» на константе.</div>
+      </div>
+
+      <h3>💡 Идея алгоритма</h3>
+      <p>Дерево регрессии рекурсивно делит пространство признаков на прямоугольные регионы $R_1, R_2, \\ldots, R_J$. В каждом регионе предсказывает <b>среднее значение</b> y всех обучающих примеров в этом регионе:</p>
+
+      <div class="math-block">$$\\hat{y}(x) = \\bar{y}_{R_j}, \\quad \\text{если } x \\in R_j$$</div>
+
+      <div class="key-concept">
+        <div class="kc-label">Ключевое отличие регрессии от классификации</div>
+        <p>В классификации лист предсказывает <b>моду</b> (самый частый класс). В регрессии лист предсказывает <b>среднее</b> значения целевой переменной. Критерий разбиения тоже меняется: не Gini / Entropy, а <b>MSE</b> (среднеквадратичная ошибка).</p>
+      </div>
+
+      <h3>🔪 Критерий разбиения: MSE</h3>
+      <p>На каждом шаге алгоритм перебирает все признаки j и все пороги t, выбирая то разбиение, которое <b>максимально снижает MSE</b>:</p>
+
+      <div class="math-block">$$\\text{MSE}_{split} = \\frac{n_L}{n} \\cdot \\text{MSE}_L + \\frac{n_R}{n} \\cdot \\text{MSE}_R$$</div>
+
+      <p>где MSE левого и правого поддеревьев:</p>
+      <div class="math-block">$$\\text{MSE}_L = \\frac{1}{n_L} \\sum_{i \\in L} (y_i - \\bar{y}_L)^2, \\quad \\text{MSE}_R = \\frac{1}{n_R} \\sum_{i \\in R} (y_i - \\bar{y}_R)^2$$</div>
+
+      <p>Выбираем $(j^*, t^*) = \\arg\\min_{j, t} \\text{MSE}_{split}(j, t)$.</p>
+
+      <h3>⚠️ Экстраполяция: главная слабость</h3>
+      <p>Дерево регрессии <b>не умеет экстраполировать</b>. За пределами диапазона обучающих данных оно всегда предсказывает то же значение, что и в крайнем листе. Это принципиальное ограничение: дерево — кусочно-постоянная функция.</p>
+
+      <p><b>Пример:</b> если дерево обучено на квартирах 30-150 м², для 300 м² оно вернёт значение крайнего правого листа — то же, что для 150 м².</p>
+
+      <h3>🛡️ Регуляризация через параметры</h3>
+      <ul>
+        <li><b>max_depth</b> — максимальная глубина. Обычно 3-6 для регрессии.</li>
+        <li><b>min_samples_split</b> — минимальное число точек для разбиения узла.</li>
+        <li><b>min_samples_leaf</b> — минимальное число точек в листе.</li>
+        <li><b>min_impurity_decrease</b> — разбиваем только если снижение MSE больше порога.</li>
+      </ul>
+
+      <h3>🌿 MAE вместо MSE</h3>
+      <p>Можно использовать MAE как критерий разбиения (<code>criterion='absolute_error'</code>). В этом случае лист предсказывает <b>медиану</b> вместо среднего — более устойчиво к выбросам.</p>
+
+      <div class="deep-dive">
+        <summary>Подробнее: как именно считается оптимальное разбиение</summary>
+        <div class="deep-dive-body">
+          <p>Для каждого признака j алгоритм сортирует точки по j-му признаку и перебирает все возможные пороги t (обычно — серединные значения между соседними уникальными значениями признака). Для каждого t считает MSE разбиения.</p>
+          <p>Сложность: O(n·p·log n) на уровень. Sklearn использует оптимизированный алгоритм на Cython.</p>
+          <p>При <b>criterion='friedman_mse'</b> используется улучшенная версия Фридмана (1984), которая лучше находит разбиения в высокой размерности.</p>
+        </div>
+      </div>
+
+      <div class="deep-dive">
+        <summary>Подробнее: почему дерево не может экстраполировать</summary>
+        <div class="deep-dive-body">
+          <p>Дерево делит входное пространство на конечное число прямоугольников. В каждом прямоугольнике — константа. За пределами наблюдаемых значений признаков дерево может только вернуть значение крайнего листа — оно понятия не имеет, что «за границей».</p>
+          <p>Это принципиально отличает дерево от линейной регрессии, которая спокойно экстраполирует (хотя и линейно). Для задач, где нужна экстраполяция, деревья не подходят.</p>
+          <p>Random Forest и Gradient Boosting страдают от той же проблемы — они тоже ансамбли деревьев.</p>
+        </div>
+      </div>
+
+      <h3>🔗 Связи с другими темами</h3>
+      <ul>
+        <li><b>Random Forest регрессия</b> — ансамбль деревьев, усредняет предсказания.</li>
+        <li><b>Gradient Boosting регрессия</b> — последовательный ансамбль, учится на остатках.</li>
+        <li><b>Линейная регрессия</b> — умеет экстраполировать, но только линейно.</li>
+        <li><b>Bias-Variance</b> — глубокое дерево: высокая дисперсия. Мелкое: высокое смещение.</li>
+      </ul>
+    `,
+
+    examples: [
+      {
+        title: 'Цена от площади: строим дерево',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>8 квартир с ценами. Вручную найти первое оптимальное разбиение по площади (MSE-критерий), построить дерево глубины 2.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>№</th><th>Площадь (м²)</th><th>Цена (млн руб.)</th></tr>
+              <tr><td>1</td><td>38</td><td>5.0</td></tr>
+              <tr><td>2</td><td>45</td><td>6.2</td></tr>
+              <tr><td>3</td><td>52</td><td>7.5</td></tr>
+              <tr><td>4</td><td>65</td><td>9.0</td></tr>
+              <tr><td>5</td><td>72</td><td>10.5</td></tr>
+              <tr><td>6</td><td>85</td><td>12.0</td></tr>
+              <tr><td>7</td><td>98</td><td>14.5</td></tr>
+              <tr><td>8</td><td>115</td><td>17.0</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: общий MSE до разбиения</h4>
+            <div class="calc">
+              ȳ = (5.0+6.2+7.5+9.0+10.5+12.0+14.5+17.0)/8 = 81.7/8 = <b>10.21</b><br><br>
+              MSE₀ = [(5−10.21)²+(6.2−10.21)²+(7.5−10.21)²+(9−10.21)²<br>
+                    +(10.5−10.21)²+(12−10.21)²+(14.5−10.21)²+(17−10.21)²] / 8<br>
+              = [27.14+16.08+7.34+1.46+0.08+3.20+18.40+46.08] / 8<br>
+              = 119.78 / 8 = <b>14.97</b>
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: перебираем пороги для разбиения</h4>
+            <div class="calc">
+              Порог t=58.5 (между 52 и 65): L={38,45,52}, R={65,72,85,98,115}<br>
+              ȳ_L = (5+6.2+7.5)/3 = 6.23, ȳ_R = (9+10.5+12+14.5+17)/5 = 12.6<br>
+              MSE_L = [(5−6.23)²+(6.2−6.23)²+(7.5−6.23)²]/3 = [1.513+0.001+1.613]/3 = 1.042<br>
+              MSE_R = [(9−12.6)²+(10.5−12.6)²+(12−12.6)²+(14.5−12.6)²+(17−12.6)²]/5<br>
+              = [12.96+4.41+0.36+3.61+19.36]/5 = 40.70/5 = 8.14<br>
+              MSE_split(58.5) = (3/8)·1.042 + (5/8)·8.14 = 0.391 + 5.088 = <b>5.48</b><br>
+              <br>
+              Порог t=68.5 (между 65 и 72): L={38,45,52,65}, R={72,85,98,115}<br>
+              ȳ_L = (5+6.2+7.5+9)/4 = 6.925, ȳ_R = (10.5+12+14.5+17)/4 = 13.5<br>
+              MSE_L = 2.08, MSE_R = 5.69<br>
+              MSE_split(68.5) = (4/8)·2.08 + (4/8)·5.69 = 1.04 + 2.845 = <b>3.89</b> ← лучше!
+            </div>
+            <div class="why">MSE 3.89 &lt; 5.48 — разбиение в t=68.5 лучше. Перебирая все пороги, находим, что t=68.5 даёт минимальный взвешенный MSE.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: строим дерево глубины 2</h4>
+            <div class="calc">
+              Корень: Площадь ≤ 68.5?<br>
+              ├─ Да (1-4): {38,45,52,65} → ещё разбиение в t=48.5<br>
+              │   ├─ Да (38,45): ȳ = (5+6.2)/2 = <b>5.6 млн</b><br>
+              │   └─ Нет (52,65): ȳ = (7.5+9)/2 = <b>8.25 млн</b><br>
+              └─ Нет (5-8): {72,85,98,115} → разбиение в t=91.5<br>
+                  ├─ Да (72,85): ȳ = (10.5+12)/2 = <b>11.25 млн</b><br>
+                  └─ Нет (98,115): ȳ = (14.5+17)/2 = <b>15.75 млн</b>
+            </div>
+            <div class="why">После 2 уровней разбиений имеем 4 листа — 4 ценовых сегмента. MSE на обучении = 0.76. Очень маленький, но дерево будет переобучено на таком маленьком датасете.</div>
+          </div>
+          <div class="step" data-step="4">
+            <h4>Шаг 4: предсказание для новой квартиры 78 м²</h4>
+            <div class="calc">
+              Площадь 78 м²: 78 > 68.5 → правая ветка<br>
+              Площадь 78 м²: 78 ≤ 91.5 → левый лист правой ветки<br>
+              ŷ = <b>11.25 млн руб.</b>
+            </div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Оптимальное первое разбиение: площадь ≤ 68.5 м² (MSE_split = 3.89 vs 14.97 изначально — снижение на 74%). Для 78 м² предсказание: <b>11.25 млн руб.</b></p>
+          </div>
+          <div class="lesson-box">
+            Алгоритм жадный: каждое разбиение локально оптимально, но глобальный оптимум не гарантирован. Для 8 точек и глубины 2 — очень высокий риск переобучения. На практике используют min_samples_leaf ≥ 5-20.
+          </div>
+        `,
+      },
+      {
+        title: 'MSE vs MAE критерий',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Сравнить MSE и MAE критерии разбиения на датасете с выбросом. Показать, что MAE устойчивее к выбросам.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>x</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+              <tr><th>y</th><td>10</td><td>12</td><td>11</td><td>14</td><td>13</td><td><b>50</b></td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: оба критерия до разбиения</h4>
+            <div class="calc">
+              ȳ = (10+12+11+14+13+50)/6 = 110/6 ≈ 18.33 (среднее сильно смещено выбросом)<br>
+              медиана = (12+13)/2 = 12.5 (устойчива к выбросу)<br><br>
+              MSE₀ = [(10−18.33)²+...+(50−18.33)²]/6 ≈ 172.9<br>
+              MAE₀ = |10−12.5|+|12−12.5|+|11−12.5|+|14−12.5|+|13−12.5|+|50−12.5| /6<br>
+                   = (2.5+0.5+1.5+1.5+0.5+37.5)/6 = 44/6 ≈ 7.33
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: разбиение в t=4.5 (отделяем выброс)</h4>
+            <div class="calc">
+              L = {x=1,2,3,4,5}: y = {10,12,11,14,13}<br>
+              R = {x=6}: y = {50}<br><br>
+              MSE-критерий:<br>
+              ȳ_L = 12, MSE_L = [(10−12)²+(12−12)²+(11−12)²+(14−12)²+(13−12)²]/5 = [4+0+1+4+1]/5 = 2.0<br>
+              MSE_R = 0 (одна точка)<br>
+              MSE_split = (5/6)·2.0 + (1/6)·0 = <b>1.67</b> — огромное снижение с 172.9!<br><br>
+              MAE-критерий:<br>
+              медиана_L = 12, MAE_L = (2+0+1+2+1)/5 = 1.2<br>
+              MAE_R = 0<br>
+              MAE_split = (5/6)·1.2 + (1/6)·0 = <b>1.0</b>
+            </div>
+            <div class="why">Оба критерия выбирают это разбиение как оптимальное. Но значения разные: MSE 1.67 vs MAE 1.0. MAE менее чувствителен к выбросу, но вычислительно сложнее.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: что предсказывает лист при MSE vs MAE</h4>
+            <div class="calc">
+              Левый лист L = {10,12,11,14,13}:<br>
+              MSE → предсказание = среднее = <b>12.0</b><br>
+              MAE → предсказание = медиана = <b>12.0</b> (совпадает здесь)<br><br>
+              Теперь добавим ещё один выброс: L = {10,12,11,14,13,<b>40</b>}:<br>
+              MSE → среднее = (10+12+11+14+13+40)/6 = <b>16.67</b> — смещено<br>
+              MAE → медиана = (12+13)/2 = <b>12.5</b> — устойчива
+            </div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>MSE-критерий: лист предсказывает <b>среднее</b>, чувствителен к выбросам. MAE-критерий: лист предсказывает <b>медиану</b>, устойчив. При наличии выбросов в таргете используйте <code>criterion='absolute_error'</code>.</p>
+          </div>
+          <div class="lesson-box">
+            В sklearn DecisionTreeRegressor: <code>criterion='squared_error'</code> (MSE, по умолчанию) или <code>criterion='absolute_error'</code> (MAE). Для данных с выбросами в y — предпочтите MAE или Huber-loss в Gradient Boosting.
+          </div>
+        `,
+      },
+      {
+        title: 'Экстраполяция: почему дерево не может',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Наглядно показать проблему экстраполяции дерева регрессии: предсказания за пределами обучающего диапазона не меняются. Сравнить с линейной регрессией.</p>
+          </div>
+          <div class="example-data-table">
+            <table>
+              <tr><th>x (год)</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th></tr>
+              <tr><th>y (тыс. пользователей)</th><td>100</td><td>150</td><td>220</td><td>310</td><td>420</td></tr>
+            </table>
+          </div>
+          <div class="step" data-step="1">
+            <h4>Шаг 1: дерево с глубиной 2</h4>
+            <div class="calc">
+              Обучение: x ∈ [2018, 2022]<br>
+              Разбиение 1: x ≤ 2019.5<br>
+                └─ Да: L = {100, 150} → ȳ_L = 125<br>
+                └─ Нет: R = {220, 310, 420}<br>
+              Разбиение 2 (в правой части): x ≤ 2020.5<br>
+                └─ Да: {220} → 220<br>
+                └─ Нет: {310, 420} → ȳ = 365<br><br>
+              Предсказания на обучении: 2018→125, 2019→125, 2020→220, 2021→365, 2022→365
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <h4>Шаг 2: экстраполяция в 2023-2025</h4>
+            <div class="calc">
+              Дерево для x=2023: 2023 > 2019.5 и 2023 > 2020.5 → лист {310, 420}: ŷ = <b>365</b><br>
+              Дерево для x=2024: то же → ŷ = <b>365</b><br>
+              Дерево для x=2025: то же → ŷ = <b>365</b><br><br>
+              Линейная регрессия для x=2023: продолжает тренд → ŷ ≈ <b>530</b><br>
+              Линейная для x=2024: ŷ ≈ <b>640</b><br>
+              Линейная для x=2025: ŷ ≈ <b>750</b>
+            </div>
+            <div class="why">Дерево «застывает» на значении крайнего правого листа (365) для любого x > 2020.5. Это математически неизбежно: дерево — кусочно-постоянная функция.</div>
+          </div>
+          <div class="step" data-step="3">
+            <h4>Шаг 3: сравнение методов по качеству экстраполяции</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Модель</th><th>2023 (факт≈520)</th><th>2024 (факт≈640)</th><th>2025 (факт≈780)</th></tr>
+                <tr><td>Дерево (depth=2)</td><td>365 (−30%)</td><td>365 (−43%)</td><td>365 (−53%)</td></tr>
+                <tr><td>Линейная регрессия</td><td>530 (+2%)</td><td>640 (0%)</td><td>750 (−4%)</td></tr>
+                <tr><td>Random Forest</td><td>365 (−30%)</td><td>365 (−43%)</td><td>365 (−53%)</td></tr>
+              </table>
+            </div>
+            <div class="why">Random Forest тоже не умеет экстраполировать — он ансамбль деревьев. Для временных рядов с трендом используйте линейную/полиномиальную регрессию или специальные методы (Prophet, ARIMA).</div>
+          </div>
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>Дерево регрессии <b>не может экстраполировать</b>: для x за пределами обучающего диапазона возвращает константу (значение крайнего листа). Линейная регрессия экстраполирует линейно. Random Forest — та же проблема, что у дерева.</p>
+          </div>
+          <div class="lesson-box">
+            Деревья (и их ансамбли) идеальны для интерполяции в обучающем диапазоне, но категорически не подходят для экстраполяции. Для задач прогнозирования с выходом за диапазон обучения — используйте регрессионные модели.
+          </div>
+        `,
+      },
+    ],
+
+    python: `
+      <h4>1. Базовый DecisionTreeRegressor</h4>
+      <pre><code>from sklearn.tree import DecisionTreeRegressor, export_text
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# Данные: цены квартир
+X = np.array([[38],[45],[52],[65],[72],[85],[98],[115]])
+y = np.array([5.0, 6.2, 7.5, 9.0, 10.5, 12.0, 14.5, 17.0])
+
+# Дерево с ограничением глубины
+tree = DecisionTreeRegressor(max_depth=2, random_state=42)
+tree.fit(X, y)
+
+print(export_text(tree, feature_names=['площадь']))
+print(f"Для 78 м²: {tree.predict([[78]])[0]:.2f} млн")</code></pre>
+
+      <h4>2. Подбор глубины через кросс-валидацию</h4>
+      <pre><code>from sklearn.model_selection import cross_val_score
+from sklearn.datasets import fetch_california_housing
+
+data = fetch_california_housing()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+results = []
+for depth in range(1, 15):
+    tree = DecisionTreeRegressor(max_depth=depth, random_state=42)
+    scores = cross_val_score(tree, X_train, y_train,
+                             cv=5, scoring='neg_mean_squared_error')
+    results.append({'depth': depth, 'val_mse': -scores.mean()})
+
+best = min(results, key=lambda r: r['val_mse'])
+print(f"Лучшая глубина: {best['depth']}, Val MSE: {best['val_mse']:.4f}")
+
+# Финальная модель
+tree = DecisionTreeRegressor(max_depth=best['depth'], random_state=42)
+tree.fit(X_train, y_train)
+y_pred = tree.predict(X_test)
+print(f"Test R²: {r2_score(y_test, y_pred):.4f}")
+print(f"Test RMSE: {mean_squared_error(y_test, y_pred)**0.5:.4f}")</code></pre>
+
+      <h4>3. MSE vs MAE критерий + визуализация ступенчатой функции</h4>
+      <pre><code>import matplotlib.pyplot as plt
+
+X_1d = np.linspace(0, 10, 50).reshape(-1, 1)
+y_1d = np.sin(X_1d.ravel()) * 3 + X_1d.ravel() + np.random.randn(50) * 0.5
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+X_plot = np.linspace(-1, 11, 200).reshape(-1, 1)
+
+for ax, criterion in zip(axes, ['squared_error', 'absolute_error']):
+    tree = DecisionTreeRegressor(max_depth=3, criterion=criterion, random_state=42)
+    tree.fit(X_1d, y_1d)
+    ax.scatter(X_1d, y_1d, alpha=0.6, label='данные')
+    ax.plot(X_plot, tree.predict(X_plot), 'r-', linewidth=2, label='дерево')
+    ax.axvline(0, color='gray', linestyle='--', alpha=0.5, label='граница данных')
+    ax.axvline(10, color='gray', linestyle='--', alpha=0.5)
+    ax.set_title(f'criterion={criterion}')
+    ax.legend()
+
+plt.tight_layout()
+plt.show()
+# Обратите внимание: за x=10 линия "застывает" — это экстраполяция</code></pre>
+    `,
+
+    math: `
+      <h3>Критерий разбиения (MSE)</h3>
+      <div class="math-block">$$\\text{MSE}_{split} = \\frac{n_L}{n} \\cdot \\frac{1}{n_L}\\sum_{i\\in L}(y_i - \\bar{y}_L)^2 + \\frac{n_R}{n} \\cdot \\frac{1}{n_R}\\sum_{i\\in R}(y_i - \\bar{y}_R)^2$$</div>
+
+      <h3>Предсказание листа</h3>
+      <div class="math-block">$$\\hat{y}_{\\text{лист}} = \\bar{y}_R = \\frac{1}{|R|} \\sum_{i \\in R} y_i \\quad \\text{(MSE-критерий)}$$</div>
+      <div class="math-block">$$\\hat{y}_{\\text{лист}} = \\text{median}(\\{y_i : i \\in R\\}) \\quad \\text{(MAE-критерий)}$$</div>
+
+      <h3>Снижение MSE (Impurity Decrease)</h3>
+      <div class="math-block">$$\\Delta\\text{MSE} = \\text{MSE}_{\\text{parent}} - \\text{MSE}_{split}$$</div>
+      <p>Разбиваем узел только если $\\Delta\\text{MSE} \\geq$ min_impurity_decrease.</p>
+
+      <h3>Feature Importance</h3>
+      <div class="math-block">$$\\text{FI}_j = \\sum_{\\text{узлы, где делим по }j} \\frac{n_{\\text{узел}}}{n} \\cdot \\Delta\\text{MSE}_{\\text{узел}}$$</div>
+      <p>Нормируется так, чтобы сумма всех FI = 1.</p>
+
+      <h3>Предсказание (кусочно-постоянная функция)</h3>
+      <div class="math-block">$$\\hat{y}(x) = \\sum_{j=1}^{J} \\bar{y}_{R_j} \\cdot \\mathbb{1}[x \\in R_j]$$</div>
+    `,
+
+    proscons: `
+      <div class="proscons">
+        <div class="pros">
+          <h4>✓ Плюсы</h4>
+          <ul>
+            <li>Интерпретируемо: можно прочитать как набор правил</li>
+            <li>Нелинейная регрессия без feature engineering</li>
+            <li>Устойчиво к масштабу признаков (не нужна нормировка)</li>
+            <li>Быстро обучается и предсказывает</li>
+            <li>Выдаёт feature importance</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>✗ Минусы</h4>
+          <ul>
+            <li><b>Не умеет экстраполировать</b> — главная слабость!</li>
+            <li>Высокая дисперсия — маленькое изменение данных = другое дерево</li>
+            <li>Ступенчатая, не гладкая аппроксимация</li>
+            <li>Склонно к переобучению без ограничений глубины</li>
+            <li>Слабее RF и GB по точности</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Дерево vs Линейная регрессия</h4>
+      <table>
+        <tr><th>Критерий</th><th>Дерево регрессии</th><th>Линейная регрессия</th></tr>
+        <tr><td>Тип зависимости</td><td>Нелинейная (кусочно-постоянная)</td><td>Линейная</td></tr>
+        <tr><td>Экстраполяция</td><td>Нет (застывает)</td><td>Да (линейно)</td></tr>
+        <tr><td>Масштабирование</td><td>Не нужно</td><td>Нужно</td></tr>
+        <tr><td>Интерпретируемость</td><td>Высокая (правила)</td><td>Высокая (коэффициенты)</td></tr>
+        <tr><td>Выбросы в y</td><td>Чувствительно (MSE) / нет (MAE)</td><td>Чувствительно</td></tr>
+        <tr><td>Взаимодействия признаков</td><td>Автоматически</td><td>Надо добавлять вручную</td></tr>
+      </table>
+    `,
+  },
+});

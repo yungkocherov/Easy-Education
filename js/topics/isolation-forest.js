@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'isolation-forest',
-  category: 'ml',
+  category: 'ml-unsup',
   title: 'Isolation Forest',
   summary: 'Аномалии изолируются быстрее нормальных точек случайными разбиениями.',
 

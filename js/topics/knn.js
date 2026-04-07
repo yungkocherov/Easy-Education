@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'knn',
-  category: 'ml',
+  category: 'ml-cls',
   title: 'k-Nearest Neighbors (kNN)',
   summary: 'Голосование k ближайших соседей — самая простая идея в ML.',
 

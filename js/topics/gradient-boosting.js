@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'gradient-boosting',
-  category: 'ml',
+  category: 'ml-cls',
   title: 'Gradient Boosting',
   summary: 'Каждое новое дерево исправляет ошибки всех предыдущих.',
 
