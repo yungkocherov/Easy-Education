@@ -341,7 +341,7 @@ App.registerTopic({
           </div>
 
           <div class="step" data-step="4">
-            <h4>Вычисляем выходы $Z = A \cdot V$</h4>
+            <h4>Вычисляем выходы $Z = A \\cdot V$</h4>
             <div class="calc">
               Для «Кот» (строка 1): $z_1 = 0{,}401 \\cdot V_1 + 0{,}198 \\cdot V_2 + 0{,}401 \\cdot V_3$<br>
               $= 0{,}401(1,0) + 0{,}198(0,1) + 0{,}401(1,1)$<br>
