@@ -328,6 +328,113 @@ App.registerTopic({
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: SVR с ε-трубой</h3>
+        <p>Меняй ε и C. Наблюдай, какие точки попадают внутрь трубы, а какие — снаружи.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="svr-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="svr-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="svr-chart"></canvas></div>
+            <div class="sim-stats" id="svr-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#svr-controls');
+        const cEps = App.makeControl('range', 'svr-eps', 'ε (ширина трубы)', { min: 0.1, max: 3, step: 0.1, value: 0.5 });
+        const cC = App.makeControl('range', 'svr-c', 'C (регуляризация, log)', { min: -1, max: 2, step: 0.1, value: 0.5 });
+        [cEps, cC].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+        const N = 80;
+
+        function generate() {
+          dataX = []; dataY = [];
+          for (let i = 0; i < N; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            dataX.push(x);
+            dataY.push(Math.sin(x) + App.Util.randn(0, 0.6));
+          }
+          update();
+        }
+
+        function update() {
+          const eps = +cEps.input.value;
+          const logC = +cC.input.value;
+          const C = Math.pow(10, logC);
+
+          // Simple linear regression as base line
+          const mx = App.Util.mean(dataX), my = App.Util.mean(dataY);
+          let num = 0, den = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            num += (dataX[i] - mx) * (dataY[i] - my);
+            den += (dataX[i] - mx) ** 2;
+          }
+          const w = num / (den || 1);
+          const b = my - w * mx;
+
+          const gridX = App.Util.linspace(0, 2 * Math.PI, 200);
+          const lineY = gridX.map(x => w * x + b);
+          const upperY = gridX.map(x => w * x + b + eps);
+          const lowerY = gridX.map(x => w * x + b - eps);
+
+          let outside = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            const pred = w * dataX[i] + b;
+            if (Math.abs(dataY[i] - pred) > eps) outside++;
+          }
+
+          const insideData = [], outsideData = [];
+          for (let i = 0; i < dataX.length; i++) {
+            const pred = w * dataX[i] + b;
+            const pt = { x: dataX[i], y: dataY[i] };
+            if (Math.abs(dataY[i] - pred) > eps) outsideData.push(pt);
+            else insideData.push(pt);
+          }
+
+          const lineData = gridX.map((x, i) => ({ x, y: lineY[i] }));
+          const upperData = gridX.map((x, i) => ({ x, y: upperY[i] }));
+          const lowerData = gridX.map((x, i) => ({ x, y: lowerY[i] }));
+
+          const ctx = container.querySelector('#svr-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Внутри трубы', data: insideData, backgroundColor: 'rgba(59,130,246,0.5)', pointRadius: 5 },
+                { label: 'Вне трубы', data: outsideData, backgroundColor: 'rgba(239,68,68,0.7)', pointRadius: 6 },
+                { label: 'Регрессия', data: lineData, type: 'line', borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
+                { label: '+ε', data: upperData, type: 'line', borderColor: 'rgba(16,185,129,0.5)', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false, showLine: true },
+                { label: '-ε', data: lowerData, type: 'line', borderColor: 'rgba(16,185,129,0.5)', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'SVR: ε-труба' } },
+              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -3, max: 3 } },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#svr-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">ε</div><div class="stat-value">${eps.toFixed(1)}</div></div>
+            <div class="stat-card"><div class="stat-label">C</div><div class="stat-value">${C.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Вне трубы</div><div class="stat-value">${outside} / ${dataX.length}</div></div>
+          `;
+        }
+
+        [cEps, cC].forEach(c => c.input.addEventListener('input', update));
+        container.querySelector('#svr-regen').onclick = generate;
+        generate();
+      },
+    },
+
     python: `
       <h3>Python: SVR через sklearn</h3>
       <p>sklearn.SVR — основной класс. Поддерживает ядра 'rbf', 'linear', 'poly', 'sigmoid'. <b>Перед SVR всегда StandardScaler!</b></p>

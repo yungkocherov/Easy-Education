@@ -390,6 +390,175 @@ App.registerTopic({
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: бустинг итерации</h3>
+        <p>Добавляй деревья одно за другим. Наблюдай, как предсказание улучшается с каждой итерацией.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="gbr-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="gbr-add1">+1 итерация</button>
+            <button class="btn" id="gbr-add10">+10 итераций</button>
+            <button class="btn secondary" id="gbr-reset">🔄 Сброс</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="gbr-pred"></canvas></div>
+            <div class="sim-chart-wrap"><canvas id="gbr-loss"></canvas></div>
+            <div class="sim-stats" id="gbr-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#gbr-controls');
+        const cLR = App.makeControl('range', 'gbr-lr', 'Learning rate η', { min: 0.01, max: 1, step: 0.01, value: 0.1 });
+        const cDepth = App.makeControl('range', 'gbr-depth', 'Глубина дерева', { min: 1, max: 4, step: 1, value: 2 });
+        [cLR, cDepth].forEach(c => controls.appendChild(c.wrap));
+
+        let predChart = null, lossChart = null;
+        let dataX = [], dataY = [];
+        let stumps = [], lossHistory = [];
+        const N = 100;
+        const gridX = App.Util.linspace(0, 2 * Math.PI, 300);
+
+        function buildStump(xs, ys, depth, maxD) {
+          if (depth >= maxD || xs.length < 4) return { val: App.Util.mean(ys) };
+          let bestMSE = Infinity, bestThr = 0;
+          const sorted = xs.map((x, i) => ({ x, y: ys[i] })).sort((a, b) => a.x - b.x);
+          for (let i = 1; i < sorted.length; i++) {
+            const thr = (sorted[i - 1].x + sorted[i].x) / 2;
+            const lY = [], rY = [];
+            for (const p of sorted) { if (p.x <= thr) lY.push(p.y); else rY.push(p.y); }
+            if (!lY.length || !rY.length) continue;
+            const mL = App.Util.mean(lY), mR = App.Util.mean(rY);
+            let m = 0;
+            for (const v of lY) m += (v - mL) ** 2;
+            for (const v of rY) m += (v - mR) ** 2;
+            if (m < bestMSE) { bestMSE = m; bestThr = thr; }
+          }
+          const lxs = [], lys = [], rxs = [], rys = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] <= bestThr) { lxs.push(xs[i]); lys.push(ys[i]); }
+            else { rxs.push(xs[i]); rys.push(ys[i]); }
+          }
+          if (!lxs.length || !rxs.length) return { val: App.Util.mean(ys) };
+          return { thr: bestThr, left: buildStump(lxs, lys, depth + 1, maxD), right: buildStump(rxs, rys, depth + 1, maxD) };
+        }
+
+        function predictStump(tree, x) {
+          if (tree.val !== undefined) return tree.val;
+          return x <= tree.thr ? predictStump(tree.left, x) : predictStump(tree.right, x);
+        }
+
+        function getResiduals() {
+          const lr = +cLR.input.value;
+          const preds = dataX.map(x => {
+            let s = 0;
+            for (const st of stumps) s += lr * predictStump(st.tree, x);
+            return s;
+          });
+          return dataY.map((y, i) => y - preds[i]);
+        }
+
+        function addIterations(count) {
+          const lr = +cLR.input.value;
+          const depth = +cDepth.input.value;
+          for (let t = 0; t < count; t++) {
+            const residuals = getResiduals();
+            const tree = buildStump(dataX, residuals, 0, depth);
+            stumps.push({ tree });
+            // compute MSE
+            const preds = dataX.map(x => {
+              let s = 0;
+              for (const st of stumps) s += lr * predictStump(st.tree, x);
+              return s;
+            });
+            let mse = 0;
+            for (let i = 0; i < dataX.length; i++) mse += (dataY[i] - preds[i]) ** 2;
+            mse /= dataX.length;
+            lossHistory.push(mse);
+          }
+          draw();
+        }
+
+        function draw() {
+          const lr = +cLR.input.value;
+          const predY = gridX.map(gx => {
+            let s = 0;
+            for (const st of stumps) s += lr * predictStump(st.tree, gx);
+            return s;
+          });
+
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map(x => ({ x, y: Math.sin(x) }));
+
+          const ctx1 = container.querySelector('#gbr-pred').getContext('2d');
+          if (predChart) predChart.destroy();
+          predChart = new Chart(ctx1, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Данные', data: scatter, backgroundColor: 'rgba(99,102,241,0.4)', pointRadius: 4 },
+                { label: 'Бустинг', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
+                { label: 'sin(x)', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.6)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Предсказание бустинга' } },
+              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -2.5, max: 2.5 } },
+            },
+          });
+          App.registerChart(predChart);
+
+          const ctx2 = container.querySelector('#gbr-loss').getContext('2d');
+          if (lossChart) lossChart.destroy();
+          lossChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+              labels: lossHistory.map((_, i) => i + 1),
+              datasets: [{
+                label: 'MSE',
+                data: lossHistory,
+                borderColor: 'rgba(239,68,68,0.8)',
+                borderWidth: 2,
+                pointRadius: 1,
+                fill: false,
+              }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'MSE по итерациям' } },
+              scales: { x: { title: { display: true, text: 'Итерация' } }, y: { beginAtZero: true, title: { display: true, text: 'MSE' } } },
+            },
+          });
+          App.registerChart(lossChart);
+
+          const curMSE = lossHistory.length ? lossHistory[lossHistory.length - 1] : '-';
+          container.querySelector('#gbr-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Итераций</div><div class="stat-value">${stumps.length}</div></div>
+            <div class="stat-card"><div class="stat-label">MSE</div><div class="stat-value">${typeof curMSE === 'number' ? curMSE.toFixed(4) : curMSE}</div></div>
+            <div class="stat-card"><div class="stat-label">η</div><div class="stat-value">${(+cLR.input.value).toFixed(2)}</div></div>
+          `;
+        }
+
+        function reset() {
+          dataX = []; dataY = []; stumps = []; lossHistory = [];
+          for (let i = 0; i < N; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            dataX.push(x);
+            dataY.push(Math.sin(x) + App.Util.randn(0, 0.5));
+          }
+          draw();
+        }
+
+        container.querySelector('#gbr-add1').onclick = () => addIterations(1);
+        container.querySelector('#gbr-add10').onclick = () => addIterations(10);
+        container.querySelector('#gbr-reset').onclick = reset;
+        reset();
+      },
+    },
+
     python: `
       <h3>Python: Gradient Boosting регрессия</h3>
       <p>sklearn GradientBoostingRegressor для малых данных, XGBRegressor и LGBMRegressor для больших и соревнований.</p>

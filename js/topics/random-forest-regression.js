@@ -340,6 +340,146 @@ App.registerTopic({
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: RF регрессия</h3>
+        <p>Увеличивай число деревьев и глубину. Наблюдай, как усреднение сглаживает предсказание.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="rfr-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="rfr-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="rfr-chart"></canvas></div>
+            <div class="sim-stats" id="rfr-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#rfr-controls');
+        const cTrees = App.makeControl('range', 'rfr-trees', 'Число деревьев', { min: 1, max: 50, step: 1, value: 10 });
+        const cDepth = App.makeControl('range', 'rfr-depth', 'Макс. глубина', { min: 1, max: 8, step: 1, value: 4 });
+        [cTrees, cDepth].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+        const N = 100;
+
+        function generate() {
+          dataX = []; dataY = [];
+          for (let i = 0; i < N; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            dataX.push(x);
+            dataY.push(Math.sin(x) + App.Util.randn(0, 0.5));
+          }
+          update();
+        }
+
+        function buildTree(xs, ys, depth, maxDepth) {
+          if (depth >= maxDepth || xs.length < 4) return { val: App.Util.mean(ys) };
+          let bestMSE = Infinity, bestThr = 0;
+          // random feature subset: pick random subset of split candidates
+          const indices = xs.map((_, i) => i);
+          const nCand = Math.max(4, Math.floor(xs.length * 0.6));
+          for (let t = 0; t < nCand; t++) {
+            const idx = indices[Math.floor(Math.random() * indices.length)];
+            const thr = xs[idx];
+            const lY = [], rY = [];
+            for (let j = 0; j < xs.length; j++) {
+              if (xs[j] <= thr) lY.push(ys[j]); else rY.push(ys[j]);
+            }
+            if (lY.length === 0 || rY.length === 0) continue;
+            const mL = App.Util.mean(lY), mR = App.Util.mean(rY);
+            let mse = 0;
+            for (const v of lY) mse += (v - mL) ** 2;
+            for (const v of rY) mse += (v - mR) ** 2;
+            if (mse < bestMSE) { bestMSE = mse; bestThr = thr; }
+          }
+          const lxs = [], lys = [], rxs = [], rys = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] <= bestThr) { lxs.push(xs[i]); lys.push(ys[i]); }
+            else { rxs.push(xs[i]); rys.push(ys[i]); }
+          }
+          if (lxs.length === 0 || rxs.length === 0) return { val: App.Util.mean(ys) };
+          return {
+            thr: bestThr,
+            left: buildTree(lxs, lys, depth + 1, maxDepth),
+            right: buildTree(rxs, rys, depth + 1, maxDepth),
+          };
+        }
+
+        function predictTree(tree, x) {
+          if (tree.val !== undefined) return tree.val;
+          return x <= tree.thr ? predictTree(tree.left, x) : predictTree(tree.right, x);
+        }
+
+        function update() {
+          const nTrees = +cTrees.input.value;
+          const maxDepth = +cDepth.input.value;
+
+          // bootstrap + build trees
+          const trees = [];
+          for (let t = 0; t < nTrees; t++) {
+            const bx = [], by = [];
+            for (let i = 0; i < dataX.length; i++) {
+              const idx = Math.floor(Math.random() * dataX.length);
+              bx.push(dataX[idx]);
+              by.push(dataY[idx]);
+            }
+            trees.push(buildTree(bx, by, 0, maxDepth));
+          }
+
+          const gridX = App.Util.linspace(0, 2 * Math.PI, 300);
+          const predY = gridX.map(gx => {
+            let s = 0;
+            for (const tree of trees) s += predictTree(tree, gx);
+            return s / nTrees;
+          });
+
+          let mse = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            let s = 0;
+            for (const tree of trees) s += predictTree(tree, dataX[i]);
+            const pred = s / nTrees;
+            mse += (dataY[i] - pred) ** 2;
+          }
+          mse /= dataX.length;
+
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map(x => ({ x, y: Math.sin(x) }));
+
+          const ctx = container.querySelector('#rfr-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Данные', data: scatter, backgroundColor: 'rgba(99,102,241,0.4)', pointRadius: 4 },
+                { label: 'RF предсказание', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
+                { label: 'sin(x)', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.6)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Random Forest регрессия' } },
+              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -2.5, max: 2.5 } },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#rfr-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Деревьев</div><div class="stat-value">${nTrees}</div></div>
+            <div class="stat-card"><div class="stat-label">MSE</div><div class="stat-value">${mse.toFixed(4)}</div></div>
+          `;
+        }
+
+        [cTrees, cDepth].forEach(c => c.input.addEventListener('input', update));
+        container.querySelector('#rfr-regen').onclick = generate;
+        generate();
+      },
+    },
+
     python: `
       <h3>Python: Random Forest Regressor</h3>
       <p>sklearn.RandomForestRegressor — надёжный, параллельный, с OOB и importance «из коробки».</p>

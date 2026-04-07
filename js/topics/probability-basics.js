@@ -616,6 +616,108 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: бросок кубика и закон больших чисел</h3>
+        <p>Увеличивай число бросков и наблюдай, как среднее сходится к 3.5.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="dice-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="dice-regen">🔄 Бросить заново</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="dice-hist"></canvas></div>
+            <div class="sim-chart-wrap"><canvas id="dice-avg"></canvas></div>
+            <div class="sim-stats" id="dice-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#dice-controls');
+        const cN = App.makeControl('range', 'dice-n', 'Число бросков', { min: 10, max: 5000, step: 10, value: 100 });
+        [cN].forEach(c => controls.appendChild(c.wrap));
+
+        let histChart = null, avgChart = null;
+
+        function run() {
+          const n = +cN.input.value;
+          const rolls = [];
+          for (let i = 0; i < n; i++) rolls.push(Math.floor(Math.random() * 6) + 1);
+
+          // histogram counts
+          const counts = [0, 0, 0, 0, 0, 0];
+          for (const r of rolls) counts[r - 1]++;
+
+          // running average
+          const runAvg = [];
+          let sum = 0;
+          for (let i = 0; i < n; i++) {
+            sum += rolls[i];
+            runAvg.push(sum / (i + 1));
+          }
+          const labels = Array.from({ length: n }, (_, i) => i + 1);
+          // downsample for performance
+          const step = Math.max(1, Math.floor(n / 300));
+          const dsLabels = [], dsAvg = [], dsRef = [];
+          for (let i = 0; i < n; i += step) {
+            dsLabels.push(labels[i]);
+            dsAvg.push(runAvg[i]);
+            dsRef.push(3.5);
+          }
+
+          const ctxH = container.querySelector('#dice-hist').getContext('2d');
+          if (histChart) histChart.destroy();
+          histChart = new Chart(ctxH, {
+            type: 'bar',
+            data: {
+              labels: ['1', '2', '3', '4', '5', '6'],
+              datasets: [{
+                label: 'Частота',
+                data: counts,
+                backgroundColor: 'rgba(99,102,241,0.6)',
+              }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Гистограмма граней' } },
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+          App.registerChart(histChart);
+
+          const ctxA = container.querySelector('#dice-avg').getContext('2d');
+          if (avgChart) avgChart.destroy();
+          avgChart = new Chart(ctxA, {
+            type: 'line',
+            data: {
+              labels: dsLabels,
+              datasets: [
+                { label: 'Среднее', data: dsAvg, borderColor: 'rgba(59,130,246,0.9)', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Теорет. (3.5)', data: dsRef, borderColor: 'rgba(239,68,68,0.7)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Среднее по ходу бросков' } },
+              scales: { x: { title: { display: true, text: 'Бросок' } }, y: { min: 1, max: 6 } },
+            },
+          });
+          App.registerChart(avgChart);
+
+          const empMean = App.Util.mean(rolls);
+          container.querySelector('#dice-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Эмпир. среднее</div><div class="stat-value">${empMean.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Теорет. среднее</div><div class="stat-value">3.500</div></div>
+            <div class="stat-card"><div class="stat-label">Разница</div><div class="stat-value">${Math.abs(empMean - 3.5).toFixed(3)}</div></div>
+          `;
+        }
+
+        cN.input.addEventListener('input', run);
+        container.querySelector('#dice-regen').onclick = run;
+        run();
+      },
+    },
+
     python: `
       <h3>📊 Вероятность и распределения в Python</h3>
       <pre><code>from scipy import stats

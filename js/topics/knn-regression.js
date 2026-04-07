@@ -363,6 +363,103 @@ App.registerTopic({
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: kNN-регрессия — эффект k</h3>
+        <p>Меняй k, шум и число точек. Наблюдай, как сглаживается предсказание.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="knnr-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="knnr-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="knnr-chart"></canvas></div>
+            <div class="sim-stats" id="knnr-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#knnr-controls');
+        const cK = App.makeControl('range', 'knnr-k', 'k (соседей)', { min: 1, max: 20, step: 1, value: 5 });
+        const cNoise = App.makeControl('range', 'knnr-noise', 'Шум σ', { min: 0.1, max: 2, step: 0.1, value: 0.5 });
+        const cN = App.makeControl('range', 'knnr-n', 'Число точек', { min: 30, max: 200, step: 5, value: 80 });
+        [cK, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+
+        function generate() {
+          const n = +cN.input.value;
+          const sigma = +cNoise.input.value;
+          dataX = []; dataY = [];
+          for (let i = 0; i < n; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            dataX.push(x);
+            dataY.push(Math.sin(x) + App.Util.randn(0, sigma));
+          }
+          update();
+        }
+
+        function update() {
+          const k = +cK.input.value;
+          // build prediction curve
+          const gridX = App.Util.linspace(0, 2 * Math.PI, 200);
+          const predY = gridX.map(gx => {
+            const dists = dataX.map((dx, i) => ({ d: Math.abs(dx - gx), y: dataY[i] }));
+            dists.sort((a, b) => a.d - b.d);
+            let s = 0;
+            for (let j = 0; j < k; j++) s += dists[j].y;
+            return s / k;
+          });
+
+          // MSE on training data
+          let mse = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            const dists = dataX.map((dx, j) => ({ d: Math.abs(dx - dataX[i]), y: dataY[j] }));
+            dists.sort((a, b) => a.d - b.d);
+            let s = 0;
+            for (let j = 0; j < k; j++) s += dists[j].y;
+            const pred = s / k;
+            mse += (dataY[i] - pred) ** 2;
+          }
+          mse /= dataX.length;
+
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map(x => ({ x, y: Math.sin(x) }));
+
+          const ctx = container.querySelector('#knnr-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Данные', data: scatter, backgroundColor: 'rgba(99,102,241,0.4)', pointRadius: 4 },
+                { label: 'kNN предсказание', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
+                { label: 'sin(x) истинная', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.6)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'kNN-регрессия' } },
+              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -2.5, max: 2.5 } },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#knnr-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">k</div><div class="stat-value">${k}</div></div>
+            <div class="stat-card"><div class="stat-label">MSE</div><div class="stat-value">${mse.toFixed(4)}</div></div>
+          `;
+        }
+
+        [cNoise, cN].forEach(c => c.input.addEventListener('input', generate));
+        cK.input.addEventListener('input', update);
+        container.querySelector('#knnr-regen').onclick = generate;
+        generate();
+      },
+    },
+
     python: `
       <h4>1. Базовый KNeighborsRegressor</h4>
       <pre><code>from sklearn.neighbors import KNeighborsRegressor

@@ -356,6 +356,136 @@ App.registerTopic({
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: дерево регрессии — глубина</h3>
+        <p>Меняй глубину дерева и шум. Наблюдай переобучение при большой глубине.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="dtr-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="dtr-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="dtr-chart"></canvas></div>
+            <div class="sim-stats" id="dtr-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#dtr-controls');
+        const cDepth = App.makeControl('range', 'dtr-depth', 'Макс. глубина', { min: 1, max: 10, step: 1, value: 3 });
+        const cNoise = App.makeControl('range', 'dtr-noise', 'Шум σ', { min: 0.1, max: 2, step: 0.1, value: 0.5 });
+        [cDepth, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+        const N = 100;
+
+        function generate() {
+          const sigma = +cNoise.input.value;
+          dataX = []; dataY = [];
+          for (let i = 0; i < N; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            dataX.push(x);
+            dataY.push(Math.sin(x) + App.Util.randn(0, sigma));
+          }
+          update();
+        }
+
+        // Simple 1D regression tree
+        function buildTree(xs, ys, depth, maxDepth) {
+          if (depth >= maxDepth || xs.length < 4) {
+            return { val: App.Util.mean(ys) };
+          }
+          let bestMSE = Infinity, bestThr = 0;
+          const sorted = xs.map((x, i) => ({ x, y: ys[i] })).sort((a, b) => a.x - b.x);
+          for (let i = 1; i < sorted.length; i++) {
+            const thr = (sorted[i - 1].x + sorted[i].x) / 2;
+            const leftY = [], rightY = [];
+            for (let j = 0; j < sorted.length; j++) {
+              if (sorted[j].x <= thr) leftY.push(sorted[j].y);
+              else rightY.push(sorted[j].y);
+            }
+            if (leftY.length === 0 || rightY.length === 0) continue;
+            const mL = App.Util.mean(leftY), mR = App.Util.mean(rightY);
+            let mse = 0;
+            for (const v of leftY) mse += (v - mL) ** 2;
+            for (const v of rightY) mse += (v - mR) ** 2;
+            if (mse < bestMSE) { bestMSE = mse; bestThr = thr; }
+          }
+          const lxs = [], lys = [], rxs = [], rys = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] <= bestThr) { lxs.push(xs[i]); lys.push(ys[i]); }
+            else { rxs.push(xs[i]); rys.push(ys[i]); }
+          }
+          if (lxs.length === 0 || rxs.length === 0) return { val: App.Util.mean(ys) };
+          return {
+            thr: bestThr,
+            left: buildTree(lxs, lys, depth + 1, maxDepth),
+            right: buildTree(rxs, rys, depth + 1, maxDepth),
+          };
+        }
+
+        function predict(tree, x) {
+          if (tree.val !== undefined) return tree.val;
+          return x <= tree.thr ? predict(tree.left, x) : predict(tree.right, x);
+        }
+
+        function countLeaves(tree) {
+          if (tree.val !== undefined) return 1;
+          return countLeaves(tree.left) + countLeaves(tree.right);
+        }
+
+        function update() {
+          const maxDepth = +cDepth.input.value;
+          const tree = buildTree(dataX, dataY, 0, maxDepth);
+          const gridX = App.Util.linspace(0, 2 * Math.PI, 400);
+          const predY = gridX.map(x => predict(tree, x));
+
+          let mse = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            mse += (dataY[i] - predict(tree, dataX[i])) ** 2;
+          }
+          mse /= dataX.length;
+
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map(x => ({ x, y: Math.sin(x) }));
+
+          const ctx = container.querySelector('#dtr-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Данные', data: scatter, backgroundColor: 'rgba(99,102,241,0.4)', pointRadius: 4 },
+                { label: 'Дерево', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true, stepped: true },
+                { label: 'sin(x)', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.6)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Дерево регрессии' } },
+              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -2.5, max: 2.5 } },
+            },
+          });
+          App.registerChart(chart);
+
+          const leaves = countLeaves(tree);
+          container.querySelector('#dtr-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Глубина</div><div class="stat-value">${maxDepth}</div></div>
+            <div class="stat-card"><div class="stat-label">MSE</div><div class="stat-value">${mse.toFixed(4)}</div></div>
+            <div class="stat-card"><div class="stat-label">Листьев</div><div class="stat-value">${leaves}</div></div>
+          `;
+        }
+
+        cDepth.input.addEventListener('input', update);
+        cNoise.input.addEventListener('input', generate);
+        container.querySelector('#dtr-regen').onclick = generate;
+        generate();
+      },
+    },
+
     python: `
       <h4>1. Базовый DecisionTreeRegressor</h4>
       <pre><code>from sklearn.tree import DecisionTreeRegressor, export_text

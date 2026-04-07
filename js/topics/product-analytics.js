@@ -497,6 +497,100 @@ LTV/CAC = 26 250 / 12 000 = <b>2.19</b>  ← ниже нормы (≥3)
       },
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: воронка конверсий</h3>
+        <p>Настрой конверсию на каждом шаге и число пользователей. Наблюдай, где теряется больше всего.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="funnel-controls"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="funnel-chart"></canvas></div>
+            <div class="sim-stats" id="funnel-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#funnel-controls');
+        const cUsers = App.makeControl('range', 'funnel-users', 'Пользователей', { min: 1000, max: 50000, step: 500, value: 10000 });
+        const cS1 = App.makeControl('range', 'funnel-s1', 'Визит → Регистр. (%)', { min: 50, max: 100, step: 1, value: 80 });
+        const cS2 = App.makeControl('range', 'funnel-s2', 'Регистр. → Актив. (%)', { min: 20, max: 80, step: 1, value: 50 });
+        const cS3 = App.makeControl('range', 'funnel-s3', 'Актив. → Покупка (%)', { min: 10, max: 60, step: 1, value: 30 });
+        const cS4 = App.makeControl('range', 'funnel-s4', 'Покупка → Повтор (%)', { min: 5, max: 40, step: 1, value: 15 });
+        [cUsers, cS1, cS2, cS3, cS4].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+
+        function update() {
+          const total = +cUsers.input.value;
+          const s1 = +cS1.input.value / 100;
+          const s2 = +cS2.input.value / 100;
+          const s3 = +cS3.input.value / 100;
+          const s4 = +cS4.input.value / 100;
+
+          const steps = [
+            { name: 'Визит', count: total },
+            { name: 'Регистрация', count: Math.round(total * s1) },
+            { name: 'Активация', count: Math.round(total * s1 * s2) },
+            { name: 'Покупка', count: Math.round(total * s1 * s2 * s3) },
+            { name: 'Повторная', count: Math.round(total * s1 * s2 * s3 * s4) },
+          ];
+
+          // find biggest drop
+          let maxDrop = 0, maxDropIdx = 0;
+          for (let i = 1; i < steps.length; i++) {
+            const drop = steps[i - 1].count - steps[i].count;
+            if (drop > maxDrop) { maxDrop = drop; maxDropIdx = i; }
+          }
+          const biggestDrop = steps[maxDropIdx - 1].name + ' → ' + steps[maxDropIdx].name;
+
+          const overallConv = (steps[steps.length - 1].count / steps[0].count * 100).toFixed(2);
+
+          const colors = [
+            'rgba(99,102,241,0.8)',
+            'rgba(59,130,246,0.8)',
+            'rgba(16,185,129,0.8)',
+            'rgba(245,158,11,0.8)',
+            'rgba(239,68,68,0.8)',
+          ];
+
+          const ctx = container.querySelector('#funnel-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: steps.map(s => s.name),
+              datasets: [{
+                label: 'Пользователей',
+                data: steps.map(s => s.count),
+                backgroundColor: colors,
+                borderWidth: 0,
+              }],
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                title: { display: true, text: 'Воронка конверсий' },
+                legend: { display: false },
+              },
+              scales: { x: { beginAtZero: true } },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#funnel-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Всего визитов</div><div class="stat-value">${total.toLocaleString()}</div></div>
+            <div class="stat-card"><div class="stat-label">Покупок</div><div class="stat-value">${steps[3].count.toLocaleString()}</div></div>
+            <div class="stat-card"><div class="stat-label">Общая конверсия</div><div class="stat-value">${overallConv}%</div></div>
+            <div class="stat-card"><div class="stat-label">Макс. потеря</div><div class="stat-value">${biggestDrop}</div></div>
+          `;
+        }
+
+        [cUsers, cS1, cS2, cS3, cS4].forEach(c => c.input.addEventListener('input', update));
+        update();
+      },
+    },
+
     python: `
       <h3>📊 Когортный анализ Retention в Pandas</h3>
       <pre><code>import pandas as pd
