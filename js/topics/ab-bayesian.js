@@ -579,5 +579,25 @@ plt.show()</code></pre>
       </div>
       <div class="callout">💡 <b>Совет:</b> в большинстве продуктовых A/B тестов байесовский подход практичнее. Для клинических испытаний и регуляторных задач — частотный (строгий контроль α).</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank">3Blue1Brown: Bayes theorem</a> — визуальное объяснение теоремы Байеса</li>
+        <li><a href="https://www.youtube.com/watch?v=9TDjifpGj-k" target="_blank">StatQuest: Bayesian Statistics</a> — байесовская статистика: prior, likelihood, posterior</li>
+        <li><a href="https://www.youtube.com/watch?v=lFd7n_nKzpk" target="_blank">StatQuest: Beta Distribution</a> — бета-распределение как prior для конверсий</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B1%D0%B0%D0%B9%D0%B5%D1%81%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9+AB+%D1%82%D0%B5%D1%81%D1%82" target="_blank">Habr: байесовский A/B тест</a> — практические руководства по байесовскому тестированию</li>
+        <li><a href="https://en.wikipedia.org/wiki/Bayesian_inference" target="_blank">Wikipedia: Bayesian inference</a> — байесовский вывод: формальное описание</li>
+      </ul>
+      <h3>📚 Документация и инструменты</h3>
+      <ul>
+        <li><a href="https://www.evanmiller.org/bayesian-ab-testing.html" target="_blank">Evan Miller: Bayesian A/B Testing</a> — онлайн-калькулятор байесовского A/B теста для конверсий</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html" target="_blank">SciPy: scipy.stats.beta</a> — бета-распределение для моделирования posterior</li>
+        <li><a href="https://www.pymc.io/projects/docs/en/stable/learn.html" target="_blank">PyMC: Getting started</a> — вероятностное программирование для байесовских моделей</li>
+      </ul>
+    `,
   },
 });

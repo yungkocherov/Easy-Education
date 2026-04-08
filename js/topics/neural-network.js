@@ -1095,5 +1095,20 @@ plt.legend(); plt.show()
       <h3>Дальше</h3>
       <p>После MLP стоит изучать: CNN (для изображений) → RNN/LSTM (для последовательностей) → Transformer (для современных LLM). Концепция backprop и градиентного спуска остаётся той же.</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi" target="_blank">3Blue1Brown: Neural Networks плейлист</a> — лучшая визуальная интуиция backprop и архитектуры MLP</li>
+        <li><a href="https://www.youtube.com/watch?v=CqOfi41LfDw" target="_blank">StatQuest: Neural Networks</a> — пошаговое объяснение с числовыми примерами</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/312450/" target="_blank">Habr: Нейронные сети с нуля</a> — реализация MLP и backpropagation на Python</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html" target="_blank">PyTorch: Build the Neural Network</a> — официальный туториал по построению нейросети</li>
+      </ul>
+    `,
   },
 });

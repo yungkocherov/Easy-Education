@@ -784,5 +784,20 @@ plt.show()</code></pre>
       <h3>Whitening</h3>
       <p>После PCA можно поделить на $\\sqrt{\\lambda_i}$ — получим данные с единичной ковариацией. Полезно перед нейросетями.</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=FgakZw6K1QQ" target="_blank">StatQuest: PCA главный компонентный анализ</a> — шаг за шагом с SVD и объяснённой дисперсией</li>
+        <li><a href="https://www.youtube.com/watch?v=PFDu9oVAE-g" target="_blank">3Blue1Brown: Eigenvectors and eigenvalues</a> — геометрическая интуиция собственных векторов</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/304214/" target="_blank">Habr: PCA — метод главных компонент</a> — математика и практика с примерами</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html" target="_blank">sklearn PCA</a> — официальная документация с параметрами и примерами</li>
+      </ul>
+    `,
   },
 });

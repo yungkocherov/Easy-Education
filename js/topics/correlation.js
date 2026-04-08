@@ -718,5 +718,25 @@ plt.show()</code></pre>
         <li><b>MIC</b> — максимальная информационная корреляция.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=xZ_z8KWkhXE" target="_blank">StatQuest: Correlation and Covariance</a> — корреляция и ковариация: разница и применение</li>
+        <li><a href="https://www.youtube.com/watch?v=Ypgo4qUBt5o" target="_blank">StatQuest: Spearman's Rank Correlation</a> — ранговая корреляция Спирмена</li>
+        <li><a href="https://www.khanacademy.org/math/ap-statistics/bivariate-data-ap/correlation-coefficient-r/v/calculating-correlation-coefficient-r" target="_blank">Khan Academy: Correlation coefficient</a> — вычисление и интерпретация коэффициента корреляции</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BB%D1%8F%D1%86%D0%B8%D1%8F" target="_blank">Habr: корреляция</a> — статьи о корреляционном анализе на Хабре</li>
+        <li><a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient" target="_blank">Wikipedia: Pearson correlation coefficient</a> — формула, свойства и ограничения корреляции Пирсона</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html" target="_blank">NumPy: numpy.corrcoef</a> — матрица корреляций для нескольких переменных</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.html" target="_blank">SciPy: scipy.stats.spearmanr</a> — ранговая корреляция Спирмена с p-value</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kendalltau.html" target="_blank">SciPy: scipy.stats.kendalltau</a> — корреляция Кендалла</li>
+      </ul>
+    `,
   },
 });

@@ -681,5 +681,24 @@ print(f"95% ДИ: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
       <h3>t-распределение vs нормальное</h3>
       <p>Когда σ неизвестна, используем $\\bar{X} - \\mu)/(s/\\sqrt{n})$ — это распределено по Стьюденту с n−1 степенями свободы. При n > 30 почти неотличимо от нормального.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=YAlJCEDH2uY" target="_blank">StatQuest: The Central Limit Theorem</a> — центральная предельная теорема: интуиция и доказательство на пальцах</li>
+        <li><a href="https://www.youtube.com/watch?v=zeJD6dqJ5lo" target="_blank">3Blue1Brown: But what is the Central Limit Theorem?</a> — визуальное объяснение ЦПТ с анимациями</li>
+        <li><a href="https://www.khanacademy.org/math/ap-statistics/sampling-distribution-ap/what-is-sampling-distribution/v/central-limit-theorem" target="_blank">Khan Academy: Central Limit Theorem</a> — интерактивные упражнения и объяснение</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D1%82%D0%B5%D0%BE%D1%80%D0%B5%D0%BC%D0%B0" target="_blank">Habr: центральная предельная теорема</a> — статьи о ЦПТ и её применении</li>
+        <li><a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">Wikipedia: Central limit theorem</a> — строгая формулировка и условия применимости</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.normal.html" target="_blank">NumPy: numpy.random.normal</a> — симуляция нормального распределения для демонстрации ЦПТ</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.sem.html" target="_blank">SciPy: scipy.stats.sem</a> — вычисление стандартной ошибки среднего</li>
+      </ul>
+    `,
   },
 });

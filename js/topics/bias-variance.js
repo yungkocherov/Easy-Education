@@ -853,5 +853,21 @@ plt.show()</code></pre>
         <li>Baseline всегда: с чем сравнивать?</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=EuBBz3bI-aA" target="_blank">StatQuest: Bias and Variance</a> — интуитивное объяснение компромисса смещения и дисперсии</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/368977/" target="_blank">Bias-Variance на Habr</a> — разбор компромисса на русском языке с примерами</li>
+        <li><a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" target="_blank">Understanding the Bias-Variance Tradeoff (Scott Fortmann-Roe)</a> — классическое интерактивное эссе с визуализациями</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_bias_variance.html" target="_blank">sklearn: Bias-Variance example</a> — демонстрация компромисса на примере полиномиальной регрессии</li>
+      </ul>
+    `,
   },
 });

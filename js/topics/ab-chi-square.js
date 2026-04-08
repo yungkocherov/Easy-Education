@@ -638,5 +638,24 @@ plt.show()</code></pre>
       <div class="callout tip">💡 Для таблицы 2×2 при E &lt; 5: используй точный тест Фишера. Для r×c при малых E: объедини редкие категории так, чтобы все E ≥ 5.</div>
       <div class="callout warn">⚠️ Хи-квадрат при больших n (>100 000) найдёт «значимость» даже при крошечном эффекте (V&lt;0.01). Всегда отчитывайся о Cramer's V рядом с p-value.</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=2QeDRsxSF9M" target="_blank">StatQuest: Chi-Square Tests</a> — хи-квадрат тест независимости и тест согласия с примерами</li>
+        <li><a href="https://www.youtube.com/watch?v=7_cs1YlZoug" target="_blank">StatQuest: Fisher's Exact Test</a> — точный тест Фишера для малых выборок (альтернатива χ²)</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/inference-categorical-data-chi-square-tests" target="_blank">Khan Academy: Chi-square tests</a> — хи-квадрат тесты с интерактивными упражнениями</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D1%85%D0%B8-%D0%BA%D0%B2%D0%B0%D0%B4%D1%80%D0%B0%D1%82" target="_blank">Habr: хи-квадрат</a> — применение хи-квадрат теста в A/B тестировании</li>
+        <li><a href="https://en.wikipedia.org/wiki/Chi-squared_test" target="_blank">Wikipedia: Chi-squared test</a> — математическое описание и условия применения</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chi2_contingency.html" target="_blank">SciPy: scipy.stats.chi2_contingency</a> — хи-квадрат тест для таблиц сопряжённости с Cramer's V</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.fisher_exact.html" target="_blank">SciPy: scipy.stats.fisher_exact</a> — точный тест Фишера для таблиц 2×2</li>
+      </ul>
+    `,
   },
 });

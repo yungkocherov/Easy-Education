@@ -1007,5 +1007,20 @@ plt.show()</code></pre>
         <li>XGBoost: либо one-hot, либо target encoding.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=7VeUPuFGJHk" target="_blank">StatQuest: Decision Trees</a> — построение деревьев решений с нуля</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/171759/" target="_blank">Деревья решений на Habr</a> — разбор алгоритма ID3/CART с примерами на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html" target="_blank">sklearn: DecisionTreeClassifier</a> — документация дерева решений в sklearn</li>
+      </ul>
+    `,
   },
 });

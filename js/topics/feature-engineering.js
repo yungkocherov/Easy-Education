@@ -661,6 +661,22 @@ for train_idx, val_idx in kf.split(df):
         <div class="kc-label">Общий принцип</div>
         <p>Feature Engineering — это <b>встраивание знания домена в признаки</b>. Чем лучше вы понимаете задачу, тем лучшие признаки создадите. Технические аспекты (кодирование, масштабирование) автоматизируются; <b>предметная экспертиза при создании признаков — нет</b>.</p>
       </div>
-    `
+    `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=68ABAU_V8qI" target="_blank">Feature Engineering — Kaggle курс (intro)</a> — обзор ключевых техник от Kaggle</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/279773/" target="_blank">Feature Engineering на Habr</a> — разбор методов обработки и создания признаков на русском</li>
+        <li><a href="https://www.kaggle.com/learn/feature-engineering" target="_blank">Kaggle: Feature Engineering micro-course</a> — практический мини-курс с упражнениями</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/preprocessing.html" target="_blank">sklearn: Preprocessing data</a> — масштабирование, кодирование, нормализация</li>
+      </ul>
+    `,
   }
 });

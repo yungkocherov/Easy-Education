@@ -774,5 +774,21 @@ plt.show()</code></pre>
         <li>Feature importance → SHAP values (лучше для интерпретации).</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=3CC4N4z3GJc" target="_blank">StatQuest: Gradient Boost (часть 1)</a> — пошаговое построение градиентного бустинга</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/327250/" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация XGBoost/LightGBM на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://xgboost.readthedocs.io/en/stable/" target="_blank">XGBoost документация</a> — официальная документация XGBoost</li>
+        <li><a href="https://lightgbm.readthedocs.io/en/latest/" target="_blank">LightGBM документация</a> — официальная документация LightGBM</li>
+      </ul>
+    `,
   },
 });

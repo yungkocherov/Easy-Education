@@ -858,5 +858,19 @@ plt.show()</code></pre>
       <h3>Масштабирование</h3>
       <p>K-Means использует евклидово расстояние — признаки с большим диапазоном доминируют. <b>Всегда скейли признаки</b> (StandardScaler).</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=4b5d3muPQmA" target="_blank">StatQuest: K-means Clustering</a> — понятное объяснение алгоритма, выбора k и инициализации</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/469535/" target="_blank">Habr: Алгоритм k-means</a> — разбор с примерами на Python</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html" target="_blank">sklearn KMeans</a> — официальная документация с параметрами и примерами</li>
+      </ul>
+    `,
   },
 });

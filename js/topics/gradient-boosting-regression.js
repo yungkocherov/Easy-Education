@@ -1067,5 +1067,21 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
         <li><b>CatBoost:</b> лучший выбор при множестве категориальных признаков, не требует OHE.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=3CC4N4z3GJc" target="_blank">StatQuest: Gradient Boost</a> — пошаговое построение градиентного бустинга для регрессии</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/327250/" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация на русском языке</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://xgboost.readthedocs.io/en/stable/" target="_blank">XGBoost документация</a> — официальная документация XGBoost</li>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html" target="_blank">sklearn: GradientBoostingRegressor</a> — документация градиентного бустинга для регрессии в sklearn</li>
+      </ul>
+    `,
   },
 });

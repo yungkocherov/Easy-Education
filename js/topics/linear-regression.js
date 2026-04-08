@@ -759,5 +759,20 @@ plt.show()</code></pre>
         <li><b>ElasticNet</b> — комбинация обоих.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=nk2CQITm_eo" target="_blank">StatQuest: Linear Regression</a> — разбор линейной регрессии с нуля</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/describing-relationships-quantitative-data" target="_blank">Khan Academy: Linear Regression</a> — интерактивный курс по регрессии и корреляции</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html" target="_blank">sklearn: LinearRegression</a> — документация линейной регрессии в sklearn</li>
+      </ul>
+    `,
   },
 });

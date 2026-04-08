@@ -775,5 +775,20 @@ print(f'Average Precision: {ap:.4f}')</code></pre>
       <h3>Доверительный интервал</h3>
       <p>DeLong's test — параметрический. Или bootstrap: многократно ресемплируй и считай AUC.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=4jRBRDbJemM" target="_blank">StatQuest: ROC and AUC</a> — пошаговое построение ROC-кривой и смысл AUC</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/280094/" target="_blank">ROC-AUC на Habr</a> — теория и интерпретация ROC/PR кривых на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html" target="_blank">sklearn: roc_curve</a> — вычисление ROC-кривой и AUC в sklearn</li>
+      </ul>
+    `,
   },
 });

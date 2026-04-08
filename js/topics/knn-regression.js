@@ -592,5 +592,20 @@ for name, model in models.items():
         <tr><td>Обучение</td><td>Мгновенно</td><td>Быстро</td></tr>
       </table>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=HVXime0nQeI" target="_blank">StatQuest: K-nearest neighbors</a> — принцип kNN, применим к регрессии и классификации</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/149693/" target="_blank">Метод ближайших соседей на Habr</a> — разбор kNN с примерами применения</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html" target="_blank">sklearn: KNeighborsRegressor</a> — документация kNN-регрессора в sklearn</li>
+      </ul>
+    `,
   },
 });

@@ -644,5 +644,21 @@ for feat, weight in sorted(exp.as_list(), key=lambda x: abs(x[1]), reverse=True)
         </ul>
       </div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=VB9uV-x0gtg" target="_blank">StatQuest: SHAP Values</a> — интуиция за SHAP values на примерах</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/492390/" target="_blank">SHAP на Habr</a> — объяснение SHAP values с примерами кода на русском</li>
+        <li><a href="https://christophm.github.io/interpretable-ml-book/" target="_blank">Interpretable Machine Learning (Christoph Molnar)</a> — открытая книга об интерпретируемости ML-моделей</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://shap.readthedocs.io/en/latest/" target="_blank">SHAP документация</a> — официальный гайд по библиотеке SHAP</li>
+      </ul>
+    `,
   },
 });

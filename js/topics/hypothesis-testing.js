@@ -713,5 +713,24 @@ else:
       <h3>Байесовская альтернатива</h3>
       <p>Байесовский фактор и апостериорные вероятности — альтернатива p-value. Прямо отвечают «вероятность гипотезы при данных».</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values, clearly explained</a> — что такое p-value и как его правильно интерпретировать</li>
+        <li><a href="https://www.youtube.com/watch?v=0oc49DyA3hU" target="_blank">StatQuest: Hypothesis Testing and The Null Hypothesis</a> — нулевая гипотеза, альтернативная гипотеза и ошибки I и II рода</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample" target="_blank">Khan Academy: Significance tests</a> — практические упражнения по проверке гипотез</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0+%D0%B3%D0%B8%D0%BF%D0%BE%D1%82%D0%B5%D0%B7" target="_blank">Habr: проверка гипотез</a> — статьи о статистических критериях на Хабре</li>
+        <li><a href="https://en.wikipedia.org/wiki/Statistical_hypothesis_testing" target="_blank">Wikipedia: Statistical hypothesis testing</a> — полный обзор методов проверки статистических гипотез</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://www.statsmodels.org/stable/stats.html" target="_blank">statsmodels: Statistical tests</a> — широкий набор статистических тестов: t-test, z-test, chi-square и др.</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html#statistical-tests" target="_blank">SciPy: Statistical tests</a> — ttest_1samp, ttest_ind, mannwhitneyu и другие критерии</li>
+      </ul>
+    `,
   },
 });

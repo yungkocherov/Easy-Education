@@ -642,6 +642,22 @@ for s in strategies:
         <div class="kc-label">Главный принцип</div>
         <p>Не существует «лучшего» метода вне контекста. Выбор зависит от <b>типа пропущенности</b>, <b>доли пропусков</b> и <b>требований к точности</b>. Индикатор пропуска — бесплатная страховка: добавляйте его всегда при MNAR, проверяйте важность.</p>
       </div>
-    `
+    `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=EYySNJU8Tz0" target="_blank">Missing Data Imputation — обзор методов</a> — разбор стратегий обработки пропусков</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/482830/" target="_blank">Пропуски в данных на Habr</a> — типы пропущенности, MCAR/MAR/MNAR и методы обработки</li>
+        <li><a href="https://github.com/iskandr/fancyimpute" target="_blank">fancyimpute — GitHub</a> — библиотека с MICE, KNN и другими продвинутыми импутерами</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/impute.html" target="_blank">sklearn: Imputation of missing values</a> — SimpleImputer, KNNImputer, IterativeImputer</li>
+      </ul>
+    `,
   }
 });

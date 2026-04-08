@@ -663,6 +663,22 @@ print("Stacking AUC:", roc_auc_score(y_test, stacking.predict_proba(X_test)[:, 1
         <div class="kc-label">Главное правило Stacking</div>
         <p><b>Без OOF — нет stacking.</b> Если мета-признаки получены без Out-of-Fold предсказаний, мета-модель переобучится и будет работать хуже одиночных базовых моделей. Это самая частая ошибка при реализации stacking вручную.</p>
       </div>
+    `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=TuIgtitqJho" target="_blank">Ensemble Methods — stacking explained</a> — разбор stacking и OOF предсказаний</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/327250/" target="_blank">Stacking на Habr</a> — практическое руководство по stacking с кодом</li>
+        <li><a href="https://mlwave.com/kaggle-ensembling-guide/" target="_blank">Kaggle Ensembling Guide (MLWave)</a> — исчерпывающий гайд по ансамблированию для соревнований</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.StackingClassifier.html" target="_blank">sklearn: StackingClassifier</a> — официальная документация по stacking в sklearn</li>
+      </ul>
     `
   }
 });

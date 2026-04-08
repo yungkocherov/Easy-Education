@@ -686,5 +686,24 @@ plt.show()</code></pre>
       </div>
       <div class="callout">💡 <b>Практическое правило:</b> если данные нормальные — t-тест. Если скошенные, ординальные или с выбросами — Манн-Уитни. Сомневаешься — проверь оба и сравни.</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=BT1FKd1Qzjw" target="_blank">StatQuest: The Wilcoxon Test (Mann-Whitney U test)</a> — ранговый тест Манна-Уитни: логика и применение</li>
+        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">StatQuest: t-tests, clearly explained</a> — сравнение t-теста и непараметрических альтернатив</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics</a> — основы статистики для понимания непараметрических тестов</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%9C%D0%B0%D0%BD%D0%BD-%D0%A3%D0%B8%D1%82%D0%BD%D0%B8+%D0%BD%D0%B5%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9" target="_blank">Habr: тест Манна-Уитни</a> — когда и как применять непараметрические тесты</li>
+        <li><a href="https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test" target="_blank">Wikipedia: Mann-Whitney U test</a> — математическое описание, статистика U и AUROC</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html" target="_blank">SciPy: scipy.stats.mannwhitneyu</a> — тест Манна-Уитни с выбором альтернативы (two-sided, greater, less)</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rankdata.html" target="_blank">SciPy: scipy.stats.rankdata</a> — ранжирование данных с обработкой совпадений (ties)</li>
+      </ul>
+    `,
   },
 });

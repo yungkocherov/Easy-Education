@@ -804,5 +804,20 @@ plt.show()</code></pre>
       <h3>Multi-variate anomalies</h3>
       <p>Isolation Forest хорошо ловит отдельные сильные аномалии, но плохо — точечные малые отклонения в контексте. Для временных рядов нужны специальные адаптации (например, детекция изменений).</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest: канал</a> — поиск по «anomaly detection» и «random forest» для фундаментальных основ</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/767950/" target="_blank">Habr: Isolation Forest</a> — разбор алгоритма с кодом и примерами на реальных данных</li>
+        <li><a href="https://arxiv.org/abs/1811.02141" target="_blank">Оригинальная статья: Isolation Forest (Liu et al.)</a> — расширенная версия с Extended Isolation Forest</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html" target="_blank">sklearn IsolationForest</a> — официальная документация с параметрами contamination и n_estimators</li>
+      </ul>
+    `,
   },
 });

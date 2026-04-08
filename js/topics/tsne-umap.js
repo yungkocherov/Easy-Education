@@ -635,5 +635,20 @@ plt.show()</code></pre>
         </ul>
       </div>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=NEaUSP4YerM" target="_blank">StatQuest: t-SNE</a> — доступное объяснение алгоритма и параметра perplexity</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/657053/" target="_blank">Habr: t-SNE и UMAP</a> — сравнение методов с практическими примерами</li>
+        <li><a href="https://distill.pub/2016/misread-tsne/" target="_blank">Distill.pub: How to Use t-SNE Effectively</a> — интерактивный разбор типичных ошибок интерпретации</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://umap-learn.readthedocs.io/en/latest/" target="_blank">UMAP документация</a> — официальная документация с туториалами и параметрами</li>
+      </ul>
+    `,
   },
 });

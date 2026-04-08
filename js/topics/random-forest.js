@@ -1127,5 +1127,20 @@ print(f'CV ROC-AUC: {grid.best_score_:.4f}')</code></pre>
       <h3>Isolation Forest</h3>
       <p>Родственник RF для поиска аномалий: чем быстрее точка изолируется случайными разбиениями — тем вероятнее, что это выброс.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=J4Wdy0Wc_xQ" target="_blank">StatQuest: Random Forests</a> — как Random Forest объединяет деревья решений</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/182052/" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html" target="_blank">sklearn: RandomForestClassifier</a> — документация случайного леса в sklearn</li>
+      </ul>
+    `,
   },
 });

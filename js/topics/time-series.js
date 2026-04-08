@@ -735,5 +735,25 @@ for p, d, q in [(1,1,0), (0,1,1), (1,1,1), (2,1,1)]:
         <li><b>Не масштабировать данные:</b> для LSTM и нейросетей нормализация обязательна (MinMaxScaler или StandardScaler).</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=GE3JOFwTWVM" target="_blank">StatQuest: Time Series Analysis</a> — введение в анализ временных рядов и ARIMA</li>
+        <li><a href="https://www.youtube.com/watch?v=bpUoxqn5SkY" target="_blank">StatQuest: ACF and PACF</a> — автокорреляционная и частичная автокорреляционная функции</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics and Probability</a> — основы статистики, полезные для понимания временных рядов</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=ARIMA+%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5+%D1%80%D1%8F%D0%B4%D1%8B" target="_blank">Habr: ARIMA и временные ряды</a> — практические статьи о работе с временными рядами</li>
+        <li><a href="https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average" target="_blank">Wikipedia: ARIMA</a> — математическое описание модели ARIMA</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://www.statsmodels.org/stable/tsa.html" target="_blank">statsmodels: Time Series Analysis (tsa)</a> — ARIMA, SARIMA, VAR, ARCH/GARCH и другие модели</li>
+        <li><a href="https://facebook.github.io/prophet/docs/quick_start.html" target="_blank">Prophet: Quick Start</a> — быстрый старт с Facebook Prophet для прогнозирования рядов с сезонностью</li>
+        <li><a href="https://scikit-learn.org/stable/modules/preprocessing.html#standardization-or-mean-removal-and-variance-scaling" target="_blank">scikit-learn: Preprocessing / Scaling</a> — MinMaxScaler и StandardScaler для нормализации перед LSTM</li>
+      </ul>
+    `,
   },
 });

@@ -1171,5 +1171,20 @@ for epoch in range(10):
         <li>AutoAugment, RandAugment — автоподбор.</li>
       </ul>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=KuXjwB4LzSA" target="_blank">3Blue1Brown: But what is a convolution?</a> — визуальная интуиция свёрточных операций</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://cs231n.stanford.edu/" target="_blank">CS231n Stanford: Convolutional Neural Networks</a> — классический курс по CNN для компьютерного зрения</li>
+        <li><a href="https://habr.com/ru/articles/309508/" target="_blank">Habr: Свёрточные нейронные сети</a> — разбор архитектуры с примерами</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html" target="_blank">PyTorch: Training a CNN on CIFAR-10</a> — официальный туториал по обучению CNN</li>
+      </ul>
+    `,
   },
 });

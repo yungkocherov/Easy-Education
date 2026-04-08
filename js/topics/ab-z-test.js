@@ -590,5 +590,24 @@ plt.show()</code></pre>
       <div class="callout tip">💡 Для малых выборок (n·p &lt; 5) используй точный тест Фишера. Он не требует нормального приближения и точен для любых n.</div>
       <div class="callout warn">⚠️ Статистическая значимость ≠ практическая значимость. Добавь CI к p-value, чтобы понять, стоит ли эффект внедрения.</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=5ABpqVSx33I" target="_blank">StatQuest: Z-scores and Z-tests</a> — z-оценки и z-тесты: когда и как применять</li>
+        <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values, clearly explained</a> — интерпретация p-value при тестировании конверсий</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample/tests-about-population-proportion/v/simple-hypothesis-testing" target="_blank">Khan Academy: Tests about a population proportion</a> — z-тест для пропорций с упражнениями</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=z-%D1%82%D0%B5%D1%81%D1%82+%D0%BF%D1%80%D0%BE%D0%BF%D0%BE%D1%80%D1%86%D0%B8%D0%B8" target="_blank">Habr: z-тест пропорций</a> — практические примеры z-теста для конверсий</li>
+        <li><a href="https://en.wikipedia.org/wiki/Z-test" target="_blank">Wikipedia: Z-test</a> — математическое описание и условия применения z-теста</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportions_ztest.html" target="_blank">statsmodels: proportions_ztest</a> — z-тест для одной или двух пропорций</li>
+        <li><a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportion_confint.html" target="_blank">statsmodels: proportion_confint</a> — доверительный интервал для пропорции</li>
+      </ul>
+    `,
   },
 });

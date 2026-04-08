@@ -824,5 +824,24 @@ print("Нормальное" if p > 0.05 else "Не нормальное")</code
         <li>Пуассон при λ→∞ → Нормальное N(λ, λ)</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=rzFX5NWojp0" target="_blank">StatQuest: Normal Distribution, Clearly Explained</a> — нормальное распределение: интуиция и формулы</li>
+        <li><a href="https://www.youtube.com/watch?v=Fvi9A_tEmXQ" target="_blank">StatQuest: The Poisson Distribution and Poisson Process</a> — распределение Пуассона с примерами</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/random-variables-stats-library" target="_blank">Khan Academy: Random variables and probability distributions</a> — курс по случайным величинам и распределениям</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F+%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D1%82%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9" target="_blank">Habr: распределения вероятностей</a> — статьи о вероятностных распределениях на Хабре</li>
+        <li><a href="https://en.wikipedia.org/wiki/List_of_probability_distributions" target="_blank">Wikipedia: List of probability distributions</a> — полный список стандартных распределений</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">SciPy: scipy.stats distributions</a> — все стандартные распределения: norm, poisson, binom, expon и др.</li>
+        <li><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.normal.html" target="_blank">NumPy: numpy.random.normal</a> — генерация нормально распределённых случайных чисел</li>
+      </ul>
+    `,
   },
 });

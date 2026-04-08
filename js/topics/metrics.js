@@ -728,5 +728,21 @@ print(df.round(3))</code></pre>
         <tr><td>Imbalanced binary</td><td>F1, AUPRC</td></tr>
       </table>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=Kdsp6soqA7o" target="_blank">StatQuest: Confusion Matrix</a> — наглядное объяснение матрицы ошибок, precision и recall</li>
+        <li><a href="https://www.youtube.com/watch?v=4jRBRDbJemM" target="_blank">StatQuest: ROC and AUC</a> — как строится ROC-кривая и что такое AUC</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/228963/" target="_blank">Метрики качества классификации на Habr</a> — подробный разбор всех метрик на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html" target="_blank">sklearn: Model evaluation</a> — полный справочник по всем метрикам в sklearn</li>
+      </ul>
+    `,
   },
 });

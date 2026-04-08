@@ -828,5 +828,25 @@ print(f"P(болезнь | +тест) = {p_disease_given_pos:.1%}")
       <h3>Moment Generating Function (MGF)</h3>
       <p>$M_X(t) = E[e^{tX}]$ — «генератор моментов». Из неё можно получить все моменты: $E[X^n] = M^{(n)}(0)$. Единственным образом определяет распределение.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=uzkc-qNVoOk" target="_blank">StatQuest: Probability is not Likelihood</a> — разница между вероятностью и функцией правдоподобия</li>
+        <li><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank">3Blue1Brown: Bayes theorem</a> — визуальное объяснение теоремы Байеса</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/probability-library" target="_blank">Khan Academy: Basic probability</a> — основы теории вероятностей с упражнениями</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D1%8F+%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D1%82%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9" target="_blank">Habr: теория вероятностей</a> — русскоязычные статьи о теории вероятностей</li>
+        <li><a href="https://en.wikipedia.org/wiki/Probability_density_function" target="_blank">Wikipedia: Probability density function (PDF)</a> — определение и свойства функции плотности вероятности</li>
+        <li><a href="https://en.wikipedia.org/wiki/Conditional_probability" target="_blank">Wikipedia: Conditional probability</a> — условная вероятность и формула Байеса</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">SciPy: scipy.stats</a> — вычисление PMF, PDF, CDF для всех стандартных распределений</li>
+        <li><a href="https://numpy.org/doc/stable/reference/random/index.html" target="_blank">NumPy: Random sampling</a> — генерация случайных выборок из разных распределений</li>
+      </ul>
+    `,
   },
 });

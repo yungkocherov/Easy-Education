@@ -809,5 +809,20 @@ plt.tight_layout(); plt.show()
         <li>Transformer (2017) — attention, LLMs.</li>
       </ol>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest: канал</a> — поиск по «perceptron» и «neural networks» для основ</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/312450/" target="_blank">Habr: Перцептрон</a> — история, математика и реализация с нуля</li>
+        <li><a href="https://en.wikipedia.org/wiki/Perceptron" target="_blank">Wikipedia: Perceptron</a> — история создания, математика и теорема сходимости</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Perceptron.html" target="_blank">sklearn Perceptron</a> — документация с параметрами и примерами</li>
+      </ul>
+    `,
   },
 });

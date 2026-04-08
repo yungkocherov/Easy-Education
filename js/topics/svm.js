@@ -1037,5 +1037,20 @@ print(classification_report(y_te, svc_best.predict(X_te_s), target_names=data.ta
       <h3>Масштабирование обязательно</h3>
       <p>SVM использует расстояния → чувствителен к масштабу. Всегда StandardScaler.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=efR1C6CvhmE" target="_blank">StatQuest: Support Vector Machines</a> — интуитивное объяснение SVM и margin</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/484148/" target="_blank">SVM на Habr</a> — разбор метода опорных векторов на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html" target="_blank">sklearn: SVC</a> — документация Support Vector Classifier в sklearn</li>
+      </ul>
+    `,
   },
 });

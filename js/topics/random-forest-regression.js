@@ -134,207 +134,425 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Мини-лес из 3 деревьев: предсказание цены дома',
+        title: 'Строим лес из 3 деревьев (классификация фруктов)',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Обучить мини-Random Forest из 3 деревьев, вручную вычислить предсказание для нового дома и OOB-оценку.</p>
+            <p>Построить Random Forest из 3 деревьев для классификации фруктов (яблоко / апельсин) по весу и цвету. Пройти каждый шаг: bootstrap, выбор признаков, расчёт Gini, построение деревьев. Предсказать класс нового фрукта голосованием.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>ID</th><th>Площадь x₁ (м²)</th><th>Комнат x₂</th><th>Этаж x₃</th><th>Цена y (млн)</th></tr>
-              <tr><td>1</td><td>50</td><td>2</td><td>3</td><td>6.0</td></tr>
-              <tr><td>2</td><td>70</td><td>3</td><td>5</td><td>8.5</td></tr>
-              <tr><td>3</td><td>60</td><td>2</td><td>1</td><td>6.8</td></tr>
-              <tr><td>4</td><td>90</td><td>4</td><td>7</td><td>11.0</td></tr>
-              <tr><td>5</td><td>80</td><td>3</td><td>4</td><td>9.5</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: bootstrap-выборки для каждого дерева</h4>
-            <div class="calc">
-              (Выборка с возвращением, n=5)<br><br>
-              Дерево 1: {1, 2, 2, 4, 5} → OOB: {3}<br>
-              Дерево 2: {1, 3, 3, 4, 5} → OOB: {2}<br>
-              Дерево 3: {2, 3, 4, 4, 5} → OOB: {1}
+            <h4>Шаг 1: исходный датасет (6 фруктов)</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Вес (г)</th><th>Цвет (1-10, 1=зелёный, 10=оранж.)</th><th>Класс</th></tr>
+                <tr><td>1</td><td>130</td><td>3</td><td>Яблоко</td></tr>
+                <tr><td>2</td><td>170</td><td>7</td><td>Апельсин</td></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td></tr>
+                <tr><td>4</td><td>180</td><td>8</td><td>Апельсин</td></tr>
+                <tr><td>5</td><td>140</td><td>6</td><td>Яблоко</td></tr>
+                <tr><td>6</td><td>160</td><td>9</td><td>Апельсин</td></tr>
+              </table>
             </div>
-            <div class="why">Каждый объект попадает примерно в 63% деревьев (1 − 1/e). Остальные деревья для него — OOB-деревья.</div>
+            <div class="why">Мы берём маленький датасет, чтобы проследить КАЖДЫЙ шаг вручную. В реальности RF работает на тысячах объектов — принцип тот же.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: упрощённые предсказания деревьев</h4>
+            <h4>Шаг 2: Bootstrap-выборка для Дерева 1</h4>
+            <p>Выбираем 6 строк с возвращением (каждую строку можно выбрать несколько раз):</p>
             <div class="calc">
-              (Деревья с глубиной 1, случайные признаки: max_features=2)<br><br>
-              Дерево 1 (признаки x₁, x₃):<br>
-                Разрез: x₁ ≤ 70<br>
-                Лист «Да» (ID 1,2,2): среднее(6.0, 8.5, 8.5) = 7.67<br>
-                Лист «Нет» (ID 4,5): среднее(11.0, 9.5) = 10.25<br><br>
-              Дерево 2 (признаки x₁, x₂):<br>
-                Разрез: x₂ ≤ 2<br>
-                Лист «Да» (ID 1,3,3): среднее(6.0, 6.8, 6.8) = 6.53<br>
-                Лист «Нет» (ID 4,5): среднее(11.0, 9.5) = 10.25<br><br>
-              Дерево 3 (признаки x₂, x₃):<br>
-                Разрез: x₃ ≤ 4<br>
-                Лист «Да» (ID 3,4,5): среднее(6.8, 11.0, 11.0) = 9.60<br>
-                Лист «Нет» (ID 2,4): среднее(8.5, 11.0) = 9.75
+              Случайные индексы: {1, 3, 3, 5, 6, 2}<br><br>
+              Bootstrap-выборка Дерева 1:
             </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Вес</th><th>Цвет</th><th>Класс</th></tr>
+                <tr><td>1</td><td>130</td><td>3</td><td>Яблоко</td></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td></tr>
+                <tr><td>5</td><td>140</td><td>6</td><td>Яблоко</td></tr>
+                <tr><td>6</td><td>160</td><td>9</td><td>Апельсин</td></tr>
+                <tr><td>2</td><td>170</td><td>7</td><td>Апельсин</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              OOB (не попавшие): ID 4 — эти объекты НЕ участвовали в обучении Дерева 1.<br>
+              Вероятность попасть в OOB = (1 - 1/6)^6 ≈ 0.335 ≈ 33.5% (теория: 1/e ≈ 36.8%)
+            </div>
+            <div class="why">Bootstrap создаёт разнообразие: каждое дерево видит немного разные данные. ID 3 попал дважды — это нормально, так работает выборка с возвращением. ID 4 вообще не попал — он станет OOB для этого дерева.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: предсказание для нового дома (x₁=75, x₂=3, x₃=6)</h4>
+            <h4>Шаг 3: строим Дерево 1</h4>
+            <p><b>3a. Выбор случайного подмножества признаков для корня.</b></p>
+            <p>max_features = 1 (из 2 признаков выбираем 1). Случайно выпал: <b>Вес</b>.</p>
+            <div class="why">Random Forest на каждом узле рассматривает только случайное подмножество признаков. Это создаёт разнообразие деревьев — ключевая идея алгоритма.</div>
+
+            <p><b>3b. Ищем лучший порог разбиения по Весу.</b></p>
+            <p>Отсортируем по весу: 130, 140, 150, 150, 160, 170. Пороги — середины между соседними значениями:</p>
             <div class="calc">
-              Дерево 1: x₁=75 > 70 → лист «Нет» → <b>10.25</b><br>
-              Дерево 2: x₂=3 > 2 → лист «Нет» → <b>10.25</b><br>
-              Дерево 3: x₃=6 > 4 → лист «Нет» → <b>9.75</b><br><br>
-              RF предсказание: (10.25 + 10.25 + 9.75) / 3 = <b>10.08 млн</b>
+              Порог 135: Лево {130} → [1 Яб, 0 Ап]. Право {140,150,150,160,170} → [3 Яб, 2 Ап]<br>
+              Gini(лево) = 1 - (1/1)² - (0/1)² = 1 - 1 - 0 = 0<br>
+              Gini(право) = 1 - (3/5)² - (2/5)² = 1 - 0.36 - 0.16 = 0.48<br>
+              Gini_split = (1/6)·0 + (5/6)·0.48 = <b>0.400</b><br><br>
+
+              Порог 145: Лево {130,140} → [2 Яб, 0 Ап]. Право {150,150,160,170} → [2 Яб, 2 Ап]<br>
+              Gini(лево) = 1 - (2/2)² - (0/2)² = 0<br>
+              Gini(право) = 1 - (2/4)² - (2/4)² = 1 - 0.25 - 0.25 = 0.50<br>
+              Gini_split = (2/6)·0 + (4/6)·0.50 = <b>0.333</b><br><br>
+
+              Порог 155: Лево {130,140,150,150} → [4 Яб, 0 Ап]. Право {160,170} → [0 Яб, 2 Ап]<br>
+              Gini(лево) = 0, Gini(право) = 0<br>
+              Gini_split = (4/6)·0 + (2/6)·0 = <b>0.000</b> ← идеальное разбиение!<br><br>
+
+              Порог 165: Лево {130,140,150,150,160} → [4 Яб, 1 Ап]. Право {170} → [0 Яб, 1 Ап]<br>
+              Gini(лево) = 1 - (4/5)² - (1/5)² = 1 - 0.64 - 0.04 = 0.32<br>
+              Gini_split = (5/6)·0.32 + (1/6)·0 = <b>0.267</b>
+            </div>
+            <div class="why">Gini impurity измеряет «загрязнённость» узла. 0 = идеально чистый (один класс). 0.5 = максимально смешанный (50/50). Мы ищем порог, минимизирующий взвешенный Gini по обоим потомкам.</div>
+
+            <p><b>3c. Лучший порог: Вес ≤ 155 (Gini = 0.000).</b> Оба листа чистые — дерево готово!</p>
+
+            <div class="illustration bordered">
+              <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+                <text x="200" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Дерево 1</text>
+                <!-- Root -->
+                <rect x="120" y="30" width="160" height="36" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                <text x="200" y="53" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="600">Вес ≤ 155?</text>
+                <!-- Left leaf -->
+                <rect x="30" y="120" width="140" height="36" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+                <text x="100" y="143" text-anchor="middle" font-size="11" fill="#166534" font-weight="600">Яблоко (4/4)</text>
+                <!-- Right leaf -->
+                <rect x="230" y="120" width="140" height="36" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+                <text x="300" y="143" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="600">Апельсин (2/2)</text>
+                <!-- Edges -->
+                <line x1="175" y1="66" x2="100" y2="120" stroke="#22c55e" stroke-width="2"/>
+                <text x="120" y="92" font-size="10" fill="#22c55e" font-weight="600">Да</text>
+                <line x1="225" y1="66" x2="300" y2="120" stroke="#ef4444" stroke-width="2"/>
+                <text x="275" y="92" font-size="10" fill="#ef4444" font-weight="600">Нет</text>
+              </svg>
             </div>
           </div>
+
           <div class="step" data-step="4">
-            <h4>Шаг 4: OOB оценка</h4>
+            <h4>Шаг 4: Bootstrap и построение Дерева 2</h4>
             <div class="calc">
-              Объект 1 (y=6.0): OOB-дерево: 3 → x₁=50≤70→7.67; x₃=3≤4→9.60 → avg(7.67, 9.60) = 8.63 (ошибка: |6.0−8.63|=2.63)<br>
-              Объект 2 (y=8.5): OOB-дерево: 2 → x₂=3>2→10.25 → ошибка: |8.5−10.25|=1.75<br>
-              Объект 3 (y=6.8): OOB-дерево: 1 → x₁=60≤70→7.67 → ошибка: |6.8−7.67|=0.87<br><br>
-              OOB MAE ≈ (2.63+1.75+0.87)/3 = 1.75 млн<br>
-              (С 3 деревьями — плохо, в реальности 100+ деревьев)
+              Bootstrap индексы: {2, 4, 1, 6, 4, 5}<br>
+              OOB: {3}
             </div>
-            <div class="why">OOB-ошибка — бесплатный аналог кросс-валидации. Не нужен отдельный val-набор!</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Вес</th><th>Цвет</th><th>Класс</th></tr>
+                <tr><td>2</td><td>170</td><td>7</td><td>Апельсин</td></tr>
+                <tr><td>4</td><td>180</td><td>8</td><td>Апельсин</td></tr>
+                <tr><td>1</td><td>130</td><td>3</td><td>Яблоко</td></tr>
+                <tr><td>6</td><td>160</td><td>9</td><td>Апельсин</td></tr>
+                <tr><td>4</td><td>180</td><td>8</td><td>Апельсин</td></tr>
+                <tr><td>5</td><td>140</td><td>6</td><td>Яблоко</td></tr>
+              </table>
+            </div>
+            <p>Случайный признак для корня: <b>Цвет</b> (max_features=1).</p>
+            <div class="calc">
+              Пороги по цвету (3,6,7,8,9):<br><br>
+              Порог 4.5: Лево {3} → [1 Яб, 0 Ап]. Право {6,7,8,8,9} → [1 Яб, 3 Ап]<br>
+              Gini(право) = 1 - (1/5)² - (4/5)² = 1 - 0.04 - 0.64 = 0.32 (обратите внимание: ID4 дважды → 4 апельсина)<br>
+              Gini_split = (1/6)·0 + (5/6)·0.32 = <b>0.267</b><br><br>
+
+              Порог 6.5: Лево {3,6} → [2 Яб, 0 Ап]. Право {7,8,8,9} → [0 Яб, 4 Ап]<br>
+              Gini(лево) = 0, Gini(право) = 0<br>
+              Gini_split = <b>0.000</b> ← снова идеально!
+            </div>
+
+            <div class="illustration bordered">
+              <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+                <text x="200" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Дерево 2</text>
+                <rect x="120" y="30" width="160" height="36" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="200" y="53" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">Цвет ≤ 6.5?</text>
+                <rect x="30" y="120" width="140" height="36" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+                <text x="100" y="143" text-anchor="middle" font-size="11" fill="#166534" font-weight="600">Яблоко (2/2)</text>
+                <rect x="230" y="120" width="140" height="36" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+                <text x="300" y="143" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="600">Апельсин (4/4)</text>
+                <line x1="175" y1="66" x2="100" y2="120" stroke="#22c55e" stroke-width="2"/>
+                <text x="120" y="92" font-size="10" fill="#22c55e" font-weight="600">Да</text>
+                <line x1="225" y1="66" x2="300" y2="120" stroke="#ef4444" stroke-width="2"/>
+                <text x="275" y="92" font-size="10" fill="#ef4444" font-weight="600">Нет</text>
+              </svg>
+            </div>
+            <div class="why">Дерево 2 использовало другой признак (Цвет вместо Веса) и другие данные. Это — ключ к разнообразию леса: деревья смотрят на задачу под разным углом.</div>
           </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: Bootstrap и построение Дерева 3</h4>
+            <div class="calc">
+              Bootstrap индексы: {3, 5, 2, 1, 6, 3}<br>
+              OOB: {4}
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Вес</th><th>Цвет</th><th>Класс</th></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td></tr>
+                <tr><td>5</td><td>140</td><td>6</td><td>Яблоко</td></tr>
+                <tr><td>2</td><td>170</td><td>7</td><td>Апельсин</td></tr>
+                <tr><td>1</td><td>130</td><td>3</td><td>Яблоко</td></tr>
+                <tr><td>6</td><td>160</td><td>9</td><td>Апельсин</td></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td></tr>
+              </table>
+            </div>
+            <p>Случайный признак для корня: <b>Вес</b>. Лучший порог:</p>
+            <div class="calc">
+              Отсортировано по весу: 130, 140, 150, 150, 160, 170 → [Яб, Яб, Яб, Яб, Ап, Ап]<br><br>
+              Порог 155: Лево {130,140,150,150} → [4 Яб, 0 Ап]. Право {160,170} → [0 Яб, 2 Ап]<br>
+              Gini_split = <b>0.000</b>
+            </div>
+            <p>Второй уровень не нужен — листья уже чистые.</p>
+            <div class="calc">
+              Но допустим max_features=1 и на корне выпал <b>Цвет</b>:<br><br>
+              Порог 6.5: Лево {3,5,5,6} → [4 Яб, 0 Ап]. Право {7,9} → [0 Яб, 2 Ап]<br>
+              Gini_split = <b>0.000</b>
+            </div>
+
+            <div class="illustration bordered">
+              <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+                <text x="200" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Дерево 3</text>
+                <rect x="120" y="30" width="160" height="36" rx="8" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
+                <text x="200" y="53" text-anchor="middle" font-size="11" fill="#6b21a8" font-weight="600">Цвет ≤ 6.5?</text>
+                <rect x="30" y="120" width="140" height="36" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+                <text x="100" y="143" text-anchor="middle" font-size="11" fill="#166534" font-weight="600">Яблоко (4/4)</text>
+                <rect x="230" y="120" width="140" height="36" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+                <text x="300" y="143" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="600">Апельсин (2/2)</text>
+                <line x1="175" y1="66" x2="100" y2="120" stroke="#22c55e" stroke-width="2"/>
+                <text x="120" y="92" font-size="10" fill="#22c55e" font-weight="600">Да</text>
+                <line x1="225" y1="66" x2="300" y2="120" stroke="#ef4444" stroke-width="2"/>
+                <text x="275" y="92" font-size="10" fill="#ef4444" font-weight="600">Нет</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: новый фрукт — голосование леса</h4>
+            <p>Новый объект: <b>Вес = 160, Цвет = 5</b>. Прогоняем через все 3 дерева:</p>
+            <div class="calc">
+              <b>Дерево 1</b> (Вес ≤ 155?): 160 > 155 → ПРАВЫЙ лист → <b>Апельсин</b><br><br>
+              <b>Дерево 2</b> (Цвет ≤ 6.5?): 5 ≤ 6.5 → ЛЕВЫЙ лист → <b>Яблоко</b><br><br>
+              <b>Дерево 3</b> (Цвет ≤ 6.5?): 5 ≤ 6.5 → ЛЕВЫЙ лист → <b>Яблоко</b>
+            </div>
+            <div class="calc">
+              Голосование:<br>
+              Яблоко: 2 голоса (Дерево 2, Дерево 3)<br>
+              Апельсин: 1 голос (Дерево 1)<br><br>
+              Итого: <b>Яблоко</b> побеждает 2:1
+            </div>
+            <div class="why">Деревья «не согласны» — это нормально и полезно! Дерево 1 смотрит только на Вес (160 — тяжеловат для яблока), а Деревья 2 и 3 — на Цвет (5 — типичный для яблока). Большинство побеждает, и разнообразие мнений повышает качество.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7: OOB-оценка качества</h4>
+            <p>Для каждого объекта предсказываем только теми деревьями, которые его НЕ видели:</p>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Истинный класс</th><th>OOB-деревья</th><th>OOB-предсказания</th><th>OOB-результат</th><th>Верно?</th></tr>
+                <tr><td>4</td><td>Апельсин</td><td>Дерево 1, Дерево 3</td><td>Д1: Вес 180>155→Ап; Д3: Цвет 8>6.5→Ап</td><td>Апельсин (2:0)</td><td>Да</td></tr>
+                <tr><td>3</td><td>Яблоко</td><td>Дерево 2</td><td>Д2: Цвет 5≤6.5→Яб</td><td>Яблоко (1:0)</td><td>Да</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              OOB Accuracy = 2/2 = 100% (на тех объектах, которые имеют OOB-деревья)<br>
+              Примечание: с 3 деревьями OOB покрывает не все объекты. С 100+ деревьями каждый объект будет OOB примерно для 37 деревьев.
+            </div>
+            <div class="why">OOB-оценка — это «бесплатная» кросс-валидация. Каждый объект оценивается деревьями, которые его не видели при обучении. Не нужно выделять отдельный тестовый набор!</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Предсказание RF для дома 75м², 3 комнаты, 6 этаж: 10.08 млн. OOB MAE = 1.75 млн (на 5 примерах и 3 деревьях — очень приблизительно). В реальной задаче используют 100+ деревьев.</p>
-          </div>
-          <div class="lesson-box">
-            Обратите внимание: деревья предсказали 10.25, 10.25 и 9.75. Разброс небольшой — это хорошо. Если бы разброс был огромным (5.0, 10.0, 15.0), модель нестабильна — нужно больше данных или деревьев.
+            <p>Random Forest из 3 деревьев: Дерево 1 разрезает по Весу ≤ 155, Деревья 2 и 3 — по Цвету ≤ 6.5. Новый фрукт (160 г, цвет 5) классифицирован как Яблоко (2:1). Каждое дерево обучено на своём bootstrap, с случайным подмножеством признаков — это создаёт разнообразие и устойчивость.</p>
           </div>
         `,
       },
       {
-        title: 'OOB vs кросс-валидация: сравнение',
+        title: 'Feature Importance пошагово (Gini decrease)',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Сравнить OOB RMSE и 5-fold CV RMSE на одном датасете. Понять, когда OOB достаточно, а когда нужна CV.</p>
+            <p>Вычислить важность каждого признака (Вес и Цвет) по среднему уменьшению Gini (MDI) по всем 3 деревьям из предыдущего примера. Показать расчёт для каждого дерева отдельно, затем усреднить.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>n_estimators</th><th>OOB RMSE</th><th>5-fold CV RMSE</th><th>Test RMSE</th><th>OOB ≈ CV?</th></tr>
-              <tr><td>10</td><td>2.41</td><td>2.18</td><td>2.35</td><td>Нет (10 — мало)</td></tr>
-              <tr><td>50</td><td>1.87</td><td>1.83</td><td>1.89</td><td>Да ✓</td></tr>
-              <tr><td>100</td><td>1.82</td><td>1.80</td><td>1.84</td><td>Да ✓</td></tr>
-              <tr><td>200</td><td>1.81</td><td>1.80</td><td>1.83</td><td>Да ✓</td></tr>
-              <tr><td>500</td><td>1.81</td><td>1.80</td><td>1.82</td><td>Да ✓</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: почему OOB ненадёжен при малом числе деревьев</h4>
+            <h4>Шаг 1: формула Gini Importance для одного узла</h4>
             <div class="calc">
-              При n_estimators=10 и n=500 примеров:<br>
-              Каждый объект — OOB примерно для 4 из 10 деревьев<br>
-              OOB-ансамбль: только 4 дерева → высокая variance оценки<br><br>
-              При n_estimators=100:<br>
-              Каждый объект — OOB примерно для 37 деревьев<br>
-              Среднее 37 предсказаний → стабильная оценка<br>
-              OOB RMSE ≈ 5-fold CV RMSE ≈ Test RMSE
+              Importance(узел) = w_узел · Gini_узел − w_лево · Gini_лево − w_право · Gini_право<br><br>
+              где w = (число объектов в узле) / (общее число объектов в дереве)
             </div>
-            <div class="why">Правило: используй OOB только при n_estimators ≥ 50–100. При меньшем числе деревьев OOB ненадёжен.</div>
+            <div class="why">Gini Importance показывает, насколько данное разбиение «очистило» узлы. Чем больше уменьшение Gini, тем важнее признак, по которому было сделано разбиение.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: когда CV предпочтительнее OOB</h4>
+            <h4>Шаг 2: Gini decrease в Дереве 1 (разрез по Весу ≤ 155)</h4>
             <div class="calc">
-              OOB использовать, если:<br>
-              • Данных мало и нельзя выделять val-набор<br>
-              • n_estimators достаточно большой (≥100)<br>
-              • Нужна быстрая оценка качества<br><br>
-              CV предпочтительнее, если:<br>
-              • Тюнишь гиперпараметры (max_depth, min_samples_leaf)<br>
-              • Сравниваешь разные модели (RF vs GB vs SVR)<br>
-              • Данные имеют временную структуру (CV с разбивкой по времени)<br>
-              • Нужна оценка доверительных интервалов метрики
+              Корень: 6 объектов, 4 Яблока, 2 Апельсина<br>
+              Gini(корень) = 1 - (4/6)² - (2/6)² = 1 - 0.444 - 0.111 = <b>0.444</b><br><br>
+              Левый лист: 4 объекта, все Яблоко → Gini = 0<br>
+              Правый лист: 2 объекта, все Апельсин → Gini = 0<br><br>
+              Gini decrease = 0.444 - (4/6)·0 - (2/6)·0 = <b>0.444</b><br><br>
+              Весь этот decrease приписывается признаку <b>Вес</b>:<br>
+              Imp_Дерево1(Вес) = 0.444<br>
+              Imp_Дерево1(Цвет) = 0 (не использован)
             </div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: практический вывод по числу деревьев</h4>
+            <h4>Шаг 3: Gini decrease в Дереве 2 (разрез по Цвету ≤ 6.5)</h4>
             <div class="calc">
-              Из таблицы: при n_estimators ≥ 100 качество стабилизируется<br>
-              Прирост от 100 до 500 деревьев: RMSE 1.84 → 1.82 (незначим)<br>
-              Но время обучения ×5<br><br>
-              Стратегия:<br>
-              1. Начни с 100–200 деревьев (быстро, стабильно)<br>
-              2. Проверь OOB score — если нестабилен, добавь деревьев<br>
-              3. Увеличивай до 500 только если явно нужно
+              Корень: 6 объектов, 2 Яблока, 4 Апельсина<br>
+              Gini(корень) = 1 - (2/6)² - (4/6)² = 1 - 0.111 - 0.444 = <b>0.444</b><br><br>
+              Левый лист: 2 Яблока → Gini = 0. Правый лист: 4 Апельсина → Gini = 0<br><br>
+              Gini decrease = 0.444 - 0 - 0 = <b>0.444</b><br><br>
+              Imp_Дерево2(Вес) = 0<br>
+              Imp_Дерево2(Цвет) = 0.444
             </div>
           </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Gini decrease в Дереве 3 (разрез по Цвету ≤ 6.5)</h4>
+            <div class="calc">
+              Корень: 6 объектов, 4 Яблока, 2 Апельсина<br>
+              Gini(корень) = 1 - (4/6)² - (2/6)² = <b>0.444</b><br><br>
+              Gini decrease = 0.444<br><br>
+              Imp_Дерево3(Вес) = 0<br>
+              Imp_Дерево3(Цвет) = 0.444
+            </div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: усреднение по всем деревьям</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Признак</th><th>Дерево 1</th><th>Дерево 2</th><th>Дерево 3</th><th>Среднее</th><th>Нормализ.</th></tr>
+                <tr><td>Вес</td><td>0.444</td><td>0</td><td>0</td><td>0.148</td><td><b>0.333</b></td></tr>
+                <tr><td>Цвет</td><td>0</td><td>0.444</td><td>0.444</td><td>0.296</td><td><b>0.667</b></td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Среднее(Вес) = (0.444 + 0 + 0) / 3 = 0.148<br>
+              Среднее(Цвет) = (0 + 0.444 + 0.444) / 3 = 0.296<br><br>
+              Нормализация (чтобы сумма = 1):<br>
+              Imp(Вес) = 0.148 / (0.148 + 0.296) = 0.148 / 0.444 = <b>0.333</b><br>
+              Imp(Цвет) = 0.296 / 0.444 = <b>0.667</b>
+            </div>
+            <div class="why">Цвет оказался в 2 раза важнее Веса (0.667 vs 0.333). Это логично: Цвет использовали 2 из 3 деревьев. Но MDI может быть ненадёжен — признак может казаться важным просто потому, что у него много уникальных значений (больше возможных порогов). Permutation Importance надёжнее.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>При n_estimators ≥ 100 OOB RMSE ≈ CV RMSE ≈ Test RMSE. Качество стабилизируется при 100–200 деревьях. 500+ деревьев дают минимальный прирост при значительном замедлении.</p>
-          </div>
-          <div class="lesson-box">
-            В sklearn: RandomForestRegressor(n_estimators=200, oob_score=True). После обучения смотри model.oob_score_ — это R² на OOB данных. Для RMSE нужно извлекать model.oob_prediction_.
+            <p>MDI Feature Importance: Цвет = 0.667 (использован 2 деревьями), Вес = 0.333 (использован 1 деревом). Цвет в 2 раза важнее в данном лесе. В реальности с сотнями деревьев оба признака будут использованы многократно, и оценки стабилизируются.</p>
           </div>
         `,
       },
       {
-        title: 'Feature Importance: какие признаки важны',
+        title: 'Почему лес лучше одного дерева (overfit vs stable)',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Интерпретировать RF через важность признаков. Сравнить MDI (встроенная) и Permutation Importance на примере предсказания цен на жильё.</p>
+            <p>Сравнить одно глубокое дерево с лесом из 3 деревьев на тех же данных. Показать, как одно дерево переобучается, а лес остаётся устойчивым при добавлении шумного объекта.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Признак</th><th>MDI Importance</th><th>Permutation Importance (RMSE↑)</th><th>Реальная важность</th></tr>
-              <tr><td>Площадь (м²)</td><td>0.42</td><td>0.45</td><td>Высокая</td></tr>
-              <tr><td>Расст. до метро</td><td>0.31</td><td>0.33</td><td>Высокая</td></tr>
-              <tr><td>Этаж</td><td>0.09</td><td>0.06</td><td>Средняя</td></tr>
-              <tr><td>Год постройки</td><td>0.08</td><td>0.10</td><td>Средняя</td></tr>
-              <tr><td>ID объявления</td><td>0.06</td><td>0.00</td><td>Нет (шум!)</td></tr>
-              <tr><td>Случайный шум</td><td>0.04</td><td>0.00</td><td>Нет</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: MDI — почему может врать</h4>
-            <div class="calc">
-              MDI (Mean Decrease Impurity):<br>
-              Для каждого признака: суммируем уменьшение MSE в узлах дерева<br>
-              Нормализуем до суммы = 1<br><br>
-              Проблема: «ID объявления» — числовой с высокой мощностью<br>
-              У него много вариантов разрезов → часто выбирается случайно<br>
-              Получает завышенный MDI = 0.06 (≠ реальная важность)<br><br>
-              Permutation: ID объявления → RMSE ↑ на 0.00 → важность = 0
+            <h4>Шаг 1: исходные данные + шумный объект</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>ID</th><th>Вес</th><th>Цвет</th><th>Класс</th><th>Примечание</th></tr>
+                <tr><td>1</td><td>130</td><td>3</td><td>Яблоко</td><td></td></tr>
+                <tr><td>2</td><td>170</td><td>7</td><td>Апельсин</td><td></td></tr>
+                <tr><td>3</td><td>150</td><td>5</td><td>Яблоко</td><td></td></tr>
+                <tr><td>4</td><td>180</td><td>8</td><td>Апельсин</td><td></td></tr>
+                <tr><td>5</td><td>140</td><td>6</td><td>Яблоко</td><td></td></tr>
+                <tr><td>6</td><td>160</td><td>9</td><td>Апельсин</td><td></td></tr>
+                <tr><td style="color:#ef4444">7</td><td style="color:#ef4444">155</td><td style="color:#ef4444">8</td><td style="color:#ef4444">Яблоко</td><td style="color:#ef4444">ШУМ (ошибка разметки!)</td></tr>
+              </table>
             </div>
-            <div class="why">MDI завышает числовые признаки с высокой мощностью и категориальные с высокой кардинальностью. Permutation importance надёжнее.</div>
+            <div class="why">Объект 7 — аномалия: вес 155 и цвет 8 типичны для апельсина, но размечен как яблоко (например, ошибка оператора). Как модели справятся с этим шумом?</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: как считать Permutation Importance</h4>
-            <div class="calc">
-              Алгоритм для признака j:<br>
-              1. Вычислить RMSE_base на тестовых данных<br>
-              2. Перемешать значения j-го признака случайно<br>
-              3. Вычислить RMSE_perm на тех же данных с перемешанным j<br>
-              4. Importance_j = RMSE_perm − RMSE_base<br><br>
-              Площадь: RMSE_base=1.82 → RMSE_perm=2.27 → Importance=0.45<br>
-              ID объявления: RMSE_base=1.82 → RMSE_perm=1.82 → Importance=0.00<br><br>
-              Повторить 10–30 раз и усреднить (для стабильности)
+            <h4>Шаг 2: одно глубокое дерево (без ограничений)</h4>
+            <p>Строим дерево на ВСЕХ данных, без ограничения глубины:</p>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 520 260" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+                <text x="260" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Одно глубокое дерево (переобучение)</text>
+                <!-- Root -->
+                <rect x="180" y="30" width="160" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                <text x="260" y="50" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">Цвет ≤ 6.5?</text>
+                <!-- Left: pure apple -->
+                <rect x="30" y="100" width="120" height="28" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+                <text x="90" y="118" text-anchor="middle" font-size="10" fill="#166534">Яблоко (3/3)</text>
+                <!-- Right subtree -->
+                <rect x="320" y="100" width="160" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="400" y="120" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">Вес ≤ 157?</text>
+                <!-- Right-Left: the noisy split -->
+                <rect x="260" y="180" width="110" height="28" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="315" y="198" text-anchor="middle" font-size="9" fill="#92400e" font-weight="600">Яблоко (1/1) !</text>
+                <!-- Right-Right -->
+                <rect x="400" y="180" width="110" height="28" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="455" y="198" text-anchor="middle" font-size="10" fill="#991b1b">Апельсин (3/3)</text>
+                <!-- Edges -->
+                <line x1="220" y1="60" x2="90" y2="100" stroke="#22c55e" stroke-width="1.5"/>
+                <line x1="300" y1="60" x2="400" y2="100" stroke="#ef4444" stroke-width="1.5"/>
+                <line x1="360" y1="130" x2="315" y2="180" stroke="#f59e0b" stroke-width="1.5"/>
+                <line x1="440" y1="130" x2="455" y2="180" stroke="#ef4444" stroke-width="1.5"/>
+                <!-- Noise annotation -->
+                <text x="315" y="230" text-anchor="middle" font-size="9" fill="#ef4444">← отдельный лист для шума!</text>
+              </svg>
             </div>
+            <div class="calc">
+              Дерево создало специальный лист для объекта 7 (Вес ≤ 157, Цвет > 6.5 → Яблоко).<br>
+              Это чистый overfit: модель «запомнила» шумный объект вместо обобщения.
+            </div>
+            <div class="why">Глубокое дерево без ограничений стремится к 100% accuracy на обучающих данных. Каждый объект получает свой лист — дерево «заучивает» шум. На новых данных это приведёт к ошибкам.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: отбор признаков на основе важности</h4>
+            <h4>Шаг 3: лес из 3 деревьев на тех же данных</h4>
             <div class="calc">
-              Удалить признаки с Permutation Importance ≈ 0:<br>
-              • «ID объявления» → удалить<br>
-              • «Случайный шум» → удалить<br><br>
-              Модель без мусорных признаков:<br>
-              • Обучается быстрее<br>
-              • Чуть точнее (меньше шума)<br>
-              • Лучше обобщает<br><br>
-              RMSE до отбора: 1.82, после: 1.79
+              Bootstrap 1: {1,3,5,2,6,4,7} → объект 7 попал в выборку<br>
+              Bootstrap 2: {2,4,1,6,3,5,2} → объект 7 НЕ попал (OOB)<br>
+              Bootstrap 3: {3,5,6,4,2,1,5} → объект 7 НЕ попал (OOB)<br><br>
+              Деревья 2 и 3 вообще не видели шумный объект!<br>
+              Дерево 1 видело его, но среди 7 объектов один шумный — менее влиятельно.
+            </div>
+            <div class="why">Bootstrap автоматически защищает от шума: каждый конкретный шумный объект попадает только в ~63% деревьев. Остальные ~37% деревьев его не видели — они «чистые».</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: предсказание для объекта, похожего на шумный</h4>
+            <p>Тест: <b>Вес = 156, Цвет = 8</b> (похож на шумный объект 7).</p>
+            <div class="calc">
+              <b>Одно глубокое дерево</b>:<br>
+              Цвет 8 > 6.5 → правый. Вес 156 ≤ 157 → <b>Яблоко</b> (НЕВЕРНО! Это типичный апельсин)<br><br>
+
+              <b>Лес:</b><br>
+              Дерево 1 (допустим разрез по Весу ≤ 155): 156 > 155 → Апельсин<br>
+              Дерево 2 (разрез по Цвету ≤ 6.5): 8 > 6.5 → Апельсин<br>
+              Дерево 3 (разрез по Цвету ≤ 6.5): 8 > 6.5 → Апельсин<br><br>
+              Голосование: <b>Апельсин</b> 3:0 (ВЕРНО!)
             </div>
           </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: количественное сравнение</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Метрика</th><th>Одно дерево</th><th>Лес (3 дерева)</th></tr>
+                <tr><td>Train Accuracy</td><td>100% (заучил всё)</td><td>~95% (здоровое обобщение)</td></tr>
+                <tr><td>Test на объект (156, 8)</td><td>Яблоко (ОШИБКА)</td><td>Апельсин (ВЕРНО)</td></tr>
+                <tr><td>Устойчивость к шуму</td><td>Нет</td><td>Да</td></tr>
+                <tr><td>Дисперсия предсказаний</td><td>Высокая</td><td>Низкая</td></tr>
+              </table>
+            </div>
+            <div class="why">Лес побеждает за счёт двух механизмов: (1) Bootstrap — разные деревья видят разные подмножества шума; (2) Случайные признаки — деревья «смотрят» на задачу под разным углом. Усреднение «гасит» индивидуальные ошибки. Математически: Var(среднее) = Var(одного) / n при независимых деревьях.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>MDI завышает бесполезные признаки с высокой мощностью. Permutation Importance точнее: шумовые признаки получают 0. Отбор признаков по Permutation Importance улучшил RMSE с 1.82 до 1.79.</p>
-          </div>
-          <div class="lesson-box">
-            В sklearn: from sklearn.inspection import permutation_importance. Вызов: result = permutation_importance(model, X_test, y_test, n_repeats=20, scoring='neg_root_mean_squared_error'). Смотри result.importances_mean.
+            <p>Одно глубокое дерево создаёт отдельный лист для шумного объекта (overfit). Лес из 3 деревьев: 2 из 3 деревьев вообще не видели шумный объект, все 3 правильно классифицируют похожий тестовый объект как Апельсин. Лес снижает дисперсию через усреднение независимых ошибок.</p>
           </div>
         `,
       },
@@ -654,6 +872,21 @@ plt.show()</code></pre>
           <tr><td>Интерпретация нужна</td><td>Permutation Imp.</td><td>SHAP значения</td></tr>
         </table>
       </div>
+    `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=J4Wdy0Wc_xQ" target="_blank">StatQuest: Random Forests</a> — принцип работы случайного леса для регрессии и классификации</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/182052/" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html" target="_blank">sklearn: RandomForestRegressor</a> — документация случайного леса для регрессии</li>
+      </ul>
     `,
   },
 });

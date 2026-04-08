@@ -767,5 +767,20 @@ Fold 3: train [1..140], test [141..160]</pre>
         <li>Если std большой — модель нестабильна.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=fSytzGwwBVw" target="_blank">StatQuest: Cross Validation</a> — объяснение K-Fold CV с нуля</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/350218/" target="_blank">Кросс-валидация на Habr</a> — подробный разбор методов кросс-валидации на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank">sklearn: Cross-validation</a> — справочник по всем методам CV в sklearn</li>
+      </ul>
+    `,
   },
 });

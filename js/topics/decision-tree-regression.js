@@ -607,5 +607,20 @@ plt.show()
         <tr><td>Взаимодействия признаков</td><td>Автоматически</td><td>Надо добавлять вручную</td></tr>
       </table>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=g9c66TUylZ4" target="_blank">StatQuest: Regression Trees</a> — деревья решений для регрессии, MSE-критерий разбиения</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/171759/" target="_blank">Деревья решений на Habr</a> — разбор CART для классификации и регрессии</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html" target="_blank">sklearn: DecisionTreeRegressor</a> — документация дерева регрессии в sklearn</li>
+      </ul>
+    `,
   },
 });

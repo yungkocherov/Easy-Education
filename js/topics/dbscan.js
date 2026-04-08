@@ -809,5 +809,19 @@ plt.show()</code></pre>
         <li>Нужно искать компромиссный ε.</li>
       </ul>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=RDZUdRSDOok" target="_blank">StatQuest: DBSCAN</a> — наглядный разбор алгоритма с примерами</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/566404/" target="_blank">Habr: DBSCAN</a> — объяснение с визуализацией и кодом</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html" target="_blank">sklearn DBSCAN</a> — официальная документация с параметрами eps и min_samples</li>
+      </ul>
+    `,
   },
 });

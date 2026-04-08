@@ -600,5 +600,25 @@ print(f"  (при α={alpha} и {n_metrics} метриках)")</code></pre>
       <div class="callout warn">⚠️ Поправки работают только если множество тестируемых гипотез задано ДО анализа данных. Если вы сначала посмотрели на данные, а потом выбрали «интересные» гипотезы — никакая поправка не поможет.</div>
       <div class="callout">💡 <b>Практический совет:</b> в продуктовых A/B тестах выберите одну первичную метрику заранее. Она тестируется без поправки. Остальные метрики — exploratory, только для генерации новых гипотез, не для принятия решений.</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=K8LQSvtjcEo" target="_blank">StatQuest: FDR and the Benjamini-Hochberg Method</a> — контроль доли ложных открытий (FDR) и метод Бенджамини-Хохберга</li>
+        <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values, clearly explained</a> — почему множественные тесты раздувают ошибку I рода</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample" target="_blank">Khan Academy: Significance tests</a> — основы статистических тестов для понимания поправок</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BC%D0%BD%D0%BE%D0%B6%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5+%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F" target="_blank">Habr: множественные сравнения</a> — проблема множественных тестов и методы коррекции</li>
+        <li><a href="https://en.wikipedia.org/wiki/False_discovery_rate" target="_blank">Wikipedia: False discovery rate</a> — FDR: определение, процедура BH и применение</li>
+        <li><a href="https://en.wikipedia.org/wiki/Bonferroni_correction" target="_blank">Wikipedia: Bonferroni correction</a> — поправка Бонферрони: формула и ограничения</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.multitest.multipletests.html" target="_blank">statsmodels: multipletests</a> — Bonferroni, Holm, BH, BY и другие поправки в одной функции</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.false_discovery_control.html" target="_blank">SciPy: false_discovery_control</a> — контроль FDR по методу Бенджамини-Хохберга</li>
+      </ul>
+    `,
   },
 });

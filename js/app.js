@@ -82,6 +82,7 @@ const App = (function () {
     proscons: 'Плюсы / Минусы',
     math: 'Математика',
     extra: 'Дополнительно',
+    links: '📎 Ссылки',
   };
 
   function renderTabs(topic) {

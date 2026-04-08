@@ -1061,5 +1061,20 @@ print(f"Для классификации: {last_hidden.shape}")
       <h3>Закат RNN</h3>
       <p>С 2018 RNN постепенно вытеснены Transformer-ами в NLP. Но остаются актуальны для стриминга, онлайн-обработки, маленьких моделей, time series.</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=YCzL96nL7j0" target="_blank">StatQuest: LSTM</a> — понятное объяснение ячейки LSTM и потоков градиентов</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank">Colah's blog: Understanding LSTM Networks</a> — классическое визуальное объяснение LSTM</li>
+        <li><a href="https://habr.com/ru/articles/484896/" target="_blank">Habr: LSTM и GRU</a> — разбор архитектур с кодом на PyTorch</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html" target="_blank">PyTorch LSTM</a> — официальная документация с параметрами и примерами</li>
+      </ul>
+    `,
   },
 });

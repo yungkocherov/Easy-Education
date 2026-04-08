@@ -752,5 +752,21 @@ for name, pipe in pipelines.items():
         <li><b>Не удалять HTML/спецсимволы:</b> парсить тексты с web нужно перед векторизацией.</li>
       </ul>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest: канал</a> — поиск по «word2vec» и «NLP» для основ векторных представлений</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/452524/" target="_blank">Habr: NLP — с чего начать</a> — обзор методов от BoW до BERT с практическими примерами</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html" target="_blank">sklearn TfidfVectorizer</a> — документация с параметрами и примерами</li>
+        <li><a href="https://radimrehurek.com/gensim/models/word2vec.html" target="_blank">Gensim Word2Vec</a> — документация по обучению и использованию Word2Vec</li>
+        <li><a href="https://huggingface.co/docs/transformers/index" target="_blank">HuggingFace Transformers</a> — документация библиотеки для работы с BERT и современными LLM</li>
+      </ul>
+    `,
   },
 });

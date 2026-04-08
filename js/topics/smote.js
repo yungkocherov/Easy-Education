@@ -814,5 +814,21 @@ print('UnderSampling F1:', f1_score(y_test, lr.predict(X_test), average='macro')
       <h3>Anomaly detection как альтернатива</h3>
       <p>Если дисбаланс очень сильный (1:1000+), возможно это не классификация, а поиск аномалий: Isolation Forest, One-Class SVM, Autoencoder.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=FheTDyCzzuk" target="_blank">Imbalanced datasets and SMOTE explained</a> — разбор проблемы дисбаланса и метода SMOTE</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/393455/" target="_blank">Дисбаланс классов на Habr</a> — стратегии работы с несбалансированными данными на русском</li>
+        <li><a href="https://arxiv.org/abs/1106.1813" target="_blank">Оригинальная статья SMOTE (Chawla et al.)</a> — исходная научная публикация алгоритма SMOTE</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://imbalanced-learn.org/stable/" target="_blank">imbalanced-learn документация</a> — полная документация библиотеки с SMOTE и вариантами</li>
+      </ul>
+    `,
   },
 });

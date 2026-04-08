@@ -913,5 +913,20 @@ plt.show()</code></pre>
       <h3>A/B тесты по-байесовски</h3>
       <p>Вместо p-value — P(B лучше A | данные). Легко обновляется, даёт вероятности напрямую.</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=O2L2Uv9pdDA" target="_blank">StatQuest: Naive Bayes</a> — объяснение наивного байесовского классификатора</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/357022/" target="_blank">Наивный Байес на Habr</a> — разбор алгоритма с примерами на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/naive_bayes.html" target="_blank">sklearn: Naive Bayes</a> — документация всех вариантов наивного байеса в sklearn</li>
+      </ul>
+    `,
   },
 });

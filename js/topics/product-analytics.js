@@ -714,5 +714,26 @@ plt.show()</code></pre>
       <div class="callout warn">⚠️ Аналитика отвечает «что» и «сколько», но не «почему». Для ответа «почему» нужны качественные методы: интервью, usability тесты, сессионные записи. Оба подхода дополняют, а не заменяют друг друга.</div>
       <div class="callout">💡 <b>Приоритет метрик:</b> Retention → Activation → Revenue → Acquisition → Referral. Начинай с удержания, а не с привлечения. Без retention деньги на маркетинг уходят в «дырявое ведро».</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=lHI5oEgNkrk" target="_blank">StatQuest: Designing Experiments</a> — принципы дизайна экспериментов для продуктовой аналитики</li>
+        <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values</a> — как интерпретировать результаты продуктовых A/B тестов</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics and Probability</a> — статистические основы для продуктового аналитика</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D0%BE%D0%B2%D0%B0%D1%8F+%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0" target="_blank">Habr: продуктовая аналитика</a> — метрики, когортный анализ, воронки на Хабре</li>
+        <li><a href="https://habr.com/ru/search/?q=unit+%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B0" target="_blank">Habr: unit-экономика</a> — LTV, CAC, ARPU и расчёт unit-экономики</li>
+        <li><a href="https://en.wikipedia.org/wiki/Customer_lifetime_value" target="_blank">Wikipedia: Customer Lifetime Value</a> — формулы и методы расчёта LTV</li>
+      </ul>
+      <h3>📚 Документация и инструменты</h3>
+      <ul>
+        <li><a href="https://amplitude.com/docs" target="_blank">Amplitude: Documentation</a> — полная документация по продуктовой аналитике в Amplitude</li>
+        <li><a href="https://pandas.pydata.org/docs/reference/groupby.html" target="_blank">Pandas: GroupBy</a> — когортный анализ и агрегации для продуктовых метрик</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">SciPy: scipy.stats</a> — статистические тесты для проверки продуктовых гипотез</li>
+      </ul>
+    `,
   },
 });

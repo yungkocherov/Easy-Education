@@ -614,5 +614,20 @@ for name, model in models.items():
         </table>
       </div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=efR1C6CvhmE" target="_blank">StatQuest: Support Vector Machines</a> — основы SVM, применимые к SVR</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/484148/" target="_blank">SVM/SVR на Habr</a> — разбор метода опорных векторов для регрессии на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html" target="_blank">sklearn: SVR</a> — документация Support Vector Regressor в sklearn</li>
+      </ul>
+    `,
   },
 });

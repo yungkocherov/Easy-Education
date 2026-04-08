@@ -622,5 +622,24 @@ plt.show()</code></pre>
       <div class="callout tip">💡 Правило: если медиана и среднее сильно расходятся — данные скошены. Используй Welch + log-transform, либо bootstrap, либо Манн-Уитни (непараметрический).</div>
       <div class="callout warn">⚠️ Никогда не используй Student при явно неравных дисперсиях (отношение s²_B/s²_A > 3). Используй Welch — он работает корректно в обоих случаях.</div>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">StatQuest: t-tests, clearly explained</a> — t-тест для двух выборок: интуиция и расчёт</li>
+        <li><a href="https://www.youtube.com/watch?v=AGh66ZPpOSQ" target="_blank">StatQuest: Welch's t-test</a> — t-тест Уэлча при неравных дисперсиях</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-two-sample/two-sample-t-test-for-difference-of-means/v/two-sample-t-test-and-robustness" target="_blank">Khan Academy: Two-sample t-test</a> — двухвыборочный t-тест с примерами</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=t-%D1%82%D0%B5%D1%81%D1%82+%D1%81%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D1%85" target="_blank">Habr: t-тест средних</a> — применение t-теста для сравнения средних значений</li>
+        <li><a href="https://en.wikipedia.org/wiki/Welch%27s_t-test" target="_blank">Wikipedia: Welch's t-test</a> — описание t-теста Уэлча и его преимущества</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html" target="_blank">SciPy: scipy.stats.ttest_ind</a> — двухвыборочный t-тест (Student и Welch) с параметром equal_var</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html" target="_blank">SciPy: scipy.stats.ttest_1samp</a> — одновыборочный t-тест</li>
+      </ul>
+    `,
   },
 });

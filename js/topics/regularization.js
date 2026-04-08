@@ -901,5 +901,22 @@ plt.show()</code></pre>
         <tr><td>Нужна интерпретация</td><td>L1</td></tr>
       </table>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=Q81RR3yKn30" target="_blank">StatQuest: Ridge Regression</a> — наглядное объяснение L2-регуляризации</li>
+        <li><a href="https://www.youtube.com/watch?v=NGf0voTMlcs" target="_blank">StatQuest: Lasso Regression</a> — L1-регуляризация и отбор признаков</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/264915/" target="_blank">Регуляризация на Habr</a> — L1, L2 и Elastic Net с математикой и кодом на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html" target="_blank">sklearn: Ridge</a> — документация Ridge-регрессии</li>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html" target="_blank">sklearn: Lasso</a> — документация Lasso-регрессии</li>
+      </ul>
+    `,
   },
 });

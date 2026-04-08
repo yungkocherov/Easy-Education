@@ -735,5 +735,20 @@ plt.show()</code></pre>
         <li>SVM с ядром ≈ логрег в признаковом пространстве.</li>
       </ul>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=yIYKR4sgzI8" target="_blank">StatQuest: Logistic Regression</a> — интуитивное объяснение логистической регрессии</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/341838/" target="_blank">Логистическая регрессия на Habr</a> — теория, реализация и примеры на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html" target="_blank">sklearn: LogisticRegression</a> — документация по логистической регрессии в sklearn</li>
+      </ul>
+    `,
   },
 });

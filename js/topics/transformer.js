@@ -1061,5 +1061,22 @@ print(f"Размер словаря: {tokenizer.vocab_size:,}")   # ~30 000 у B
       <h3>In-context learning</h3>
       <p>Большие LLM умеют учиться из примеров в промпте без изменения весов — few-shot, zero-shot. Эмерджентное свойство scale.</p>
     `,
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank">3Blue1Brown: Attention in transformers</a> — визуальная интуиция механизма внимания</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest: канал</a> — поиск по «transformer» и «attention» для пошагового разбора</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention Is All You Need (Vaswani et al., 2017)</a> — оригинальная статья, представившая архитектуру Transformer</li>
+        <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">Jay Alammar: The Illustrated Transformer</a> — лучшее визуальное объяснение трансформера</li>
+        <li><a href="https://habr.com/ru/articles/486358/" target="_blank">Habr: Трансформер</a> — разбор архитектуры с кодом на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://huggingface.co/docs/transformers/index" target="_blank">HuggingFace Transformers</a> — документация, туториалы и модели для быстрого старта</li>
+      </ul>
+    `,
   },
 });

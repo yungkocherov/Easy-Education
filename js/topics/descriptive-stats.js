@@ -789,5 +789,25 @@ plt.show()  # Выброс 450 виден как отдельная точка</
       <h3>Дальше</h3>
       <p>После описательной статистики обычно переходят к <b>распределениям</b> и <b>проверке гипотез</b> — они отвечают на вопрос «а значимо ли отличие?».</p>
     `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=XNgt7F6FqDU" target="_blank">StatQuest: Histograms, Clearly Explained</a> — наглядное объяснение гистограмм и их параметров</li>
+        <li><a href="https://www.youtube.com/watch?v=SzZ6GpcfoQY" target="_blank">StatQuest: Mean, Variance and Standard Deviation</a> — среднее, дисперсия и стандартное отклонение</li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data" target="_blank">Khan Academy: Summarizing quantitative data</a> — интерактивный курс по описательной статистике</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0" target="_blank">Habr: описательная статистика</a> — подборка русскоязычных статей на Хабре</li>
+        <li><a href="https://en.wikipedia.org/wiki/Descriptive_statistics" target="_blank">Wikipedia: Descriptive statistics</a> — обзор методов описательной статистики</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://numpy.org/doc/stable/reference/routines.statistics.html" target="_blank">NumPy: Statistical routines</a> — mean, median, std, percentile и другие функции</li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">SciPy: scipy.stats</a> — расширенные статистические функции, skewness, kurtosis</li>
+        <li><a href="https://pandas.pydata.org/docs/reference/frame.html#computations-descriptive-stats" target="_blank">Pandas: describe() и статистические методы</a> — быстрый сводный анализ DataFrame</li>
+      </ul>
+    `,
   },
 });

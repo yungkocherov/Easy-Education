@@ -729,7 +729,22 @@ plt.show()</code></pre>
       <p>Если некоторые признаки важнее, умножить их на больший вес. Иначе нерелевантные признаки «разбавят» расстояние.</p>
 
       <h3>kNN и learning theory</h3>
-      <p>1-NN имеет асимптотическую ошибку ≤ 2× оптимальная (Bayes). Для большого n kNN сходится к оптимальному классификатору при $k \\to \\infty$ и $k/n \\to 0$.</p>
+      <p>1-NN имеет асимптотическую ошибку ≤ 2× оптимальная (Bayes). Для больших n kNN сходится к оптимальному классификатору при $k \\to \\infty$ и $k/n \\to 0$.</p>
+    `,
+
+    links: `
+      <h3>📺 Видео</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=HVXime0nQeI" target="_blank">StatQuest: K-nearest neighbors</a> — наглядное объяснение алгоритма kNN</li>
+      </ul>
+      <h3>📖 Статьи</h3>
+      <ul>
+        <li><a href="https://habr.com/ru/articles/149693/" target="_blank">Метод ближайших соседей на Habr</a> — разбор kNN с примерами на русском</li>
+      </ul>
+      <h3>📚 Документация</h3>
+      <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html" target="_blank">sklearn: KNeighborsClassifier</a> — документация kNN-классификатора</li>
+      </ul>
     `,
   },
 });
