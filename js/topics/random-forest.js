@@ -244,244 +244,540 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Bootstrap выборка: пошагово',
+        title: 'Строим Random Forest из 3 деревьев',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать, как bootstrap-выборки создают разнообразные деревья, и что такое OOB (out-of-bag) примеры.</p>
-          </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Индекс</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
-              <tr><th>Метка</th><td>A</td><td>B</td><td>A</td><td>B</td><td>A</td><td>A</td><td>B</td><td>A</td><td>B</td><td>A</td></tr>
-            </table>
+            <p>Построить Random Forest из 3 деревьев на датасете из 6 фруктов. Проследить каждый шаг: bootstrap-выборки, построение деревьев, голосование и OOB-оценку.</p>
           </div>
           <div class="step" data-step="1">
-            <h4>Шаг 1: создать bootstrap-выборку для дерева 1</h4>
-            <div class="calc">
-              n=10 → тянем 10 раз с возвращением (равновероятно)<br>
-              Выборка: [3, 7, 3, 1, 9, 2, 5, 3, 8, 1]<br>
-              Уникальные: {1,2,3,5,7,8,9} — 7 из 10<br>
-              OOB для дерева 1: {4, 6, 10} — 3 примера не попали
-            </div>
-            <div class="why">В среднем bootstrap оставляет за бортом ≈ 36.8% = (1−1/n)ⁿ → e⁻¹ ≈ 0.368 примеров.</div>
-          </div>
-          <div class="step" data-step="2">
-            <h4>Шаг 2: bootstrap-выборки для 5 деревьев</h4>
+            <h4>Шаг 1: исходный датасет</h4>
+            <p>6 фруктов, 2 признака: Вес (г) и Цвет (1=бледный, 10=насыщенный).</p>
             <div class="example-data-table">
               <table>
-                <tr><th>Дерево</th><th>Bootstrap индексы</th><th>OOB индексы</th></tr>
-                <tr><td>1</td><td>3,7,3,1,9,2,5,3,8,1</td><td>4,6,10</td></tr>
-                <tr><td>2</td><td>5,2,8,4,1,5,9,6,2,4</td><td>3,7,10</td></tr>
-                <tr><td>3</td><td>10,4,7,1,6,3,10,2,5,8</td><td>9 (и др.)</td></tr>
-                <tr><td>4</td><td>6,9,3,7,2,4,8,1,6,9</td><td>5,10 (и др.)</td></tr>
-                <tr><td>5</td><td>1,3,5,2,7,9,4,6,3,1</td><td>8,10 (и др.)</td></tr>
+                <tr><th>#</th><th>Вес (г)</th><th>Цвет (1–10)</th><th>Класс</th></tr>
+                <tr><td>1</td><td>150</td><td>3</td><td style="color:#16a34a;font-weight:600">Яблоко</td></tr>
+                <tr><td>2</td><td>170</td><td>4</td><td style="color:#16a34a;font-weight:600">Яблоко</td></tr>
+                <tr><td>3</td><td>130</td><td>2</td><td style="color:#16a34a;font-weight:600">Яблоко</td></tr>
+                <tr><td>4</td><td>200</td><td>8</td><td style="color:#ea580c;font-weight:600">Апельсин</td></tr>
+                <tr><td>5</td><td>190</td><td>7</td><td style="color:#ea580c;font-weight:600">Апельсин</td></tr>
+                <tr><td>6</td><td>210</td><td>9</td><td style="color:#ea580c;font-weight:600">Апельсин</td></tr>
               </table>
             </div>
-            <div class="why">Каждое дерево видит разные данные → деревья разнообразны → ансамбль лучше одного дерева.</div>
+            <div class="why">Датасет намеренно маленький — 6 объектов — чтобы можно было проследить каждый шаг вручную. В реальности датасет может быть миллионы строк.</div>
           </div>
-          <div class="step" data-step="3">
-            <h4>Шаг 3: случайный выбор признаков (max_features)</h4>
+
+          <div class="step" data-step="2">
+            <h4>Шаг 2: bootstrap-выборка для Дерева 1</h4>
             <div class="calc">
-              Датасет: 16 признаков<br>
-              Классификация: max_features = √16 = 4<br>
-              В каждом узле случайно выбираем 4 признака из 16<br>
-              Ищем лучшее разбиение только среди этих 4<br>
-              → Деревья видят разные признаки в каждом узле<br>
-              → Корреляция деревьев снижается → ансамбль лучше
+              n = 6. Тянем 6 раз с возвращением (каждый раз — случайный индекс 1..6).<br>
+              Результат: [1, 3, 3, 4, 5, 6]<br>
+              &nbsp;&nbsp;индекс 1 — 1 раз, индекс 2 — 0 раз, индекс 3 — 2 раза,<br>
+              &nbsp;&nbsp;индекс 4 — 1 раз, индекс 5 — 1 раз, индекс 6 — 1 раз.<br>
+              OOB (не попали ни разу): {2}
             </div>
-            <div class="why">Если не ограничивать признаки — доминирующий признак попадёт в корень всех деревьев, и они станут похожими. Разнообразие ключевое для Random Forest.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Позиция в bootstrap</th><th>Индекс</th><th>Вес</th><th>Цвет</th><th>Класс</th></tr>
+                <tr><td>1</td><td>1</td><td>150</td><td>3</td><td style="color:#16a34a">Яблоко</td></tr>
+                <tr><td>2</td><td>3</td><td>130</td><td>2</td><td style="color:#16a34a">Яблоко</td></tr>
+                <tr><td>3</td><td>3</td><td>130</td><td>2</td><td style="color:#16a34a">Яблоко (дубль)</td></tr>
+                <tr><td>4</td><td>4</td><td>200</td><td>8</td><td style="color:#ea580c">Апельсин</td></tr>
+                <tr><td>5</td><td>5</td><td>190</td><td>7</td><td style="color:#ea580c">Апельсин</td></tr>
+                <tr><td>6</td><td>6</td><td>210</td><td>9</td><td style="color:#ea580c">Апельсин</td></tr>
+              </table>
+            </div>
+            <div class="why">Индекс 3 встречается дважды — это нормально: bootstrap тянет с возвращением. Индекс 2 пропущен — он OOB для Дерева 1.</div>
           </div>
+
+          <div class="step" data-step="3">
+            <h4>Шаг 3: строим Дерево 1 (max_features = 1)</h4>
+            <p>При каждом разбиении случайно выбираем 1 признак из 2. Для корня выпало: <b>Вес</b>.</p>
+            <div class="calc">
+              Данные в корне: {1,3,3,4,5,6} → 3 яблока, 3 апельсина<br>
+              Gini корня = 1 − (3/6)² − (3/6)² = 1 − 0.25 − 0.25 = <b>0.5</b><br><br>
+              Пробуем пороги для Вес (сортируем значения: 130,130,150,190,200,210):<br>
+              Пороги между соседними уникальными: 140, 160, 185, 195, 205<br><br>
+              <b>Порог Вес &lt; 140:</b><br>
+              &nbsp;&nbsp;Левое (Вес&lt;140): {3,3} = 2 яблока, 0 апельс. → Gini = 1−(2/2)²−(0/2)² = 0<br>
+              &nbsp;&nbsp;Правое (Вес≥140): {1,4,5,6} = 1 яблоко, 3 апельс. → Gini = 1−(1/4)²−(3/4)² = 1−0.0625−0.5625 = 0.375<br>
+              &nbsp;&nbsp;Взвешенный Gini = (2/6)·0 + (4/6)·0.375 = 0 + 0.25 = 0.25<br><br>
+              <b>Порог Вес &lt; 160:</b><br>
+              &nbsp;&nbsp;Левое (Вес&lt;160): {1,3,3} = 3 яблока, 0 апельс. → Gini = 1−(3/3)²−0 = 0<br>
+              &nbsp;&nbsp;Правое (Вес≥160): {4,5,6} = 0 яблок, 3 апельс. → Gini = 0<br>
+              &nbsp;&nbsp;Взвешенный Gini = (3/6)·0 + (3/6)·0 = <b>0.0 ← минимум!</b><br><br>
+              <b>Порог Вес &lt; 185:</b><br>
+              &nbsp;&nbsp;(тот же результат: Вес{130,130,150}&lt;185=яблоки; Вес{190,200,210}≥185=апельсины)<br>
+              &nbsp;&nbsp;Взвешенный Gini = 0 + 0 = <b>0.0</b><br><br>
+              Снижение нечистоты = 0.5 − 0.0 = <b>0.5</b> (максимально возможное)<br>
+              Выбираем порог Вес &lt; 185 (оба порога 160 и 185 дают Gini=0; берём 185 как середину между 150 и 190).
+            </div>
+            <div class="why">Gini = 0 означает абсолютно чистые листья. Лучше быть не может. Дерево 1 — идеальный классификатор на своих данных.</div>
+          </div>
+
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 155" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Bootstrap: выборка 10 элементов с возвращением</text>
-              <!-- Original dataset: indices 1-10 -->
-              <text x="50" y="38" font-size="10" fill="#64748b" font-weight="600">Оригинал:</text>
-              <text x="50" y="52" font-size="9" fill="#64748b">Индексы 1–10</text>
-              <!-- Boxes for original 1-10 -->
-              <rect x="130" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="142" y="46" text-anchor="middle" font-size="10" fill="#3730a3">1</text>
-              <rect x="158" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="170" y="46" text-anchor="middle" font-size="10" fill="#3730a3">2</text>
-              <rect x="186" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="198" y="46" text-anchor="middle" font-size="10" fill="#3730a3">3</text>
-              <rect x="214" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="226" y="46" text-anchor="middle" font-size="10" fill="#3730a3">4</text>
-              <rect x="242" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="254" y="46" text-anchor="middle" font-size="10" fill="#3730a3">5</text>
-              <rect x="270" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="282" y="46" text-anchor="middle" font-size="10" fill="#3730a3">6</text>
-              <rect x="298" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="310" y="46" text-anchor="middle" font-size="10" fill="#3730a3">7</text>
-              <rect x="326" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="338" y="46" text-anchor="middle" font-size="10" fill="#3730a3">8</text>
-              <rect x="354" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="366" y="46" text-anchor="middle" font-size="10" fill="#3730a3">9</text>
-              <rect x="382" y="30" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="394" y="46" text-anchor="middle" font-size="10" fill="#3730a3">10</text>
-              <!-- Arrow down -->
-              <text x="230" y="74" text-anchor="middle" font-size="16" fill="#64748b">↓ с возвращением</text>
-              <!-- Bootstrap sample: [3,7,3,1,9,2,5,3,8,1] -->
-              <text x="50" y="100" font-size="10" fill="#64748b" font-weight="600">Bootstrap:</text>
-              <text x="50" y="114" font-size="9" fill="#64748b">выборка дерева 1</text>
-              <!-- 3 repeated -->
-              <rect x="130" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-              <text x="142" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
-              <rect x="158" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="170" y="104" text-anchor="middle" font-size="10" fill="#3730a3">7</text>
-              <!-- 3 repeated again -->
-              <rect x="186" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-              <text x="198" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
-              <rect x="214" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="226" y="104" text-anchor="middle" font-size="10" fill="#3730a3">1</text>
-              <rect x="242" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="254" y="104" text-anchor="middle" font-size="10" fill="#3730a3">9</text>
-              <rect x="270" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="282" y="104" text-anchor="middle" font-size="10" fill="#3730a3">2</text>
-              <rect x="298" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="310" y="104" text-anchor="middle" font-size="10" fill="#3730a3">5</text>
-              <!-- 3 third time -->
-              <rect x="326" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-              <text x="338" y="104" text-anchor="middle" font-size="10" fill="#065f46">3</text>
-              <rect x="354" y="88" width="24" height="24" rx="3" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
-              <text x="366" y="104" text-anchor="middle" font-size="10" fill="#3730a3">8</text>
-              <!-- 1 repeated -->
-              <rect x="382" y="88" width="24" height="24" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-              <text x="394" y="104" text-anchor="middle" font-size="10" fill="#065f46">1</text>
-              <!-- OOB label -->
-              <text x="50" y="135" font-size="10" fill="#ef4444" font-weight="600">OOB (не попали):</text>
-              <rect x="178" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-              <text x="190" y="138" text-anchor="middle" font-size="10" fill="#991b1b">4</text>
-              <rect x="206" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-              <text x="218" y="138" text-anchor="middle" font-size="10" fill="#991b1b">6</text>
-              <rect x="234" y="124" width="24" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-              <text x="246" y="138" text-anchor="middle" font-size="10" fill="#991b1b">10</text>
-              <text x="275" y="138" font-size="9" fill="#ef4444">← ~36.8% пропущено</text>
+            <svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Дерево 1: Вес &lt; 185?</text>
+              <!-- Root node -->
+              <rect x="145" y="25" width="130" height="44" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+              <text x="210" y="43" text-anchor="middle" font-size="11" font-weight="700" fill="#3730a3">Вес &lt; 185?</text>
+              <text x="210" y="59" text-anchor="middle" font-size="9" fill="#4338ca">Gini корня = 0.5</text>
+              <!-- Left branch -->
+              <line x1="175" y1="69" x2="100" y2="110" stroke="#16a34a" stroke-width="2"/>
+              <text x="120" y="98" font-size="9" fill="#16a34a" font-weight="600">Да (≤184г)</text>
+              <!-- Right branch -->
+              <line x1="245" y1="69" x2="320" y2="110" stroke="#ea580c" stroke-width="2"/>
+              <text x="265" y="98" font-size="9" fill="#ea580c" font-weight="600">Нет (≥185г)</text>
+              <!-- Left leaf -->
+              <rect x="40" y="110" width="120" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+              <text x="100" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Яблоко</text>
+              <text x="100" y="146" text-anchor="middle" font-size="9" fill="#166534">3 яблока / 0 апельс.</text>
+              <text x="100" y="159" text-anchor="middle" font-size="9" fill="#166534">Gini = 0 (чистый)</text>
+              <!-- Right leaf -->
+              <rect x="260" y="110" width="120" height="48" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+              <text x="320" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">Апельсин</text>
+              <text x="320" y="146" text-anchor="middle" font-size="9" fill="#9a3412">0 яблок / 3 апельс.</text>
+              <text x="320" y="159" text-anchor="middle" font-size="9" fill="#9a3412">Gini = 0 (чистый)</text>
             </svg>
-            <div class="caption">Bootstrap: зелёные клетки повторяются (3 встречается трижды, 1 дважды). Красные клетки (4, 6, 10) не попали — это OOB примеры для оценки качества без test set.</div>
+            <div class="caption">Дерево 1 разделяет фрукты идеально по весу: объекты с Вес&lt;185г — яблоки, с Вес≥185г — апельсины. Оба листа абсолютно чисты (Gini=0).</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: bootstrap-выборка для Дерева 2</h4>
+            <div class="calc">
+              Тянем 6 раз с возвращением: [2, 2, 4, 5, 6, 6]<br>
+              &nbsp;&nbsp;индекс 1 — 0 раз, индекс 2 — 2 раза, индекс 3 — 0 раз,<br>
+              &nbsp;&nbsp;индекс 4 — 1 раз, индекс 5 — 1 раз, индекс 6 — 2 раза.<br>
+              OOB (не попали): {1, 3}
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Позиция</th><th>Индекс</th><th>Вес</th><th>Цвет</th><th>Класс</th></tr>
+                <tr><td>1</td><td>2</td><td>170</td><td>4</td><td style="color:#16a34a">Яблоко</td></tr>
+                <tr><td>2</td><td>2</td><td>170</td><td>4</td><td style="color:#16a34a">Яблоко (дубль)</td></tr>
+                <tr><td>3</td><td>4</td><td>200</td><td>8</td><td style="color:#ea580c">Апельсин</td></tr>
+                <tr><td>4</td><td>5</td><td>190</td><td>7</td><td style="color:#ea580c">Апельсин</td></tr>
+                <tr><td>5</td><td>6</td><td>210</td><td>9</td><td style="color:#ea580c">Апельсин</td></tr>
+                <tr><td>6</td><td>6</td><td>210</td><td>9</td><td style="color:#ea580c">Апельсин (дубль)</td></tr>
+              </table>
+            </div>
+            <p>Для корня Дерева 2 случайно выпал признак: <b>Цвет</b>.</p>
+            <div class="calc">
+              Данные: {2,2,4,5,6,6} → 2 яблока (цвет=4,4), 4 апельсина (цвет=8,7,9,9)<br>
+              Gini корня = 1 − (2/6)² − (4/6)² = 1 − 0.111 − 0.444 = <b>0.444</b><br><br>
+              Уникальные значения Цвета: 4, 7, 8, 9. Пороги: 5.5, 7.5, 8.5<br><br>
+              <b>Порог Цвет &lt; 5.5:</b><br>
+              &nbsp;&nbsp;Левое (Цвет&lt;5.5): {2,2} → цвет=4,4 → 2 яблока, 0 апельс. → Gini = 0<br>
+              &nbsp;&nbsp;Правое (Цвет≥5.5): {4,5,6,6} → цвет=8,7,9,9 → 0 яблок, 4 апельс. → Gini = 0<br>
+              &nbsp;&nbsp;Взвешенный Gini = (2/6)·0 + (4/6)·0 = <b>0.0 ← лучший!</b><br><br>
+              Снижение нечистоты = 0.444 − 0.0 = <b>0.444</b>
+            </div>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Дерево 2: Цвет &lt; 5.5?</text>
+              <!-- Root node -->
+              <rect x="135" y="25" width="150" height="44" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+              <text x="210" y="43" text-anchor="middle" font-size="11" font-weight="700" fill="#78350f">Цвет &lt; 5.5?</text>
+              <text x="210" y="59" text-anchor="middle" font-size="9" fill="#92400e">Gini корня = 0.444</text>
+              <!-- Left branch -->
+              <line x1="175" y1="69" x2="100" y2="110" stroke="#16a34a" stroke-width="2"/>
+              <text x="105" y="98" font-size="9" fill="#16a34a" font-weight="600">Да (цвет ≤5)</text>
+              <!-- Right branch -->
+              <line x1="245" y1="69" x2="320" y2="110" stroke="#ea580c" stroke-width="2"/>
+              <text x="258" y="98" font-size="9" fill="#ea580c" font-weight="600">Нет (цвет ≥6)</text>
+              <!-- Left leaf -->
+              <rect x="40" y="110" width="120" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+              <text x="100" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Яблоко</text>
+              <text x="100" y="146" text-anchor="middle" font-size="9" fill="#166534">2 яблока / 0 апельс.</text>
+              <text x="100" y="159" text-anchor="middle" font-size="9" fill="#166534">Gini = 0</text>
+              <!-- Right leaf -->
+              <rect x="260" y="110" width="120" height="48" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+              <text x="320" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">Апельсин</text>
+              <text x="320" y="146" text-anchor="middle" font-size="9" fill="#9a3412">0 яблок / 4 апельс.</text>
+              <text x="320" y="159" text-anchor="middle" font-size="9" fill="#9a3412">Gini = 0</text>
+            </svg>
+            <div class="caption">Дерево 2 использует признак Цвет: объекты с Цветом &lt; 5.5 — яблоки (бледные), с Цветом ≥ 5.5 — апельсины (насыщенные). Снова идеальное разделение.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: bootstrap-выборка для Дерева 3</h4>
+            <div class="calc">
+              Тянем 6 раз с возвращением: [1, 2, 3, 5, 5, 6]<br>
+              &nbsp;&nbsp;индекс 1 — 1 раз, индекс 2 — 1 раз, индекс 3 — 1 раз,<br>
+              &nbsp;&nbsp;индекс 4 — 0 раз, индекс 5 — 2 раза, индекс 6 — 1 раз.<br>
+              OOB (не попали): {4}
+            </div>
+            <p>Для корня Дерева 3 случайно выпал признак: <b>Вес</b>.</p>
+            <div class="calc">
+              Данные: {1,2,3,5,5,6} → 3 яблока (150,170,130), 3 апельс. (190,190,210)<br>
+              Gini корня = 1 − (3/6)² − (3/6)² = <b>0.5</b><br><br>
+              Порог Вес &lt; 185:<br>
+              &nbsp;&nbsp;Левое: {1,2,3} → 150,170,130 → 3 яблока, 0 апельс. → Gini = 0<br>
+              &nbsp;&nbsp;Правое: {5,5,6} → 190,190,210 → 0 яблок, 3 апельс. → Gini = 0<br>
+              &nbsp;&nbsp;Взвешенный Gini = 0. Снижение = 0.5 − 0 = <b>0.5</b>
+            </div>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+              <text x="210" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Дерево 3: Вес &lt; 185?</text>
+              <!-- Root node -->
+              <rect x="135" y="25" width="150" height="44" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+              <text x="210" y="43" text-anchor="middle" font-size="11" font-weight="700" fill="#3730a3">Вес &lt; 185?</text>
+              <text x="210" y="59" text-anchor="middle" font-size="9" fill="#4338ca">Gini корня = 0.5</text>
+              <!-- Left branch -->
+              <line x1="175" y1="69" x2="100" y2="110" stroke="#16a34a" stroke-width="2"/>
+              <text x="100" y="98" font-size="9" fill="#16a34a" font-weight="600">Да</text>
+              <!-- Right branch -->
+              <line x1="245" y1="69" x2="320" y2="110" stroke="#ea580c" stroke-width="2"/>
+              <text x="300" y="98" font-size="9" fill="#ea580c" font-weight="600">Нет</text>
+              <!-- Left leaf -->
+              <rect x="40" y="110" width="120" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+              <text x="100" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Яблоко</text>
+              <text x="100" y="146" text-anchor="middle" font-size="9" fill="#166534">3 яблока / 0 апельс.</text>
+              <text x="100" y="159" text-anchor="middle" font-size="9" fill="#166534">Gini = 0</text>
+              <!-- Right leaf -->
+              <rect x="260" y="110" width="120" height="48" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+              <text x="320" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">Апельсин</text>
+              <text x="320" y="146" text-anchor="middle" font-size="9" fill="#9a3412">0 яблок / 3 апельс.</text>
+              <text x="320" y="159" text-anchor="middle" font-size="9" fill="#9a3412">Gini = 0</text>
+            </svg>
+            <div class="caption">Дерево 3 аналогично Дереву 1 использует порог по Весу. Они похожи структурой, но обучались на разных bootstrap-выборках.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: классифицируем новый фрукт (Вес=160г, Цвет=5)</h4>
+            <div class="calc">
+              <b>Дерево 1</b> (Вес &lt; 185?):<br>
+              &nbsp;&nbsp;160 &lt; 185? → Да → лист «Яблоко». Предсказание: <b>Яблоко</b><br><br>
+              <b>Дерево 2</b> (Цвет &lt; 5.5?):<br>
+              &nbsp;&nbsp;5 &lt; 5.5? → Да → лист «Яблоко». Предсказание: <b>Яблоко</b><br><br>
+              <b>Дерево 3</b> (Вес &lt; 185?):<br>
+              &nbsp;&nbsp;160 &lt; 185? → Да → лист «Яблоко». Предсказание: <b>Яблоко</b><br><br>
+              Голосование: Яблоко=3, Апельсин=0<br>
+              Итог: <b>Яблоко</b> (единогласно, 3:0)
+            </div>
+            <div class="why">Все три дерева согласны. Это сильный сигнал — высокая уверенность леса. Если бы деревья расходились (2:1), уверенность была бы ниже.</div>
+          </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+              <text x="250" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Голосование: Вес=160г, Цвет=5</text>
+              <!-- New fruit box -->
+              <rect x="10" y="25" width="90" height="50" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+              <text x="55" y="46" text-anchor="middle" font-size="9" font-weight="600" fill="#334155">Новый фрукт</text>
+              <text x="55" y="59" text-anchor="middle" font-size="9" fill="#64748b">Вес=160г</text>
+              <text x="55" y="72" text-anchor="middle" font-size="9" fill="#64748b">Цвет=5</text>
+              <!-- Arrow -->
+              <line x1="100" y1="50" x2="130" y2="50" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+              <!-- Tree 1 -->
+              <rect x="130" y="25" width="80" height="50" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="170" y="44" text-anchor="middle" font-size="9" font-weight="600" fill="#3730a3">Дерево 1</text>
+              <text x="170" y="57" text-anchor="middle" font-size="9" fill="#4338ca">Вес&lt;185?</text>
+              <text x="170" y="69" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">→ Яблоко</text>
+              <!-- Tree 2 -->
+              <rect x="220" y="25" width="80" height="50" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+              <text x="260" y="44" text-anchor="middle" font-size="9" font-weight="600" fill="#78350f">Дерево 2</text>
+              <text x="260" y="57" text-anchor="middle" font-size="9" fill="#92400e">Цвет&lt;5.5?</text>
+              <text x="260" y="69" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">→ Яблоко</text>
+              <!-- Tree 3 -->
+              <rect x="310" y="25" width="80" height="50" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+              <text x="350" y="44" text-anchor="middle" font-size="9" font-weight="600" fill="#3730a3">Дерево 3</text>
+              <text x="350" y="57" text-anchor="middle" font-size="9" fill="#4338ca">Вес&lt;185?</text>
+              <text x="350" y="69" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">→ Яблоко</text>
+              <!-- Vote result -->
+              <rect x="405" y="20" width="85" height="60" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+              <text x="447" y="41" text-anchor="middle" font-size="9" font-weight="600" fill="#166534">Голосование</text>
+              <text x="447" y="54" text-anchor="middle" font-size="10" font-weight="700" fill="#15803d">Яблоко</text>
+              <text x="447" y="68" text-anchor="middle" font-size="11" font-weight="700" fill="#16a34a">3 : 0</text>
+            </svg>
+            <div class="caption">Все три дерева единогласно предсказывают «Яблоко». Лес уверен на 100%.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7: OOB-оценка качества</h4>
+            <p>Для каждого объекта собираем предсказания только тех деревьев, в чьих bootstrap-выборках этот объект <b>отсутствовал</b> (OOB-деревья).</p>
+            <div class="calc">
+              <b>Объект 2</b> (Вес=170, Цвет=4, класс=Яблоко): OOB для Дерева 1.<br>
+              &nbsp;&nbsp;Дерево 1: Вес 170 &lt; 185? → Да → Яблоко ✓<br><br>
+              <b>Объект 1</b> (Вес=150, Цвет=3, класс=Яблоко): OOB для Дерева 2.<br>
+              &nbsp;&nbsp;Дерево 2: Цвет 3 &lt; 5.5? → Да → Яблоко ✓<br><br>
+              <b>Объект 3</b> (Вес=130, Цвет=2, класс=Яблоко): OOB для Дерева 2.<br>
+              &nbsp;&nbsp;Дерево 2: Цвет 2 &lt; 5.5? → Да → Яблоко ✓<br><br>
+              <b>Объект 4</b> (Вес=200, Цвет=8, класс=Апельсин): OOB для Дерева 3.<br>
+              &nbsp;&nbsp;Дерево 3: Вес 200 &lt; 185? → Нет → Апельсин ✓<br><br>
+              Итог: 4 из 4 правильно. <b>OOB Accuracy = 4/4 = 100%</b>
+            </div>
+            <div class="why">OOB — бесплатная кросс-валидация: каждый объект проверяется деревьями, которые его «не видели» при обучении. Нет data leakage, не нужен отдельный test set.</div>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th>Объект</th><th>Класс</th><th>OOB-дерево</th><th>Предсказание OOB</th><th>Верно?</th></tr>
+              <tr><td>2 (Яблоко)</td><td style="color:#16a34a">Яблоко</td><td>Дерево 1</td><td style="color:#16a34a">Яблоко</td><td>✓</td></tr>
+              <tr><td>1 (Яблоко)</td><td style="color:#16a34a">Яблоко</td><td>Дерево 2</td><td style="color:#16a34a">Яблоко</td><td>✓</td></tr>
+              <tr><td>3 (Яблоко)</td><td style="color:#16a34a">Яблоко</td><td>Дерево 2</td><td style="color:#16a34a">Яблоко</td><td>✓</td></tr>
+              <tr><td>4 (Апельс.)</td><td style="color:#ea580c">Апельсин</td><td>Дерево 3</td><td style="color:#ea580c">Апельсин</td><td>✓</td></tr>
+            </table>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Bootstrap + random features = два уровня рандомизации. Вместе они гарантируют разнообразие деревьев и снижают variance ансамбля по сравнению с одним деревом.</p>
+            <p><b>Новый фрукт (Вес=160г, Цвет=5):</b> все 3 дерева предсказывают Яблоко (3:0).<br>
+            <b>OOB Accuracy = 100%</b> (4 из 4 OOB-объектов распознаны верно).<br>
+            Лес из 3 деревьев = два уровня разнообразия: разные bootstrap-выборки + разные случайные признаки в каждом узле.</p>
           </div>
           <div class="lesson-box">
-            Теорема: ошибка случайного леса ≤ ρ̄·σ²/s², где ρ̄ — средняя корреляция между деревьями, σ² — дисперсия отдельного дерева, s — точность дерева. Чем меньше ρ̄ и чем точнее деревья — тем лучше лес.
+            Ключевой принцип Random Forest: чем <b>менее коррелированы</b> деревья, тем больше выигрыш от ансамбля. bootstrap + max_features — два механизма снижения корреляции. В среднем bootstrap пропускает ≈ 36.8% объектов: lim(1−1/n)ⁿ = e⁻¹ ≈ 0.368.
           </div>
         `,
       },
       {
-        title: 'Голосование 5 деревьев',
+        title: 'Feature Importance пошагово',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>5 деревьев предсказывают класс нового объекта. Сравнить majority voting и probability averaging.</p>
+            <p>Вычислить важность признаков для леса из 3 деревьев (из Примера 1). Использовать MDI (Mean Decrease in Impurity) и показать Permutation Importance как альтернативу.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Дерево</th><th>Предсказание</th><th>P(класс A)</th><th>P(класс B)</th></tr>
-              <tr><td>Дерево 1</td><td>A</td><td>0.80</td><td>0.20</td></tr>
-              <tr><td>Дерево 2</td><td>B</td><td>0.35</td><td>0.65</td></tr>
-              <tr><td>Дерево 3</td><td>A</td><td>0.70</td><td>0.30</td></tr>
-              <tr><td>Дерево 4</td><td>A</td><td>0.55</td><td>0.45</td></tr>
-              <tr><td>Дерево 5</td><td>B</td><td>0.40</td><td>0.60</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: majority voting (hard voting)</h4>
+            <h4>Шаг 1: снижение нечистоты в каждом дереве</h4>
+            <p>MDI-важность признака = суммарное снижение Gini по всем разбиениям по этому признаку в дереве, взвешенное на долю объектов в узле.</p>
             <div class="calc">
-              A: 3 голоса (Деревья 1, 3, 4)<br>
-              B: 2 голоса (Деревья 2, 5)<br>
-              Результат: <b>класс A</b> (большинством 3:2)
+              <b>Формула:</b> ΔGini(узел) = n_узла/n_всего × (Gini_родителя − Gini_взвешенный_детей)<br><br>
+              <b>Дерево 1</b> (обучалось на 6 объектах, использовало признак Вес):<br>
+              &nbsp;&nbsp;Корень: n=6, Gini_до=0.5, Gini_после=0<br>
+              &nbsp;&nbsp;ΔGini(Вес) = (6/6) × (0.5 − 0) = <b>0.500</b><br>
+              &nbsp;&nbsp;ΔGini(Цвет) = 0 (признак не использован)<br><br>
+              <b>Дерево 2</b> (6 объектов, использовало признак Цвет):<br>
+              &nbsp;&nbsp;Корень: n=6, Gini_до=0.444, Gini_после=0<br>
+              &nbsp;&nbsp;ΔGini(Цвет) = (6/6) × (0.444 − 0) = <b>0.444</b><br>
+              &nbsp;&nbsp;ΔGini(Вес) = 0 (признак не использован)<br><br>
+              <b>Дерево 3</b> (6 объектов, использовало признак Вес):<br>
+              &nbsp;&nbsp;Корень: n=6, Gini_до=0.5, Gini_после=0<br>
+              &nbsp;&nbsp;ΔGini(Вес) = (6/6) × (0.5 − 0) = <b>0.500</b><br>
+              &nbsp;&nbsp;ΔGini(Цвет) = 0 (признак не использован)
             </div>
-            <div class="why">Простое голосование: каждое дерево имеет 1 голос. Стандарт для классификации.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: probability averaging (soft voting)</h4>
+            <h4>Шаг 2: усредняем по всем деревьям</h4>
             <div class="calc">
-              P̄(A) = (0.80 + 0.35 + 0.70 + 0.55 + 0.40) / 5<br>
-                    = 2.80 / 5 = <b>0.560</b><br>
-              P̄(B) = (0.20 + 0.65 + 0.30 + 0.45 + 0.60) / 5<br>
-                    = 2.20 / 5 = <b>0.440</b><br>
-              Результат: <b>класс A</b> (P=0.56 > 0.5)
+              <b>Важность Вес:</b><br>
+              &nbsp;&nbsp;= (ΔGini_дерево1 + ΔGini_дерево2 + ΔGini_дерево3) / 3<br>
+              &nbsp;&nbsp;= (0.500 + 0.000 + 0.500) / 3<br>
+              &nbsp;&nbsp;= 1.000 / 3 = <b>0.333</b><br><br>
+              <b>Важность Цвет:</b><br>
+              &nbsp;&nbsp;= (0.000 + 0.444 + 0.000) / 3<br>
+              &nbsp;&nbsp;= 0.444 / 3 = <b>0.148</b>
             </div>
-            <div class="why">Soft voting учитывает уверенность дерева. Лучше когда деревья хорошо откалиброваны. Обычно soft voting точнее.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: когда они расходятся?</h4>
+            <h4>Шаг 3: нормализация (сумма = 1)</h4>
             <div class="calc">
-              Пример: Дерево 2 даёт P(B)=0.95 (очень уверено)<br>
-              Дерево 3 даёт P(A)=0.51 (едва за A)<br>
-              Hard: A побеждает голосованием<br>
-              Soft: P̄(B) может победить, если дерево 2 очень уверено<br><br>
-              Если P(A) = [0.51, 0.51, 0.51, 0.35, 0.35]:<br>
-              Hard: 3:2 → A<br>
-              Soft: P̄(A) = 2.23/5 = 0.446 → B!
+              Сумма сырых важностей = 0.333 + 0.148 = <b>0.481</b><br><br>
+              Нормализованная важность Вес:<br>
+              &nbsp;&nbsp;= 0.333 / 0.481 = <b>0.693 ≈ 69.3%</b><br><br>
+              Нормализованная важность Цвет:<br>
+              &nbsp;&nbsp;= 0.148 / 0.481 = <b>0.308 ≈ 30.7%</b><br><br>
+              Проверка: 69.3% + 30.7% = 100% ✓
             </div>
-            <div class="why">Soft voting может отличаться от hard voting, когда меньшинство деревьев очень уверено.</div>
+            <div class="why">Признак Вес важнее: он использовался в 2 деревьях из 3 и давал большое снижение Gini. Цвет использован только в 1 дереве — меньший вклад.</div>
           </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+              <text x="200" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">MDI Feature Importance</text>
+              <!-- Bar background -->
+              <rect x="90" y="30" width="270" height="30" rx="4" fill="#f1f5f9"/>
+              <rect x="90" y="30" width="187" height="30" rx="4" fill="#6366f1"/>
+              <text x="80" y="51" text-anchor="end" font-size="10" font-weight="600" fill="#334155">Вес (г)</text>
+              <text x="285" y="51" font-size="10" font-weight="700" fill="#fff">69.3%</text>
+              <!-- Цвет bar -->
+              <rect x="90" y="75" width="270" height="30" rx="4" fill="#f1f5f9"/>
+              <rect x="90" y="75" width="83" height="30" rx="4" fill="#f59e0b"/>
+              <text x="80" y="96" text-anchor="end" font-size="10" font-weight="600" fill="#334155">Цвет</text>
+              <text x="100" y="96" font-size="10" font-weight="700" fill="#fff">30.7%</text>
+              <!-- Axis -->
+              <line x1="90" y1="120" x2="360" y2="120" stroke="#94a3b8" stroke-width="1"/>
+              <text x="90" y="130" text-anchor="middle" font-size="8" fill="#94a3b8">0%</text>
+              <text x="225" y="130" text-anchor="middle" font-size="8" fill="#94a3b8">50%</text>
+              <text x="360" y="130" text-anchor="middle" font-size="8" fill="#94a3b8">100%</text>
+            </svg>
+            <div class="caption">MDI Feature Importance: Вес (69.3%) важнее Цвета (30.7%), потому что 2 дерева из 3 выбрали его для первого разбиения.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Permutation Importance — альтернативный метод</h4>
+            <p>Идея: если признак важен, то перемешивание его значений ухудшит качество модели. Если нет — качество останется прежним.</p>
+            <div class="calc">
+              Базовая точность леса на тренировочных данных: 6/6 = 1.00<br><br>
+              <b>Шаг A: перемешиваем Вес</b><br>
+              &nbsp;&nbsp;Исходные Вес: [150,170,130,200,190,210]<br>
+              &nbsp;&nbsp;После shuffle (пример): [200,130,210,150,170,190]<br>
+              &nbsp;&nbsp;Теперь объект №1 имеет Вес=200 (апельсиновый вес) с классом Яблоко<br>
+              &nbsp;&nbsp;Дерево 1 (Вес&lt;185): предсказывает Апельсин для №1 → ошибка!<br>
+              &nbsp;&nbsp;Точность после shuffle Вес ≈ 3/6 = 0.50<br>
+              &nbsp;&nbsp;Permutation Importance(Вес) = 1.00 − 0.50 = <b>0.50</b><br><br>
+              <b>Шаг B: перемешиваем Цвет</b><br>
+              &nbsp;&nbsp;Дерево 2 (Цвет&lt;5.5) теряет разделяющую силу при shuffle Цвета<br>
+              &nbsp;&nbsp;Деревья 1 и 3 не используют Цвет → не страдают<br>
+              &nbsp;&nbsp;Точность после shuffle Цвет ≈ 4/6 = 0.67 (2 дерева из 3 работают правильно)<br>
+              &nbsp;&nbsp;Permutation Importance(Цвет) = 1.00 − 0.67 = <b>0.33</b><br><br>
+              Нормализация: Вес=0.50/(0.50+0.33)=<b>60.2%</b>, Цвет=0.33/(0.50+0.33)=<b>39.8%</b>
+            </div>
+            <div class="why">MDI и Permutation Importance дают похожие результаты (Вес важнее), но не идентичные. Permutation Importance надёжнее при высококардинальных числовых признаках, MDI — быстрее.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Оба метода предсказывают класс A. Soft voting (P=0.56) предпочтительнее: учитывает неопределённость каждого дерева. В sklearn: voting='soft' требует predict_proba у каждой модели.</p>
+            <p><b>MDI:</b> Вес = 69.3%, Цвет = 30.7%.<br>
+            <b>Permutation Importance:</b> Вес ≈ 60%, Цвет ≈ 40%.<br>
+            Оба метода согласны: Вес — более важный признак. В sklearn: <code>model.feature_importances_</code> даёт MDI, <code>permutation_importance(model, X, y)</code> — permutation-метод.</p>
           </div>
           <div class="lesson-box">
-            Feature importance в Random Forest: важность признака = суммарное снижение Gini при разбиениях по этому признаку, усреднённое по всем деревьям. Это MDI (mean decrease in impurity).
+            MDI имеет известный недостаток: он завышает важность признаков с большим количеством уникальных значений (bias towards high cardinality). Permutation Importance лишён этого bias, но требует отдельного evaluation dataset — иначе даст optimistically biased оценку.
           </div>
         `,
       },
       {
-        title: 'OOB оценка качества',
+        title: 'Почему лес лучше одного дерева',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать, как out-of-bag примеры позволяют оценить качество случайного леса без отдельного валидационного набора.</p>
+            <p>Объяснить математически и через числа, почему Random Forest превосходит одно дерево. Показать связь между корреляцией деревьев, их дисперсией и дисперсией леса.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Пример</th><th>Факт</th><th>OOB дерево 1</th><th>OOB дерево 2</th><th>OOB дерево 4</th><th>OOB голос</th><th>Правильно?</th></tr>
-              <tr><td>№4</td><td>B</td><td>B (0.65)</td><td>—</td><td>B (0.70)</td><td>B</td><td>Да</td></tr>
-              <tr><td>№6</td><td>A</td><td>—</td><td>A (0.80)</td><td>—</td><td>A</td><td>Да</td></tr>
-              <tr><td>№10</td><td>A</td><td>B (0.55)</td><td>B (0.60)</td><td>A (0.52)</td><td>B</td><td>Нет</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: принцип OOB оценки</h4>
+            <h4>Шаг 1: проблема одного дерева — высокий variance</h4>
             <div class="calc">
-              Каждый пример xᵢ пропущен ≈ 37% деревьев (OOB деревья)<br>
-              Для xᵢ: собираем предсказания только OOB деревьев<br>
-              Голосование среди этих деревьев → OOB предсказание<br>
-              Сравниваем с истинной меткой → OOB ошибка
+              Одно дерево без ограничений глубины:<br>
+              &nbsp;&nbsp;Train accuracy = 100% (идеально запоминает обучающие данные)<br>
+              &nbsp;&nbsp;Test accuracy = 83% (не обобщает новые примеры)<br>
+              &nbsp;&nbsp;Bias = ~0 (дерево очень гибкое)<br>
+              &nbsp;&nbsp;Variance = высокий: маленькое изменение данных → другое дерево<br><br>
+              Если заменить 2 объекта из 100 — дерево может измениться кардинально.<br>
+              Это overfit: дерево учит «шум» в данных.
             </div>
-            <div class="why">OOB деревья «не видели» этот пример при обучении → честная оценка без data leakage.</div>
+            <div class="why">Глубокое дерево — unstable learner: высокая дисперсия предсказаний между разными выборками. Именно это исправляет Random Forest.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: вычислить OOB accuracy</h4>
+            <h4>Шаг 2: теорема об ошибке леса</h4>
+            <p>Пусть каждое дерево — случайная величина с дисперсией σ² и средней парной корреляцией ρ между предсказаниями.</p>
             <div class="calc">
-              Всего примеров: 10<br>
-              OOB предсказания:<br>
-              №1: A ✓, №2: B ✓, №3: A ✓, №4: B ✓<br>
-              №5: A ✓, №6: A ✓, №7: B ✓, №8: A ✓<br>
-              №9: B ✓, №10: B (факт A) ✗<br><br>
-              OOB Accuracy = 9/10 = <b>90%</b>
+              <b>Дисперсия среднего T деревьев:</b><br>
+              Var(среднего T деревьев) = ρ·σ² + (1−ρ)/T · σ²<br><br>
+              Разберём формулу по частям:<br>
+              &nbsp;&nbsp;ρ·σ² — «неустранимый» шум: коррелированная часть ошибки,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;не исчезает даже при T→∞<br>
+              &nbsp;&nbsp;(1−ρ)/T · σ² — «устранимый» шум: при увеличении T→∞ стремится к 0<br><br>
+              При T→∞: Var → ρ·σ² (нижняя граница)
             </div>
+            <div class="why">Поэтому нужно снижать ρ (корреляцию между деревьями). Именно это делает Random Feature Selection: деревья используют разные признаки → меньше похожи → меньше коррелируют.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: сравнение с CV</h4>
+            <h4>Шаг 3: числовой пример</h4>
             <div class="calc">
-              5-fold CV Accuracy: 88.5%<br>
-              OOB Accuracy: 90%<br>
-              Test Accuracy (hold-out 20%): 89%<br><br>
-              OOB ≈ CV при большом числе деревьев (≥100)<br>
-              OOB быстрее: не нужно переобучать n_folds раз
+              Параметры одного дерева:<br>
+              &nbsp;&nbsp;σ² = 0.10 (дисперсия предсказания одного дерева)<br>
+              &nbsp;&nbsp;ρ = 0.30 (средняя корреляция между парами деревьев)<br><br>
+              <b>Одно дерево (T=1):</b><br>
+              &nbsp;&nbsp;Var = ρ·σ² + (1−ρ)/1 · σ²<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.30·0.10 + (1−0.30)/1 · 0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.70·0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.070 = <b>0.100</b> (= σ², как и ожидалось)<br><br>
+              <b>Лес из T=10 деревьев:</b><br>
+              &nbsp;&nbsp;Var = 0.30·0.10 + (1−0.30)/10 · 0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.70/10 · 0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.007 = <b>0.037</b><br>
+              &nbsp;&nbsp;Снижение: 0.100 → 0.037 = в <b>2.7 раза</b> меньше<br><br>
+              <b>Лес из T=100 деревьев:</b><br>
+              &nbsp;&nbsp;Var = 0.30·0.10 + (1−0.30)/100 · 0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.70/100 · 0.10<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.030 + 0.0007 = <b>0.0307</b><br>
+              &nbsp;&nbsp;Снижение: 0.100 → 0.031 = в <b>3.2 раза</b> меньше<br><br>
+              <b>Лес из T=∞ деревьев (предел):</b><br>
+              &nbsp;&nbsp;Var = ρ·σ² = 0.30·0.10 = <b>0.030</b><br>
+              &nbsp;&nbsp;Снижение: 0.100 → 0.030 = в <b>3.3 раза</b> меньше<br><br>
+              Вывод: от 10 деревьев до ∞ деревьев выигрыш всего 0.037→0.030.<br>
+              Большинство пользы — уже в первых ~100 деревьях!
             </div>
-            <div class="why">OOB — «бесплатная» оценка: вычисляется вместе с обучением леса. При n_estimators=100+ очень надёжна.</div>
           </div>
+
+          <div class="illustration bordered">
+            <svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Variance леса vs число деревьев (ρ=0.3, σ²=0.1)</text>
+              <!-- Y axis -->
+              <line x1="55" y1="25" x2="55" y2="145" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- X axis -->
+              <line x1="55" y1="145" x2="445" y2="145" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Y labels -->
+              <text x="50" y="29" text-anchor="end" font-size="8" fill="#64748b">0.10</text>
+              <text x="50" y="69" text-anchor="end" font-size="8" fill="#64748b">0.07</text>
+              <text x="50" y="109" text-anchor="end" font-size="8" fill="#64748b">0.04</text>
+              <text x="50" y="148" text-anchor="end" font-size="8" fill="#64748b">0.03</text>
+              <!-- Horizontal dashed line at ρσ²=0.030 (asymptote) -->
+              <line x1="55" y1="140" x2="445" y2="140" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+              <text x="450" y="143" font-size="8" fill="#ef4444">ρσ²=0.03</text>
+              <!-- Single tree bar T=1 -->
+              <rect x="70" y="25" width="50" height="120" rx="3" fill="#f87171" opacity="0.85"/>
+              <text x="95" y="21" text-anchor="middle" font-size="8" font-weight="600" fill="#dc2626">0.100</text>
+              <text x="95" y="160" text-anchor="middle" font-size="8" fill="#64748b">T=1</text>
+              <!-- T=5 -->
+              <rect x="145" y="76" width="50" height="69" rx="3" fill="#fb923c" opacity="0.85"/>
+              <text x="170" y="72" text-anchor="middle" font-size="8" font-weight="600" fill="#c2410c">0.044</text>
+              <text x="170" y="160" text-anchor="middle" font-size="8" fill="#64748b">T=5</text>
+              <!-- T=10 -->
+              <rect x="220" y="95" width="50" height="50" rx="3" fill="#fbbf24" opacity="0.85"/>
+              <text x="245" y="91" text-anchor="middle" font-size="8" font-weight="600" fill="#78350f">0.037</text>
+              <text x="245" y="160" text-anchor="middle" font-size="8" fill="#64748b">T=10</text>
+              <!-- T=50 -->
+              <rect x="295" y="104" width="50" height="41" rx="3" fill="#4ade80" opacity="0.85"/>
+              <text x="320" y="100" text-anchor="middle" font-size="8" font-weight="600" fill="#15803d">0.031</text>
+              <text x="320" y="160" text-anchor="middle" font-size="8" fill="#64748b">T=50</text>
+              <!-- T=100 -->
+              <rect x="370" y="106" width="50" height="39" rx="3" fill="#34d399" opacity="0.85"/>
+              <text x="395" y="102" text-anchor="middle" font-size="8" font-weight="600" fill="#065f46">0.031</text>
+              <text x="395" y="160" text-anchor="middle" font-size="8" fill="#64748b">T=100</text>
+              <!-- Legend -->
+              <line x1="70" y1="170" x2="90" y2="170" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+              <text x="94" y="173" font-size="8" fill="#64748b">предел при T→∞: Var = ρ·σ² = 0.030</text>
+            </svg>
+            <div class="caption">Variance быстро падает с первыми деревьями (T=1→10: в 2.7 раза), затем замедляется. При T≥100 дальнейшее добавление деревьев даёт минимальный прирост — ограничением становится ρσ².</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: практические последствия</h4>
+            <div class="calc">
+              <b>Одно глубокое дерево:</b><br>
+              &nbsp;&nbsp;Train accuracy = 100%, Test accuracy = 83%<br>
+              &nbsp;&nbsp;Разрыв = 17% → явный overfit (высокий variance)<br><br>
+              <b>Random Forest (100 деревьев, ρ=0.3):</b><br>
+              &nbsp;&nbsp;Train accuracy = 100%, Test accuracy = 95%<br>
+              &nbsp;&nbsp;Разрыв = 5% → overfit значительно меньше<br><br>
+              Улучшение test accuracy: 83% → 95% (+12%)<br>
+              Причина: variance снизился в ~3 раза (0.10 → 0.031)<br><br>
+              <b>Что если снизить ρ с 0.3 до 0.1?</b><br>
+              &nbsp;&nbsp;(Меньше коррелированные деревья — эффективнее forest)<br>
+              &nbsp;&nbsp;При ρ=0.1, T=100: Var = 0.1·0.1 + 0.9/100·0.1 = 0.010 + 0.001 = 0.011<br>
+              &nbsp;&nbsp;Снижение vs одного дерева: в 0.1/0.011 ≈ <b>9 раз!</b>
+            </div>
+            <div class="why">Чтобы снизить ρ: (1) уменьшить max_features — деревья используют разные признаки; (2) добавить случайность в пороги (Extra Trees). Баланс: слишком маленький max_features → слабые деревья (высокий bias).</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>OOB Score = 90%. Преимущество: не тратим данные на validation set и не нужна кросс-валидация. В sklearn: RandomForestClassifier(oob_score=True) → model.oob_score_</p>
+            <p><b>Формула:</b> Var(лес из T деревьев) = ρ·σ² + (1−ρ)/T · σ²<br>
+            При ρ=0.3, σ²=0.1, T=100: Var = 0.030 + 0.001 = <b>0.031</b> против 0.100 у одного дерева — <b>в 3.2 раза меньше</b>.<br>
+            Практически: Test accuracy 83% (1 дерево) → 95% (100 деревьев). Ключ — снижение корреляции через random features.</p>
           </div>
           <div class="lesson-box">
-            При малом числе деревьев OOB нестабилен: каждый пример оценивается мало деревьями. При n_estimators ≥ 100 OOB Score практически совпадает с Leave-One-Out CV и обычно достаточен для выбора гиперпараметров.
+            Два предельных случая формулы: (1) ρ=0 (независимые деревья) → Var = σ²/T → при T→∞ ошибка исчезает; (2) ρ=1 (идентичные деревья) → Var = σ² → лес = одно дерево, никакой пользы. Реальный RF: 0 &lt; ρ &lt; 1, поэтому он всегда лучше одного дерева, но есть предел улучшения.
           </div>
         `,
       },
