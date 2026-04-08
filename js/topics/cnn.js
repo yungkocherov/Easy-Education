@@ -255,400 +255,530 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Свёртка 3×3 вручную',
+        title: 'Свёртка 3×3: полный расчёт',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Применить фильтр детекции вертикальных границ к фрагменту изображения 5×5. Вычислить вручную все элементы feature map 3×3 (без padding, stride=1). Фильтр Собеля:</p>
+            <p>Дано изображение 5x5 в оттенках серого (значения пикселей 0–255). Применить вертикальный фильтр Собеля 3x3 вручную: вычислить ВСЕ 9 элементов выходной feature map, затем ReLU и MaxPool 2x2. Каждое умножение показано явно.</p>
             <div class="math-block">$$K = \\begin{pmatrix}-1 & 0 & 1 \\\\ -2 & 0 & 2 \\\\ -1 & 0 & 1\\end{pmatrix}$$</div>
           </div>
 
-          <div class="illustration bordered">
-            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
-              <!-- 5x5 input grid, cell size 22px starting at x=10,y=10 -->
-              <!-- Highlight top-left 3x3 window -->
-              <rect x="10" y="10" width="66" height="66" fill="#fef9c3" rx="2"/>
-              <!-- 5x5 grid lines -->
-              <g stroke="#64748b" stroke-width="1" fill="none">
-                <rect x="10" y="10" width="110" height="110" rx="2"/>
-                <line x1="10" y1="32" x2="120" y2="32"/><line x1="10" y1="54" x2="120" y2="54"/>
-                <line x1="10" y1="76" x2="120" y2="76"/><line x1="10" y1="98" x2="120" y2="98"/>
-                <line x1="32" y1="10" x2="32" y2="120"/><line x1="54" y1="10" x2="54" y2="120"/>
-                <line x1="76" y1="10" x2="76" y2="120"/><line x1="98" y1="10" x2="98" y2="120"/>
-              </g>
-              <!-- Cell values (5x5): first 2 cols=0, last 3=1 -->
-              <g font-size="11" text-anchor="middle" fill="#1e293b">
-                <!-- Row 0 -->
-                <text x="21" y="26">0</text><text x="43" y="26">0</text>
-                <text x="65" y="26" fill="#3b82f6" font-weight="600">1</text>
-                <text x="87" y="26" fill="#3b82f6" font-weight="600">1</text>
-                <text x="109" y="26" fill="#3b82f6" font-weight="600">1</text>
-                <!-- Row 1 -->
-                <text x="21" y="48">0</text><text x="43" y="48">0</text>
-                <text x="65" y="48" fill="#3b82f6" font-weight="600">1</text>
-                <text x="87" y="48" fill="#3b82f6" font-weight="600">1</text>
-                <text x="109" y="48" fill="#3b82f6" font-weight="600">1</text>
-                <!-- Row 2 -->
-                <text x="21" y="70">0</text><text x="43" y="70">0</text>
-                <text x="65" y="70" fill="#3b82f6" font-weight="600">1</text>
-                <text x="87" y="70" fill="#3b82f6" font-weight="600">1</text>
-                <text x="109" y="70" fill="#3b82f6" font-weight="600">1</text>
-                <!-- Row 3 -->
-                <text x="21" y="92">0</text><text x="43" y="92">0</text>
-                <text x="65" y="92" fill="#3b82f6" font-weight="600">1</text>
-                <text x="87" y="92" fill="#3b82f6" font-weight="600">1</text>
-                <text x="109" y="92" fill="#3b82f6" font-weight="600">1</text>
-                <!-- Row 4 -->
-                <text x="21" y="114">0</text><text x="43" y="114">0</text>
-                <text x="65" y="114" fill="#3b82f6" font-weight="600">1</text>
-                <text x="87" y="114" fill="#3b82f6" font-weight="600">1</text>
-                <text x="109" y="114" fill="#3b82f6" font-weight="600">1</text>
-              </g>
-              <text x="65" y="130" text-anchor="middle" font-size="9" fill="#64748b">вход 5×5</text>
-              <!-- Arrow -->
-              <line x1="130" y1="65" x2="155" y2="65" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-arr)"/>
-              <defs>
-                <marker id="cnn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
-                </marker>
-              </defs>
-              <!-- 3x3 filter grid at x=158 -->
-              <g stroke="#ef4444" stroke-width="1.5" fill="none">
-                <rect x="158" y="32" width="66" height="66" rx="2"/>
-                <line x1="158" y1="54" x2="224" y2="54"/><line x1="158" y1="76" x2="224" y2="76"/>
-                <line x1="180" y1="32" x2="180" y2="98"/><line x1="202" y1="32" x2="202" y2="98"/>
-              </g>
-              <!-- Filter values (Sobel): -1 0 1 / -2 0 2 / -1 0 1 -->
-              <g font-size="10" text-anchor="middle" fill="#b91c1c" font-weight="600">
-                <text x="169" y="48">−1</text><text x="191" y="48">0</text><text x="213" y="48">1</text>
-                <text x="169" y="70">−2</text><text x="191" y="70">0</text><text x="213" y="70">2</text>
-                <text x="169" y="92">−1</text><text x="191" y="92">0</text><text x="213" y="92">1</text>
-              </g>
-              <text x="191" y="112" text-anchor="middle" font-size="9" fill="#64748b">фильтр 3×3</text>
-              <!-- Arrow -->
-              <line x1="234" y1="65" x2="260" y2="65" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-arr)"/>
-              <!-- 3x3 output grid at x=265 -->
-              <g stroke="#10b981" stroke-width="1.5" fill="none">
-                <rect x="265" y="32" width="66" height="66" rx="2"/>
-                <line x1="265" y1="54" x2="331" y2="54"/><line x1="265" y1="76" x2="331" y2="76"/>
-                <line x1="287" y1="32" x2="287" y2="98"/><line x1="309" y1="32" x2="309" y2="98"/>
-              </g>
-              <!-- Output values: 4 4 0 / 4 4 0 / 4 4 0 -->
-              <g font-size="11" text-anchor="middle" font-weight="600">
-                <text x="276" y="48" fill="#10b981">4</text><text x="298" y="48" fill="#10b981">4</text><text x="320" y="48" fill="#64748b">0</text>
-                <text x="276" y="70" fill="#10b981">4</text><text x="298" y="70" fill="#10b981">4</text><text x="320" y="70" fill="#64748b">0</text>
-                <text x="276" y="92" fill="#10b981">4</text><text x="298" y="92" fill="#10b981">4</text><text x="320" y="92" fill="#64748b">0</text>
-              </g>
-              <text x="298" y="112" text-anchor="middle" font-size="9" fill="#64748b">feature map 3×3</text>
-              <!-- Yellow highlight box shows active window in input -->
-              <rect x="10" y="10" width="66" height="66" fill="none" stroke="#f59e0b" stroke-width="2.5" rx="2" stroke-dasharray="4,2"/>
-              <text x="43" y="7" text-anchor="middle" font-size="8" fill="#f59e0b">окно</text>
-              <!-- "=" label -->
-              <text x="253" y="70" text-anchor="middle" font-size="14" fill="#64748b">*</text>
-              <text x="350" y="70" text-anchor="middle" font-size="14" fill="#64748b">=</text>
-            </svg>
-            <div class="caption">Свёртка 5×5 ✱ фильтр Собеля 3×3 = feature map 3×3. Жёлтая рамка — текущее окно (поз. 0,0). Зелёные ячейки: отклик 4 (граница найдена). Серые: 0 (однородная область).</div>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th colspan="5">Изображение $I$ (5×5)</th></tr>
-              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-            </table>
-          </div>
-
           <div class="step" data-step="1">
-            <h4>Размер выходной feature map</h4>
-            <div class="calc">$H_{out} = \\dfrac{H_{in} - k}{s} + 1 = \\dfrac{5 - 3}{1} + 1 = 3$</div>
-            <div class="why">Выход 3×3. Фильтр 3×3 на изображении 5×5 без padding даёт уменьшение на $k-1=2$ пикселя по каждому краю.</div>
+            <h4>Шаг 1: Входное изображение 5x5</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="5">Изображение I (5x5), значения пикселей</th></tr>
+                <tr><td>10</td><td>10</td><td>10</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>10</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Левая часть (столбцы 0–1): тёмные пиксели (10)<br>
+              Правая часть (столбцы 3–4): светлые пиксели (80)<br>
+              Столбец 2: граница смещается вниз (10 сверху, 80 снизу)<br><br>
+              Размер выхода: (5−3)/1 + 1 = <b>3×3</b> (без padding, stride=1)
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 500 170" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+                <defs>
+                  <marker id="cnn-a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                  </marker>
+                </defs>
+                <text x="60" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Вход 5x5</text>
+                <!-- 5x5 grid, cell=22, start x=10,y=20 -->
+                <g stroke="#94a3b8" stroke-width="1" fill="none">
+                  <rect x="10" y="20" width="110" height="110" rx="2"/>
+                  <line x1="10" y1="42" x2="120" y2="42"/><line x1="10" y1="64" x2="120" y2="64"/>
+                  <line x1="10" y1="86" x2="120" y2="86"/><line x1="10" y1="108" x2="120" y2="108"/>
+                  <line x1="32" y1="20" x2="32" y2="130"/><line x1="54" y1="20" x2="54" y2="130"/>
+                  <line x1="76" y1="20" x2="76" y2="130"/><line x1="98" y1="20" x2="98" y2="130"/>
+                </g>
+                <!-- Cell fills: dark=10, light=80 -->
+                <rect x="76" y="64" width="22" height="66" fill="#dbeafe" opacity="0.5"/>
+                <rect x="76" y="20" width="22" height="44" fill="#fef3c7" opacity="0.3"/>
+                <rect x="98" y="20" width="22" height="110" fill="#dbeafe" opacity="0.5"/>
+                <!-- Values -->
+                <g font-size="9" text-anchor="middle" fill="#1e293b">
+                  <text x="21" y="35">10</text><text x="43" y="35">10</text><text x="65" y="35">10</text><text x="87" y="35" fill="#3b82f6" font-weight="600">80</text><text x="109" y="35" fill="#3b82f6" font-weight="600">80</text>
+                  <text x="21" y="57">10</text><text x="43" y="57">10</text><text x="65" y="57">10</text><text x="87" y="57" fill="#3b82f6" font-weight="600">80</text><text x="109" y="57" fill="#3b82f6" font-weight="600">80</text>
+                  <text x="21" y="79">10</text><text x="43" y="79">10</text><text x="65" y="79" fill="#3b82f6" font-weight="600">80</text><text x="87" y="79" fill="#3b82f6" font-weight="600">80</text><text x="109" y="79" fill="#3b82f6" font-weight="600">80</text>
+                  <text x="21" y="101">10</text><text x="43" y="101">10</text><text x="65" y="101" fill="#3b82f6" font-weight="600">80</text><text x="87" y="101" fill="#3b82f6" font-weight="600">80</text><text x="109" y="101" fill="#3b82f6" font-weight="600">80</text>
+                  <text x="21" y="123">10</text><text x="43" y="123">10</text><text x="65" y="123" fill="#3b82f6" font-weight="600">80</text><text x="87" y="123" fill="#3b82f6" font-weight="600">80</text><text x="109" y="123" fill="#3b82f6" font-weight="600">80</text>
+                </g>
+                <!-- Arrow -->
+                <line x1="130" y1="75" x2="155" y2="75" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-a)"/>
+                <text x="142" y="70" font-size="8" fill="#64748b">*</text>
+                <!-- Filter -->
+                <text x="195" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">Фильтр 3x3</text>
+                <g stroke="#ef4444" stroke-width="1.5" fill="none">
+                  <rect x="160" y="40" width="66" height="66" rx="2"/>
+                  <line x1="160" y1="62" x2="226" y2="62"/><line x1="160" y1="84" x2="226" y2="84"/>
+                  <line x1="182" y1="40" x2="182" y2="106"/><line x1="204" y1="40" x2="204" y2="106"/>
+                </g>
+                <g font-size="10" text-anchor="middle" fill="#b91c1c" font-weight="600">
+                  <text x="171" y="56">-1</text><text x="193" y="56">0</text><text x="215" y="56">1</text>
+                  <text x="171" y="78">-2</text><text x="193" y="78">0</text><text x="215" y="78">2</text>
+                  <text x="171" y="100">-1</text><text x="193" y="100">0</text><text x="215" y="100">1</text>
+                </g>
+                <!-- Arrow -->
+                <line x1="236" y1="75" x2="261" y2="75" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-a)"/>
+                <text x="248" y="70" font-size="8" fill="#64748b">=</text>
+                <!-- Output 3x3 -->
+                <text x="330" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#10b981">Feature map 3x3</text>
+                <g stroke="#10b981" stroke-width="1.5" fill="none">
+                  <rect x="270" y="40" width="90" height="90" rx="2"/>
+                  <line x1="270" y1="70" x2="360" y2="70"/><line x1="270" y1="100" x2="360" y2="100"/>
+                  <line x1="300" y1="40" x2="300" y2="130"/><line x1="330" y1="40" x2="330" y2="130"/>
+                </g>
+                <g font-size="11" text-anchor="middle" font-weight="600">
+                  <text x="285" y="60" fill="#10b981">280</text><text x="315" y="60" fill="#10b981">280</text><text x="345" y="60" fill="#64748b">0</text>
+                  <text x="285" y="90" fill="#10b981">210</text><text x="315" y="90" fill="#10b981">140</text><text x="345" y="90" fill="#64748b">0</text>
+                  <text x="285" y="120" fill="#64748b">0</text><text x="315" y="120" fill="#64748b">0</text><text x="345" y="120" fill="#64748b">0</text>
+                </g>
+                <text x="50" y="150" font-size="8" fill="#64748b">тёмное | светлое</text>
+                <text x="315" y="150" text-anchor="middle" font-size="8" fill="#64748b">граница найдена!</text>
+              </svg>
+            </div>
+            <div class="why">Изображение имитирует вертикальную границу: тёмная область слева, светлая справа. Граница «ступенькой» смещается в столбце 2. Фильтр Собеля должен обнаружить эту границу.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Элемент $(1,1)$: окно в левом верхнем углу</h4>
-            <p>Фрагмент изображения под окном позиции (0,0)–(2,2):</p>
+            <h4>Шаг 2: Позиция (0,0) — все 9 умножений</h4>
+            <p>Окно: строки 0–2, столбцы 0–2 изображения:</p>
             <div class="calc">
-              $\\begin{pmatrix}0&0&1\\\\0&0&1\\\\0&0&1\\end{pmatrix}$, перемножаем поэлементно с $K$ и суммируем:<br><br>
-              $(-1)\\cdot0 + 0\\cdot0 + 1\\cdot1$<br>
-              $+ (-2)\\cdot0 + 0\\cdot0 + 2\\cdot1$<br>
-              $+ (-1)\\cdot0 + 0\\cdot0 + 1\\cdot1 = 0+0+1+0+0+2+0+0+1 = 4$
+              Окно: $\\begin{pmatrix}10&10&10\\\\10&10&10\\\\10&10&80\\end{pmatrix}$, Фильтр: $\\begin{pmatrix}-1&0&1\\\\-2&0&2\\\\-1&0&1\\end{pmatrix}$<br><br>
+              Поэлементное умножение:<br>
+              (-1)·10 = <b>-10</b> &nbsp;&nbsp; 0·10 = <b>0</b> &nbsp;&nbsp; 1·10 = <b>+10</b><br>
+              (-2)·10 = <b>-20</b> &nbsp;&nbsp; 0·10 = <b>0</b> &nbsp;&nbsp; 2·10 = <b>+20</b><br>
+              (-1)·10 = <b>-10</b> &nbsp;&nbsp; 0·10 = <b>0</b> &nbsp;&nbsp; 1·80 = <b>+80</b><br><br>
+              Сумма: -10 + 0 + 10 + (-20) + 0 + 20 + (-10) + 0 + 80 = <b>70</b><br>
+              output[0][0] = <b>70</b>
             </div>
-            <div class="why">Значение $4$ — сильный отклик! В этом окне есть вертикальная граница: слева 0, справа 1. Фильтр Собеля именно для этого и предназначен.</div>
+            <div class="why">Отклик 70 (умеренный): в нижнем правом углу окна есть пиксель 80, а слева — 10. Фильтр «видит» начало границы. Без пикселя 80 было бы 0 (однородная область).</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Элемент $(1,2)$: окно сдвинуто на 1 вправо</h4>
-            <p>Фрагмент: столбцы 1–3, строки 0–2:</p>
+            <h4>Шаг 3: Позиция (0,1) — сдвиг вправо на 1</h4>
+            <p>Окно: строки 0–2, столбцы 1–3:</p>
             <div class="calc">
-              $\\begin{pmatrix}0&1&1\\\\0&1&1\\\\0&1&1\\end{pmatrix}$, умножаем на $K$:<br><br>
-              $(-1)\\cdot0 + 0\\cdot1 + 1\\cdot1 + (-2)\\cdot0 + 0\\cdot1 + 2\\cdot1 + (-1)\\cdot0 + 0\\cdot1 + 1\\cdot1 = 1+2+1 = 4$
+              Окно: $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\10&80&80\\end{pmatrix}$<br><br>
+              (-1)·10 = -10 &nbsp;&nbsp; 0·10 = 0 &nbsp;&nbsp; 1·80 = +80<br>
+              (-2)·10 = -20 &nbsp;&nbsp; 0·10 = 0 &nbsp;&nbsp; 2·80 = +160<br>
+              (-1)·10 = -10 &nbsp;&nbsp; 0·80 = 0 &nbsp;&nbsp; 1·80 = +80<br><br>
+              Сумма: -10 + 0 + 80 + (-20) + 0 + 160 + (-10) + 0 + 80 = <b>280</b><br>
+              output[0][1] = <b>280</b>
             </div>
-            <div class="why">Снова $4$: граница всё ещё в поле зрения этого окна (столбец 1 — нули, столбец 3 — единицы, контраст есть).</div>
+            <div class="why">Отклик 280 — сильный! Левый столбец окна = 10 (тёмный), правый = 80 (светлый). Это ярко выраженная вертикальная граница. Фильтр Собеля максимально реагирует именно на такой контраст.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Элемент $(1,3)$: окно уехало вправо от границы</h4>
-            <p>Фрагмент: столбцы 2–4, строки 0–2:</p>
+            <h4>Шаг 4: Позиция (0,2) — ещё правее</h4>
+            <p>Окно: строки 0–2, столбцы 2–4:</p>
             <div class="calc">
-              $\\begin{pmatrix}1&1&1\\\\1&1&1\\\\1&1&1\\end{pmatrix}$, умножаем на $K$:<br><br>
-              $(-1)\\cdot1 + 0\\cdot1 + 1\\cdot1 + (-2)\\cdot1 + 0\\cdot1 + 2\\cdot1 + (-1)\\cdot1 + 0\\cdot1 + 1\\cdot1$<br>
-              $= (-1+1) + (-2+2) + (-1+1) = 0$
+              Окно: $\\begin{pmatrix}10&80&80\\\\10&80&80\\\\80&80&80\\end{pmatrix}$<br><br>
+              (-1)·10 = -10 &nbsp;&nbsp; 0·80 = 0 &nbsp;&nbsp; 1·80 = +80<br>
+              (-2)·10 = -20 &nbsp;&nbsp; 0·80 = 0 &nbsp;&nbsp; 2·80 = +160<br>
+              (-1)·80 = -80 &nbsp;&nbsp; 0·80 = 0 &nbsp;&nbsp; 1·80 = +80<br><br>
+              Сумма: -10 + 0 + 80 + (-20) + 0 + 160 + (-80) + 0 + 80 = <b>210</b><br>
+              output[0][2] = <b>210</b>
             </div>
-            <div class="why">Значение $0$: окно полностью внутри однородной области (все пиксели = 1). Нет границы — нет отклика. Это и есть смысл свёртки!</div>
+            <div class="why">Отклик 210 — всё ещё сильный. Левый столбец ещё содержит тёмные пиксели (10, 10, 80). Но нижний пиксель уже 80, поэтому контраст чуть слабее, чем при 280.</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Итоговая feature map</h4>
+            <h4>Шаг 5: Полный первый ряд + все 9 позиций</h4>
+            <p>Вычислим оставшиеся 6 позиций тем же способом:</p>
             <div class="calc">
-              Из соображений симметрии (изображение однородно по вертикали):<br><br>
-              $\\text{Feature map} = \\begin{pmatrix}4 & 4 & 0 \\\\ 4 & 4 & 0 \\\\ 4 & 4 & 0\\end{pmatrix}$
+              <b>Строка 1 (row=1):</b><br>
+              (1,0): окно строки 1–3, столбцы 0–2:<br>
+              $\\begin{pmatrix}10&10&10\\\\10&10&80\\\\10&10&80\\end{pmatrix}$ → -10+0+10-20+0+160-10+0+80 = <b>210</b><br><br>
+              (1,1): $\\begin{pmatrix}10&10&80\\\\10&80&80\\\\10&80&80\\end{pmatrix}$ → -10+0+80-20+0+160-10+0+80 = <b>280</b><br><br>
+              (1,2): $\\begin{pmatrix}10&80&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$ → -10+0+80-160+0+160-80+0+80 = <b>70</b><br><br>
+              <b>Строка 2 (row=2):</b><br>
+              (2,0): $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\10&10&80\\end{pmatrix}$ → -10+0+80-20+0+160-10+0+80 = <b>280</b><br><br>
+              (2,1): $\\begin{pmatrix}10&80&80\\\\10&80&80\\\\10&80&80\\end{pmatrix}$ → -10+0+80-20+0+160-10+0+80 = <b>280</b><br><br>
+              (2,2): $\\begin{pmatrix}80&80&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$ → -80+0+80-160+0+160-80+0+80 = <b>0</b>
             </div>
-            <div class="why">Левые столбцы feature map «загорелись» — там фильтр нашёл вертикальную границу. Правый столбец нулевой — однородная область. Так работает детекция признаков в CNN.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="3">Feature map (свёртка, 3x3)</th></tr>
+                <tr><td>70</td><td><b>280</b></td><td>210</td></tr>
+                <tr><td>210</td><td><b>280</b></td><td>70</td></tr>
+                <tr><td><b>280</b></td><td><b>280</b></td><td>0</td></tr>
+              </table>
+            </div>
+            <div class="why">Высокие значения (280) — там, где вертикальная граница проходит чётко. 0 — однородная область (все 80). Фильтр «нарисовал карту» расположения границ в изображении.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: Итоговая feature map — визуализация</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 460 130" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+                <text x="230" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Вход 5x5 → Свёртка → Feature map 3x3</text>
+                <!-- Input 5x5 simplified -->
+                <rect x="10" y="24" width="40" height="90" fill="#1e293b" rx="2"/>
+                <rect x="50" y="24" width="20" height="45" fill="#1e293b" rx="0"/>
+                <rect x="50" y="69" width="20" height="45" fill="#93c5fd" rx="0"/>
+                <rect x="70" y="24" width="40" height="90" fill="#93c5fd" rx="2"/>
+                <text x="55" y="75" text-anchor="middle" font-size="8" fill="#fff">граница</text>
+                <text x="30" y="122" font-size="8" fill="#64748b">10</text>
+                <text x="90" y="122" font-size="8" fill="#64748b">80</text>
+                <!-- Arrow -->
+                <line x1="118" y1="70" x2="140" y2="70" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-a)"/>
+                <!-- Feature map 3x3 as heatmap -->
+                <g transform="translate(150,30)">
+                  <rect x="0" y="0" width="30" height="30" fill="#fef3c7" rx="1"/><text x="15" y="20" text-anchor="middle" font-size="9" fill="#92400e">70</text>
+                  <rect x="30" y="0" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="20" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="0" width="30" height="30" fill="#fdba74" rx="1"/><text x="75" y="20" text-anchor="middle" font-size="9" fill="#7c2d12">210</text>
+                  <rect x="0" y="30" width="30" height="30" fill="#fdba74" rx="1"/><text x="15" y="50" text-anchor="middle" font-size="9" fill="#7c2d12">210</text>
+                  <rect x="30" y="30" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="50" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="30" width="30" height="30" fill="#fef3c7" rx="1"/><text x="75" y="50" text-anchor="middle" font-size="9" fill="#92400e">70</text>
+                  <rect x="0" y="60" width="30" height="30" fill="#f97316" rx="1"/><text x="15" y="80" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="30" y="60" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="80" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="60" width="30" height="30" fill="#f1f5f9" rx="1"/><text x="75" y="80" text-anchor="middle" font-size="9" fill="#94a3b8">0</text>
+                </g>
+                <text x="195" y="122" text-anchor="middle" font-size="8" fill="#64748b">Feature map</text>
+                <!-- Arrow -->
+                <line x1="255" y1="70" x2="277" y2="70" stroke="#64748b" stroke-width="1.5" marker-end="url(#cnn-a)"/>
+                <text x="266" y="62" font-size="8" fill="#64748b">ReLU</text>
+                <!-- After ReLU (same, all positive) -->
+                <g transform="translate(285,30)">
+                  <rect x="0" y="0" width="30" height="30" fill="#fef3c7" rx="1"/><text x="15" y="20" text-anchor="middle" font-size="9">70</text>
+                  <rect x="30" y="0" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="20" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="0" width="30" height="30" fill="#fdba74" rx="1"/><text x="75" y="20" text-anchor="middle" font-size="9">210</text>
+                  <rect x="0" y="30" width="30" height="30" fill="#fdba74" rx="1"/><text x="15" y="50" text-anchor="middle" font-size="9">210</text>
+                  <rect x="30" y="30" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="50" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="30" width="30" height="30" fill="#fef3c7" rx="1"/><text x="75" y="50" text-anchor="middle" font-size="9">70</text>
+                  <rect x="0" y="60" width="30" height="30" fill="#f97316" rx="1"/><text x="15" y="80" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="30" y="60" width="30" height="30" fill="#f97316" rx="1"/><text x="45" y="80" text-anchor="middle" font-size="9" fill="#fff">280</text>
+                  <rect x="60" y="60" width="30" height="30" fill="#f1f5f9" rx="1"/><text x="75" y="80" text-anchor="middle" font-size="9" fill="#94a3b8">0</text>
+                </g>
+                <text x="330" y="122" text-anchor="middle" font-size="8" fill="#64748b">После ReLU</text>
+              </svg>
+            </div>
+            <div class="why">Feature map показывает ГДЕ в изображении находится вертикальная граница. Яркие оранжевые ячейки (280) = чёткая граница. Бледные (70) = слабая граница. Белая (0) = однородная область.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7: ReLU — max(0, x) для каждого значения</h4>
+            <div class="calc">
+              ReLU(70) = max(0, 70) = <b>70</b> (без изменений)<br>
+              ReLU(280) = max(0, 280) = <b>280</b> (без изменений)<br>
+              ReLU(210) = max(0, 210) = <b>210</b> (без изменений)<br>
+              ReLU(0) = max(0, 0) = <b>0</b> (без изменений)<br><br>
+              В данном случае все значения ≥ 0, поэтому ReLU ничего не изменил.<br>
+              Но если бы фильтр давал отрицательные значения (например, тёмное справа от светлого),<br>
+              ReLU обнулил бы их: «нас интересуют только ПОЛОЖИТЕЛЬНЫЕ отклики».
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="3">После ReLU (3x3)</th></tr>
+                <tr><td>70</td><td>280</td><td>210</td></tr>
+                <tr><td>210</td><td>280</td><td>70</td></tr>
+                <tr><td>280</td><td>280</td><td>0</td></tr>
+              </table>
+            </div>
+            <div class="why">ReLU отсекает отрицательные активации. Интуиция: «фильтр нашёл паттерн» = положительный отклик. Отрицательный = «паттерн не найден или найден инверсный» → обнуляем.</div>
+          </div>
+
+          <div class="step" data-step="8">
+            <h4>Шаг 8: MaxPool 2x2 (stride=2)</h4>
+            <div class="calc">
+              Feature map 3x3 не делится ровно на блоки 2x2 (нечётный размер!).<br>
+              Обычно MaxPool 2x2 на 3x3 даёт выход пола (3/2) = 1x1 (только один полный блок)<br>
+              Или, если взять с перекрытием/padding, 2x2. Покажем один полный блок:<br><br>
+              Блок (0,0)-(1,1): $\\begin{pmatrix}70&280\\\\210&280\\end{pmatrix}$ → max = <b>280</b><br><br>
+              Если с padding=right+bottom → дополняем нулями до 4x4:<br>
+              $\\begin{pmatrix}70&280&210&0\\\\210&280&70&0\\\\280&280&0&0\\\\0&0&0&0\\end{pmatrix}$<br><br>
+              Блок (0,0): max(70,280,210,280) = <b>280</b><br>
+              Блок (0,1): max(210,0,70,0) = <b>210</b><br>
+              Блок (1,0): max(280,280,0,0) = <b>280</b><br>
+              Блок (1,1): max(0,0,0,0) = <b>0</b><br><br>
+              MaxPool 2x2: $\\begin{pmatrix}280&210\\\\280&0\\end{pmatrix}$
+            </div>
+            <div class="why">MaxPool сжимает 3x3 → 2x2 (или 1x1 без padding). Сохраняется самый сильный отклик в каждом регионе: 280 = «здесь точно есть граница». Позиция внутри блока теряется — это translation invariance.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Feature map 3×3 с нулями справа и четвёрками слева. Применяя ReLU к этому выходу, получаем активационную карту: фильтр «нашёл» вертикальную границу в позиции между столбцами 0 и 1.</p>
+            <p>Свёртка 5x5 с Собелем 3x3 дала feature map: максимум 280 там, где граница чёткая, 0 где однородно. ReLU оставил всё без изменений (нет отрицательных). MaxPool 2x2 сжал до 2x2, сохранив пиковые отклики 280.</p>
           </div>
-
           <div class="lesson-box">
-            <b>Ключевая идея:</b> фильтр — это «детектор паттерна». Высокое значение в feature map = «паттерн нашёлся здесь». Разные фильтры ищут разные паттерны. В глубокой CNN первые слои — края, потом — текстуры, потом — объекты.
+            Полный пайплайн CNN: Input → Conv (извлечение признаков) → ReLU (нелинейность) → Pool (сжатие). Каждый Conv-фильтр — «детектор» одного паттерна. В реальной сети 32–512 фильтров на слой, каждый ищет свой паттерн.
           </div>
         `
       },
       {
-        title: 'Подсчёт параметров',
+        title: 'Подсчёт параметров по слоям',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Подсчитать число параметров в мини-CNN: Conv(3×3, 8 фильтров) → MaxPool(2×2) → FC(→10). Вход: 28×28×1 (например, MNIST). Сравнить с полносвязной сетью.</p>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th>Слой</th><th>Размер выхода</th><th>Параметров</th></tr>
-              <tr><td>Вход</td><td>28×28×1</td><td>—</td></tr>
-              <tr><td>Conv 3×3, 8 фильтров</td><td>26×26×8</td><td>$3\\cdot3\\cdot1\\cdot8 + 8 = 80$</td></tr>
-              <tr><td>MaxPool 2×2</td><td>13×13×8</td><td>$0$</td></tr>
-              <tr><td>Flatten</td><td>1352</td><td>—</td></tr>
-              <tr><td>FC → 10</td><td>10</td><td>$1352\\cdot10 + 10 = 13530$</td></tr>
-              <tr><td><b>Итого</b></td><td>—</td><td><b>13 610</b></td></tr>
-            </table>
+            <p>Дана архитектура мини-CNN для MNIST (28x28x1): Conv1(3x3, 16) → Pool → Conv2(3x3, 32) → Pool → FC(128) → FC(10). Вычислить размеры тензоров и число параметров на КАЖДОМ слое. Показать формулы и каждое число.</p>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Параметры Conv-слоя</h4>
+            <h4>Шаг 1: Вход → Conv1(3x3, 16 фильтров, no padding)</h4>
             <div class="calc">
-              Один фильтр 3×3×1: $3 \\times 3 \\times 1 = 9$ весов $+ 1$ bias $= 10$ параметров<br>
-              8 фильтров: $8 \\times 10 = 80$ параметров
+              <b>Размер выхода:</b><br>
+              H_out = (H_in − k) / stride + 1 = (28 − 3) / 1 + 1 = <b>26</b><br>
+              W_out = (28 − 3) / 1 + 1 = <b>26</b><br>
+              Каналов = 16 (число фильтров)<br>
+              Выход: <b>26 x 26 x 16</b><br><br>
+              <b>Параметры:</b><br>
+              Один фильтр: k x k x C_in = 3 x 3 x 1 = 9 весов + 1 bias = <b>10</b><br>
+              16 фильтров: 16 x 10 = <b>160 параметров</b>
             </div>
-            <div class="why">Параметры фильтра умножаются на число входных каналов (здесь 1 для grayscale). Для RGB-изображения (3 канала): $3\\times3\\times3\\times8+8 = 224$ параметра.</div>
+            <div class="why">Conv1 берёт 1-канальный вход (grayscale) и создаёт 16 карт признаков. Каждый фильтр 3x3 имеет всего 9 весов — они ПЕРЕИСПОЛЬЗУЮТСЯ для всех 26x26 позиций (weight sharing). Это в 784/9 ≈ 87 раз экономнее FC.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Размер выхода Conv-слоя</h4>
-            <div class="calc">$H_{out} = \\dfrac{28 - 3}{1} + 1 = 26$, значит выход $26 \\times 26 \\times 8$</div>
-            <div class="why">Без padding фильтр 3×3 уменьшает размер на 2 (по 1 с каждого края). С padding=1 размер сохранился бы: 28×28×8.</div>
+            <h4>Шаг 2: MaxPool1(2x2, stride=2)</h4>
+            <div class="calc">
+              H_out = 26 / 2 = <b>13</b><br>
+              W_out = 26 / 2 = <b>13</b><br>
+              Каналов = 16 (не меняется!)<br>
+              Выход: <b>13 x 13 x 16</b><br><br>
+              Параметры: <b>0</b> (MaxPool — фиксированная операция, без обучаемых весов)
+            </div>
+            <div class="why">Pooling уменьшает пространственные размеры в 2 раза (26→13), но число каналов остаётся 16. Объём данных: 26x26x16 = 10816 → 13x13x16 = 2704 (в 4 раза меньше).</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>MaxPool(2×2) — без параметров!</h4>
-            <div class="calc">$H_{out} = \\dfrac{26}{2} = 13$, выход $13 \\times 13 \\times 8$</div>
-            <div class="why">Pooling — это фиксированная операция (max или avg), у неё нет обучаемых параметров. Она только уменьшает размер в 2 раза. После flatten: $13 \\times 13 \\times 8 = 1352$ нейрона.</div>
+            <h4>Шаг 3: Conv2(3x3, 32 фильтра, no padding)</h4>
+            <div class="calc">
+              <b>Размер выхода:</b><br>
+              H_out = (13 − 3) / 1 + 1 = <b>11</b><br>
+              Выход: <b>11 x 11 x 32</b><br><br>
+              <b>Параметры:</b><br>
+              Один фильтр: 3 x 3 x <b>16</b> = 144 весов + 1 bias = <b>145</b><br>
+              (16 — потому что ВХОД имеет 16 каналов от Conv1!)<br>
+              32 фильтра: 32 x 145 = <b>4 640 параметров</b>
+            </div>
+            <div class="why">Второй Conv-слой НАМНОГО тяжелее (4640 vs 160), потому что каждый фильтр теперь 3x3x16 (работает по всем 16 входным каналам). Формула: k x k x C_in x C_out + C_out.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Сравнение с полносвязной сетью на том же входе</h4>
+            <h4>Шаг 4: MaxPool2(2x2) → Flatten</h4>
             <div class="calc">
-              FC от $28 \\times 28 = 784$ входов к первому слою из 100 нейронов: $784 \\times 100 + 100 = 78 500$ пар.<br>
-              FC 100→10: $100 \\times 10 + 10 = 1010$ пар.<br>
-              Итого FC: $79 510$ параметров
+              MaxPool2: 11 x 11 x 32 → пол(11/2) = 5<br>
+              Выход: <b>5 x 5 x 32</b> = <b>800</b> нейронов<br>
+              Параметры: <b>0</b><br><br>
+              Flatten: преобразуем 3D тензор 5x5x32 в 1D вектор длины 800
             </div>
-            <div class="calc">
-              CNN (наш): $13 610$ параметров — в <b>5,8 раз меньше</b> при той же задаче!
-            </div>
-            <div class="why">Главное преимущество CNN: weight sharing. Один фильтр применяется ко всем 26×26 позициям, но весов всего 9. В FC каждый нейрон имеет отдельный вес к каждому пикселю — расточительно.</div>
+            <div class="why">После двух Conv+Pool тензор сжался с 28x28x1 = 784 до 5x5x32 = 800. Пространственный размер уменьшился (28→5), но каналов стало больше (1→32). Каждый канал — отдельный «детектор паттерна».</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Более глубокая сеть: Conv→Conv→Pool→FC</h4>
+            <h4>Шаг 5: FC1(800→128) и FC2(128→10)</h4>
             <div class="calc">
-              Слой 1: Conv(3×3, 32 фильтра, padding=1): вход 28×28×1 → выход 28×28×32<br>
-              Параметров: $3\\times3\\times1\\times32 + 32 = 320$<br><br>
-              Слой 2: Conv(3×3, 64 фильтра, padding=1): вход 28×28×32 → выход 28×28×64<br>
-              Параметров: $3\\times3\\times32\\times64 + 64 = 18 496$<br><br>
-              MaxPool: 28×28×64 → 14×14×64 = 12 544 нейрона<br>
-              FC → 10: $12 544 \\times 10 + 10 = 125 450$<br>
-              Итого: $320 + 18496 + 125450 = 144 266$ параметров
+              <b>FC1 (800 → 128):</b><br>
+              Веса: 800 x 128 = 102 400<br>
+              Bias: 128<br>
+              Итого: <b>102 528 параметров</b><br><br>
+              <b>FC2 (128 → 10):</b><br>
+              Веса: 128 x 10 = 1 280<br>
+              Bias: 10<br>
+              Итого: <b>1 290 параметров</b>
             </div>
-            <div class="why">Второй Conv-слой имеет больше параметров, потому что входных каналов 32 (а не 1). Но FC всё равно доминирует! Поэтому в современных CNN используют Global Average Pooling вместо FC для резкого уменьшения числа параметров.</div>
+            <div class="why">FC1 — «бутылочное горлышко»: 102 528 из 108 618 всех параметров! Это 94% модели. Именно поэтому в современных CNN FC заменяют на Global Average Pooling.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: Итоговая таблица</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Слой</th><th>Выход</th><th>Параметры</th><th>% от всех</th></tr>
+                <tr><td>Вход</td><td>28x28x1</td><td>—</td><td>—</td></tr>
+                <tr><td>Conv1 (3x3, 16)</td><td>26x26x16</td><td>160</td><td>0.1%</td></tr>
+                <tr><td>MaxPool1 (2x2)</td><td>13x13x16</td><td>0</td><td>—</td></tr>
+                <tr><td>Conv2 (3x3, 32)</td><td>11x11x32</td><td>4 640</td><td>4.3%</td></tr>
+                <tr><td>MaxPool2 (2x2)</td><td>5x5x32</td><td>0</td><td>—</td></tr>
+                <tr><td>Flatten</td><td>800</td><td>—</td><td>—</td></tr>
+                <tr><td>FC1 (→128)</td><td>128</td><td><b>102 528</b></td><td><b>94.4%</b></td></tr>
+                <tr><td>FC2 (→10)</td><td>10</td><td>1 290</td><td>1.2%</td></tr>
+                <tr><td colspan="2"><b>ИТОГО</b></td><td colspan="2"><b>108 618</b></td></tr>
+              </table>
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 500 80" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+                <text x="250" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Распределение параметров</text>
+                <!-- Bar chart -->
+                <rect x="20" y="25" width="2" height="40" fill="#6366f1" rx="1"/><text x="21" y="75" text-anchor="middle" font-size="7" fill="#64748b">Conv1</text>
+                <rect x="40" y="25" width="20" height="40" fill="#6366f1" rx="1"/><text x="50" y="75" text-anchor="middle" font-size="7" fill="#64748b">Conv2</text>
+                <rect x="80" y="25" width="380" height="40" fill="#ef4444" rx="1"/><text x="270" y="50" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">FC1: 102 528 (94.4%)</text>
+                <rect x="462" y="25" width="8" height="40" fill="#f59e0b" rx="1"/><text x="466" y="75" text-anchor="middle" font-size="7" fill="#64748b">FC2</text>
+              </svg>
+            </div>
+            <div class="why">Conv-слои экономны (160 + 4640 = 4800 параметров), потому что каждый фильтр переиспользуется для всех позиций. FC-слой расточителен: каждый из 800 входов соединён с каждым из 128 выходов. Решение: Global Average Pooling заменяет FC.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Простая CNN (28×28→Conv8→Pool→FC10): 13 610 параметров. Это в 5,8 раз меньше аналогичной FC-сети (79 510 пар.). Conv-слои экономят параметры через weight sharing, но FC остаётся «бутылочным горлышком».</p>
+            <p>Всего: 108 618 параметров. Conv1: 160 (0.1%), Conv2: 4640 (4.3%), FC1: 102 528 (94.4%), FC2: 1290 (1.2%). FC-слой доминирует. С padding размеры были бы больше (28→14→7), и FC ещё тяжелее.</p>
           </div>
-
           <div class="lesson-box">
-            <b>Правило подсчёта Conv-слоя:</b> $k \\times k \\times C_{in} \\times C_{out} + C_{out}$. Параметры растут с числом фильтров $C_{out}$ и числом входных каналов $C_{in}$, но НЕ с размером изображения $H \\times W$ — это и есть weight sharing.
+            <b>Формула параметров Conv:</b> k x k x C_in x C_out + C_out. Формула параметров FC: N_in x N_out + N_out. Conv растёт с глубиной каналов, FC — с пространственным размером. Современные CNN (ResNet, EfficientNet) используют GAP для устранения FC.
           </div>
         `
       },
       {
-        title: 'MaxPooling 2×2',
+        title: 'Что видят фильтры: горизонт, вертикаль, диагональ',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Применить MaxPooling 2×2 (stride=2) к feature map 4×4 после ReLU. Понять, что теряется и что сохраняется. Сравнить с AvgPooling.</p>
-          </div>
-
-          <div class="illustration bordered">
-            <svg viewBox="0 0 440 160" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
-              <defs>
-                <marker id="mp-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
-                </marker>
-              </defs>
-              <!-- 4x4 input grid, cell 30px, start x=20,y=20 -->
-              <!-- Highlight the 4 2x2 blocks -->
-              <rect x="20" y="20" width="60" height="60" fill="#dbeafe" rx="1"/>
-              <rect x="80" y="20" width="60" height="60" fill="#fef3c7" rx="1"/>
-              <rect x="20" y="80" width="60" height="60" fill="#d1fae5" rx="1"/>
-              <rect x="80" y="80" width="60" height="60" fill="#fce7f3" rx="1"/>
-              <!-- Grid lines 4x4 -->
-              <g stroke="#64748b" stroke-width="1">
-                <rect x="20" y="20" width="120" height="120" fill="none"/>
-                <line x1="20" y1="50" x2="140" y2="50"/><line x1="20" y1="80" x2="140" y2="80"/><line x1="20" y1="110" x2="140" y2="110"/>
-                <line x1="50" y1="20" x2="50" y2="140"/><line x1="80" y1="20" x2="80" y2="140"/><line x1="110" y1="20" x2="110" y2="140"/>
-              </g>
-              <!-- Values: row0: 3,1,0,5; row1: 0,4,2,1; row2: 2,0,6,0; row3: 1,3,0,4 -->
-              <g font-size="13" text-anchor="middle" font-weight="600">
-                <!-- row 0 -->
-                <text x="35" y="42" fill="#1e40af">3</text><text x="65" y="42" fill="#1e40af">1</text>
-                <text x="95" y="42" fill="#92400e">0</text><text x="125" y="42" fill="#92400e">5</text>
-                <!-- row 1 -->
-                <text x="35" y="72" fill="#1e40af">0</text>
-                <text x="65" y="72" fill="#1e40af" font-size="14">4</text>
-                <text x="95" y="72" fill="#92400e">2</text><text x="125" y="72" fill="#92400e">1</text>
-                <!-- row 2 -->
-                <text x="35" y="102" fill="#065f46">2</text><text x="65" y="102" fill="#065f46">0</text>
-                <text x="95" y="102" fill="#831843">6</text><text x="125" y="102" fill="#831843">0</text>
-                <!-- row 3 -->
-                <text x="35" y="132" fill="#065f46">1</text><text x="65" y="132" fill="#065f46">3</text>
-                <text x="95" y="132" fill="#831843">0</text><text x="125" y="132" fill="#831843">4</text>
-              </g>
-              <text x="80" y="154" text-anchor="middle" font-size="9" fill="#64748b">feature map 4×4</text>
-              <!-- Arrow -->
-              <line x1="150" y1="80" x2="178" y2="80" stroke="#64748b" stroke-width="1.5" marker-end="url(#mp-arr)"/>
-              <text x="164" y="75" text-anchor="middle" font-size="8" fill="#64748b">MaxPool</text>
-              <text x="164" y="95" text-anchor="middle" font-size="8" fill="#64748b">2×2</text>
-              <!-- 2x2 output grid, cell 50px, start x=185,y=55 -->
-              <rect x="185" y="55" width="50" height="50" fill="#dbeafe" rx="2"/>
-              <rect x="235" y="55" width="50" height="50" fill="#fef3c7" rx="2"/>
-              <rect x="185" y="105" width="50" height="50" fill="#d1fae5" rx="2"/>
-              <rect x="235" y="105" width="50" height="50" fill="#fce7f3" rx="2"/>
-              <g stroke="#64748b" stroke-width="1.5">
-                <rect x="185" y="55" width="100" height="100" fill="none"/>
-                <line x1="185" y1="105" x2="285" y2="105"/>
-                <line x1="235" y1="55" x2="235" y2="155"/>
-              </g>
-              <!-- Max values -->
-              <g font-size="18" text-anchor="middle" font-weight="700">
-                <text x="210" y="88" fill="#1e40af">4</text>
-                <text x="260" y="88" fill="#92400e">5</text>
-                <text x="210" y="138" fill="#065f46">3</text>
-                <text x="260" y="138" fill="#831843">6</text>
-              </g>
-              <text x="235" y="170" text-anchor="middle" font-size="9" fill="#64748b">MaxPool 2×2</text>
-              <!-- Max labels -->
-              <text x="210" y="62" text-anchor="middle" font-size="8" fill="#64748b">max=4</text>
-              <text x="260" y="62" text-anchor="middle" font-size="8" fill="#64748b">max=5</text>
-              <text x="210" y="112" text-anchor="middle" font-size="8" fill="#64748b">max=3</text>
-              <text x="260" y="112" text-anchor="middle" font-size="8" fill="#64748b">max=6</text>
-            </svg>
-            <div class="caption">MaxPooling 2×2: 4 цветных блока в сетке 4×4 → 4 максимума в сетке 2×2. Каждый блок 2×2 «сворачивается» в одно число — самый сильный отклик.</div>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th colspan="4">Feature map $A$ (после ReLU, 4×4)</th></tr>
-              <tr><td>3</td><td>1</td><td>0</td><td>5</td></tr>
-              <tr><td>0</td><td>4</td><td>2</td><td>1</td></tr>
-              <tr><td>2</td><td>0</td><td>6</td><td>0</td></tr>
-              <tr><td>1</td><td>3</td><td>0</td><td>4</td></tr>
-            </table>
+            <p>Одно и то же изображение 5x5 пропустить через 3 разных фильтра: вертикальный Собель, горизонтальный Собель, диагональный. Сравнить выходы и понять, что «видит» каждый фильтр.</p>
           </div>
 
           <div class="step" data-step="1">
-            <h4>MaxPooling: берём максимум из каждого окна 2×2</h4>
-            <p>Разбиваем 4×4 на четыре блока 2×2 (без перекрытия, stride=2):</p>
-            <div class="calc">
-              Блок (0,0)–(1,1): $\\begin{pmatrix}3&1\\\\0&4\\end{pmatrix}$ → $\\max = 4$<br>
-              Блок (0,2)–(1,3): $\\begin{pmatrix}0&5\\\\2&1\\end{pmatrix}$ → $\\max = 5$<br>
-              Блок (2,0)–(3,1): $\\begin{pmatrix}2&0\\\\1&3\\end{pmatrix}$ → $\\max = 3$<br>
-              Блок (2,2)–(3,3): $\\begin{pmatrix}6&0\\\\0&4\\end{pmatrix}$ → $\\max = 6$
+            <h4>Шаг 1: Входное изображение с двумя типами границ</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="5">Изображение I (5x5)</th></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>10</td><td>10</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>80</td><td>80</td><td>80</td><td>80</td><td>80</td></tr>
+                <tr><td>80</td><td>80</td><td>80</td><td>80</td><td>80</td></tr>
+              </table>
             </div>
             <div class="calc">
-              $\\text{MaxPool}(A) = \\begin{pmatrix}4 & 5 \\\\ 3 & 6\\end{pmatrix}$
+              <b>Вертикальная граница:</b> столбец 1→2 (10→80) в строках 0–2<br>
+              <b>Горизонтальная граница:</b> строка 2→3 (10→80) в столбцах 0–1<br>
+              <b>Правый нижний угол:</b> однородная область (всё 80)
             </div>
-            <div class="why">Выход 2×2: в 4 раза меньше пикселей. Сохранены самые сильные активации — «где фильтр сработал сильнее всего в этом регионе».</div>
+            <div class="why">Изображение содержит «Г»-образную тёмную область (10) в левом верхнем углу. Остальное — светлое (80). Есть и вертикальная, и горизонтальная граница.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>AvgPooling: берём среднее из каждого окна</h4>
+            <h4>Шаг 2: Фильтр 1 — вертикальный Собель</h4>
             <div class="calc">
-              Блок (0,0)–(1,1): $(3+1+0+4)/4 = 2{,}0$<br>
-              Блок (0,2)–(1,3): $(0+5+2+1)/4 = 2{,}0$<br>
-              Блок (2,0)–(3,1): $(2+0+1+3)/4 = 1{,}5$<br>
-              Блок (2,2)–(3,3): $(6+0+0+4)/4 = 2{,}5$
+              $K_v = \\begin{pmatrix}-1&0&1\\\\-2&0&2\\\\-1&0&1\\end{pmatrix}$<br><br>
+              Этот фильтр реагирует на разницу «лево vs право».<br><br>
+              Ключевые позиции feature map (3x3):<br><br>
+              (0,0): окно $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\10&10&80\\end{pmatrix}$<br>
+              = (-1)·10 + 0·10 + 1·80 + (-2)·10 + 0·10 + 2·80 + (-1)·10 + 0·10 + 1·80<br>
+              = -10+80-20+160-10+80 = <b>280</b> (сильный отклик!)<br><br>
+              (0,2): окно $\\begin{pmatrix}80&80&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$<br>
+              = -80+80-160+160-80+80 = <b>0</b> (однородно)<br><br>
+              (2,0): окно $\\begin{pmatrix}10&10&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$<br>
+              = -10+80-160+160-80+80 = <b>70</b> (слабый: граница только в 1 строке из 3)
             </div>
-            <div class="calc">$\\text{AvgPool}(A) = \\begin{pmatrix}2{,}0 & 2{,}0 \\\\ 1{,}5 & 2{,}5\\end{pmatrix}$</div>
-            <div class="why">AvgPool «размазывает» информацию. MaxPool «вытаскивает» самую яркую активацию. Для задач классификации MaxPool обычно лучше: «был ли этот паттерн где-то в регионе?»</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="3">Верт. Собель: feature map</th></tr>
+                <tr><td><b>280</b></td><td>210</td><td>0</td></tr>
+                <tr><td><b>280</b></td><td>140</td><td>0</td></tr>
+                <tr><td>70</td><td>0</td><td>0</td></tr>
+              </table>
+            </div>
+            <div class="why">Вертикальный фильтр «зажёг» левый столбец (280, 280, 70) — там вертикальная граница. Правый столбец = 0 (однородная область). Фильтр НАШЁЛ вертикальную границу и ПРОИГНОРИРОВАЛ горизонтальную.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Что теряется при pooling?</h4>
+            <h4>Шаг 3: Фильтр 2 — горизонтальный Собель</h4>
             <div class="calc">
-              MaxPool сохраняет: где паттерн был (грубо) и насколько сильно<br>
-              MaxPool теряет: точное положение внутри окна 2×2 (translation invariance!)
+              $K_h = \\begin{pmatrix}-1&-2&-1\\\\0&0&0\\\\1&2&1\\end{pmatrix}$<br><br>
+              Этот фильтр реагирует на разницу «верх vs низ».<br><br>
+              (0,0): окно $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\10&10&80\\end{pmatrix}$<br>
+              = (-1)·10+(-2)·10+(-1)·80 + 0+0+0 + 1·10+2·10+1·80<br>
+              = -10-20-80+10+20+80 = <b>0</b> (нет горизонтальной границы!)<br><br>
+              (2,0): окно $\\begin{pmatrix}10&10&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$<br>
+              = (-1)·10+(-2)·10+(-1)·80 + 0+0+0 + 1·80+2·80+1·80<br>
+              = -10-20-80+80+160+80 = <b>210</b> (сильный!)<br><br>
+              (2,2): окно $\\begin{pmatrix}80&80&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$<br>
+              = -80-160-80+80+160+80 = <b>0</b>
             </div>
-            <div class="why">Кот в левом углу и кот в правом углу блока 2×2 дадут одинаковый MaxPool-результат. Это translation invariance — полезное свойство: кот остаётся котом, сдвинутый на 1 пиксель.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="3">Гориз. Собель: feature map</th></tr>
+                <tr><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td>140</td><td>70</td><td>0</td></tr>
+                <tr><td><b>210</b></td><td><b>140</b></td><td>0</td></tr>
+              </table>
+            </div>
+            <div class="why">Горизонтальный фильтр «зажёг» нижнюю строку (210, 140) — там горизонтальная граница. Верхняя строка = 0. Этот фильтр НАШЁЛ горизонтальную границу и ПРОИГНОРИРОВАЛ вертикальную!</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Receptive field после Conv+Pool</h4>
+            <h4>Шаг 4: Фильтр 3 — диагональный (45 градусов)</h4>
             <div class="calc">
-              Conv 3×3: receptive field = 3×3 пикселя входного изображения<br>
-              MaxPool 2×2: receptive field удваивается → 6×6 пикселя оригинала<br>
-              Следующий Conv 3×3: receptive field растёт → 10×10<br>
-              После ещё одного Pool → 20×20
+              $K_d = \\begin{pmatrix}0&-1&-2\\\\1&0&-1\\\\2&1&0\\end{pmatrix}$<br><br>
+              Реагирует на диагональную границу (из правого верхнего в левый нижний).<br><br>
+              (0,0): окно $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\10&10&80\\end{pmatrix}$<br>
+              = 0·10+(-1)·10+(-2)·80 + 1·10+0·10+(-1)·80 + 2·10+1·10+0·80<br>
+              = 0-10-160+10+0-80+20+10+0 = <b>-210</b> → после ReLU: <b>0</b><br><br>
+              (1,0): окно $\\begin{pmatrix}10&10&80\\\\10&10&80\\\\80&80&80\\end{pmatrix}$<br>
+              = 0-10-160+10+0-80+160+80+0 = <b>0</b><br><br>
+              (2,0): окно $\\begin{pmatrix}10&10&80\\\\80&80&80\\\\80&80&80\\end{pmatrix}$<br>
+              = 0-10-160+80+0-80+160+80+0 = <b>70</b>
             </div>
-            <div class="why">Глубокие нейроны «видят» всё большую область оригинального изображения. Ранние нейроны — локальные паттерны (края), поздние — глобальные (объекты). Это иерархия признаков.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th colspan="3">Диагон. фильтр: feature map</th></tr>
+                <tr><td>-210</td><td>-140</td><td>0</td></tr>
+                <tr><td>0</td><td>-70</td><td>0</td></tr>
+                <tr><td>70</td><td>0</td><td>0</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              После ReLU (обнуляем отрицательные):<br>
+              $\\begin{pmatrix}0&0&0\\\\0&0&0\\\\70&0&0\\end{pmatrix}$
+            </div>
+            <div class="why">Диагональный фильтр почти не активировался (только 70 в одной ячейке). Потому что в изображении НЕТ диагональных границ — только вертикальные и горизонтальные. Каждый фильтр «видит» только свой тип паттерна!</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Global Average Pooling (GAP) — современная альтернатива</h4>
-            <div class="calc">
-              Для нашей 4×4 feature map:<br>
-              $\\text{GAP} = \\dfrac{3+1+0+5+0+4+2+1+2+0+6+0+1+3+0+4}{16} = \\dfrac{32}{16} = 2{,}0$
+            <h4>Шаг 5: Сравнение трёх фильтров</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+                <text x="250" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Три фильтра — три разных «зрения»</text>
+                <!-- Vertical filter result -->
+                <g transform="translate(20,25)">
+                  <text x="45" y="0" text-anchor="middle" font-size="9" fill="#6366f1" font-weight="600">Верт. Собель</text>
+                  <rect x="0" y="5" width="30" height="30" fill="#f97316"/><rect x="30" y="5" width="30" height="30" fill="#fdba74"/><rect x="60" y="5" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="35" width="30" height="30" fill="#f97316"/><rect x="30" y="35" width="30" height="30" fill="#fef3c7"/><rect x="60" y="35" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="65" width="30" height="30" fill="#fef3c7"/><rect x="30" y="65" width="30" height="30" fill="#f1f5f9"/><rect x="60" y="65" width="30" height="30" fill="#f1f5f9"/>
+                  <text x="45" y="110" text-anchor="middle" font-size="8" fill="#64748b">видит | границу</text>
+                </g>
+                <!-- Horizontal filter result -->
+                <g transform="translate(170,25)">
+                  <text x="45" y="0" text-anchor="middle" font-size="9" fill="#10b981" font-weight="600">Гориз. Собель</text>
+                  <rect x="0" y="5" width="30" height="30" fill="#f1f5f9"/><rect x="30" y="5" width="30" height="30" fill="#f1f5f9"/><rect x="60" y="5" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="35" width="30" height="30" fill="#fef3c7"/><rect x="30" y="35" width="30" height="30" fill="#fef3c7"/><rect x="60" y="35" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="65" width="30" height="30" fill="#fdba74"/><rect x="30" y="65" width="30" height="30" fill="#fef3c7"/><rect x="60" y="65" width="30" height="30" fill="#f1f5f9"/>
+                  <text x="45" y="110" text-anchor="middle" font-size="8" fill="#64748b">видит — границу</text>
+                </g>
+                <!-- Diagonal filter result -->
+                <g transform="translate(320,25)">
+                  <text x="45" y="0" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="600">Диагон. фильтр</text>
+                  <rect x="0" y="5" width="30" height="30" fill="#f1f5f9"/><rect x="30" y="5" width="30" height="30" fill="#f1f5f9"/><rect x="60" y="5" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="35" width="30" height="30" fill="#f1f5f9"/><rect x="30" y="35" width="30" height="30" fill="#f1f5f9"/><rect x="60" y="35" width="30" height="30" fill="#f1f5f9"/>
+                  <rect x="0" y="65" width="30" height="30" fill="#fef3c7"/><rect x="30" y="65" width="30" height="30" fill="#f1f5f9"/><rect x="60" y="65" width="30" height="30" fill="#f1f5f9"/>
+                  <text x="45" y="110" text-anchor="middle" font-size="8" fill="#64748b">почти пусто</text>
+                </g>
+              </svg>
             </div>
-            <div class="calc">
-              Обычный путь: Conv → Flatten(4×4×64 = 1024) → FC → Softmax: нужно 1024×num_classes параметров<br>
-              С GAP: Conv → GAP(64) → Softmax: нужно только 64×num_classes — в 16 раз меньше!
+            <div class="example-data-table">
+              <table>
+                <tr><th>Фильтр</th><th>Макс. отклик</th><th>Сумма после ReLU</th><th>Что нашёл</th></tr>
+                <tr><td>Верт. Собель</td><td><b>280</b></td><td><b>980</b></td><td>Вертикальную границу слева</td></tr>
+                <tr><td>Гориз. Собель</td><td><b>210</b></td><td><b>560</b></td><td>Горизонтальную границу снизу</td></tr>
+                <tr><td>Диагональный</td><td>70</td><td>70</td><td>Почти ничего (нет диагонали)</td></tr>
+              </table>
             </div>
-            <div class="why">GAP сжимает всю feature map до одного числа на канал. Используется в ResNet, MobileNet и других современных архитектурах для уменьшения параметров FC-слоя.</div>
+            <div class="why">Каждый фильтр — специалист по своему типу границ. CNN обучает фильтры автоматически: первый слой находит края (как Собель), второй — текстуры (комбинации краёв), третий — части объектов, и так далее. Это иерархия признаков.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>MaxPool(2×2) на 4×4 feature map даёт 2×2 с максимумами каждого блока: $(4, 5; 3, 6)$. AvgPool даёт усреднённый результат $(2{,}0, 2{,}0; 1{,}5, 2{,}5)$. MaxPool сохраняет самые сильные активации и уменьшает размер в 4 раза, внося translation invariance.</p>
+            <p>Вертикальный фильтр: сильный отклик (280) на вертикальной границе. Горизонтальный: сильный (210) на горизонтальной. Диагональный: почти нулевой (нет диагонали). Каждый фильтр «видит» только свой паттерн. CNN автоматически обучает набор фильтров для задачи.</p>
           </div>
-
           <div class="lesson-box">
-            <b>Почему MaxPool популярнее AvgPool:</b> в задачах классификации важно «был ли паттерн» (Max), а не «насколько он в среднем был» (Avg). После ReLU большинство значений — нули, Max сохраняет ненулевые активации. Но AvgPool лучше для Global Average Pooling.
+            В реальной CNN первый слой содержит 32–64 фильтра, которые обучаются автоматически. После обучения они оказываются похожи на Собеля, Габора и другие классические детекторы. Но CNN может найти и нестандартные фильтры, специфичные для задачи (например, детектор кошачьих глаз).
           </div>
         `
       },

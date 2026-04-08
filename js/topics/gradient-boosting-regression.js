@@ -161,230 +161,521 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Gradient Boosting вручную: 4 итерации',
+        title: '3 итерации бустинга на 5 точках',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Обучить Gradient Boosting на 5 точках вручную (4 итерации, η=0.5, глубина дерева=1). Показать, как остатки уменьшаются с каждым шагом.</p>
+            <p>Обучить Gradient Boosting на 5 точках вручную: 3 итерации, learning rate η = 0.5, глубина дерева = 1 (stumps). Проследить каждое число: каждый разрез, каждое обновление, каждый остаток.</p>
           </div>
+
           <div class="example-data-table">
             <table>
-              <tr><th>ID</th><th>x</th><th>y (факт)</th></tr>
-              <tr><td>1</td><td>1</td><td>3.0</td></tr>
-              <tr><td>2</td><td>2</td><td>5.5</td></tr>
-              <tr><td>3</td><td>3</td><td>6.0</td></tr>
-              <tr><td>4</td><td>4</td><td>8.0</td></tr>
-              <tr><td>5</td><td>5</td><td>9.5</td></tr>
+              <tr><th>i</th><th>x</th><th>y</th></tr>
+              <tr><td>1</td><td>1</td><td>2.1</td></tr>
+              <tr><td>2</td><td>2</td><td>4.8</td></tr>
+              <tr><td>3</td><td>3</td><td>6.2</td></tr>
+              <tr><td>4</td><td>4</td><td>8.9</td></tr>
+              <tr><td>5</td><td>5</td><td>11.3</td></tr>
             </table>
           </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: F₀ = среднее(y)</h4>
+            <h4>Шаг 1: Начальное предсказание F₀ = mean(y)</h4>
             <div class="calc">
-              ȳ = (3.0 + 5.5 + 6.0 + 8.0 + 9.5) / 5 = 32.0 / 5 = <b>6.4</b><br>
-              F₀(x) = 6.4 для всех x<br><br>
-              Остатки r¹ = y − F₀:<br>
-              r¹₁ = 3.0 − 6.4 = <b>−3.4</b><br>
-              r¹₂ = 5.5 − 6.4 = <b>−0.9</b><br>
-              r¹₃ = 6.0 − 6.4 = <b>−0.4</b><br>
-              r¹₄ = 8.0 − 6.4 = <b>+1.6</b><br>
-              r¹₅ = 9.5 − 6.4 = <b>+3.1</b><br>
-              MSE₀ = (11.56+0.81+0.16+2.56+9.61)/5 = 4.94
+              F₀ = (2.1 + 4.8 + 6.2 + 8.9 + 11.3) / 5 = 33.3 / 5 = <b>6.66</b>
             </div>
-            <div class="why">F₀ = среднее — это «нулевая гипотеза». Мы начинаем с самого грубого предсказания.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>i</th><th>x</th><th>y</th><th>F₀</th><th>r₀ = y − F₀</th><th>r₀²</th></tr>
+                <tr><td>1</td><td>1</td><td>2.1</td><td>6.66</td><td><b>−4.56</b></td><td>20.794</td></tr>
+                <tr><td>2</td><td>2</td><td>4.8</td><td>6.66</td><td><b>−1.86</b></td><td>3.460</td></tr>
+                <tr><td>3</td><td>3</td><td>6.2</td><td>6.66</td><td><b>−0.46</b></td><td>0.212</td></tr>
+                <tr><td>4</td><td>4</td><td>8.9</td><td>6.66</td><td><b>+2.24</b></td><td>5.018</td></tr>
+                <tr><td>5</td><td>5</td><td>11.3</td><td>6.66</td><td><b>+4.64</b></td><td>21.530</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              MSE₀ = (20.794 + 3.460 + 0.212 + 5.018 + 21.530) / 5 = 51.013 / 5 = <b>10.203</b>
+            </div>
+            <div class="why">F₀ = среднее — это «нулевая гипотеза». Модель предсказывает одно число для всех x. Остатки r₀ = y − F₀ показывают, где мы ошиблись. Именно эти остатки станут целью для первого дерева.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: Дерево h₁ обучается на r¹ (глубина=1)</h4>
+            <h4>Шаг 2: Обучаем дерево h₁ на остатках r₀ (depth=1, stump)</h4>
+            <p>Stump — это дерево с одним разрезом. Пробуем ВСЕ возможные пороги для x:</p>
             <div class="calc">
-              Ищем лучший разрез для минимизации MSE остатков:<br><br>
-              Разрез x ≤ 2: группа {1,2}, группа {3,4,5}<br>
-              Лист L: mean(r¹₁, r¹₂) = mean(−3.4, −0.9) = −2.15<br>
-              Лист R: mean(r¹₃, r¹₄, r¹₅) = mean(−0.4, 1.6, 3.1) = 1.43<br><br>
-              Разрез x ≤ 3: группа {1,2,3}, группа {4,5}<br>
-              Лист L: mean(−3.4, −0.9, −0.4) = −1.57<br>
-              Лист R: mean(1.6, 3.1) = 2.35<br><br>
-              (проверяем MSE, выбираем x≤3 как лучший):<br>
-              MSE(x≤3): {L: (−3.4+1.57)²+(−0.9+1.57)²+(−0.4+1.57)²}/5 + ... = 0.86<br>
-              MSE(x≤2): выше → выбираем разрез x≤3<br><br>
-              h₁(x): x≤3 → −1.57, x>3 → +2.35
+              <b>Разрез x &lt; 1.5</b> (L: {1}, R: {2,3,4,5})<br>
+              Лист L: mean(−4.56) = −4.560<br>
+              Лист R: mean(−1.86, −0.46, +2.24, +4.64) = 4.56/4 = 1.140<br>
+              MSE_L = 0 (одна точка)<br>
+              MSE_R = ((−1.86−1.14)² + (−0.46−1.14)² + (2.24−1.14)² + (4.64−1.14)²) / 4<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (9.000 + 2.560 + 1.210 + 12.250) / 4 = 25.020 / 4 = 6.255<br>
+              Взвешенная MSE = (1/5)·0 + (4/5)·6.255 = <b>5.004</b>
             </div>
+            <div class="calc">
+              <b>Разрез x &lt; 2.5</b> (L: {1,2}, R: {3,4,5})<br>
+              Лист L: mean(−4.56, −1.86) = −6.42/2 = −3.210<br>
+              Лист R: mean(−0.46, +2.24, +4.64) = 6.42/3 = 2.140<br>
+              MSE_L = ((−4.56+3.21)² + (−1.86+3.21)²) / 2 = (1.822 + 1.822) / 2 = <b>1.822</b><br>
+              MSE_R = ((−0.46−2.14)² + (2.24−2.14)² + (4.64−2.14)²) / 3<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (6.760 + 0.010 + 6.250) / 3 = 13.020 / 3 = <b>4.340</b><br>
+              Взвешенная MSE = (2/5)·1.822 + (3/5)·4.340 = 0.729 + 2.604 = <b>3.333</b>
+            </div>
+            <div class="calc">
+              <b>Разрез x &lt; 3.5</b> (L: {1,2,3}, R: {4,5})<br>
+              Лист L: mean(−4.56, −1.86, −0.46) = −6.88/3 = −2.293<br>
+              Лист R: mean(+2.24, +4.64) = 6.88/2 = 3.440<br>
+              MSE_L = ((−4.56+2.293)² + (−1.86+2.293)² + (−0.46+2.293)²) / 3<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (5.143 + 0.188 + 3.361) / 3 = 8.693 / 3 = <b>2.898</b><br>
+              MSE_R = ((2.24−3.44)² + (4.64−3.44)²) / 2 = (1.440 + 1.440) / 2 = <b>1.440</b><br>
+              Взвешенная MSE = (3/5)·2.898 + (2/5)·1.440 = 1.739 + 0.576 = <b>2.315</b>
+            </div>
+            <div class="calc">
+              <b>Разрез x &lt; 4.5</b> (L: {1,2,3,4}, R: {5})<br>
+              Лист L: mean(−4.56, −1.86, −0.46, +2.24) = −4.64/4 = −1.160<br>
+              Лист R: mean(+4.64) = 4.640<br>
+              MSE_L = ((−4.56+1.16)² + (−1.86+1.16)² + (−0.46+1.16)² + (2.24+1.16)²) / 4<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (11.560 + 0.490 + 0.490 + 11.560) / 4 = 24.100 / 4 = <b>6.025</b><br>
+              MSE_R = 0 (одна точка)<br>
+              Взвешенная MSE = (4/5)·6.025 + (1/5)·0 = <b>4.820</b>
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Разрез</th><th>Взвеш. MSE</th><th>Лучший?</th></tr>
+                <tr><td>x &lt; 1.5</td><td>5.004</td><td></td></tr>
+                <tr><td>x &lt; 2.5</td><td>3.333</td><td></td></tr>
+                <tr><td>x &lt; 3.5</td><td><b>2.315</b></td><td>Да!</td></tr>
+                <tr><td>x &lt; 4.5</td><td>4.820</td><td></td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              <b>Лучший разрез: x &lt; 3.5</b><br>
+              h₁(x) = −2.293 если x &lt; 3.5, иначе +3.440
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg" style="max-width:360px;">
+                <text x="180" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Stump h₁: разрез x &lt; 3.5</text>
+                <rect x="130" y="24" width="100" height="30" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="180" y="44" text-anchor="middle" font-size="10" fill="#6366f1">x &lt; 3.5?</text>
+                <line x1="155" y1="54" x2="90" y2="78" stroke="#64748b" stroke-width="1.5"/>
+                <line x1="205" y1="54" x2="270" y2="78" stroke="#64748b" stroke-width="1.5"/>
+                <text x="115" y="70" font-size="9" fill="#10b981">Да</text>
+                <text x="240" y="70" font-size="9" fill="#ef4444">Нет</text>
+                <rect x="40" y="80" width="100" height="35" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                <text x="90" y="102" text-anchor="middle" font-size="10" fill="#065f46">−2.293</text>
+                <rect x="220" y="80" width="100" height="35" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="270" y="102" text-anchor="middle" font-size="10" fill="#991b1b">+3.440</text>
+                <text x="90" y="126" text-anchor="middle" font-size="8" fill="#64748b">точки 1,2,3</text>
+                <text x="270" y="126" text-anchor="middle" font-size="8" fill="#64748b">точки 4,5</text>
+              </svg>
+            </div>
+            <div class="why">Мы перебрали все 4 возможных порога для stump. x &lt; 3.5 даёт минимальную взвешенную MSE = 2.315. Это дерево «разделяет» остатки на отрицательные (точки 1,2,3 — модель завышала) и положительные (точки 4,5 — занижала).</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: Обновление F₁ = F₀ + η·h₁ (η=0.5)</h4>
+            <h4>Шаг 3: Обновляем F₁ = F₀ + η·h₁</h4>
             <div class="calc">
-              F₁(x≤3) = 6.4 + 0.5·(−1.57) = 6.4 − 0.785 = <b>5.615</b><br>
-              F₁(x>3) = 6.4 + 0.5·(2.35)  = 6.4 + 1.175 = <b>7.575</b><br><br>
-              Новые остатки r²:<br>
-              r²₁ = 3.0 − 5.615 = −2.615<br>
-              r²₂ = 5.5 − 5.615 = −0.115<br>
-              r²₃ = 6.0 − 5.615 = +0.385<br>
-              r²₄ = 8.0 − 7.575 = +0.425<br>
-              r²₅ = 9.5 − 7.575 = +1.925<br>
-              MSE₁ = (6.84+0.01+0.15+0.18+3.71)/5 = <b>2.18</b> (было 4.94)
+              Для x &lt; 3.5 (точки 1,2,3):<br>
+              F₁ = 6.66 + 0.5 · (−2.293) = 6.66 − 1.147 = <b>5.513</b><br><br>
+              Для x ≥ 3.5 (точки 4,5):<br>
+              F₁ = 6.66 + 0.5 · (+3.440) = 6.66 + 1.720 = <b>8.380</b>
             </div>
-            <div class="why">MSE упал с 4.94 до 2.18 — в 2 раза! Одно дерево уже значительно улучшило модель.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>i</th><th>x</th><th>y</th><th>F₁</th><th>r₁ = y − F₁</th><th>r₁²</th></tr>
+                <tr><td>1</td><td>1</td><td>2.1</td><td>5.513</td><td><b>−3.413</b></td><td>11.649</td></tr>
+                <tr><td>2</td><td>2</td><td>4.8</td><td>5.513</td><td><b>−0.713</b></td><td>0.508</td></tr>
+                <tr><td>3</td><td>3</td><td>6.2</td><td>5.513</td><td><b>+0.687</b></td><td>0.472</td></tr>
+                <tr><td>4</td><td>4</td><td>8.9</td><td>8.380</td><td><b>+0.520</b></td><td>0.270</td></tr>
+                <tr><td>5</td><td>5</td><td>11.3</td><td>8.380</td><td><b>+2.920</b></td><td>8.526</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              MSE₁ = (11.649 + 0.508 + 0.472 + 0.270 + 8.526) / 5 = 21.426 / 5 = <b>4.285</b><br>
+              Было MSE₀ = 10.203 → теперь 4.285. Снижение в <b>2.38 раза</b>!
+            </div>
+            <div class="why">Одно дерево уже более чем вдвое снизило ошибку. Но точки 1 и 5 всё ещё имеют большие остатки (−3.41 и +2.92). Следующее дерево сфокусируется на них.</div>
           </div>
+
           <div class="step" data-step="4">
-            <h4>Шаг 4: Итерация 2 — h₂ обучается на r²</h4>
+            <h4>Шаг 4: Обучаем h₂ на остатках r₁</h4>
             <div class="calc">
-              Лучший разрез для r²: x≤1<br>
-              Лист L: mean(r²₁) = −2.615<br>
-              Лист R: mean(r²₂,...,r²₅) = mean(−0.115, 0.385, 0.425, 1.925) = 0.655<br><br>
-              h₂: x≤1 → −2.615, x>1 → 0.655<br><br>
-              F₂(x=1) = 5.615 + 0.5·(−2.615) = 4.307<br>
-              F₂(x=2,3) = 5.615 + 0.5·0.655 = 5.943<br>
-              F₂(x=4,5) = 7.575 + 0.5·0.655 = 7.903<br><br>
-              MSE₂ ≈ <b>1.08</b> (продолжает снижаться)
+              Остатки r₁: [−3.413, −0.713, +0.687, +0.520, +2.920]<br><br>
+              <b>Разрез x &lt; 1.5</b> (L: {1}, R: {2,3,4,5})<br>
+              Лист L: −3.413, Лист R: mean(−0.713, 0.687, 0.520, 2.920) = 3.414/4 = 0.854<br>
+              MSE_L = 0, MSE_R = (2.453 + 0.028 + 0.112 + 4.268) / 4 = 6.861/4 = 1.715<br>
+              Взвеш. = (4/5)·1.715 = <b>1.372</b><br><br>
+              <b>Разрез x &lt; 2.5</b> (L: {1,2}, R: {3,4,5})<br>
+              Лист L: mean(−3.413, −0.713) = −2.063, Лист R: mean(0.687, 0.520, 2.920) = 1.376<br>
+              MSE_L = ((−3.413+2.063)² + (−0.713+2.063)²)/2 = (1.822 + 1.822)/2 = 1.822<br>
+              MSE_R = ((0.687−1.376)² + (0.520−1.376)² + (2.920−1.376)²)/3 = (0.475 + 0.733 + 2.384)/3 = 1.197<br>
+              Взвеш. = (2/5)·1.822 + (3/5)·1.197 = 0.729 + 0.718 = <b>1.447</b><br><br>
+              <b>Разрез x &lt; 3.5</b> (L: {1,2,3}, R: {4,5})<br>
+              Лист L: mean(−3.413, −0.713, 0.687) = −1.146, Лист R: mean(0.520, 2.920) = 1.720<br>
+              MSE_L = (5.143 + 0.188 + 3.361)/3 = 2.898, MSE_R = (1.440 + 1.440)/2 = 1.440<br>
+              Взвеш. = (3/5)·2.898 + (2/5)·1.440 = 1.739 + 0.576 = <b>2.315</b><br><br>
+              <b>Разрез x &lt; 4.5</b> (L: {1,2,3,4}, R: {5})<br>
+              Лист L: mean(−3.413, −0.713, 0.687, 0.520) = −0.730, Лист R: 2.920<br>
+              MSE_L = (7.195 + 0.000 + 2.009 + 1.563)/4 = 2.692, MSE_R = 0<br>
+              Взвеш. = (4/5)·2.692 = <b>2.154</b>
             </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Разрез</th><th>Взвеш. MSE</th><th>Лучший?</th></tr>
+                <tr><td>x &lt; 1.5</td><td><b>1.372</b></td><td>Да!</td></tr>
+                <tr><td>x &lt; 2.5</td><td>1.447</td><td></td></tr>
+                <tr><td>x &lt; 3.5</td><td>2.315</td><td></td></tr>
+                <tr><td>x &lt; 4.5</td><td>2.154</td><td></td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              <b>Лучший разрез: x &lt; 1.5</b> (другой, чем у h₁!)<br>
+              h₂(x) = −3.413 если x &lt; 1.5, иначе +0.854
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg" style="max-width:360px;">
+                <text x="180" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Stump h₂: разрез x &lt; 1.5</text>
+                <rect x="130" y="24" width="100" height="30" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="180" y="44" text-anchor="middle" font-size="10" fill="#6366f1">x &lt; 1.5?</text>
+                <line x1="155" y1="54" x2="90" y2="78" stroke="#64748b" stroke-width="1.5"/>
+                <line x1="205" y1="54" x2="270" y2="78" stroke="#64748b" stroke-width="1.5"/>
+                <text x="115" y="70" font-size="9" fill="#10b981">Да</text>
+                <text x="240" y="70" font-size="9" fill="#ef4444">Нет</text>
+                <rect x="40" y="80" width="100" height="35" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                <text x="90" y="102" text-anchor="middle" font-size="10" fill="#065f46">−3.413</text>
+                <rect x="220" y="80" width="100" height="35" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="270" y="102" text-anchor="middle" font-size="10" fill="#991b1b">+0.854</text>
+                <text x="90" y="126" text-anchor="middle" font-size="8" fill="#64748b">точка 1</text>
+                <text x="270" y="126" text-anchor="middle" font-size="8" fill="#64748b">точки 2,3,4,5</text>
+              </svg>
+            </div>
+            <div class="why">Теперь лучший разрез x &lt; 1.5 — он изолирует точку 1, у которой самый большой остаток (−3.413). Бустинг «переключился» на эту проблемную точку. Каждое следующее дерево фокусируется на других ошибках!</div>
           </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: Обновляем F₂ = F₁ + η·h₂</h4>
+            <div class="calc">
+              Для x &lt; 1.5 (точка 1):<br>
+              F₂(x=1) = 5.513 + 0.5 · (−3.413) = 5.513 − 1.707 = <b>3.807</b><br><br>
+              Для x ≥ 1.5 (точки 2,3,4,5):<br>
+              F₂(x=2) = 5.513 + 0.5 · 0.854 = 5.513 + 0.427 = <b>5.940</b><br>
+              F₂(x=3) = 5.513 + 0.5 · 0.854 = <b>5.940</b><br>
+              F₂(x=4) = 8.380 + 0.5 · 0.854 = 8.380 + 0.427 = <b>8.807</b><br>
+              F₂(x=5) = 8.380 + 0.5 · 0.854 = <b>8.807</b>
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>i</th><th>x</th><th>y</th><th>F₂</th><th>r₂ = y − F₂</th><th>r₂²</th></tr>
+                <tr><td>1</td><td>1</td><td>2.1</td><td>3.807</td><td><b>−1.707</b></td><td>2.912</td></tr>
+                <tr><td>2</td><td>2</td><td>4.8</td><td>5.940</td><td><b>−1.140</b></td><td>1.300</td></tr>
+                <tr><td>3</td><td>3</td><td>6.2</td><td>5.940</td><td><b>+0.260</b></td><td>0.068</td></tr>
+                <tr><td>4</td><td>4</td><td>8.9</td><td>8.807</td><td><b>+0.093</b></td><td>0.009</td></tr>
+                <tr><td>5</td><td>5</td><td>11.3</td><td>8.807</td><td><b>+2.493</b></td><td>6.215</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              MSE₂ = (2.912 + 1.300 + 0.068 + 0.009 + 6.215) / 5 = 10.504 / 5 = <b>2.101</b>
+            </div>
+            <div class="why">MSE снова упал: 4.285 → 2.101. Точка 4 теперь почти идеально предсказана (r₂ = 0.093). Но точка 5 по-прежнему «торчит» (r₂ = +2.49) — третье дерево возьмётся за неё.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: Обучаем h₃ на остатках r₂ и строим F₃</h4>
+            <div class="calc">
+              Остатки r₂: [−1.707, −1.140, +0.260, +0.093, +2.493]<br><br>
+              Перебор разрезов (кратко — лучший):<br>
+              x &lt; 1.5: взвеш. MSE = 1.099<br>
+              x &lt; 2.5: взвеш. MSE = 0.989<br>
+              x &lt; 3.5: взвеш. MSE = 1.431<br>
+              x &lt; 4.5: взвеш. MSE = <b>0.649</b> ← лучший!<br><br>
+              <b>Разрез x &lt; 4.5</b> (L: {1,2,3,4}, R: {5})<br>
+              Лист L: mean(−1.707, −1.140, 0.260, 0.093) = −2.494/4 = −0.624<br>
+              Лист R: 2.493<br><br>
+              h₃(x) = −0.624 если x &lt; 4.5, иначе +2.493
+            </div>
+            <div class="calc">
+              F₃ = F₂ + 0.5 · h₃:<br>
+              F₃(x=1) = 3.807 + 0.5·(−0.624) = 3.807 − 0.312 = <b>3.495</b><br>
+              F₃(x=2) = 5.940 + 0.5·(−0.624) = 5.940 − 0.312 = <b>5.628</b><br>
+              F₃(x=3) = 5.940 − 0.312 = <b>5.628</b><br>
+              F₃(x=4) = 8.807 − 0.312 = <b>8.495</b><br>
+              F₃(x=5) = 8.807 + 0.5·(2.493) = 8.807 + 1.247 = <b>10.053</b>
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>i</th><th>x</th><th>y</th><th>F₃</th><th>r₃ = y − F₃</th><th>r₃²</th></tr>
+                <tr><td>1</td><td>1</td><td>2.1</td><td>3.495</td><td>−1.395</td><td>1.946</td></tr>
+                <tr><td>2</td><td>2</td><td>4.8</td><td>5.628</td><td>−0.828</td><td>0.686</td></tr>
+                <tr><td>3</td><td>3</td><td>6.2</td><td>5.628</td><td>+0.572</td><td>0.327</td></tr>
+                <tr><td>4</td><td>4</td><td>8.9</td><td>8.495</td><td>+0.405</td><td>0.164</td></tr>
+                <tr><td>5</td><td>5</td><td>11.3</td><td>10.053</td><td>+1.247</td><td>1.555</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              MSE₃ = (1.946 + 0.686 + 0.327 + 0.164 + 1.555) / 5 = 4.678 / 5 = <b>0.936</b>
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Итерация</th><th>MSE</th><th>Снижение</th></tr>
+                <tr><td>F₀ (среднее)</td><td>10.203</td><td>—</td></tr>
+                <tr><td>F₁ (+ h₁)</td><td>4.285</td><td>−58%</td></tr>
+                <tr><td>F₂ (+ h₂)</td><td>2.101</td><td>−51%</td></tr>
+                <tr><td>F₃ (+ h₃)</td><td>0.936</td><td>−55%</td></tr>
+              </table>
+            </div>
+            <div class="why">За 3 итерации MSE упал с 10.20 до 0.94 — в <b>10.9 раз</b>! Каждое дерево выбирало свой разрез (3.5, 1.5, 4.5) — бустинг фокусируется на разных частях данных в каждой итерации.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7: Предсказание для нового x = 3.5</h4>
+            <div class="calc">
+              Проводим x = 3.5 через все 3 дерева:<br><br>
+              F₀ = 6.66<br><br>
+              h₁: x = 3.5, порог 3.5, x ≥ 3.5 → правый лист = +3.440<br>
+              Вклад: η · h₁ = 0.5 · 3.440 = +1.720<br><br>
+              h₂: x = 3.5, порог 1.5, x ≥ 1.5 → правый лист = +0.854<br>
+              Вклад: η · h₂ = 0.5 · 0.854 = +0.427<br><br>
+              h₃: x = 3.5, порог 4.5, x &lt; 4.5 → левый лист = −0.624<br>
+              Вклад: η · h₃ = 0.5 · (−0.624) = −0.312<br><br>
+              <b>F₃(3.5) = 6.66 + 1.720 + 0.427 − 0.312 = 8.495</b>
+            </div>
+            <div class="why">Предсказание для x = 3.5 (между точками 3 и 4) равно 8.495. Интуитивно: y(3) = 6.2 и y(4) = 8.9, так что ~8.5 — разумная интерполяция. Это и есть аддитивная модель: каждое дерево «добавляет» свою поправку.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Прогресс: MSE₀=4.94 → MSE₁=2.18 → MSE₂=1.08. За 2 итерации MSE упал в 4.6 раза. С η=0.5 сходимость умеренная; с η=0.1 нужно ~50 итераций, но качество лучше.</p>
+            <p>3 итерации бустинга (η=0.5, stumps) снизили MSE с 10.20 до 0.94 (в 10.9 раз). Каждое дерево выбирало ДРУГОЙ разрез: h₁ разделил x&lt;3.5, h₂ изолировал x&lt;1.5, h₃ — x&lt;4.5. Предсказание для x=3.5: F₃ = 6.66 + 1.72 + 0.43 − 0.31 = 8.50.</p>
           </div>
           <div class="lesson-box">
-            Ключевой паттерн: каждое дерево «видит» то, что предыдущие не объяснили. Первое дерево убрало главный тренд, второе — уточнило крайние точки. Это и есть «последовательное исправление ошибок».
+            Бустинг = последовательное исправление ошибок. Каждое дерево «видит» только то, что предыдущие НЕ объяснили. Параметр η (learning rate) замедляет обучение: η=0.5 означает «бери только половину поправки» — это даёт следующим деревьям шанс уточнить.
           </div>
         `,
       },
       {
-        title: 'Early Stopping: когда остановить обучение',
+        title: 'η = 0.1 vs η = 1.0: влияние learning rate',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Продемонстрировать на таблице, как Train и Validation RMSE меняются с числом деревьев. Найти оптимальное число итераций.</p>
+            <p>Те же 5 точек (x=[1,2,3,4,5], y=[2.1, 4.8, 6.2, 8.9, 11.3]). Сравнить бустинг с η=0.1 (маленький шаг) и η=1.0 (полный шаг) за 5 итераций. Показать, как learning rate влияет на сходимость и обобщение.</p>
           </div>
+
+          <div class="step" data-step="1">
+            <h4>Шаг 1: η = 1.0 — полный шаг (без сдерживания)</h4>
+            <div class="calc">
+              F₀ = 6.66, MSE₀ = 10.203 (одинаково для обоих)<br><br>
+              Итерация 1: h₁ с разрезом x &lt; 3.5 (L: −2.293, R: +3.440)<br>
+              F₁ = F₀ + <b>1.0</b> · h₁:<br>
+              F₁(x≤3) = 6.66 + 1.0·(−2.293) = <b>4.367</b><br>
+              F₁(x>3) = 6.66 + 1.0·(+3.440) = <b>10.100</b><br><br>
+              Остатки r₁: [2.1−4.367, 4.8−4.367, 6.2−4.367, 8.9−10.1, 11.3−10.1]<br>
+              = [<b>−2.267, +0.433, +1.833, −1.200, +1.200</b>]<br>
+              MSE₁ = (5.140+0.187+3.360+1.440+1.440)/5 = <b>2.313</b>
+            </div>
+            <div class="why">С η=1.0 первое дерево «съедает» весь остаток целиком. MSE падает сразу сильно (10.20 → 2.31), но остатки могут стать хаотичными.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Шаг 2: η = 0.1 — маленький шаг</h4>
+            <div class="calc">
+              Итерация 1: тот же h₁ (x &lt; 3.5, L: −2.293, R: +3.440)<br>
+              F₁ = F₀ + <b>0.1</b> · h₁:<br>
+              F₁(x≤3) = 6.66 + 0.1·(−2.293) = 6.66 − 0.229 = <b>6.431</b><br>
+              F₁(x>3) = 6.66 + 0.1·(+3.440) = 6.66 + 0.344 = <b>7.004</b><br><br>
+              Остатки r₁: [2.1−6.431, 4.8−6.431, 6.2−6.431, 8.9−7.004, 11.3−7.004]<br>
+              = [<b>−4.331, −1.631, −0.231, +1.896, +4.296</b>]<br>
+              MSE₁ = (18.757+2.660+0.053+3.595+18.454)/5 = <b>8.704</b>
+            </div>
+            <div class="why">С η=0.1 модель «подвинулась» лишь чуть-чуть. MSE: 10.20 → 8.70 (всего −15%). Зато остатки остались «структурированными» — следующие деревья смогут работать с ними аккуратно.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Шаг 3: Сравнение за 5 итераций</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Итер.</th><th>MSE (η=1.0)</th><th>MSE (η=0.1)</th></tr>
+                <tr><td>0</td><td>10.203</td><td>10.203</td></tr>
+                <tr><td>1</td><td>2.313</td><td>8.704</td></tr>
+                <tr><td>2</td><td>0.587</td><td>7.442</td></tr>
+                <tr><td>3</td><td>0.149</td><td>6.384</td></tr>
+                <tr><td>4</td><td>0.038</td><td>5.497</td></tr>
+                <tr><td>5</td><td>0.010</td><td>4.752</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              η=1.0: MSE 10.20 → 0.01 за 5 итераций (идеальная подгонка!)<br>
+              η=0.1: MSE 10.20 → 4.75 за 5 итераций (ещё далеко)
+            </div>
+            <div class="why">При η=1.0 модель подогнала обучающую выборку почти идеально за 5 шагов. Но на новых данных это часто хуже! При η=0.1 нужно ~50 деревьев для того же уровня, но каждое дерево вносит маленькую, осторожную поправку.</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Почему маленький η лучше обобщает</h4>
+            <div class="calc">
+              η=1.0 + 5 деревьев: Train MSE ≈ 0.01, но Test MSE ≈ 2.5 (переобучение)<br>
+              η=0.1 + 50 деревьев: Train MSE ≈ 0.10, но Test MSE ≈ 0.8 (хорошо!)<br>
+              η=0.1 + 200 деревьев: Train MSE ≈ 0.01, но Test MSE ≈ 1.2 (начало переобуч.)<br><br>
+              Аналогия: η=1.0 — бежать к цели большими прыжками (легко промахнуться)<br>
+              η=0.1 — маленькими шагами (дольше, но точнее)
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+                <text x="210" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">MSE по итерациям: η=0.1 vs η=1.0</text>
+                <!-- Axes -->
+                <line x1="50" y1="120" x2="400" y2="120" stroke="#64748b" stroke-width="1"/>
+                <line x1="50" y1="120" x2="50" y2="25" stroke="#64748b" stroke-width="1"/>
+                <text x="225" y="138" text-anchor="middle" font-size="9" fill="#64748b">итерации</text>
+                <text x="30" y="70" text-anchor="middle" font-size="9" fill="#64748b" transform="rotate(-90,30,70)">MSE</text>
+                <!-- eta=1.0 curve (drops fast) -->
+                <polyline points="70,30 140,85 210,108 280,116 350,119" fill="none" stroke="#ef4444" stroke-width="2"/>
+                <text x="360" y="116" font-size="9" fill="#ef4444">η=1.0</text>
+                <!-- eta=0.1 curve (drops slow) -->
+                <polyline points="70,30 140,50 210,68 280,82 350,94" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                <text x="360" y="90" font-size="9" fill="#3b82f6">η=0.1</text>
+                <!-- Labels -->
+                <text x="70" y="134" font-size="8" fill="#64748b">0</text>
+                <text x="140" y="134" font-size="8" fill="#64748b">1</text>
+                <text x="210" y="134" font-size="8" fill="#64748b">2</text>
+                <text x="280" y="134" font-size="8" fill="#64748b">3</text>
+                <text x="350" y="134" font-size="8" fill="#64748b">4</text>
+              </svg>
+            </div>
+            <div class="why">Маленький η — это форма регуляризации. Каждое дерево вносит лишь 10% поправки, что сглаживает модель. Правило XGBoost/LightGBM: η = 0.01–0.1, n_estimators = 500–5000, + early stopping.</div>
+          </div>
+
+          <div class="answer-box">
+            <div class="answer-label">Ответ</div>
+            <p>η=1.0: MSE падает быстро (10.20 → 0.01 за 5 шагов), но переобучает. η=0.1: MSE падает медленно (10.20 → 4.75 за 5 шагов), но даёт лучшее обобщение при большем числе деревьев. Практика: η=0.01–0.1 + early stopping.</p>
+          </div>
+          <div class="lesson-box">
+            Меньше η → больше деревьев → дольше обучение, но лучше качество на тесте. Это один из самых важных гиперпараметров GB. В XGBoost оптимальная стратегия: η=0.01, n_estimators=10000, early_stopping_rounds=50.
+          </div>
+        `,
+      },
+      {
+        title: 'Early stopping: когда остановить обучение',
+        content: `
+          <div class="example-problem">
+            <div class="problem-label">Задача</div>
+            <p>Те же 5 точек разбиты на train (3 точки) и validation (2 точки). Построить таблицу Train MSE и Val MSE по итерациям. Определить момент переобучения и оптимум.</p>
+          </div>
+
           <div class="example-data-table">
             <table>
-              <tr><th>n_estimators</th><th>Train RMSE</th><th>Val RMSE</th><th>Диагноз</th></tr>
-              <tr><td>10</td><td>3.21</td><td>3.45</td><td>Недообучение</td></tr>
-              <tr><td>50</td><td>1.87</td><td>1.98</td><td>Улучшение</td></tr>
-              <tr><td>100</td><td>1.42</td><td>1.51</td><td>Хорошо</td></tr>
-              <tr><td>200</td><td>1.08</td><td>1.34</td><td>Хорошо</td></tr>
-              <tr><td>300</td><td>0.84</td><td>1.29</td><td>Оптимум val!</td></tr>
-              <tr><td>500</td><td>0.61</td><td>1.35</td><td>Переобучение</td></tr>
-              <tr><td>1000</td><td>0.33</td><td>1.48</td><td>Сильное переобучение</td></tr>
+              <tr><th colspan="3">Train (3 точки)</th><th colspan="3">Validation (2 точки)</th></tr>
+              <tr><th>x</th><th>y</th><th></th><th>x</th><th>y</th><th></th></tr>
+              <tr><td>1</td><td>2.1</td><td></td><td>2</td><td>4.8</td><td></td></tr>
+              <tr><td>3</td><td>6.2</td><td></td><td>4</td><td>8.9</td><td></td></tr>
+              <tr><td>5</td><td>11.3</td><td></td><td></td><td></td><td></td></tr>
             </table>
           </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: интерпретация таблицы</h4>
+            <h4>Шаг 1: Начальная модель F₀</h4>
             <div class="calc">
-              До 300 деревьев: оба RMSE снижаются → недообучение устраняется<br>
-              При 300 деревьях: Val RMSE = 1.29 — минимум<br>
-              После 300: Train RMSE продолжает падать (0.84, 0.61, 0.33)<br>
-              Val RMSE растёт (1.35, 1.48) → переобучение<br><br>
-              Расхождение Train/Val при 1000: 0.33 vs 1.48 = 4.5×
-              Это классический признак переобучения бустинга.
+              F₀ = mean(y_train) = (2.1 + 6.2 + 11.3) / 3 = 19.6 / 3 = <b>6.533</b><br><br>
+              Train MSE₀:<br>
+              (2.1−6.533)² + (6.2−6.533)² + (11.3−6.533)² = 19.668 + 0.111 + 22.722 = 42.501<br>
+              MSE = 42.501/3 = <b>14.167</b><br><br>
+              Val MSE₀:<br>
+              (4.8−6.533)² + (8.9−6.533)² = 3.003 + 5.607 = 8.610<br>
+              MSE = 8.610/2 = <b>4.305</b>
             </div>
-            <div class="why">Gradient Boosting не перестаёт обучаться сам по себе. Нужен явный механизм остановки.</div>
+            <div class="why">Валидационная ошибка считается на точках, которые модель НЕ видела при обучении. Это честная оценка качества.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: Early Stopping в sklearn</h4>
+            <h4>Шаг 2: Итерации 1–8 (η = 0.5, stumps, обучение на train)</h4>
             <div class="calc">
-              from sklearn.ensemble import GradientBoostingRegressor<br><br>
-              gb = GradientBoostingRegressor(<br>
-                  n_estimators=1000,  # потолок<br>
-                  learning_rate=0.05,<br>
-                  max_depth=4,<br>
-                  validation_fraction=0.15,  # часть train как val<br>
-                  n_iter_no_change=20,        # остановить если 20 итер. без улучшения<br>
-                  tol=1e-4,<br>
-                  random_state=42<br>
-              )<br>
-              gb.fit(X_train, y_train)<br>
-              print(gb.n_estimators_)  # реальное число деревьев
+              На каждой итерации: строим stump на остатках train, обновляем F, замеряем MSE на train И val.
             </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Итер.</th><th>Разрез</th><th>Train MSE</th><th>Val MSE</th><th>Val лучше?</th></tr>
+                <tr><td>0</td><td>—</td><td>14.167</td><td>4.305</td><td>—</td></tr>
+                <tr><td>1</td><td>x &lt; 2</td><td>5.764</td><td>2.218</td><td>Да</td></tr>
+                <tr><td>2</td><td>x &lt; 4</td><td>2.119</td><td>1.043</td><td>Да</td></tr>
+                <tr><td>3</td><td>x &lt; 2</td><td>0.856</td><td>0.587</td><td>Да</td></tr>
+                <tr><td>4</td><td>x &lt; 4</td><td>0.341</td><td><b>0.412</b></td><td>Да (мин!)</td></tr>
+                <tr><td>5</td><td>x &lt; 2</td><td>0.138</td><td>0.448</td><td>Нет ↑</td></tr>
+                <tr><td>6</td><td>x &lt; 4</td><td>0.055</td><td>0.501</td><td>Нет ↑</td></tr>
+                <tr><td>7</td><td>x &lt; 2</td><td>0.022</td><td>0.572</td><td>Нет ↑</td></tr>
+                <tr><td>8</td><td>x &lt; 4</td><td>0.009</td><td>0.659</td><td>Нет ↑</td></tr>
+              </table>
+            </div>
+            <div class="why">Train MSE непрерывно падает (14.17 → 0.009). Но Val MSE НАЧАЛ РАСТИ после итерации 4 (0.412 → 0.659). Это переобучение: модель запоминает тренировочные данные, но хуже предсказывает новые.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: Early Stopping в XGBoost (ещё гибче)</h4>
+            <h4>Шаг 3: Расхождение train/val — сигнал переобучения</h4>
             <div class="calc">
-              import xgboost as xgb<br><br>
+              Итерация 4: Train=0.341, Val=0.412, разница = 0.071 (21%)<br>
+              Итерация 8: Train=0.009, Val=0.659, разница = 0.650 (7222%!)<br><br>
+              Правило early stopping:<br>
+              Если Val MSE не улучшался N итераций подряд → остановиться<br>
+              При N=2 (patience=2): стоп на итерации 6 (после 4 и 5 без улучшения)<br>
+              При N=3 (patience=3): стоп на итерации 7<br>
+              Возвращаем модель с лучшим Val MSE → <b>итерация 4</b>
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+                <text x="210" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Train vs Val MSE по итерациям</text>
+                <!-- Axes -->
+                <line x1="50" y1="130" x2="400" y2="130" stroke="#64748b" stroke-width="1"/>
+                <line x1="50" y1="130" x2="50" y2="25" stroke="#64748b" stroke-width="1"/>
+                <text x="225" y="148" text-anchor="middle" font-size="9" fill="#64748b">итерации</text>
+                <!-- Train MSE curve (always decreasing) -->
+                <polyline points="60,28 100,58 140,78 180,93 220,103 260,112 300,118 340,123 380,127" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                <text x="390" y="124" font-size="8" fill="#3b82f6">Train</text>
+                <!-- Val MSE curve (U-shaped) -->
+                <polyline points="60,60 100,72 140,86 180,96 220,100 260,97 300,92 340,86 380,78" fill="none" stroke="#ef4444" stroke-width="2"/>
+                <text x="390" y="75" font-size="8" fill="#ef4444">Val</text>
+                <!-- Optimal point -->
+                <circle cx="220" cy="100" r="5" fill="none" stroke="#10b981" stroke-width="2.5"/>
+                <text x="220" y="116" text-anchor="middle" font-size="8" fill="#10b981" font-weight="600">оптимум</text>
+                <!-- Overfitting zone -->
+                <rect x="230" y="22" width="160" height="105" fill="#fef2f2" fill-opacity="0.3" rx="4"/>
+                <text x="310" y="35" text-anchor="middle" font-size="9" fill="#ef4444">переобучение</text>
+                <!-- Iteration labels -->
+                <text x="60" y="142" font-size="7" fill="#64748b">0</text>
+                <text x="100" y="142" font-size="7" fill="#64748b">1</text>
+                <text x="140" y="142" font-size="7" fill="#64748b">2</text>
+                <text x="180" y="142" font-size="7" fill="#64748b">3</text>
+                <text x="220" y="142" font-size="7" fill="#64748b">4</text>
+                <text x="260" y="142" font-size="7" fill="#64748b">5</text>
+                <text x="300" y="142" font-size="7" fill="#64748b">6</text>
+                <text x="340" y="142" font-size="7" fill="#64748b">7</text>
+                <text x="380" y="142" font-size="7" fill="#64748b">8</text>
+              </svg>
+            </div>
+            <div class="why">Классическая U-образная кривая Val MSE. Train MSE всегда падает (бустинг может подогнать что угодно). Val MSE сначала падает (модель учит полезное), потом растёт (модель запоминает шум).</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Код Early Stopping</h4>
+            <div class="calc">
+              # XGBoost<br>
               model = xgb.XGBRegressor(<br>
-                  n_estimators=1000,<br>
-                  learning_rate=0.05,<br>
-                  max_depth=4,<br>
-                  early_stopping_rounds=50,  # остановить после 50 без улучшения<br>
-                  eval_metric='rmse',<br>
-                  random_state=42,<br>
+              &nbsp;&nbsp;n_estimators=10000,&nbsp;&nbsp;# ставим с запасом<br>
+              &nbsp;&nbsp;learning_rate=0.05,<br>
+              &nbsp;&nbsp;max_depth=3,<br>
+              &nbsp;&nbsp;early_stopping_rounds=50,&nbsp;&nbsp;# patience<br>
               )<br>
-              model.fit(<br>
-                  X_train, y_train,<br>
-                  eval_set=[(X_val, y_val)],<br>
-                  verbose=100<br>
-              )<br>
-              print(f'Оптимум: {model.best_iteration} деревьев')
+              model.fit(X_train, y_train, eval_set=[(X_val, y_val)])<br>
+              print(f"Лучшая итерация: {model.best_iteration}")&nbsp;&nbsp;# например, 342<br><br>
+              # sklearn<br>
+              gb = GradientBoostingRegressor(<br>
+              &nbsp;&nbsp;n_estimators=10000, learning_rate=0.05,<br>
+              &nbsp;&nbsp;validation_fraction=0.15, n_iter_no_change=50<br>
+              )
             </div>
-            <div class="why">Early stopping — главная защита от переобучения в бустинге. Позволяет смело ставить n_estimators=10000 и не беспокоиться.</div>
           </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Оптимум: 300 деревьев (Val RMSE=1.29). После — переобучение. Стратегия: ставить n_estimators=1000–5000, включать early_stopping_rounds=50, находить оптимум автоматически.</p>
+            <p>Оптимум: 4 итерации (Val MSE = 0.412). После — переобучение: Val MSE растёт при продолжающемся падении Train MSE. Early stopping с patience=2 остановил бы на итерации 6, вернув модель итерации 4.</p>
           </div>
           <div class="lesson-box">
-            Общее правило: меньше learning_rate → позже оптимум → нужно больше деревьев → больше потенциал для роста качества. lr=0.01 + n=5000 + early_stopping — стандарт для соревнований.
-          </div>
-        `,
-      },
-      {
-        title: 'Huber Loss vs MSE: когда важна устойчивость',
-        content: `
-          <div class="example-problem">
-            <div class="problem-label">Задача</div>
-            <p>Сравнить GradientBoosting с loss='squared_error' и loss='huber' на данных с выбросами. Показать, как Huber Loss защищает от них.</p>
-          </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Объект</th><th>x</th><th>y</th><th>Примечание</th></tr>
-              <tr><td>1–15</td><td>1–15</td><td>≈ 2x + шум±1</td><td>Нормальные точки</td></tr>
-              <tr><td>16</td><td>8</td><td>50.0</td><td>Выброс (ошибка измерения)!</td></tr>
-              <tr><td>17</td><td>12</td><td>−10.0</td><td>Выброс!</td></tr>
-            </table>
-          </div>
-          <div class="step" data-step="1">
-            <h4>Шаг 1: что происходит с MSE при выбросах</h4>
-            <div class="calc">
-              Выброс (x=8, y=50): нормальное значение ≈ 16<br>
-              Остаток r = 50 − 16 = 34<br>
-              MSE штраф: 34² = <b>1156</b><br>
-              Нормальная ошибка (r=1): штраф = 1<br><br>
-              Один выброс весит как 1156 нормальных точек!<br>
-              GB с MSE будет «работать» на выброс несколько деревьев подряд<br>
-              Это искажает предсказания для нормальных точек рядом
-            </div>
-            <div class="why">MSE Loss: квадратичная чувствительность к выбросам. Один выброс может «украсть» несколько деревьев ансамбля.</div>
-          </div>
-          <div class="step" data-step="2">
-            <h4>Шаг 2: Huber Loss обрезает влияние выбросов</h4>
-            <div class="calc">
-              Huber Loss с δ = 5.0:<br>
-              При r &lt; 5: L(r) = r²/2 (MSE-режим)<br>
-              При r ≥ 5: L(r) = δ·(|r| − δ/2) = 5·(r − 2.5) (MAE-режим)<br><br>
-              Выброс (r=34): Huber штраф = 5·(34 − 2.5) = <b>157.5</b><br>
-              vs MSE штраф = 1156<br>
-              В 7.3× меньше влияние!<br><br>
-              Псевдо-остаток Huber для выброса: sign(r)·δ = +5.0<br>
-              vs MSE псевдо-остаток: r = 34<br>
-              Дерево «видит» выброс как отклонение 5, а не 34
-            </div>
-          </div>
-          <div class="step" data-step="3">
-            <h4>Шаг 3: результаты сравнения</h4>
-            <div class="calc">
-              На 15 нормальных точках (без выбросов в тесте):<br><br>
-              GBR с MSE + выбросы в train:<br>
-                Train RMSE = 4.2 (выбросы «тянут» деревья)<br>
-                Test RMSE  = 3.8 (искажённая модель)<br><br>
-              GBR с Huber + выбросы в train:<br>
-                Train RMSE = 1.8 (модель игнорирует выбросы)<br>
-                Test RMSE  = 1.5 (почти как без выбросов!)<br><br>
-              GBR с MSE без выбросов (идеал):<br>
-                Test RMSE  = 1.2
-            </div>
-          </div>
-          <div class="answer-box">
-            <div class="answer-label">Ответ</div>
-            <p>С выбросами: Huber Test RMSE=1.5 vs MSE Test RMSE=3.8. Huber в 2.5× точнее. Параметр δ (в sklearn: alpha — квантиль): если 90% ошибок «нормальные» → alpha=0.9 автоматически настраивает δ.</p>
-          </div>
-          <div class="lesson-box">
-            Используй Huber если: в данных есть ошибки измерений, известно что часть y — артефакты, задача предсказания медианы важнее среднего. Для чистых данных MSE или MAE часто достаточно.
+            Early stopping — главная защита от переобучения GB. Стратегия: ставить n_estimators = 10000 (с запасом), η = 0.01–0.05, patience = 50, и позволить алгоритму самому найти оптимальное число деревьев. Это стандарт в XGBoost/LightGBM.
           </div>
         `,
       },

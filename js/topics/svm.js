@@ -209,242 +209,469 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Линейный SVM: 4 точки, найти margin',
+        title: 'SVM на 4 точках: находим margin',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>По 4 точкам найти разделяющую гиперплоскость и ширину margin вручную.</p>
+            <p>4 точки на плоскости, два класса. Найти разделяющую гиперплоскость с максимальным margin, определить опорные векторы, вычислить расстояние от каждой точки до границы. Предсказать класс новой точки (3,3).</p>
           </div>
+
           <div class="example-data-table">
             <table>
               <tr><th>Точка</th><th>x₁</th><th>x₂</th><th>Класс y</th></tr>
-              <tr><td>A</td><td>1</td><td>2</td><td>+1</td></tr>
-              <tr><td>B</td><td>2</td><td>3</td><td>+1</td></tr>
-              <tr><td>C</td><td>3</td><td>1</td><td>−1</td></tr>
-              <tr><td>D</td><td>4</td><td>2</td><td>−1</td></tr>
+              <tr><td>A</td><td>1</td><td>1</td><td>−1</td></tr>
+              <tr><td>B</td><td>2</td><td>2</td><td>−1</td></tr>
+              <tr><td>C</td><td>4</td><td>4</td><td>+1</td></tr>
+              <tr><td>D</td><td>5</td><td>5</td><td>+1</td></tr>
             </table>
           </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: попробовать разделяющую прямую</h4>
+            <h4>Шаг 1: Визуализация данных</h4>
             <div class="calc">
-              Попробуем: w₁x₁ + w₂x₂ + b = 0<br>
-              Угадаем: x₁ − x₂ + 0 = 0, т.е. x₁ = x₂<br><br>
-              Проверим:<br>
-              A(1,2): 1 − 2 = −1 (предсказывает y=−1, факт +1) ✗<br>
-              B(2,3): 2 − 3 = −1 ✗<br>
-              Не подходит — нужно сместить.
+              Все точки лежат на прямой x₂ = x₁ (диагональ):<br>
+              A(1,1), B(2,2) — класс −1 (синие)<br>
+              C(4,4), D(5,5) — класс +1 (оранжевые)<br><br>
+              Между группами: «дырка» от x = 2 до x = 4<br>
+              Середина промежутка: (2+4)/2 = 3, т.е. точка (3,3)
             </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+                <defs>
+                  <marker id="svm-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                  </marker>
+                </defs>
+                <text x="200" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">4 точки на плоскости x₂ = x₁</text>
+                <!-- Axes -->
+                <line x1="40" y1="180" x2="380" y2="180" stroke="#64748b" stroke-width="1"/>
+                <line x1="40" y1="180" x2="40" y2="20" stroke="#64748b" stroke-width="1"/>
+                <text x="380" y="195" font-size="9" fill="#64748b">x₁</text>
+                <text x="25" y="20" font-size="9" fill="#64748b">x₂</text>
+                <!-- Scale: x=40+x1*60, y=180-x2*28 -->
+                <!-- Grid labels -->
+                <text x="100" y="195" font-size="8" fill="#94a3b8">1</text>
+                <text x="160" y="195" font-size="8" fill="#94a3b8">2</text>
+                <text x="220" y="195" font-size="8" fill="#94a3b8">3</text>
+                <text x="280" y="195" font-size="8" fill="#94a3b8">4</text>
+                <text x="340" y="195" font-size="8" fill="#94a3b8">5</text>
+                <!-- Points: A(1,1)→(100,152), B(2,2)→(160,124), C(4,4)→(280,68), D(5,5)→(340,40) -->
+                <circle cx="100" cy="152" r="10" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                <text x="100" y="156" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">A</text>
+                <circle cx="160" cy="124" r="10" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                <text x="160" y="128" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">B</text>
+                <circle cx="280" cy="68" r="10" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                <text x="280" y="72" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">C</text>
+                <circle cx="340" cy="40" r="10" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                <text x="340" y="44" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">D</text>
+                <!-- Diagonal line x2=x1 -->
+                <line x1="60" y1="170" x2="360" y2="28" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+                <!-- Legend -->
+                <circle cx="50" cy="16" r="5" fill="#3b82f6"/>
+                <text x="60" y="20" font-size="8" fill="#3b82f6">класс −1</text>
+                <circle cx="130" cy="16" r="5" fill="#f59e0b"/>
+                <text x="140" y="20" font-size="8" fill="#f59e0b">класс +1</text>
+              </svg>
+            </div>
+            <div class="why">Точки лежат на диагонали x₂ = x₁. Линейно разделимы: между B(2,2) и C(4,4) есть зазор. Любая прямая, проходящая через эту «дыру», разделит классы. Но SVM хочет МАКСИМАЛЬНЫЙ зазор.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: найти правильную границу</h4>
+            <h4>Шаг 2: Любая разделяющая прямая работает, но SVM хочет лучшую</h4>
             <div class="calc">
-              Попробуем: x₁ − x₂ + 1 = 0 (добавим b=+1)<br><br>
-              A(1,2): 1 − 2 + 1 = 0 — на границе (опорный вектор!)<br>
-              B(2,3): 2 − 3 + 1 = 0 — тоже на границе!<br>
-              C(3,1): 3 − 1 + 1 = 3 > 0 → предсказание +1, факт −1 ✗<br><br>
-              Попробуем: −x₁ + x₂ + 1 = 0, т.е. x₂ = x₁ − 1<br>
-              A(1,2): −1 + 2 + 1 = 2 > 0 → +1 ✓<br>
-              B(2,3): −2 + 3 + 1 = 2 > 0 → +1 ✓<br>
-              C(3,1): −3 + 1 + 1 = −1 &lt; 0 → −1 ✓<br>
-              D(4,2): −4 + 2 + 1 = −1 &lt; 0 → −1 ✓
+              Разделяющая прямая: w₁x₁ + w₂x₂ + b = 0<br><br>
+              Попробуем разные варианты:<br>
+              Прямая 1: x₁ + x₂ − 7 = 0 (проходит через точку (3,4))<br>
+              &nbsp;&nbsp;A(1,1): 1+1−7 = −5 &lt; 0 → класс −1 ✓<br>
+              &nbsp;&nbsp;C(4,4): 4+4−7 = +1 > 0 → класс +1 ✓ Работает!<br><br>
+              Прямая 2: x₁ + x₂ − 8 = 0<br>
+              &nbsp;&nbsp;A(1,1): 1+1−8 = −6 &lt; 0 → −1 ✓<br>
+              &nbsp;&nbsp;C(4,4): 4+4−8 = 0 — НА границе (слишком близко!)<br><br>
+              Прямая 3: x₁ + x₂ − 6 = 0 (ровно посередине)<br>
+              &nbsp;&nbsp;A(1,1): 1+1−6 = −4 ✓, B(2,2): 2+2−6 = −2 ✓<br>
+              &nbsp;&nbsp;C(4,4): 4+4−6 = +2 ✓, D(5,5): 5+5−6 = +4 ✓<br>
+              Все точки далеко от границы!
             </div>
-            <div class="why">Граница w = (−1, 1), b = 1 → прямая x₂ = x₁ − 1. Все 4 точки классифицированы правильно!</div>
+            <div class="why">Есть бесконечно много разделяющих прямых. Все три работают. Но SVM ищет ту, которая максимизирует РАССТОЯНИЕ от ближайших точек. Посмотрим, какая из них лучше.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: вычислить margin</h4>
+            <h4>Шаг 3: Находим оптимальную границу: w = (1,1), b = −4.5</h4>
             <div class="calc">
-              ‖w‖ = √(w₁² + w₂²) = √(1 + 1) = √2 ≈ 1.414<br><br>
-              Расстояние от точки до гиперплоскости: |w·x + b| / ‖w‖<br><br>
-              A(1,2): |−1 + 2 + 1| / √2 = 2/√2 = √2 ≈ <b>1.414</b><br>
-              B(2,3): |−2 + 3 + 1| / √2 = 2/√2 = √2 ≈ <b>1.414</b><br>
-              C(3,1): |−3 + 1 + 1| / √2 = 1/√2 ≈ <b>0.707</b><br>
-              D(4,2): |−4 + 2 + 1| / √2 = 1/√2 ≈ <b>0.707</b><br><br>
-              Опорные векторы: C и D (ближайшие к границе)<br>
-              Margin = 2 · min_distance = 2 · 0.707 = <b>1.414</b>
+              Средняя точка между B(2,2) и C(4,4):<br>
+              midpoint = ((2+4)/2, (2+4)/2) = (3, 3)<br><br>
+              Направление от −1 к +1: вдоль вектора (1,1) (по диагонали)<br>
+              Разделяющая прямая должна быть ПЕРПЕНДИКУЛЯРНА этому направлению<br>
+              и проходить через (3,3).<br><br>
+              Перпендикуляр к (1,1): прямая x₁ + x₂ = const<br>
+              Через (3,3): x₁ + x₂ = 6, т.е. x₁ + x₂ − 6 = 0<br><br>
+              Нормализуем для SVM: w = (1,1), b = −6<br>
+              Но для канонической формы (min |w·x+b| = 1) нужно масштабировать.<br><br>
+              Ближайшие точки к границе: B(2,2) и C(4,4)<br>
+              w·B + b = 1·2 + 1·2 − 6 = −2<br>
+              w·C + b = 1·4 + 1·4 − 6 = +2<br><br>
+              Масштабируем: делим w и b на 2:<br>
+              w = (0.5, 0.5), b = −3 → w·B + b = 1+1−3 = −1, w·C + b = 2+2−3 = +1 ✓<br><br>
+              Или эквивалентно: <b>w = (1, 1), b = −6</b>, нормируем потом.<br>
+              Каноническая форма: <b>x₁ + x₂ − 6 = 0</b>
             </div>
+            <div class="why">Мы нашли границу как перпендикулярный биссектор отрезка [B, C]. Это гарантирует одинаковое расстояние от B и C до границы — то есть максимальный margin.</div>
           </div>
+
           <div class="step" data-step="4">
-            <h4>Шаг 4: нормализовать w для канонической формы</h4>
+            <h4>Шаг 4: Расстояние от каждой точки до границы</h4>
             <div class="calc">
-              В SVM ищем w такой, что минимальное |w·x + b| = 1<br>
-              Сейчас минимум = 1 (у C и D)<br>
-              Ширина margin = 2/‖w‖ = 2/√2 = √2 ≈ <b>1.414</b><br>
-              SVM максимизирует именно эту величину
+              Расстояние от точки (x₁, x₂) до прямой w₁x₁ + w₂x₂ + b = 0:<br>
+              d = |w₁x₁ + w₂x₂ + b| / ‖w‖<br><br>
+              ‖w‖ = √(1² + 1²) = √2 ≈ 1.414<br><br>
+              A(1,1): d = |1+1−6| / √2 = |−4| / √2 = 4/√2 = 2√2 ≈ <b>2.828</b><br>
+              B(2,2): d = |2+2−6| / √2 = |−2| / √2 = 2/√2 = √2 ≈ <b>1.414</b> ← ближайшая −1<br>
+              C(4,4): d = |4+4−6| / √2 = |+2| / √2 = 2/√2 = √2 ≈ <b>1.414</b> ← ближайшая +1<br>
+              D(5,5): d = |5+5−6| / √2 = |+4| / √2 = 4/√2 = 2√2 ≈ <b>2.828</b>
             </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Точка</th><th>w·x + b</th><th>Расстояние</th><th>Опорный вектор?</th></tr>
+                <tr><td>A(1,1)</td><td>−4</td><td>2.828</td><td>Нет</td></tr>
+                <tr><td>B(2,2)</td><td>−2</td><td><b>1.414</b></td><td><b>Да!</b></td></tr>
+                <tr><td>C(4,4)</td><td>+2</td><td><b>1.414</b></td><td><b>Да!</b></td></tr>
+                <tr><td>D(5,5)</td><td>+4</td><td>2.828</td><td>Нет</td></tr>
+              </table>
+            </div>
+            <div class="why">Опорные векторы = точки, ближайшие к границе: B(2,2) и C(4,4). Они «определяют» положение границы. Если убрать A или D — ничего не изменится. Если сдвинуть B или C — граница сдвинется.</div>
           </div>
-          <div class="illustration bordered">
-            <svg viewBox="0 0 400 165" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
-              <text x="200" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SVM: 4 точки, разделяющая прямая и margin</text>
-              <!-- Axes -->
-              <line x1="45" y1="20" x2="45" y2="145" stroke="#64748b" stroke-width="1.5"/>
-              <line x1="45" y1="145" x2="375" y2="145" stroke="#64748b" stroke-width="1.5"/>
-              <text x="375" y="157" font-size="9" fill="#64748b">x₁</text>
-              <text x="32" y="16" font-size="9" fill="#64748b">x₂</text>
-              <!-- Scale: x1=1..4 → x=45+x1*70; x2=1..3 → y=145-x2*42 -->
-              <!-- A(1,2)→(115,61), B(2,3)→(185,19), C(3,1)→(255,103), D(4,2)→(325,61) -->
-              <!-- Separating line: x2 = x1 - 1 → (x1=1,x2=0), (x1=4.5,x2=3.5) → screen: (115,145),(360,7) -->
-              <!-- Margin lines: x2=x1 (upper), x2=x1-2 (lower) -->
-              <!-- Upper margin: x2=x1: (1,1)→(115,103),(3,3)→(255,19) -->
-              <line x1="115" y1="103" x2="285" y2="19" stroke="#3b82f6" stroke-width="1" stroke-dasharray="5,3" opacity="0.7"/>
-              <!-- Lower margin: x2=x1-2: (2,0)→(185,145),(5,3)→(390,19) clipped -->
-              <line x1="185" y1="145" x2="375" y2="61" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5,3" opacity="0.7"/>
-              <!-- Separating line: x2=x1-1: (1,0)→(115,145),(4.5,3.5)→(360,7) -->
-              <line x1="115" y1="145" x2="360" y2="7" stroke="#ef4444" stroke-width="2.5"/>
-              <text x="362" y="10" font-size="9" fill="#ef4444">−x₁+x₂+1=0</text>
-              <!-- Margin area shading -->
-              <polygon points="115,103 285,19 360,7 185,145" fill="#ef4444" fill-opacity="0.07"/>
-              <!-- Data points -->
-              <circle cx="115" cy="61" r="9" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
-              <text x="115" y="58" text-anchor="middle" font-size="8" fill="#fff">A</text>
-              <circle cx="185" cy="19" r="9" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
-              <text x="185" y="16" text-anchor="middle" font-size="8" fill="#fff">B</text>
-              <!-- Support vectors: C, D on margin boundary; ring indicator -->
-              <circle cx="255" cy="103" r="9" fill="#f59e0b" stroke="#1d4ed8" stroke-width="2.5"/>
-              <text x="255" y="100" text-anchor="middle" font-size="8" fill="#1d4ed8">C</text>
-              <circle cx="255" cy="103" r="14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
-              <circle cx="325" cy="61" r="9" fill="#f59e0b" stroke="#1d4ed8" stroke-width="2.5"/>
-              <text x="325" y="58" text-anchor="middle" font-size="8" fill="#1d4ed8">D</text>
-              <circle cx="325" cy="61" r="14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
-              <!-- Margin label -->
-              <line x1="210" y1="67" x2="248" y2="67" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
-              <line x1="210" y1="67" x2="172" y2="67" stroke="#64748b" stroke-width="1.5"/>
-              <text x="210" y="80" text-anchor="middle" font-size="9" fill="#64748b">margin = √2</text>
-              <!-- Legend -->
-              <circle cx="48" cy="157" r="5" fill="#3b82f6"/>
-              <text x="57" y="161" font-size="8" fill="#3b82f6">класс +1 (A,B)</text>
-              <circle cx="138" cy="157" r="5" fill="#f59e0b"/>
-              <text x="147" y="161" font-size="8" fill="#f59e0b">класс −1 (C,D)</text>
-              <text x="225" y="161" font-size="8" fill="#f59e0b">○ опорные векторы</text>
-            </svg>
-            <div class="caption">Красная линия — разделяющая гиперплоскость. Пунктирные линии — границы margin. C и D (обведены кружком) — опорные векторы на margin. Ширина margin = √2 ≈ 1.41.</div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: Margin = 2 / ‖w‖</h4>
+            <div class="calc">
+              В канонической форме (|w·x+b| = 1 для опорных векторов):<br>
+              w' = w/2 = (0.5, 0.5), b' = −3<br>
+              ‖w'‖ = √(0.25 + 0.25) = √0.5 = 1/√2 ≈ 0.707<br><br>
+              Margin = 2 / ‖w'‖ = 2 / (1/√2) = 2√2 ≈ <b>2.828</b><br><br>
+              Или эквивалентно: margin = 2 · min_distance = 2 · 1.414 = <b>2.828</b>
+            </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+                <text x="210" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">SVM: граница, margin и опорные векторы</text>
+                <!-- Axes -->
+                <line x1="40" y1="180" x2="380" y2="180" stroke="#64748b" stroke-width="1"/>
+                <line x1="40" y1="180" x2="40" y2="20" stroke="#64748b" stroke-width="1"/>
+                <text x="380" y="195" font-size="9" fill="#64748b">x₁</text>
+                <text x="25" y="20" font-size="9" fill="#64748b">x₂</text>
+                <!-- Scale: x=40+x1*60, y=180-x2*28 -->
+                <!-- Boundary: x1+x2=6 → (0,6) to (6,0) → screen: (40,12) to (400,180) -->
+                <line x1="40" y1="12" x2="400" y2="180" stroke="#ef4444" stroke-width="2.5"/>
+                <text x="365" y="158" font-size="9" fill="#ef4444" font-weight="600">x₁+x₂=6</text>
+                <!-- Margin line -1: x1+x2=4 → (0,4) to (4,0) → screen: (40,68) to (280,180) -->
+                <line x1="40" y1="68" x2="280" y2="180" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
+                <text x="55" y="63" font-size="8" fill="#3b82f6">x₁+x₂=4</text>
+                <!-- Margin line +1: x1+x2=8 → (0,8) to (8,0) → but clipped: (160,12) to (400,124) -->
+                <line x1="160" y1="12" x2="400" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+                <text x="375" y="108" font-size="8" fill="#f59e0b">x₁+x₂=8</text>
+                <!-- Margin shading -->
+                <polygon points="40,68 280,180 400,180 400,124 160,12 40,12" fill="#ef4444" fill-opacity="0.06"/>
+                <!-- Points -->
+                <circle cx="100" cy="152" r="10" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                <text x="100" y="156" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">A</text>
+                <!-- B is support vector -->
+                <circle cx="160" cy="124" r="10" fill="#3b82f6" stroke="#ef4444" stroke-width="3"/>
+                <text x="160" y="128" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">B</text>
+                <circle cx="160" cy="124" r="16" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <!-- C is support vector -->
+                <circle cx="280" cy="68" r="10" fill="#f59e0b" stroke="#ef4444" stroke-width="3"/>
+                <text x="280" y="72" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">C</text>
+                <circle cx="280" cy="68" r="16" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <circle cx="340" cy="40" r="10" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                <text x="340" y="44" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">D</text>
+                <!-- Margin arrows -->
+                <line x1="185" y1="110" x2="240" y2="84" stroke="#64748b" stroke-width="1.5" marker-end="url(#svm-arr)"/>
+                <line x1="255" y1="82" x2="200" y2="108" stroke="#64748b" stroke-width="1.5" marker-end="url(#svm-arr)"/>
+                <text x="220" y="104" text-anchor="middle" font-size="9" fill="#64748b" font-weight="600">margin=2√2</text>
+              </svg>
+              <div class="caption">Красная линия — разделяющая гиперплоскость x₁+x₂=6. Пунктирные — границы margin (x₁+x₂=4 и x₁+x₂=8). B и C (обведены) — опорные векторы. Margin = 2√2 ≈ 2.83.</div>
+            </div>
+            <div class="why">Margin = расстояние между двумя пунктирными линиями = 2√2 ≈ 2.83. SVM нашёл прямую, которая максимизирует именно это расстояние. Опорных векторов всего 2 из 4 точек.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: Предсказание для новой точки (3,3)</h4>
+            <div class="calc">
+              Граница: x₁ + x₂ − 6 = 0, w = (1, 1), b = −6<br><br>
+              Для точки (3,3):<br>
+              w·x + b = 1·3 + 1·3 + (−6) = 3 + 3 − 6 = <b>0</b><br><br>
+              Значение = 0 → точка РОВНО на границе!<br>
+              Формально: sign(0) не определён → неуверенное предсказание<br><br>
+              Для точки (3.5, 3.5):<br>
+              w·x + b = 3.5 + 3.5 − 6 = +1 > 0 → класс <b>+1</b><br><br>
+              Для точки (2.5, 2.5):<br>
+              w·x + b = 2.5 + 2.5 − 6 = −1 &lt; 0 → класс <b>−1</b>
+            </div>
+            <div class="why">SVM предсказывает sign(w·x + b). Положительное значение → +1, отрицательное → −1. Абсолютное значение |w·x+b|/‖w‖ — это «уверенность» (расстояние от границы). Чем дальше от границы, тем увереннее.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Разделяющая прямая: −x₁ + x₂ + 1 = 0. Опорные векторы: C(3,1) и D(4,2). Margin = √2 ≈ 1.414. A и B тоже опорные (расстояние √2 с другой стороны).</p>
+            <p>Граница: x₁ + x₂ = 6. Опорные векторы: B(2,2) и C(4,4). Margin = 2√2 ≈ 2.83. Точка (3,3) лежит ровно на границе (неопределённость), (3.5,3.5) → +1, (2.5,2.5) → −1.</p>
           </div>
           <div class="lesson-box">
-            Жёсткий SVM (hard margin) требует идеального разделения. Мягкий (soft margin, параметр C): допускает нарушения с штрафом C·ξᵢ. Большой C → жёсткий, малый C → мягкий, широкий margin.
+            Опорные векторы — единственные точки, влияющие на границу. Если удалить A или D, граница не изменится. Если сдвинуть B ближе к C — margin сузится. Это делает SVM устойчивым к не-опорным точкам.
           </div>
         `,
       },
       {
-        title: 'Эффект параметра C',
+        title: 'Soft margin: эффект параметра C',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать, как параметр C (штраф за нарушение margin) влияет на границу и обобщение SVM.</p>
+            <p>Добавляем «шумную» точку E(3,3) с классом −1 в данные из примера 1. Теперь классы НЕ разделимы линейно. Сравнить SVM с C=0.1 (мягкий) и C=100 (жёсткий).</p>
           </div>
+
           <div class="example-data-table">
             <table>
-              <tr><th>C</th><th>Margin</th><th>Нарушений</th><th>Train Acc</th><th>Val Acc</th><th>Диагноз</th></tr>
-              <tr><td>0.001</td><td>Очень широкий</td><td>Много</td><td>78%</td><td>76%</td><td>Underfitting</td></tr>
-              <tr><td>0.1</td><td>Широкий</td><td>Несколько</td><td>85%</td><td>84%</td><td>Хорошо</td></tr>
-              <tr><td>1</td><td>Средний</td><td>1–2</td><td>88%</td><td>87%</td><td>Оптимум</td></tr>
-              <tr><td>10</td><td>Узкий</td><td>0–1</td><td>93%</td><td>86%</td><td>Начало переобуч.</td></tr>
-              <tr><td>1000</td><td>Минимальный</td><td>0</td><td>98%</td><td>81%</td><td>Переобучение</td></tr>
+              <tr><th>Точка</th><th>x₁</th><th>x₂</th><th>Класс y</th><th>Примечание</th></tr>
+              <tr><td>A</td><td>1</td><td>1</td><td>−1</td><td></td></tr>
+              <tr><td>B</td><td>2</td><td>2</td><td>−1</td><td></td></tr>
+              <tr><td>C</td><td>4</td><td>4</td><td>+1</td><td></td></tr>
+              <tr><td>D</td><td>5</td><td>5</td><td>+1</td><td></td></tr>
+              <tr><td>E</td><td>3</td><td>3</td><td>−1</td><td>Шумная точка!</td></tr>
             </table>
           </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: что контролирует C</h4>
+            <h4>Шаг 1: Проблема — данные больше не разделимы</h4>
             <div class="calc">
-              Целевая функция SVM: min (1/2)‖w‖² + C·Σξᵢ<br>
-              ‖w‖² — регуляризация (широкий margin)<br>
-              C·Σξᵢ — штраф за нарушения (верная классификация)<br><br>
-              C → 0: регуляризация доминирует → ignore ошибки → широкий margin<br>
-              C → ∞: ошибки нетерпимы → узкий margin → жёсткий SVM
+              Без точки E: граница x₁+x₂ = 6 идеально разделяла классы<br>
+              Точка E(3,3): w·x + b = 3+3−6 = 0 → на самой границе!<br>
+              Класс E = −1, но она среди точек +1<br><br>
+              Если поставить границу x₁+x₂ = 7 (правее E):<br>
+              E(3,3): 3+3−7 = −1 &lt; 0 → −1 ✓<br>
+              C(4,4): 4+4−7 = +1 > 0 → +1 ✓<br>
+              Но: B(2,2): 2+2−7 = −3 (далеко), C(4,4): +1 (близко)<br>
+              Margin стал маленьким и несбалансированным
             </div>
-            <div class="why">C — аналог 1/λ в Ridge регрессии. Большой C = малая регуляризация.</div>
+            <div class="why">Hard margin SVM не может обработать эту ситуацию: нет прямой, идеально разделяющей все 5 точек с хорошим margin. Нужен SOFT margin — допуск нарушений.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: геометрический смысл</h4>
+            <h4>Шаг 2: C = 100 (жёсткий — «не терпит ошибок»)</h4>
             <div class="calc">
-              C=0.1: margin = 2/‖w‖ ≈ 2.5 (широкий)<br>
-              Несколько точек могут лежать «не той стороне» margin — ξᵢ > 0<br>
-              Но штраф 0.1·ξᵢ мал → SVM терпит нарушения<br><br>
-              C=1000: margin ≈ 0.08 (узкий)<br>
-              SVM пытается классифицировать всё обучение правильно<br>
-              Граница изгибается вокруг шумных точек → переобучение
+              Целевая функция: min ½‖w‖² + <b>100</b>·Σξᵢ<br><br>
+              С C=100 штраф за нарушение очень высок<br>
+              SVM пытается классифицировать ВСЕ точки верно, включая шумную E<br><br>
+              Результат: граница сдвигается к x₁+x₂ ≈ 7.2<br>
+              &nbsp;&nbsp;B(2,2): 2+2−7.2 = −3.2 → −1 ✓ (далеко от границы)<br>
+              &nbsp;&nbsp;E(3,3): 3+3−7.2 = −1.2 → −1 ✓ (но граница подвинулась ради E!)<br>
+              &nbsp;&nbsp;C(4,4): 4+4−7.2 = +0.8 → +1 ✓ (ОЧЕНЬ близко к границе)<br><br>
+              Margin ≈ 2·0.8/√2 = 1.13 (был 2.83 без шума — сократился в 2.5 раза!)
             </div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;">
+                <text x="210" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">C=100: граница подстроилась под шумную точку</text>
+                <!-- Boundary shifted right -->
+                <line x1="120" y1="15" x2="390" y2="130" stroke="#ef4444" stroke-width="2"/>
+                <text x="370" y="120" font-size="8" fill="#ef4444">x₁+x₂=7.2</text>
+                <!-- Points: A(1,1), B(2,2), E(3,3), C(4,4), D(5,5) -->
+                <!-- Scale: x=30+x1*65, y=130-x2*22 -->
+                <circle cx="95" cy="108" r="8" fill="#3b82f6"/>
+                <text x="95" y="112" text-anchor="middle" font-size="7" fill="#fff">A</text>
+                <circle cx="160" cy="86" r="8" fill="#3b82f6"/>
+                <text x="160" y="90" text-anchor="middle" font-size="7" fill="#fff">B</text>
+                <circle cx="225" cy="64" r="8" fill="#3b82f6" stroke="#ef4444" stroke-width="2"/>
+                <text x="225" y="68" text-anchor="middle" font-size="7" fill="#fff">E</text>
+                <text x="240" y="56" font-size="8" fill="#ef4444">шум!</text>
+                <circle cx="290" cy="42" r="8" fill="#f59e0b"/>
+                <text x="290" y="46" text-anchor="middle" font-size="7" fill="#fff">C</text>
+                <circle cx="355" cy="20" r="8" fill="#f59e0b"/>
+                <text x="355" y="24" text-anchor="middle" font-size="7" fill="#fff">D</text>
+                <!-- Narrow margin indication -->
+                <line x1="270" y1="50" x2="295" y2="50" stroke="#64748b" stroke-width="1" marker-end="url(#svm-arr)"/>
+                <text x="283" y="62" font-size="7" fill="#64748b">узкий margin</text>
+              </svg>
+            </div>
+            <div class="why">C=100 «заставляет» SVM классифицировать шумную E правильно. Цена: margin сузился с 2.83 до ~1.13, и граница стала неоптимальной для «настоящих» данных. Одна шумная точка испортила модель!</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: выбор оптимального C</h4>
+            <h4>Шаг 3: C = 0.1 (мягкий — «терпит ошибки»)</h4>
             <div class="calc">
-              Метод: grid search + cross-validation<br>
-              Сетка: C ∈ [0.001, 0.01, 0.1, 1, 10, 100, 1000]<br>
-              Для каждого C: 5-fold CV accuracy<br>
-              Выбрать C с максимальным CV accuracy<br>
-              Результат: C=1 → CV accuracy 87% (оптимум из таблицы)
+              Целевая функция: min ½‖w‖² + <b>0.1</b>·Σξᵢ<br><br>
+              С C=0.1 штраф за нарушение низкий<br>
+              SVM предпочтёт ШИРОКИЙ margin, даже если E окажется «не на своей стороне»<br><br>
+              Результат: граница остаётся близко к x₁+x₂ = 6.0<br>
+              &nbsp;&nbsp;B(2,2): 2+2−6 = −2 → −1 ✓<br>
+              &nbsp;&nbsp;E(3,3): 3+3−6 = 0 → на границе, ξ_E > 0 (нарушение)<br>
+              &nbsp;&nbsp;C(4,4): 4+4−6 = +2 → +1 ✓<br><br>
+              Штраф за E: 0.1 · ξ_E ≈ 0.1 · 1.0 = 0.1 (маленький)<br>
+              Margin ≈ 2.83 (почти не изменился!)<br><br>
+              E классифицирована НЕВЕРНО (ξ > 0), но margin сохранён
             </div>
+            <div class="why">C=0.1 «игнорирует» шумную точку E. Границы почти такие же, как без шума. Для новых данных этот SVM будет обобщать лучше, потому что margin широкий.</div>
           </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Сравнительная таблица</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th></th><th>C = 0.1</th><th>C = 100</th></tr>
+                <tr><td>Граница</td><td>x₁+x₂ ≈ 6.0</td><td>x₁+x₂ ≈ 7.2</td></tr>
+                <tr><td>Margin</td><td><b>≈ 2.83 (широкий)</b></td><td>≈ 1.13 (узкий)</td></tr>
+                <tr><td>Train accuracy</td><td>4/5 = 80%</td><td><b>5/5 = 100%</b></td></tr>
+                <tr><td>Ошибка на E</td><td>Да (допускает)</td><td>Нет (подстроился)</td></tr>
+                <tr><td>Обобщение</td><td><b>Хорошее</b></td><td>Плохое (под шум)</td></tr>
+                <tr><td>Опорные векторы</td><td>B, C, E</td><td>E, C</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Практический выбор C:<br>
+              from sklearn.model_selection import GridSearchCV<br>
+              param_grid = {'C': [0.001, 0.01, 0.1, 1, 10, 100]}<br>
+              grid = GridSearchCV(SVC(), param_grid, cv=5)<br>
+              # Обычно оптимум C = 0.1–10 для большинства задач
+            </div>
+            <div class="why">C контролирует баланс: широкий margin (обобщение) vs верная классификация обучения (подгонка). Малый C → широкий margin, допускает ошибки. Большой C → узкий margin, подстраивается под шум.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Оптимум C=1 (Val Acc=87%). Малый C — недообучение (широкий margin, много ошибок). Большой C — переобучение (узкий margin, подгонка под шум).</p>
+            <p>C=0.1: margin ≈ 2.83, train acc = 80% (E ошибочна, но модель устойчива). C=100: margin ≈ 1.13, train acc = 100% (но подстроился под шум). В реальных задачах C=0.1 обобщает лучше.</p>
           </div>
           <div class="lesson-box">
-            Для RBF ядра нужно одновременно выбирать C и γ: GridSearchCV с логарифмической сеткой. Стандартная сетка: C=[0.1,1,10,100], γ=[0.001,0.01,0.1,1]. Вычислительно дорого для больших датасетов.
+            C — аналог 1/λ в регуляризации. Большой C = мало регуляризации = переобучение. Малый C = много регуляризации = недообучение. Выбирать через cross-validation. Стандартная сетка: C = [0.01, 0.1, 1, 10, 100].
           </div>
         `,
       },
       {
-        title: 'RBF ядро vs линейное',
+        title: 'RBF kernel: нелинейное разделение',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Сравнить линейное и RBF ядро на нелинейно разделимых данных (два концентрических круга).</p>
+            <p>6 точек расположены двумя «кольцами»: внутренние точки (+1) близко к центру, внешние (−1) далеко. Линейный SVM не справится. Показать, как RBF kernel решает задачу: вычислить K(xᵢ, xⱼ) для всех пар, показать трансформацию пространства.</p>
           </div>
+
           <div class="example-data-table">
             <table>
-              <tr><th>Точка</th><th>x₁</th><th>x₂</th><th>r = √(x₁²+x₂²)</th><th>Класс</th></tr>
-              <tr><td>A</td><td>0.5</td><td>0</td><td>0.5</td><td>Внутр. (+1)</td></tr>
-              <tr><td>B</td><td>0</td><td>0.7</td><td>0.7</td><td>Внутр. (+1)</td></tr>
-              <tr><td>C</td><td>2</td><td>0</td><td>2.0</td><td>Внешн. (−1)</td></tr>
-              <tr><td>D</td><td>0</td><td>2.5</td><td>2.5</td><td>Внешн. (−1)</td></tr>
+              <tr><th>Точка</th><th>x₁</th><th>x₂</th><th>r = √(x₁²+x₂²)</th><th>Класс y</th></tr>
+              <tr><td>A</td><td>1</td><td>0</td><td>1.00</td><td>+1 (внутр.)</td></tr>
+              <tr><td>B</td><td>0</td><td>1</td><td>1.00</td><td>+1 (внутр.)</td></tr>
+              <tr><td>C</td><td>−1</td><td>0</td><td>1.00</td><td>+1 (внутр.)</td></tr>
+              <tr><td>D</td><td>3</td><td>0</td><td>3.00</td><td>−1 (внешн.)</td></tr>
+              <tr><td>E</td><td>0</td><td>3</td><td>3.00</td><td>−1 (внешн.)</td></tr>
+              <tr><td>F</td><td>−3</td><td>0</td><td>3.00</td><td>−1 (внешн.)</td></tr>
             </table>
           </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: линейное ядро провалится</h4>
+            <h4>Шаг 1: Почему линейный SVM провалится</h4>
             <div class="calc">
-              Линейный SVM ищет: w₁x₁ + w₂x₂ + b = 0<br>
-              Для любых (w₁, w₂, b) найдутся ошибки:<br>
-              Внутренние точки разбросаны по окружности r=0.6<br>
-              Внешние — по r=2.2<br>
-              Нет прямой, разделяющей два кольца<br>
-              Accuracy линейного SVM ≈ 50–60%
+              Внутренние точки (r=1): A(1,0), B(0,1), C(−1,0) — вокруг центра<br>
+              Внешние точки (r=3): D(3,0), E(0,3), F(−3,0) — далеко от центра<br><br>
+              Нужна КРУГОВАЯ граница r = 2 (между кольцами)<br>
+              Но линейный SVM ищет ПРЯМУЮ w₁x₁ + w₂x₂ + b = 0<br><br>
+              Любая прямая через центр отсечёт часть внутренних И внешних точек<br>
+              Например, x₁ = 0: A(1,0) справа ✓, C(−1,0) слева ✗<br>
+              Линейный SVM: train accuracy ≈ 50–67%
             </div>
-            <div class="why">Данные линейно неразделимы в (x₁, x₂). Нужно поднять в высшее измерение.</div>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="max-width:300px;">
+                <text x="150" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Два кольца: линейно неразделимы</text>
+                <!-- Center at (150,110), scale 25px per unit -->
+                <!-- Inner ring (r=1) -->
+                <circle cx="150" cy="110" r="25" fill="none" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+                <!-- Outer ring (r=3) -->
+                <circle cx="150" cy="110" r="75" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+                <!-- Points -->
+                <circle cx="175" cy="110" r="8" fill="#3b82f6"/><text x="175" y="114" text-anchor="middle" font-size="7" fill="#fff">A</text>
+                <circle cx="150" cy="85" r="8" fill="#3b82f6"/><text x="150" y="89" text-anchor="middle" font-size="7" fill="#fff">B</text>
+                <circle cx="125" cy="110" r="8" fill="#3b82f6"/><text x="125" y="114" text-anchor="middle" font-size="7" fill="#fff">C</text>
+                <circle cx="225" cy="110" r="8" fill="#f59e0b"/><text x="225" y="114" text-anchor="middle" font-size="7" fill="#fff">D</text>
+                <circle cx="150" cy="35" r="8" fill="#f59e0b"/><text x="150" y="39" text-anchor="middle" font-size="7" fill="#fff">E</text>
+                <circle cx="75" cy="110" r="8" fill="#f59e0b"/><text x="75" y="114" text-anchor="middle" font-size="7" fill="#fff">F</text>
+                <!-- Ideal boundary -->
+                <circle cx="150" cy="110" r="50" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6,3"/>
+                <text x="215" y="70" font-size="8" fill="#10b981">идеальная граница r=2</text>
+              </svg>
+            </div>
+            <div class="why">Данные расположены двумя концентрическими кольцами. Никакая прямая не может разделить «внутри» от «снаружи». Нужно нелинейное преобразование.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: RBF ядро — неявное расширение признаков</h4>
+            <h4>Шаг 2: Вычисляем RBF kernel K(xᵢ, xⱼ) = exp(−γ‖xᵢ−xⱼ‖²)</h4>
             <div class="calc">
-              RBF: K(x, xᵢ) = exp(−γ‖x−xᵢ‖²)<br>
-              При γ=1:<br>
-              K(A, C) = exp(−(2−0.5)² − 0²) = exp(−2.25) ≈ 0.105<br>
-              K(A, B) = exp(−0.25 − 0.49) = exp(−0.74) ≈ 0.477<br><br>
-              RBF неявно проецирует в бесконечномерное пространство<br>
-              В этом пространстве круговая граница → линейная гиперплоскость<br>
-              Accuracy RBF SVM ≈ 98–100%
+              Возьмём γ = 0.5. Считаем K для ключевых пар:<br><br>
+              <b>Внутри-внутри:</b><br>
+              K(A, B) = exp(−0.5·((1−0)²+(0−1)²)) = exp(−0.5·2) = exp(−1) ≈ <b>0.368</b><br>
+              K(A, C) = exp(−0.5·((1−(−1))²+(0−0)²)) = exp(−0.5·4) = exp(−2) ≈ <b>0.135</b><br>
+              K(B, C) = exp(−0.5·((0−(−1))²+(1−0)²)) = exp(−0.5·2) = exp(−1) ≈ <b>0.368</b><br><br>
+              <b>Снаружи-снаружи:</b><br>
+              K(D, E) = exp(−0.5·((3−0)²+(0−3)²)) = exp(−0.5·18) = exp(−9) ≈ <b>0.0001</b><br>
+              K(D, F) = exp(−0.5·((3−(−3))²+0²)) = exp(−0.5·36) = exp(−18) ≈ <b>0.000</b><br><br>
+              <b>Внутри-снаружи:</b><br>
+              K(A, D) = exp(−0.5·((1−3)²+0²)) = exp(−0.5·4) = exp(−2) ≈ <b>0.135</b><br>
+              K(A, E) = exp(−0.5·(1²+(−3)²)) = exp(−0.5·10) = exp(−5) ≈ <b>0.007</b><br>
+              K(B, D) = exp(−0.5·((−3)²+(1)²)) = exp(−0.5·10) = exp(−5) ≈ <b>0.007</b>
             </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>K(·,·)</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+                <tr><td><b>A</b></td><td>1.000</td><td>0.368</td><td>0.135</td><td>0.135</td><td>0.007</td><td>0.002</td></tr>
+                <tr><td><b>B</b></td><td>0.368</td><td>1.000</td><td>0.368</td><td>0.007</td><td>0.135</td><td>0.007</td></tr>
+                <tr><td><b>C</b></td><td>0.135</td><td>0.368</td><td>1.000</td><td>0.002</td><td>0.007</td><td>0.135</td></tr>
+                <tr><td><b>D</b></td><td>0.135</td><td>0.007</td><td>0.002</td><td>1.000</td><td>0.0001</td><td>0.000</td></tr>
+                <tr><td><b>E</b></td><td>0.007</td><td>0.135</td><td>0.007</td><td>0.0001</td><td>1.000</td><td>0.000</td></tr>
+                <tr><td><b>F</b></td><td>0.002</td><td>0.007</td><td>0.135</td><td>0.000</td><td>0.000</td><td>1.000</td></tr>
+              </table>
+            </div>
+            <div class="why">K(xᵢ, xⱼ) — «похожесть» между точками. Внутренние точки похожи друг на друга (K ≈ 0.13–0.37). Внешние точки НЕ похожи на внутренние (K ≈ 0.002–0.007). RBF kernel создаёт «пузыри» вокруг каждой точки.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: явный kernel trick через φ(x)</h4>
+            <h4>Шаг 3: Kernel trick — неявное поднятие в высшее измерение</h4>
             <div class="calc">
-              Добавим признак r² = x₁² + x₂²<br>
-              Новое признаковое пространство: (x₁, x₂, r²)<br><br>
-              A(0.5, 0, 0.25), B(0, 0.7, 0.49)<br>
-              C(2, 0, 4.00), D(0, 2.5, 6.25)<br><br>
-              Теперь разделяем по r² = 1.0:<br>
-              r² &lt; 1 → внутренний (+1): A(0.25) ✓, B(0.49) ✓<br>
-              r² > 1 → внешний (−1): C(4.0) ✓, D(6.25) ✓<br>
-              Линейный SVM в новом пространстве работает идеально!
+              Вместо RBF можно ЯВНО добавить признак r² = x₁² + x₂²:<br><br>
+              A(1,0): r² = 1² + 0² = <b>1</b> → новое пространство: (1, 0, 1)<br>
+              B(0,1): r² = 0² + 1² = <b>1</b> → (0, 1, 1)<br>
+              C(−1,0): r² = 1² + 0² = <b>1</b> → (−1, 0, 1)<br>
+              D(3,0): r² = 9 + 0 = <b>9</b> → (3, 0, 9)<br>
+              E(0,3): r² = 0 + 9 = <b>9</b> → (0, 3, 9)<br>
+              F(−3,0): r² = 9 + 0 = <b>9</b> → (−3, 0, 9)<br><br>
+              В новом пространстве (x₁, x₂, r²):<br>
+              Внутренние: r² = 1 (все на «полке» z=1)<br>
+              Внешние: r² = 9 (все на «полке» z=9)<br><br>
+              Линейный разделитель: r² = 5 (или z = 5)<br>
+              r² &lt; 5 → +1 (внутренние) ✓<br>
+              r² > 5 → −1 (внешние) ✓<br>
+              <b>100% accuracy!</b>
             </div>
+            <div class="why">Kernel trick: RBF kernel НЕЯВНО поднимает данные в бесконечномерное пространство, где круговая граница становится линейной гиперплоскостью. Мы показали это на примере с r² — это упрощённая версия того, что делает RBF.</div>
           </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4: Влияние γ на границу</h4>
+            <div class="calc">
+              γ = 0.01 (маленький): K(A,D) = exp(−0.01·4) = exp(−0.04) ≈ 0.96<br>
+              Все точки «похожи» → слишком гладкая граница → underfitting<br><br>
+              γ = 10 (большой): K(A,D) = exp(−10·4) = exp(−40) ≈ 0.000<br>
+              Только ближайшие точки «видят» друг друга → слишком сложная граница → overfitting<br><br>
+              γ = 0.5 (оптимум): K адекватно отличает ближних от дальних
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>γ</th><th>K(A,B) внутри</th><th>K(A,D) внутри-снаружи</th><th>Train Acc</th><th>Граница</th></tr>
+                <tr><td>0.01</td><td>0.98</td><td>0.96</td><td>50%</td><td>Прямая (underfitting)</td></tr>
+                <tr><td>0.1</td><td>0.82</td><td>0.67</td><td>83%</td><td>Слабо изогнутая</td></tr>
+                <tr><td>0.5</td><td>0.37</td><td>0.14</td><td><b>100%</b></td><td><b>Круговая (оптимум)</b></td></tr>
+                <tr><td>10</td><td>0.00</td><td>0.00</td><td>100%</td><td>Островки (overfitting)</td></tr>
+              </table>
+            </div>
+            <div class="why">γ контролирует «радиус влияния» каждой точки. Малый γ — все точки похожи (плавная граница). Большой γ — только ближайшие соседи влияют (сложная, переобученная граница). Выбирать через cross-validation вместе с C.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Линейный SVM: ~55% accuracy (не справляется). RBF SVM (γ=1, C=1): 100% на этих данных. Ключевая идея kernel trick: вычислять K(x,xᵢ) без явного вычисления φ(x).</p>
+            <p>Линейный SVM: 50–67% (не справляется с кольцами). RBF SVM (γ=0.5, C=1): 100%. K(xᵢ,xⱼ) показывает «похожесть»: внутренние точки похожи (K≈0.37), внутренние-внешние различны (K≈0.007). Kernel trick заменяет круговую границу линейной в высшем измерении.</p>
           </div>
           <div class="lesson-box">
-            Параметр γ контролирует «ширину» RBF. Малый γ → широкое влияние → плавная граница. Большой γ → узкое влияние → сложная, переобученная граница. Выбирать вместе с C через GridSearchCV.
+            Практика: всегда начинай с линейного SVM (быстро). Если accuracy низкая — пробуй RBF. Выбирай C и γ через GridSearchCV с логарифмической сеткой: C=[0.1,1,10,100], γ=[0.001,0.01,0.1,1].
           </div>
         `,
       },

@@ -221,230 +221,441 @@ else:
 
     examples: [
       {
-        title: 'Одобрение кредита: строим дерево',
+        title: 'Строим дерево решений с нуля',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>По 6 заявителям построить дерево решений для выдачи кредита. Найти лучшее первое разбиение по индексу Gini.</p>
+            <p>8 человек, 3 признака: Возраст (&lt;30 / >=30), Доход (низкий/высокий), Студент (да/нет). Целевая переменная: Покупка (да/нет). Построить дерево решений по Gini, проследить <b>каждый</b> шаг выбора признака, рекурсию и классификацию нового объекта.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>№</th><th>Зарплата (тыс.)</th><th>Стаж (лет)</th><th>Долги?</th><th>Решение</th></tr>
-              <tr><td>1</td><td>80</td><td>5</td><td>Нет</td><td>Одобрить (1)</td></tr>
-              <tr><td>2</td><td>40</td><td>2</td><td>Да</td><td>Отказать (0)</td></tr>
-              <tr><td>3</td><td>60</td><td>8</td><td>Нет</td><td>Одобрить (1)</td></tr>
-              <tr><td>4</td><td>30</td><td>1</td><td>Нет</td><td>Отказать (0)</td></tr>
-              <tr><td>5</td><td>90</td><td>3</td><td>Да</td><td>Отказать (0)</td></tr>
-              <tr><td>6</td><td>70</td><td>10</td><td>Нет</td><td>Одобрить (1)</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: Gini корневого узла (все 6 примеров)</h4>
-            <div class="calc">
-              Одобрено: 3 (№1,3,6), Отказано: 3 (№2,4,5)<br>
-              p₁ = 3/6 = 0.5, p₀ = 3/6 = 0.5<br>
-              Gini = 1 − (0.5² + 0.5²) = 1 − 0.5 = <b>0.50</b>
+            <h4>Шаг 1. Датасет — 8 строк</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>№</th><th>Возраст</th><th>Доход</th><th>Студент</th><th>Покупка</th></tr>
+                <tr><td>1</td><td>&lt;30</td><td>высокий</td><td>нет</td><td>нет</td></tr>
+                <tr><td>2</td><td>&lt;30</td><td>высокий</td><td>да</td><td>да</td></tr>
+                <tr><td>3</td><td>&ge;30</td><td>высокий</td><td>нет</td><td>да</td></tr>
+                <tr><td>4</td><td>&ge;30</td><td>низкий</td><td>нет</td><td>да</td></tr>
+                <tr><td>5</td><td>&ge;30</td><td>низкий</td><td>да</td><td>да</td></tr>
+                <tr><td>6</td><td>&lt;30</td><td>низкий</td><td>нет</td><td>нет</td></tr>
+                <tr><td>7</td><td>&lt;30</td><td>низкий</td><td>да</td><td>да</td></tr>
+                <tr><td>8</td><td>&ge;30</td><td>высокий</td><td>да</td><td>нет</td></tr>
+              </table>
             </div>
-            <div class="why">Gini = 0.5 — максимальное загрязнение. Идеальный чистый узел имеет Gini = 0.</div>
+            <div class="why">8 примеров: 5 «да» (№2,3,4,5,7) и 3 «нет» (№1,6,8). Данных мало, но достаточно для ручного разбора.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: разбиение «Долги = Да?»</h4>
+            <h4>Шаг 2. Gini корневого узла (все 8 примеров)</h4>
             <div class="calc">
-              Левая (Долги=Нет): №1,3,4,6 → Одобрено:3, Отказано:1<br>
-              Gini_лев = 1 − ((3/4)² + (1/4)²) = 1 − (0.5625 + 0.0625) = <b>0.375</b><br><br>
-              Правая (Долги=Да): №2,5 → Одобрено:0, Отказано:2<br>
-              Gini_прав = 1 − ((0/2)² + (2/2)²) = 1 − 1 = <b>0.000</b> (чистый!)<br><br>
-              Взвешенный Gini = (4/6)·0.375 + (2/6)·0.0 = <b>0.250</b><br>
-              Gain = 0.50 − 0.250 = <b>0.250</b>
+              Покупка=да: 5 из 8, Покупка=нет: 3 из 8<br>
+              $p_{\\text{да}} = 5/8 = 0{,}625$, &nbsp; $p_{\\text{нет}} = 3/8 = 0{,}375$<br><br>
+              $\\text{Gini}_{\\text{root}} = 1 - (p_{\\text{да}}^2 + p_{\\text{нет}}^2)$<br>
+              $= 1 - (0{,}625^2 + 0{,}375^2)$<br>
+              $= 1 - (0{,}3906 + 0{,}1406)$<br>
+              $= 1 - 0{,}5312 = \\mathbf{0{,}469}$
             </div>
+            <div class="why">Gini = 0,469 — высокая «грязь». Максимум для 2 классов — 0.5 (при 50/50). Нам нужно найти split, который снизит Gini дочерних узлов.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: разбиение «Зарплата ≥ 65?»</h4>
+            <h4>Шаг 3. Пробуем split по Возрасту</h4>
             <div class="calc">
-              Левая (Зарплата &lt; 65): №2,3,4 → Одобрено:1, Отказано:2<br>
-              Gini_лев = 1 − ((1/3)² + (2/3)²) = 1 − 0.556 = <b>0.444</b><br><br>
-              Правая (Зарплата ≥ 65): №1,5,6 → Одобрено:2, Отказано:1<br>
-              Gini_прав = 1 − ((2/3)² + (1/3)²) = <b>0.444</b><br><br>
-              Взвешенный Gini = 0.5·0.444 + 0.5·0.444 = <b>0.444</b><br>
-              Gain = 0.50 − 0.444 = <b>0.056</b>
+              <b>Левый: Возраст &lt; 30</b> — строки №1,2,6,7 (4 шт.)<br>
+              Да: 2 (№2,7), Нет: 2 (№1,6)<br>
+              $\\text{Gini}_L = 1 - ((2/4)^2 + (2/4)^2) = 1 - (0{,}25 + 0{,}25) = \\mathbf{0{,}500}$<br><br>
+
+              <b>Правый: Возраст &ge; 30</b> — строки №3,4,5,8 (4 шт.)<br>
+              Да: 3 (№3,4,5), Нет: 1 (№8)<br>
+              $\\text{Gini}_R = 1 - ((3/4)^2 + (1/4)^2) = 1 - (0{,}5625 + 0{,}0625) = \\mathbf{0{,}375}$<br><br>
+
+              <b>Взвешенный Gini:</b><br>
+              $= (4/8) \\cdot 0{,}500 + (4/8) \\cdot 0{,}375 = 0{,}250 + 0{,}1875 = \\mathbf{0{,}4375}$<br><br>
+              <b>Information Gain = 0,469 - 0,4375 = 0,031</b>
             </div>
+            <div class="why">Слабый gain: левый узел (Возраст &lt; 30) остался при Gini=0.5 — максимально грязный. Возраст не очень полезный первый split.</div>
           </div>
+
           <div class="step" data-step="4">
-            <h4>Шаг 4: выбрать лучшее разбиение</h4>
+            <h4>Шаг 4. Пробуем split по Доходу</h4>
             <div class="calc">
-              Gain(Долги): 0.250 — лучшее!<br>
-              Gain(Зарплата≥65): 0.056<br>
-              Gain(Стаж≥5): ≈0.167<br><br>
-              Структура дерева:<br>
-              Долги = Да? → Да: Отказать (лист, Gini=0)<br>
-              → Нет: продолжить на 4 примерах (Gini=0.375)
+              <b>Левый: Доход = низкий</b> — строки №4,5,6,7 (4 шт.)<br>
+              Да: 3 (№4,5,7), Нет: 1 (№6)<br>
+              $\\text{Gini}_L = 1 - ((3/4)^2 + (1/4)^2) = 1 - 0{,}625 = \\mathbf{0{,}375}$<br><br>
+
+              <b>Правый: Доход = высокий</b> — строки №1,2,3,8 (4 шт.)<br>
+              Да: 2 (№2,3), Нет: 2 (№1,8)<br>
+              $\\text{Gini}_R = 1 - ((2/4)^2 + (2/4)^2) = \\mathbf{0{,}500}$<br><br>
+
+              <b>Взвешенный Gini:</b><br>
+              $= (4/8) \\cdot 0{,}375 + (4/8) \\cdot 0{,}500 = 0{,}1875 + 0{,}250 = \\mathbf{0{,}4375}$<br><br>
+              <b>Information Gain = 0,469 - 0,4375 = 0,031</b>
             </div>
-            <div class="why">Признак «Долги» лучше всех: правая ветка абсолютно чистая. Правило жёсткое и понятное.</div>
+            <div class="why">Такой же gain, как у Возраста (0,031). Правый узел (высокий доход) остался максимально грязным — это не лучший split.</div>
           </div>
-          <div class="illustration bordered">
-            <svg viewBox="0 0 440 165" xmlns="http://www.w3.org/2000/svg" style="max-width:440px;">
-              <text x="220" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево решений: одобрение кредита</text>
-              <!-- Root node -->
-              <rect x="155" y="26" width="130" height="38" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
-              <text x="220" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#3730a3">Есть долги?</text>
-              <text x="220" y="58" text-anchor="middle" font-size="9" fill="#6366f1">Gini=0.50, n=6</text>
-              <!-- Left branch: Да → Отказать -->
-              <line x1="185" y1="64" x2="110" y2="100" stroke="#ef4444" stroke-width="2"/>
-              <text x="138" y="88" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="600">Да</text>
-              <rect x="55" y="100" width="110" height="38" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-              <text x="110" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">Отказать</text>
-              <text x="110" y="131" text-anchor="middle" font-size="9" fill="#ef4444">Gini=0.0, n=2</text>
-              <!-- Right branch: Нет → second split -->
-              <line x1="255" y1="64" x2="330" y2="100" stroke="#10b981" stroke-width="2"/>
-              <text x="302" y="88" text-anchor="middle" font-size="9" fill="#10b981" font-weight="600">Нет</text>
-              <rect x="270" y="100" width="130" height="38" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-              <text x="335" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#065f46">Зарплата ≥ 65?</text>
-              <text x="335" y="131" text-anchor="middle" font-size="9" fill="#10b981">Gini=0.375, n=4</text>
-              <!-- Level 2 from "Зарплата >= 65?" -->
-              <line x1="300" y1="138" x2="260" y2="155" stroke="#ef4444" stroke-width="1.5"/>
-              <text x="270" y="150" text-anchor="middle" font-size="8" fill="#ef4444">Нет</text>
-              <rect x="215" y="152" width="80" height="10" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
-              <text x="255" y="160" text-anchor="middle" font-size="8" fill="#991b1b">Отказать</text>
-              <line x1="370" y1="138" x2="405" y2="155" stroke="#10b981" stroke-width="1.5"/>
-              <text x="396" y="150" text-anchor="middle" font-size="8" fill="#10b981">Да</text>
-              <rect x="362" y="152" width="80" height="10" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
-              <text x="402" y="160" text-anchor="middle" font-size="8" fill="#065f46">Одобрить</text>
-              <!-- Gain labels -->
-              <text x="110" y="95" text-anchor="middle" font-size="8" fill="#ef4444">Gain=0.250</text>
-            </svg>
-            <div class="caption">Дерево решений для кредита. Корень: «Есть долги?» — лучший сплит (Gain=0.25). Левая ветка (Да) — чистый лист Отказать. Правая (Нет) — второй уровень по зарплате.</div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Пробуем split по Студент</h4>
+            <div class="calc">
+              <b>Левый: Студент = нет</b> — строки №1,3,4,6 (4 шт.)<br>
+              Да: 2 (№3,4), Нет: 2 (№1,6)<br>
+              $\\text{Gini}_L = 1 - ((2/4)^2 + (2/4)^2) = \\mathbf{0{,}500}$<br><br>
+
+              <b>Правый: Студент = да</b> — строки №2,5,7,8 (4 шт.)<br>
+              Да: 3 (№2,5,7), Нет: 1 (№8)<br>
+              $\\text{Gini}_R = 1 - ((3/4)^2 + (1/4)^2) = \\mathbf{0{,}375}$<br><br>
+
+              <b>Взвешенный Gini:</b><br>
+              $= (4/8) \\cdot 0{,}500 + (4/8) \\cdot 0{,}375 = 0{,}250 + 0{,}1875 = \\mathbf{0{,}4375}$<br><br>
+              <b>Information Gain = 0,469 - 0,4375 = 0,031</b>
+            </div>
+            <div class="why">Все три признака дали одинаковый gain = 0,031! При равенстве CART выбирает первый встретившийся — берём <b>Возраст</b>.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. Сравниваем все gains и выбираем корневой split</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Признак</th><th>Gini_weighted</th><th>Information Gain</th></tr>
+                <tr><td>Возраст</td><td>0.4375</td><td><b>0.031</b></td></tr>
+                <tr><td>Доход</td><td>0.4375</td><td>0.031</td></tr>
+                <tr><td>Студент</td><td>0.4375</td><td>0.031</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Все gains равны. Выбираем <b>Возраст</b> (первый в списке).<br>
+              Корень: «Возраст &lt; 30?»<br>
+              Левый: {№1,2,6,7} — Gini=0.500, нужно дальше<br>
+              Правый: {№3,4,5,8} — Gini=0.375, нужно дальше
+            </div>
+            <div class="why">Ни один из узлов не чистый — нужна рекурсия. Переходим к левому дочернему узлу.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7. Рекурсия: левый узел (Возраст &lt; 30, строки №1,2,6,7)</h4>
+            <div class="calc">
+              Текущий: Да:2, Нет:2, Gini=0.500<br><br>
+
+              <b>Split по Доходу:</b><br>
+              Низкий: №6,7 → Да:1, Нет:1 → Gini = 0.500<br>
+              Высокий: №1,2 → Да:1, Нет:1 → Gini = 0.500<br>
+              Weighted = 0.500. Gain = 0.000<br><br>
+
+              <b>Split по Студент:</b><br>
+              Нет: №1,6 → Да:0, Нет:2 → Gini = <b>0.000</b> (чистый!)<br>
+              Да: №2,7 → Да:2, Нет:0 → Gini = <b>0.000</b> (чистый!)<br>
+              Weighted = 0.000. <b>Gain = 0.500 — идеальный split!</b>
+            </div>
+            <div class="why">Студент идеально разделяет молодых: все студенты покупают, все не-студенты — нет. Gini обоих листьев = 0.</div>
+          </div>
+
+          <div class="step" data-step="8">
+            <h4>Шаг 8. Рекурсия: правый узел (Возраст &ge; 30, строки №3,4,5,8)</h4>
+            <div class="calc">
+              Текущий: Да:3, Нет:1, Gini=0.375<br><br>
+
+              <b>Split по Доходу:</b><br>
+              Низкий: №4,5 → Да:2, Нет:0 → Gini = <b>0.000</b><br>
+              Высокий: №3,8 → Да:1, Нет:1 → Gini = 0.500<br>
+              Weighted = (2/4)·0.000 + (2/4)·0.500 = <b>0.250</b>. Gain = 0.125<br><br>
+
+              <b>Split по Студент:</b><br>
+              Нет: №3,4 → Да:2, Нет:0 → Gini = 0.000<br>
+              Да: №5,8 → Да:1, Нет:1 → Gini = 0.500<br>
+              Weighted = 0.250. Gain = 0.125<br><br>
+
+              Оба gain=0.125, берём <b>Доход</b> (первый).<br>
+              Лист «низкий»: 2/2 «да» → предсказание: <b>да</b><br>
+              Узел «высокий»: 1/1 → ещё один split нужен (или лист по большинству).<br>
+              №3 (да) и №8 (нет) — split по Студент: нет→да, да→нет. <b>Два чистых листа.</b>
+            </div>
+            <div class="why">Правая ветка нуждается в двух уровнях. Все 8 примеров теперь классифицируются правильно.</div>
+          </div>
+
+          <div class="step" data-step="9">
+            <h4>Шаг 9. Финальное дерево — SVG</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 520 250" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+                <text x="260" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Дерево решений: Покупка</text>
+                <!-- Root -->
+                <rect x="175" y="24" width="170" height="36" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+                <text x="260" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#3730a3">Возраст &lt; 30?</text>
+                <text x="260" y="54" text-anchor="middle" font-size="8" fill="#6366f1">n=8, Gini=0.469</text>
+                <!-- Left child: Student? -->
+                <line x1="210" y1="60" x2="120" y2="90" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="158" y="78" font-size="9" fill="#6366f1" font-weight="600">Да</text>
+                <rect x="45" y="90" width="150" height="36" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+                <text x="120" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#3730a3">Студент?</text>
+                <text x="120" y="120" text-anchor="middle" font-size="8" fill="#6366f1">n=4, Gini=0.500</text>
+                <!-- Left-Left leaf: Нет покупки -->
+                <line x1="80" y1="126" x2="50" y2="155" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="58" y="145" font-size="8" fill="#ef4444">Нет</text>
+                <rect x="10" y="155" width="80" height="28" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="50" y="173" text-anchor="middle" font-size="9" font-weight="600" fill="#991b1b">НЕТ (0/2)</text>
+                <!-- Left-Right leaf: Да покупка -->
+                <line x1="160" y1="126" x2="190" y2="155" stroke="#10b981" stroke-width="1.5"/>
+                <text x="182" y="145" font-size="8" fill="#10b981">Да</text>
+                <rect x="155" y="155" width="80" height="28" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                <text x="195" y="173" text-anchor="middle" font-size="9" font-weight="600" fill="#065f46">ДА (2/2)</text>
+                <!-- Right child: Доход? -->
+                <line x1="310" y1="60" x2="400" y2="90" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="362" y="78" font-size="9" fill="#6366f1" font-weight="600">Нет</text>
+                <rect x="325" y="90" width="150" height="36" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+                <text x="400" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#3730a3">Доход?</text>
+                <text x="400" y="120" text-anchor="middle" font-size="8" fill="#6366f1">n=4, Gini=0.375</text>
+                <!-- Right-Left leaf: Да -->
+                <line x1="360" y1="126" x2="320" y2="155" stroke="#10b981" stroke-width="1.5"/>
+                <text x="332" y="145" font-size="8" fill="#10b981">Низкий</text>
+                <rect x="280" y="155" width="80" height="28" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                <text x="320" y="173" text-anchor="middle" font-size="9" font-weight="600" fill="#065f46">ДА (2/2)</text>
+                <!-- Right-Right: Student? -->
+                <line x1="440" y1="126" x2="470" y2="155" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="464" y="145" font-size="8" fill="#6366f1">Высокий</text>
+                <rect x="420" y="155" width="95" height="28" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="467" y="173" text-anchor="middle" font-size="9" font-weight="600" fill="#3730a3">Студент?</text>
+                <!-- RR leaves -->
+                <line x1="445" y1="183" x2="420" y2="210" stroke="#10b981" stroke-width="1"/>
+                <text x="425" y="205" font-size="7" fill="#10b981">Нет</text>
+                <rect x="385" y="210" width="70" height="22" rx="5" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+                <text x="420" y="225" text-anchor="middle" font-size="8" font-weight="600" fill="#065f46">ДА</text>
+                <line x1="490" y1="183" x2="500" y2="210" stroke="#ef4444" stroke-width="1"/>
+                <text x="503" y="205" font-size="7" fill="#ef4444">Да</text>
+                <rect x="470" y="210" width="50" height="22" rx="5" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+                <text x="495" y="225" text-anchor="middle" font-size="8" font-weight="600" fill="#991b1b">НЕТ</text>
+              </svg>
+              <div class="caption">Финальное дерево: 3 уровня, 5 листьев. Все 8 примеров классифицируются правильно (train accuracy = 100%).</div>
+            </div>
+          </div>
+
+          <div class="step" data-step="10">
+            <h4>Шаг 10. Классифицируем нового человека: Возраст=25, Доход=высокий, Студент=да</h4>
+            <div class="calc">
+              1) Возраст &lt; 30? → 25 &lt; 30 = <b>Да</b> → идём влево<br>
+              2) Студент? → <b>Да</b> → идём вправо<br>
+              3) Попадаем в лист: <b>ДА (покупка)</b><br><br>
+              Путь: Корень → Лево (молодой) → Право (студент) → Лист «ДА»
+            </div>
+            <div class="why">Классификация — это просто серия if/else по построенному дереву. Каждый новый объект проходит от корня к листу, отвечая на вопросы в узлах.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Первое разбиение: «Есть долги?». Да → Отказать. Нет → второй уровень. Дерево глубиной 2 классифицирует все 6 примеров без ошибок.</p>
+            <p>Дерево глубины 3 с 5 листьями. Корень: Возраст &lt; 30. Молодые делятся по Студент (студенты покупают, нет — не покупают). Старшие: низкий доход → да; высокий доход → зависит от студента. Новый человек (25, высокий, студент) → <b>покупка: да</b>.</p>
           </div>
+
           <div class="lesson-box">
-            Алгоритм CART перебирает все признаки и все пороги, выбирая пару (признак, порог) с минимальным взвешенным Gini. Сложность O(n·d·log n) на уровень.
+            <b>Алгоритм CART:</b> на каждом узле перебери все признаки и все пороги. Выбери пару (признак, порог) с максимальным Information Gain (= наибольшим снижением Gini). Рекурсивно повтори для каждого дочернего узла. Останови, когда узел чистый или достигнут лимит глубины.
           </div>
         `,
       },
       {
-        title: 'Gini: пошаговый расчёт',
+        title: 'Gini vs Entropy',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Детально разобрать Gini Impurity и Information Gain для двух кандидатных разбиений, сравнить их.</p>
+            <p>Взять тот же датасет из 8 человек. Вычислить для каждого кандидатного split и <b>Gini</b>, и <b>Entropy</b>. Показать, что оба критерия выбирают (почти) одно и то же дерево.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Узел</th><th>Класс A</th><th>Класс B</th><th>Всего</th><th>Gini</th></tr>
-              <tr><td>Родитель</td><td>10</td><td>10</td><td>20</td><td>?</td></tr>
-              <tr><td>Разбиение 1 — Левый</td><td>8</td><td>2</td><td>10</td><td>?</td></tr>
-              <tr><td>Разбиение 1 — Правый</td><td>2</td><td>8</td><td>10</td><td>?</td></tr>
-              <tr><td>Разбиение 2 — Левый</td><td>6</td><td>4</td><td>10</td><td>?</td></tr>
-              <tr><td>Разбиение 2 — Правый</td><td>4</td><td>6</td><td>10</td><td>?</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: Gini родительского узла</h4>
+            <h4>Шаг 1. Формулы — напоминание</h4>
             <div class="calc">
-              p_A = 10/20 = 0.5, p_B = 10/20 = 0.5<br>
-              Gini = 1 − (p_A² + p_B²) = 1 − (0.25 + 0.25) = <b>0.500</b>
+              <b>Gini Impurity:</b> $G = 1 - \\sum_k p_k^2$<br>
+              <b>Entropy:</b> $H = -\\sum_k p_k \\log_2 p_k$<br><br>
+              Обе функции: 0 при чистом узле, максимум при равномерном распределении.<br>
+              Gini_max(2 класса) = 0.500<br>
+              Entropy_max(2 класса) = 1.000 бит
             </div>
-            <div class="why">Gini максимален (0.5) при двух равных классах. Чем чище узел, тем меньше Gini.</div>
+            <div class="why">Gini и Entropy — две разные меры «загрязнённости» узла. Они почти всегда согласуются, но численно отличаются.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: Gini разбиения 1 (хорошее)</h4>
+            <h4>Шаг 2. Корневой узел: Gini vs Entropy</h4>
             <div class="calc">
-              Левый [8A, 2B]: p_A=0.8, p_B=0.2<br>
-              Gini_лев = 1 − (0.64 + 0.04) = <b>0.320</b><br><br>
-              Правый [2A, 8B]: p_A=0.2, p_B=0.8<br>
-              Gini_прав = 1 − (0.04 + 0.64) = <b>0.320</b><br><br>
-              Взвешенный = (10/20)·0.320 + (10/20)·0.320 = <b>0.320</b><br>
-              Gain₁ = 0.500 − 0.320 = <b>0.180</b>
+              Да:5, Нет:3, n=8. $p_{\\text{да}}=0{,}625$, $p_{\\text{нет}}=0{,}375$<br><br>
+              <b>Gini</b> = $1 - (0{,}625^2 + 0{,}375^2) = 1 - 0{,}5312 = \\mathbf{0{,}469}$<br><br>
+              <b>Entropy</b> = $-(0{,}625 \\cdot \\log_2 0{,}625 + 0{,}375 \\cdot \\log_2 0{,}375)$<br>
+              $= -(0{,}625 \\cdot (-0{,}678) + 0{,}375 \\cdot (-1{,}415))$<br>
+              $= -(- 0{,}424 - 0{,}531) = \\mathbf{0{,}954}$ бит
             </div>
+            <div class="why">Числа разные (0,469 vs 0,954), но обе метрики показывают высокую загрязнённость (близко к максимуму).</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: Gini разбиения 2 (слабое)</h4>
+            <h4>Шаг 3. Split по Студент (идеальный split для левого поддерева) — оба критерия</h4>
             <div class="calc">
-              Левый [6A, 4B]: p_A=0.6, p_B=0.4<br>
-              Gini_лев = 1 − (0.36 + 0.16) = <b>0.480</b><br><br>
-              Правый [4A, 6B]: Gini_прав = <b>0.480</b><br><br>
-              Взвешенный = 0.5·0.480 + 0.5·0.480 = <b>0.480</b><br>
-              Gain₂ = 0.500 − 0.480 = <b>0.020</b>
+              Напоминание (из примера 1, левый узел — молодые, строки №1,2,6,7):<br>
+              Студент=Нет: №1,6 → 0 да, 2 нет<br>
+              Студент=Да: №2,7 → 2 да, 0 нет<br><br>
+
+              <b>Gini:</b><br>
+              $G_L = 1 - (0^2 + 1^2) = 0{,}000$<br>
+              $G_R = 1 - (1^2 + 0^2) = 0{,}000$<br>
+              Weighted = 0.000. <b>Gini Gain = 0.500</b><br><br>
+
+              <b>Entropy:</b><br>
+              $H_L = 0{,}000$ (чистый узел)<br>
+              $H_R = 0{,}000$ (чистый узел)<br>
+              Weighted = 0.000. <b>Info Gain = 1.000 бит</b>
             </div>
-            <div class="why">Разбиение 2 почти не помогает: оба узла остались почти такими же смешанными. Дерево выберет разбиение 1.</div>
+            <div class="why">Оба критерия единогласны: идеальный split (gain = максимум). При чистых узлах результат всегда совпадает.</div>
           </div>
+
           <div class="step" data-step="4">
-            <h4>Шаг 4: идеальное разбиение</h4>
-            <div class="calc">
-              Левый [10A, 0B]: Gini = 1 − (1² + 0²) = <b>0.0</b> — идеально!<br>
-              Правый [0A, 10B]: Gini = <b>0.0</b><br>
-              Взвешенный Gini = 0 → Gain = 0.500 — максимально возможный
+            <h4>Шаг 4. Сравнительная таблица всех splits на корне</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Split</th><th>Gini Gain</th><th>Entropy Gain (бит)</th><th>Ранг (Gini)</th><th>Ранг (Entropy)</th></tr>
+                <tr><td>Возраст</td><td>0.031</td><td>0.049</td><td>1 (tie)</td><td>1 (tie)</td></tr>
+                <tr><td>Доход</td><td>0.031</td><td>0.049</td><td>1 (tie)</td><td>1 (tie)</td></tr>
+                <tr><td>Студент</td><td>0.031</td><td>0.049</td><td>1 (tie)</td><td>1 (tie)</td></tr>
+              </table>
             </div>
+            <div class="calc">
+              <b>Entropy gain для Возраста:</b><br>
+              $H_L$ (молодые: 2/4 да, 2/4 нет) = $-(0{,}5 \\log_2 0{,}5 + 0{,}5 \\log_2 0{,}5) = 1{,}000$<br>
+              $H_R$ (старшие: 3/4 да, 1/4 нет) = $-(0{,}75 \\cdot (-0{,}415) + 0{,}25 \\cdot (-2{,}0)) = 0{,}811$<br>
+              Weighted = $(4/8) \\cdot 1{,}000 + (4/8) \\cdot 0{,}811 = 0{,}906$<br>
+              Info Gain = $0{,}954 - 0{,}906 = \\mathbf{0{,}049}$ бит
+            </div>
+            <div class="why">И Gini, и Entropy дают <b>одинаковый рейтинг</b> splits. Это типично: на практике Gini и Entropy выбирают один и тот же split в ~98% случаев.</div>
           </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Когда Gini и Entropy расходятся?</h4>
+            <div class="calc">
+              Расхождение чаще при <b>многоклассовых</b> задачах (3+ класса).<br>
+              Entropy штрафует «грязные» узлы сильнее (логарифм растёт быстрее, чем квадрат).<br><br>
+              Пример: узел [90, 5, 5] (3 класса):<br>
+              Gini = $1 - (0{,}9^2 + 0{,}05^2 + 0{,}05^2) = 1 - 0{,}815 = 0{,}185$<br>
+              Entropy = $-(0{,}9 \\cdot (-0{,}152) + 2 \\cdot 0{,}05 \\cdot (-4{,}322)) = 0{,}569$ бит<br><br>
+              Для бинарных задач разница пренебрежимо мала.
+            </div>
+            <div class="why">Практическая рекомендация: используйте Gini (по умолчанию в sklearn) — он чуть быстрее вычислительно (нет логарифма). Переключайтесь на Entropy, только если видите явные отличия на validation.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Разбиение 1: Gain=0.180. Разбиение 2: Gain=0.020. Дерево выберет разбиение 1 как корневое условие.</p>
+            <p>На нашем датасете Gini и Entropy дают <b>одинаковое дерево</b>. Оба критерия совпали в рейтинге всех splits. Расхождение возможно при &ge;3 классах. Для практики: Gini — default, менять не нужно.</p>
           </div>
+
           <div class="lesson-box">
-            Энтропия (ID3): −Σp·log₂(p). Gini (CART): 1−Σp². Оба критерия дают схожие результаты, Gini быстрее вычислять. Для регрессии используют variance reduction.
+            <b>Gini vs Entropy — итог:</b> Gini = $1-\\sum p_k^2$ (быстрее). Entropy = $-\\sum p_k \\log_2 p_k$ (теоретически обоснованнее). На бинарных задачах результаты почти тождественны. sklearn использует Gini по умолчанию (criterion='gini').
           </div>
         `,
       },
       {
-        title: 'Переобучение при depth=∞',
+        title: 'Переобучение: depth=1 vs depth=∞',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать, как неограниченная глубина дерева приводит к переобучению, и как правильно регуляризовать.</p>
+            <p>Показать на конкретных числах, как глубина дерева влияет на train/test accuracy. Датасет: 100 примеров (80 train, 20 test), 2 класса с шумом 10%.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Глубина</th><th>Train Accuracy</th><th>Val Accuracy</th><th>Листьев</th><th>Диагноз</th></tr>
-              <tr><td>1</td><td>62%</td><td>60%</td><td>2</td><td>Underfitting</td></tr>
-              <tr><td>2</td><td>78%</td><td>75%</td><td>4</td><td>Нормально</td></tr>
-              <tr><td>3</td><td>85%</td><td>83%</td><td>8</td><td>Оптимум</td></tr>
-              <tr><td>5</td><td>94%</td><td>80%</td><td>32</td><td>Начало переобуч.</td></tr>
-              <tr><td>10</td><td>100%</td><td>71%</td><td>~200</td><td>Переобучение</td></tr>
-              <tr><td>∞</td><td>100%</td><td>68%</td><td>n</td><td>Полное переобуч.</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: что происходит при depth=∞</h4>
-            <div class="calc">
-              n=100 примеров → до 100 листьев при depth=∞<br>
-              Каждый лист ≈ 1 обучающий пример<br>
-              Train Accuracy = 100% — дерево запомнило всё<br>
-              Новый объект x_new попадает в лист с 1 примером<br>
-              → предсказание = метка этого 1 примера с шумом<br>
-              → любой шум в данных = ошибка на тесте
+            <h4>Шаг 1. Данные: train 80, test 20, шум 10%</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Параметр</th><th>Значение</th></tr>
+                <tr><td>Train размер</td><td>80 примеров</td></tr>
+                <tr><td>Test размер</td><td>20 примеров</td></tr>
+                <tr><td>Признаков</td><td>5 (числовые)</td></tr>
+                <tr><td>Классов</td><td>2 (0 и 1)</td></tr>
+                <tr><td>Шум</td><td>10% меток перевёрнуты</td></tr>
+                <tr><td>Истинная граница</td><td>$x_1 + x_2 > 0$ (линейная)</td></tr>
+              </table>
             </div>
-            <div class="why">Дерево без ограничений — это lookup table, а не обобщающая модель.</div>
+            <div class="why">Шум 10% означает: 8 из 80 тренировочных примеров имеют «неправильную» метку. Идеальная модель не может дать 100% accuracy — потолок ~90%.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: методы регуляризации</h4>
+            <h4>Шаг 2. depth=1 (Decision Stump) — underfitting</h4>
             <div class="calc">
-              max_depth=3 → ограничить глубину напрямую<br>
-              min_samples_split=10 → делить узел, только если ≥10 примеров<br>
-              min_samples_leaf=5 → каждый лист ≥5 примеров<br>
-              max_leaf_nodes=20 → не более 20 листьев<br>
-              min_impurity_decrease=0.01 → делить, только если Gain ≥ 0.01
+              Одна линия-split: например, $x_1 > 0.3$<br>
+              Это грубое приближение истинной границы $x_1 + x_2 > 0$.<br><br>
+              <b>Train accuracy:</b> 65/80 = <b>81.3%</b><br>
+              <b>Test accuracy:</b> 16/20 = <b>80.0%</b><br>
+              <b>Листьев:</b> 2<br><br>
+              Train ≈ Test → нет переобучения, но модель слишком простая.
             </div>
-            <div class="why">min_samples_leaf часто эффективнее max_depth: не даёт создавать листья с очень малым числом примеров.</div>
+            <div class="why">Stump с одним split не может выразить зависимость от двух переменных ($x_1 + x_2$). Это <b>underfitting</b>: модель не захватывает даже основной паттерн.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: cost-complexity pruning</h4>
+            <h4>Шаг 3. depth=3 — оптимум</h4>
             <div class="calc">
-              Loss(T) = Gini(T) + α · |leaves(T)|<br>
-              α=0 → полное дерево<br>
-              α → ∞ → только корень<br>
-              Оптимальный α: перебрать сетку, выбрать max Val Accuracy<br>
-              В sklearn: DecisionTreeClassifier(ccp_alpha=0.01)
+              3 уровня splits: дерево может приблизить линейную границу<br>
+              кусочно-осевыми разрезами ($x_1 > a$ ∧ $x_2 > b$).<br><br>
+              <b>Train accuracy:</b> 73/80 = <b>91.3%</b><br>
+              <b>Test accuracy:</b> 18/20 = <b>90.0%</b><br>
+              <b>Листьев:</b> 8<br><br>
+              Train и Test близки и оба высокие → хороший баланс!
             </div>
+            <div class="why">Дерево глубины 3 достаточно гибкое, чтобы выучить паттерн, но недостаточно сложное, чтобы запомнить шум. Разрыв Train-Test всего 1.3%.</div>
           </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4. depth=∞ — переобучение</h4>
+            <div class="calc">
+              Дерево растёт, пока каждый лист не станет чистым.<br><br>
+              <b>Train accuracy:</b> 80/80 = <b>100%</b> (запомнило всё!)<br>
+              <b>Test accuracy:</b> 14/20 = <b>70.0%</b><br>
+              <b>Листьев:</b> ~60-80<br><br>
+              Разрыв: 100% - 70% = <b>30%</b> — огромный gap!
+            </div>
+            <div class="calc">
+              Дерево запомнило 8 шумных примеров как «правила»:<br>
+              Пример №23 (шум): $x_1=0{,}12, x_2=-0{,}05$ → метка 1 (ошибочная)<br>
+              Дерево создало лист: «если $x_1 \\in [0{,}11, 0{,}13]$ и $x_2 \\in [-0{,}06, -0{,}04]$ → класс 1»<br>
+              Этот лист содержит ОДИН пример и не обобщает!
+            </div>
+            <div class="why">Дерево без ограничений = lookup table. Каждый лист ≈ 1 пример. Любой шум в данных запоминается как «правило» и переносится на тест.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Сводная таблица по глубинам</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Глубина</th><th>Train Acc</th><th>Test Acc</th><th>Gap</th><th>Листьев</th><th>Диагноз</th></tr>
+                <tr><td>1</td><td>81.3%</td><td>80.0%</td><td>1.3%</td><td>2</td><td style="color:#f59e0b;">Underfitting</td></tr>
+                <tr><td>2</td><td>86.3%</td><td>85.0%</td><td>1.3%</td><td>4</td><td>Нормально</td></tr>
+                <tr><td><b>3</b></td><td><b>91.3%</b></td><td><b>90.0%</b></td><td><b>1.3%</b></td><td><b>8</b></td><td style="color:#10b981;"><b>Оптимум</b></td></tr>
+                <tr><td>5</td><td>96.3%</td><td>82.0%</td><td>14.3%</td><td>~25</td><td style="color:#f59e0b;">Начало переобуч.</td></tr>
+                <tr><td>10</td><td>100%</td><td>72.0%</td><td>28%</td><td>~55</td><td style="color:#ef4444;">Переобучение</td></tr>
+                <tr><td>∞</td><td>100%</td><td>70.0%</td><td>30%</td><td>~70</td><td style="color:#ef4444;">Полное переобуч.</td></tr>
+              </table>
+            </div>
+            <div class="why">Паттерн: Train monotonно растёт с глубиной. Test сначала растёт, достигает пика (depth=3), потом падает. Разрыв = сигнал переобучения.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. Как выбрать оптимальную глубину на практике</h4>
+            <div class="calc">
+              <b>Метод 1: Cross-Validation</b><br>
+              Перебрать depth = 1, 2, ..., 15.<br>
+              Для каждого depth: 5-fold CV → средний val accuracy.<br>
+              Выбрать depth с max val accuracy.<br><br>
+
+              <b>Метод 2: min_samples_leaf</b><br>
+              Вместо ограничения глубины: min_samples_leaf = 5-10% от n.<br>
+              80 примеров → min_samples_leaf = 4-8.<br>
+              Это гарантирует, что каждый лист содержит достаточно примеров.<br><br>
+
+              <b>Метод 3: Cost-Complexity Pruning (ccp_alpha)</b><br>
+              Построить полное дерево → обрезать ветки, увеличивая $\\alpha$.<br>
+              $\\text{Cost}(T) = \\text{Gini}(T) + \\alpha \\cdot |\\text{листьев}(T)|$<br>
+              Подобрать $\\alpha$ по CV.
+            </div>
+            <div class="why">Не гадайте глубину — используйте cross-validation. В sklearn: GridSearchCV(DecisionTreeClassifier(), {'max_depth': range(1,16)}).</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Оптимальная глубина = 3 (Val 83%). Правило: min_samples_leaf ≈ 1–5% от датасета. Строй кривые обучения (train vs val по глубине) для диагностики.</p>
+            <p>depth=1: underfitting (81/80%). depth=3: оптимум (91/90%). depth=∞: переобучение (100/70%). Правило: если Train >> Test — уменьшай глубину. Если Train ≈ Test и оба низкие — увеличивай. Используй CV для автоматического подбора.</p>
           </div>
+
           <div class="lesson-box">
-            Кривая обучения: val score растёт с глубиной, достигает пика, затем падает (переобучение). Пик — оптимум. Train score монотонно растёт. Если они близки — underfitting, если расходятся — overfitting.
+            <b>Кривая обучения:</b> стройте график Train/Test accuracy vs depth. Пик Test accuracy = оптимальная глубина. Разрыв между кривыми = мера переобучения. Применяйте min_samples_leaf или ccp_alpha вместо жёсткого max_depth — они адаптивнее.
           </div>
         `,
       },

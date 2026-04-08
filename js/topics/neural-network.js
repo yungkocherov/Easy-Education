@@ -216,267 +216,422 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Forward pass: сеть 2→2→1',
+        title: 'Forward pass: сеть 2→2→1 полностью',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Прогнать вход $x = (1,\; 2)$ через сеть 2→2→1. Конкретные веса скрытого слоя:</p>
+            <p>Прогнать вход $x = [1,\\; 2]$ через сеть 2→2→1 для задачи <b>бинарной классификации</b>. Целевое значение: $y = 1$.</p>
+            <p>Веса (записаны явно — возьмите ручку и повторяйте):</p>
             <div class="math-block">$$W^{(1)} = \\begin{pmatrix}0{,}5 & 0{,}2 \\\\ -0{,}3 & 0{,}8\\end{pmatrix},\\quad b^{(1)} = \\begin{pmatrix}0{,}1 \\\\ -0{,}5\\end{pmatrix}$$</div>
-            <p>Выходной слой: $W^{(2)} = (0{,}6,\; -0{,}4)$, $b^{(2)} = 0{,}2$. Активация скрытого слоя: ReLU. Выход: линейный (регрессия).</p>
-          </div>
-
-          <div class="illustration bordered">
-            <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <defs>
-                <marker id="nn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
-                </marker>
-              </defs>
-              <!-- Input layer: x1=1, x2=2 -->
-              <circle cx="60" cy="60" r="22" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-              <text x="60" y="57" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="600">x₁</text>
-              <text x="60" y="70" text-anchor="middle" font-size="10" fill="#1e40af">= 1</text>
-              <circle cx="60" cy="130" r="22" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-              <text x="60" y="127" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="600">x₂</text>
-              <text x="60" y="140" text-anchor="middle" font-size="10" fill="#1e40af">= 2</text>
-              <!-- Hidden layer: h1, h2 -->
-              <circle cx="230" cy="60" r="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-              <text x="230" y="57" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">h₁</text>
-              <text x="230" y="70" text-anchor="middle" font-size="10" fill="#92400e">1.0</text>
-              <circle cx="230" cy="130" r="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-              <text x="230" y="127" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">h₂</text>
-              <text x="230" y="140" text-anchor="middle" font-size="10" fill="#92400e">0.8</text>
-              <!-- Output layer -->
-              <circle cx="390" cy="95" r="22" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
-              <text x="390" y="92" text-anchor="middle" font-size="11" fill="#065f46" font-weight="600">ŷ</text>
-              <text x="390" y="105" text-anchor="middle" font-size="10" fill="#065f46">0.48</text>
-              <!-- Edges x1→h1: w=0.5 -->
-              <line x1="82" y1="60" x2="208" y2="60" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
-              <text x="145" y="52" text-anchor="middle" font-size="9" fill="#6366f1">0.5</text>
-              <!-- Edges x1→h2: w=-0.3 -->
-              <line x1="80" y1="68" x2="210" y2="122" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
-              <text x="148" y="105" text-anchor="middle" font-size="9" fill="#6366f1">−0.3</text>
-              <!-- Edges x2→h1: w=0.2 -->
-              <line x1="80" y1="122" x2="210" y2="68" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
-              <text x="148" y="87" text-anchor="middle" font-size="9" fill="#6366f1">0.2</text>
-              <!-- Edges x2→h2: w=0.8 -->
-              <line x1="82" y1="130" x2="208" y2="130" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-arr)"/>
-              <text x="145" y="143" text-anchor="middle" font-size="9" fill="#6366f1">0.8</text>
-              <!-- Edges h1→out: w=0.6 -->
-              <line x1="252" y1="67" x2="368" y2="88" stroke="#10b981" stroke-width="1.8" marker-end="url(#nn-arr)"/>
-              <text x="310" y="72" text-anchor="middle" font-size="9" fill="#10b981">0.6</text>
-              <!-- Edges h2→out: w=-0.4 -->
-              <line x1="252" y1="123" x2="368" y2="102" stroke="#10b981" stroke-width="1.8" marker-end="url(#nn-arr)"/>
-              <text x="310" y="122" text-anchor="middle" font-size="9" fill="#10b981">−0.4</text>
-              <!-- Layer labels -->
-              <text x="60" y="165" text-anchor="middle" font-size="9" fill="#64748b">вход</text>
-              <text x="230" y="165" text-anchor="middle" font-size="9" fill="#64748b">скрытый (ReLU)</text>
-              <text x="390" y="165" text-anchor="middle" font-size="9" fill="#64748b">выход</text>
-            </svg>
-            <div class="caption">Сеть 2→2→1: веса на рёбрах, значения активаций внутри узлов после forward pass (x=(1,2)). Скрытый слой: ReLU(z). Выход: 0.48.</div>
+            <div class="math-block">$$W^{(2)} = (0{,}6,\\; -0{,}4),\\quad b^{(2)} = 0{,}2$$</div>
+            <p>Скрытый слой: ReLU. Выход: <b>sigmoid</b> (классификация). Loss: Binary Cross-Entropy.</p>
           </div>
 
           <div class="example-data-table">
             <table>
-              <tr><th>Слой</th><th>Операция</th><th>Результат</th></tr>
-              <tr><td>Вход</td><td>—</td><td>$x = (1,\; 2)$</td></tr>
-              <tr><td>Скрытый (pre-act)</td><td>$z^{(1)} = W^{(1)} x + b^{(1)}$</td><td>$(1{,}0,\; 0{,}8)$</td></tr>
-              <tr><td>Скрытый (post-act)</td><td>$a^{(1)} = \\text{ReLU}(z^{(1)})$</td><td>$(1{,}0,\; 0{,}8)$</td></tr>
-              <tr><td>Выход (pre-act)</td><td>$z^{(2)} = W^{(2)} a^{(1)} + b^{(2)}$</td><td>$0{,}48$</td></tr>
-              <tr><td>Выход</td><td>линейный</td><td>$\\hat{y} = 0{,}48$</td></tr>
+              <tr><th>Параметр</th><th>Размерность</th><th>Значения</th></tr>
+              <tr><td>$x$ (вход)</td><td>2×1</td><td>[1, 2]</td></tr>
+              <tr><td>$W^{(1)}$</td><td>2×2</td><td>[[0.5, 0.2], [−0.3, 0.8]]</td></tr>
+              <tr><td>$b^{(1)}$</td><td>2×1</td><td>[0.1, −0.5]</td></tr>
+              <tr><td>$W^{(2)}$</td><td>1×2</td><td>[0.6, −0.4]</td></tr>
+              <tr><td>$b^{(2)}$</td><td>1×1</td><td>[0.2]</td></tr>
+              <tr><td>Всего параметров</td><td>—</td><td>4 + 2 + 2 + 1 = <b>9</b></td></tr>
             </table>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Вычисляем скрытый слой: нейрон 1</h4>
-            <div class="calc">$z^{(1)}_1 = 0{,}5 \\cdot 1 + 0{,}2 \\cdot 2 + 0{,}1 = 0{,}5 + 0{,}4 + 0{,}1 = 1{,}0$</div>
-            <div class="calc">$a^{(1)}_1 = \\text{ReLU}(1{,}0) = 1{,}0$</div>
-            <div class="why">$z > 0$, поэтому ReLU пропускает значение без изменений.</div>
+            <h4>Шаг 1. Архитектура сети — SVG-схема со всеми весами</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+                <defs>
+                  <marker id="nn-fwd" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <polygon points="0 0,6 3,0 6" fill="#64748b"/>
+                  </marker>
+                </defs>
+                <!-- Input layer -->
+                <circle cx="60" cy="65" r="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                <text x="60" y="60" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="700">x₁</text>
+                <text x="60" y="76" text-anchor="middle" font-size="10" fill="#1e40af">= 1</text>
+                <circle cx="60" cy="150" r="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                <text x="60" y="145" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="700">x₂</text>
+                <text x="60" y="161" text-anchor="middle" font-size="10" fill="#1e40af">= 2</text>
+                <!-- Hidden layer -->
+                <circle cx="250" cy="55" r="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="250" y="50" text-anchor="middle" font-size="11" fill="#92400e" font-weight="700">h₁</text>
+                <text x="250" y="64" text-anchor="middle" font-size="9" fill="#92400e">b=0.1</text>
+                <circle cx="250" cy="155" r="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="250" y="150" text-anchor="middle" font-size="11" fill="#92400e" font-weight="700">h₂</text>
+                <text x="250" y="164" text-anchor="middle" font-size="9" fill="#92400e">b=−0.5</text>
+                <!-- Output -->
+                <circle cx="440" cy="105" r="26" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+                <text x="440" y="100" text-anchor="middle" font-size="12" fill="#065f46" font-weight="700">out</text>
+                <text x="440" y="115" text-anchor="middle" font-size="9" fill="#065f46">b=0.2</text>
+                <!-- Edges input→hidden -->
+                <line x1="84" y1="60" x2="226" y2="55" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-fwd)"/>
+                <text x="155" y="48" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="600">0.5</text>
+                <line x1="84" y1="75" x2="226" y2="145" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-fwd)"/>
+                <text x="145" y="125" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="600">−0.3</text>
+                <line x1="84" y1="142" x2="226" y2="65" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-fwd)"/>
+                <text x="165" y="92" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="600">0.2</text>
+                <line x1="84" y1="150" x2="226" y2="155" stroke="#6366f1" stroke-width="1.5" marker-end="url(#nn-fwd)"/>
+                <text x="155" y="163" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="600">0.8</text>
+                <!-- Edges hidden→output -->
+                <line x1="274" y1="60" x2="414" y2="98" stroke="#10b981" stroke-width="2" marker-end="url(#nn-fwd)"/>
+                <text x="344" y="72" text-anchor="middle" font-size="10" fill="#10b981" font-weight="600">0.6</text>
+                <line x1="274" y1="150" x2="414" y2="112" stroke="#10b981" stroke-width="2" marker-end="url(#nn-fwd)"/>
+                <text x="344" y="142" text-anchor="middle" font-size="10" fill="#10b981" font-weight="600">−0.4</text>
+                <!-- Labels -->
+                <text x="60" y="190" text-anchor="middle" font-size="10" fill="#64748b">Вход</text>
+                <text x="250" y="190" text-anchor="middle" font-size="10" fill="#64748b">Скрытый (ReLU)</text>
+                <text x="440" y="190" text-anchor="middle" font-size="10" fill="#64748b">Выход (sigmoid)</text>
+              </svg>
+              <div class="caption">Полная архитектура: 2 входа, 2 скрытых нейрона (ReLU), 1 выход (sigmoid). Все веса и bias подписаны.</div>
+            </div>
+            <div class="why">Каждое ребро = одно умножение. Bias записан внутри узлов. При forward pass мы последовательно вычисляем значения слева направо.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Вычисляем скрытый слой: нейрон 2</h4>
-            <div class="calc">$z^{(1)}_2 = -0{,}3 \\cdot 1 + 0{,}8 \\cdot 2 + (-0{,}5) = -0{,}3 + 1{,}6 - 0{,}5 = 0{,}8$</div>
-            <div class="calc">$a^{(1)}_2 = \\text{ReLU}(0{,}8) = 0{,}8$</div>
-            <div class="why">Тоже положительное значение — ReLU не обнуляет.</div>
+            <h4>Шаг 2. Скрытый нейрон h₁: каждое умножение</h4>
+            <div class="calc">
+              $z_1 = w_{11} \\cdot x_1 + w_{12} \\cdot x_2 + b_1$<br><br>
+              $w_{11} \\cdot x_1 = 0{,}5 \\times 1 = 0{,}5$<br>
+              $w_{12} \\cdot x_2 = 0{,}2 \\times 2 = 0{,}4$<br>
+              $z_1 = 0{,}5 + 0{,}4 + 0{,}1 = \\mathbf{1{,}0}$
+            </div>
+            <div class="calc">
+              $a_1 = \\text{ReLU}(z_1) = \\text{ReLU}(1{,}0) = \\max(0,\\; 1{,}0) = \\mathbf{1{,}0}$
+            </div>
+            <div class="why">$z_1 = 1{,}0 > 0$, поэтому ReLU(1.0) = 1.0. ReLU «пропускает» положительные значения без изменений, а отрицательные зануляет.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Вычисляем выходной нейрон</h4>
-            <div class="calc">$z^{(2)} = 0{,}6 \\cdot 1{,}0 + (-0{,}4) \\cdot 0{,}8 + 0{,}2 = 0{,}6 - 0{,}32 + 0{,}2 = 0{,}48$</div>
-            <div class="calc">$\\hat{y} = 0{,}48$ (линейная активация для регрессии)</div>
-            <div class="why">Предсказание модели: 0,48. Это взвешенная сумма активаций скрытого слоя — каждый скрытый нейрон «голосует» своим вкладом.</div>
+            <h4>Шаг 3. Скрытый нейрон h₂: каждое умножение</h4>
+            <div class="calc">
+              $z_2 = w_{21} \\cdot x_1 + w_{22} \\cdot x_2 + b_2$<br><br>
+              $w_{21} \\cdot x_1 = (-0{,}3) \\times 1 = -0{,}3$<br>
+              $w_{22} \\cdot x_2 = 0{,}8 \\times 2 = 1{,}6$<br>
+              $z_2 = -0{,}3 + 1{,}6 + (-0{,}5) = -0{,}3 + 1{,}6 - 0{,}5 = \\mathbf{0{,}8}$
+            </div>
+            <div class="calc">
+              $a_2 = \\text{ReLU}(z_2) = \\text{ReLU}(0{,}8) = \\max(0,\\; 0{,}8) = \\mathbf{0{,}8}$
+            </div>
+            <div class="why">Тоже положительное: $0{,}8 > 0$, ReLU пропускает. Обратите внимание: нейрон h₂ «видит» $x_2$ сильнее ($w_{22}=0{,}8$), а $x_1$ — с отрицательным весом.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Подсчёт параметров</h4>
+            <h4>Шаг 4. Выходной нейрон: pre-activation и sigmoid</h4>
             <div class="calc">
-              Скрытый слой: $W^{(1)}$ — $2 \\times 2 = 4$ весов $+$ $b^{(1)}$ — 2 bias = <b>6 параметров</b><br>
-              Выходной слой: $W^{(2)}$ — 2 весá $+$ $b^{(2)}$ — 1 bias = <b>3 параметра</b><br>
-              Итого: $6 + 3 = $ <b>9 параметров</b>
+              $z_{out} = w_1^{(2)} \\cdot a_1 + w_2^{(2)} \\cdot a_2 + b^{(2)}$<br><br>
+              $w_1^{(2)} \\cdot a_1 = 0{,}6 \\times 1{,}0 = 0{,}6$<br>
+              $w_2^{(2)} \\cdot a_2 = (-0{,}4) \\times 0{,}8 = -0{,}32$<br>
+              $z_{out} = 0{,}6 + (-0{,}32) + 0{,}2 = 0{,}6 - 0{,}32 + 0{,}2 = \\mathbf{0{,}48}$
             </div>
-            <div class="why">Для сравнения: полносвязная сеть 2→100→50→1 имела бы $(2\\times100+100)+(100\\times50+50)+(50\\times1+1) = 5401$ параметр. Размер сети растёт быстро!</div>
+            <div class="calc">
+              Sigmoid: $\\hat{y} = \\sigma(z_{out}) = \\dfrac{1}{1 + e^{-0{,}48}}$<br><br>
+              $e^{-0{,}48} = 0{,}6188$<br>
+              $\\hat{y} = \\dfrac{1}{1 + 0{,}6188} = \\dfrac{1}{1{,}6188} = \\mathbf{0{,}618}$
+            </div>
+            <div class="why">Sigmoid переводит любое число в диапазон (0, 1) — это вероятность класса 1. Наша сеть считает, что $P(y=1) = 0{,}618$, то есть 61,8%.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Loss: Binary Cross-Entropy</h4>
+            <div class="calc">
+              $L = -[y \\cdot \\ln(\\hat{y}) + (1-y) \\cdot \\ln(1-\\hat{y})]$<br><br>
+              $y = 1$, поэтому:<br>
+              $L = -[1 \\cdot \\ln(0{,}618) + 0 \\cdot \\ln(0{,}382)]$<br>
+              $L = -\\ln(0{,}618) = -(-0{,}481) = \\mathbf{0{,}481}$
+            </div>
+            <div class="why">Если бы $\\hat{y}$ был ближе к 1, $\\ln(\\hat{y})$ был бы ближе к 0, и loss был бы меньше. При $\\hat{y}=1$: $L=0$ (идеально). При $\\hat{y}\\to 0$: $L \\to +\\infty$ (максимальная ошибка).</div>
+          </div>
+
+          <div class="example-data-table">
+            <table>
+              <tr><th>Слой</th><th>Формула</th><th>Числовой результат</th></tr>
+              <tr><td>Вход</td><td>—</td><td>$x = [1,\\; 2]$</td></tr>
+              <tr><td>Скрытый $z$</td><td>$W^{(1)}x + b^{(1)}$</td><td>$[1{,}0,\\; 0{,}8]$</td></tr>
+              <tr><td>Скрытый $a$</td><td>ReLU($z$)</td><td>$[1{,}0,\\; 0{,}8]$</td></tr>
+              <tr><td>Выход $z_{out}$</td><td>$W^{(2)}a + b^{(2)}$</td><td>$0{,}48$</td></tr>
+              <tr><td>Выход $\\hat{y}$</td><td>$\\sigma(z_{out})$</td><td>$0{,}618$</td></tr>
+              <tr><td>Loss</td><td>$-\\ln(\\hat{y})$</td><td>$0{,}481$</td></tr>
+            </table>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Forward pass: $x=(1,2) \\to z^{(1)}=(1{,}0,\\;0{,}8) \\to a^{(1)}=(1{,}0,\\;0{,}8) \\to \\hat{y} = 0{,}48$. Сеть «преобразовала» входное пространство через нелинейный скрытый слой и выдала число.</p>
+            <p>Forward pass: $x=[1,2] \\to z=[1{,}0,\\; 0{,}8] \\to a=[1{,}0,\\; 0{,}8] \\to z_{out}=0{,}48 \\to \\hat{y} = \\sigma(0{,}48) = 0{,}618$. Loss (BCE) = 0,481. Сеть на 61,8% уверена в классе 1, но мы хотим 100% — нужен backprop.</p>
           </div>
 
           <div class="lesson-box">
-            <b>Что делает скрытый слой:</b> он создаёт новые признаки из входных. Нейрон 1 (с весами 0,5 и 0,2) реагирует на «взвешенную сумму входов», нейрон 2 — на другую комбинацию. ReLU вносит нелинейность, без которой два слоя были бы эквивалентны одному.
+            <b>Что делает каждый слой:</b> скрытый слой создаёт новые «признаки» ($a_1$ и $a_2$) из входных. ReLU вносит нелинейность — без неё 2 линейных слоя эквивалентны одному. Sigmoid на выходе превращает число в вероятность.
           </div>
         `
       },
       {
-        title: 'Backprop одного шага',
+        title: 'Backprop: вычисляем все градиенты',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Продолжаем предыдущий пример. Истинный ответ $y = 1{,}0$. Вычислить градиенты по всем параметрам сети и обновить веса с $\\eta = 0{,}1$. Текущее предсказание $\\hat{y} = 0{,}48$.</p>
+            <p>Продолжаем пример 1. Вычислить <b>все</b> градиенты по всем 9 параметрам, обновить веса с $\\eta = 0{,}1$, затем сделать второй forward pass и показать, что loss снизился.</p>
+            <p>Напоминание: $\\hat{y}=0{,}618$, $y=1$, $z_{out}=0{,}48$, $a=[1{,}0,\\; 0{,}8]$, $z=[1{,}0,\\; 0{,}8]$, $x=[1,\\; 2]$.</p>
           </div>
 
           <div class="example-data-table">
             <table>
-              <tr><th>Шаг</th><th>Что считаем</th><th>Результат</th></tr>
-              <tr><td>1</td><td>Loss $L = (\\hat{y}-y)^2$</td><td>$0{,}2704$</td></tr>
-              <tr><td>2</td><td>$\\partial L / \\partial \\hat{y}$</td><td>$-1{,}04$</td></tr>
-              <tr><td>3</td><td>$\\partial L / \\partial W^{(2)}$</td><td>$(-1{,}04,\\; -0{,}832)$</td></tr>
-              <tr><td>4</td><td>$\\partial L / \\partial a^{(1)}$</td><td>$(-0{,}624,\\; 0{,}416)$</td></tr>
-              <tr><td>5</td><td>$\\partial L / \\partial W^{(1)}$</td><td>матрица $2\\times2$</td></tr>
+              <tr><th>Параметр</th><th>Старое значение</th><th>Градиент $\\partial L / \\partial$</th><th>Новое значение</th></tr>
+              <tr><td>$w_1^{(2)}$</td><td>0.6</td><td>?</td><td>?</td></tr>
+              <tr><td>$w_2^{(2)}$</td><td>−0.4</td><td>?</td><td>?</td></tr>
+              <tr><td>$b^{(2)}$</td><td>0.2</td><td>?</td><td>?</td></tr>
+              <tr><td>$w_{11}^{(1)}$</td><td>0.5</td><td>?</td><td>?</td></tr>
+              <tr><td>$w_{12}^{(1)}$</td><td>0.2</td><td>?</td><td>?</td></tr>
+              <tr><td>$w_{21}^{(1)}$</td><td>−0.3</td><td>?</td><td>?</td></tr>
+              <tr><td>$w_{22}^{(1)}$</td><td>0.8</td><td>?</td><td>?</td></tr>
+              <tr><td>$b_1^{(1)}$</td><td>0.1</td><td>?</td><td>?</td></tr>
+              <tr><td>$b_2^{(1)}$</td><td>−0.5</td><td>?</td><td>?</td></tr>
             </table>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Ошибка и Loss</h4>
-            <div class="calc">$e = \\hat{y} - y = 0{,}48 - 1{,}0 = -0{,}52$</div>
-            <div class="calc">$L = e^2 = (-0{,}52)^2 = 0{,}2704$</div>
-            <div class="why">Используем MSE loss: $L=(\\hat{y}-y)^2$. Ошибка отрицательная — мы предсказали меньше, чем нужно.</div>
+            <h4>Шаг 1. Градиент loss по выходу: $\\partial L / \\partial \\hat{y}$</h4>
+            <div class="calc">
+              $L = -\\ln(\\hat{y})$ (при $y=1$)<br>
+              $\\dfrac{\\partial L}{\\partial \\hat{y}} = -\\dfrac{1}{\\hat{y}} = -\\dfrac{1}{0{,}618} = \\mathbf{-1{,}618}$
+            </div>
+            <div class="why">Знак отрицательный: чтобы уменьшить loss, нужно <b>увеличить</b> $\\hat{y}$ (сдвинуть предсказание ближе к 1). Это начальная точка обратного распространения.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Градиент по выходу (начало backprop)</h4>
-            <div class="calc">$\\dfrac{\\partial L}{\\partial \\hat{y}} = 2e = 2 \\cdot (-0{,}52) = -1{,}04$</div>
-            <div class="why">Градиент отрицательный — нужно увеличить $\\hat{y}$. Backprop начинается с конца сети и идёт назад.</div>
+            <h4>Шаг 2. Через sigmoid: $\\partial L / \\partial z_{out}$</h4>
+            <div class="calc">
+              Производная sigmoid: $\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$<br>
+              $\\sigma'(0{,}48) = 0{,}618 \\times (1 - 0{,}618) = 0{,}618 \\times 0{,}382 = 0{,}236$<br><br>
+              Для BCE + sigmoid есть красивое упрощение:<br>
+              $\\dfrac{\\partial L}{\\partial z_{out}} = \\hat{y} - y = 0{,}618 - 1 = \\mathbf{-0{,}382}$
+            </div>
+            <div class="why">Проверка: $(-1{,}618) \\times 0{,}236 = -0{,}382$ — сходится! Упрощение $\\hat{y}-y$ работает только для пары BCE + sigmoid.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Градиент по весам выходного слоя</h4>
+            <h4>Шаг 3. Градиенты по $W^{(2)}$ и $b^{(2)}$</h4>
             <div class="calc">
-              $\\dfrac{\\partial L}{\\partial W^{(2)}_1} = (-1{,}04) \\cdot a^{(1)}_1 = (-1{,}04) \\cdot 1{,}0 = -1{,}04$<br>
-              $\\dfrac{\\partial L}{\\partial W^{(2)}_2} = (-1{,}04) \\cdot a^{(1)}_2 = (-1{,}04) \\cdot 0{,}8 = -0{,}832$<br>
-              $\\dfrac{\\partial L}{\\partial b^{(2)}} = -1{,}04$
+              $\\dfrac{\\partial L}{\\partial w_1^{(2)}} = \\dfrac{\\partial L}{\\partial z_{out}} \\cdot a_1 = (-0{,}382) \\times 1{,}0 = \\mathbf{-0{,}382}$<br><br>
+              $\\dfrac{\\partial L}{\\partial w_2^{(2)}} = \\dfrac{\\partial L}{\\partial z_{out}} \\cdot a_2 = (-0{,}382) \\times 0{,}8 = \\mathbf{-0{,}306}$<br><br>
+              $\\dfrac{\\partial L}{\\partial b^{(2)}} = \\dfrac{\\partial L}{\\partial z_{out}} \\cdot 1 = \\mathbf{-0{,}382}$
             </div>
-            <div class="calc">
-              Обновление: $W^{(2)} \\gets (0{,}6 + 0{,}104,\\; -0{,}4 + 0{,}083) = (0{,}704,\\; -0{,}317)$
-            </div>
-            <div class="why">Градиент по $W^{(2)}_1$ больше (−1,04), потому что нейрон 1 был активирован сильнее (1,0 > 0,8). Больший вклад → больший градиент.</div>
+            <div class="why">Градиент по весу = (градиент по pre-activation) $\\times$ (вход этого веса). Чем сильнее активирован нейрон ($a_1 > a_2$), тем больше его вес будет скорректирован.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Передаём градиент в скрытый слой (chain rule)</h4>
+            <h4>Шаг 4. Передаём градиент к скрытым активациям</h4>
             <div class="calc">
-              $\\dfrac{\\partial L}{\\partial a^{(1)}_1} = \\dfrac{\\partial L}{\\partial z^{(2)}} \\cdot W^{(2)}_1 = (-1{,}04) \\cdot 0{,}6 = -0{,}624$<br>
-              $\\dfrac{\\partial L}{\\partial a^{(1)}_2} = (-1{,}04) \\cdot (-0{,}4) = +0{,}416$
+              $\\dfrac{\\partial L}{\\partial a_1} = \\dfrac{\\partial L}{\\partial z_{out}} \\cdot w_1^{(2)} = (-0{,}382) \\times 0{,}6 = \\mathbf{-0{,}229}$<br><br>
+              $\\dfrac{\\partial L}{\\partial a_2} = \\dfrac{\\partial L}{\\partial z_{out}} \\cdot w_2^{(2)} = (-0{,}382) \\times (-0{,}4) = \\mathbf{+0{,}153}$
             </div>
-            <div class="why">Это и есть «обратное распространение»: градиент ошибки пропорционален весам, с которыми каждый нейрон влиял на выход. Знак у второго нейрона положительный — уменьшить его активацию полезно (он тянул $\\hat{y}$ вниз из-за отрицательного $W^{(2)}_2$).</div>
+            <div class="why">Градиент по $a_2$ <b>положительный</b>: вес $w_2^{(2)}=-0{,}4$ отрицательный, поэтому увеличение $a_2$ <b>уменьшает</b> $z_{out}$, а нам нужно его увеличить. Значит, $a_2$ следует уменьшить.</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Через ReLU и к весам скрытого слоя</h4>
+            <h4>Шаг 5. Через ReLU: $\\partial L / \\partial z_j$</h4>
             <div class="calc">
-              ReLU: $z^{(1)}_1 = 1{,}0 > 0$ → $\\partial a_1 / \\partial z_1 = 1$, &nbsp; $z^{(1)}_2 = 0{,}8 > 0$ → $\\partial a_2 / \\partial z_2 = 1$<br><br>
-              $\\partial L / \\partial W^{(1)}_{11} = (-0{,}624) \\cdot x_1 = -0{,}624$, &nbsp; $\\partial L / \\partial W^{(1)}_{12} = (-0{,}624) \\cdot 2 = -1{,}248$<br>
-              $\\partial L / \\partial W^{(1)}_{21} = 0{,}416 \\cdot 1 = 0{,}416$, &nbsp; $\\partial L / \\partial W^{(1)}_{22} = 0{,}416 \\cdot 2 = 0{,}832$
+              $\\text{ReLU}'(z) = \\begin{cases} 1, & z > 0 \\\\ 0, & z \\leq 0 \\end{cases}$<br><br>
+              $z_1 = 1{,}0 > 0 \\Rightarrow \\text{ReLU}'(z_1) = 1$<br>
+              $z_2 = 0{,}8 > 0 \\Rightarrow \\text{ReLU}'(z_2) = 1$<br><br>
+              $\\dfrac{\\partial L}{\\partial z_1} = \\dfrac{\\partial L}{\\partial a_1} \\cdot 1 = \\mathbf{-0{,}229}$<br>
+              $\\dfrac{\\partial L}{\\partial z_2} = \\dfrac{\\partial L}{\\partial a_2} \\cdot 1 = \\mathbf{+0{,}153}$
             </div>
-            <div class="why">Если бы $z^{(1)}_j < 0$, ReLU «убило бы» нейрон: градиент был бы нулём и веса этого нейрона не обновились бы (проблема «dying ReLU»).</div>
+            <div class="why">Оба $z > 0$, поэтому ReLU'=1 и градиент проходит без изменений. Если бы $z_j \\leq 0$, ReLU «убило бы» нейрон: градиент = 0, веса бы не обновились (проблема dying ReLU).</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. Градиенты по всей матрице $W^{(1)}$ и $b^{(1)}$ — 6 значений</h4>
+            <div class="calc">
+              <b>Первый нейрон ($\\partial L/\\partial z_1 = -0{,}229$):</b><br>
+              $\\dfrac{\\partial L}{\\partial w_{11}} = (-0{,}229) \\times x_1 = (-0{,}229) \\times 1 = \\mathbf{-0{,}229}$<br>
+              $\\dfrac{\\partial L}{\\partial w_{12}} = (-0{,}229) \\times x_2 = (-0{,}229) \\times 2 = \\mathbf{-0{,}458}$<br>
+              $\\dfrac{\\partial L}{\\partial b_1} = (-0{,}229) \\times 1 = \\mathbf{-0{,}229}$<br><br>
+
+              <b>Второй нейрон ($\\partial L/\\partial z_2 = +0{,}153$):</b><br>
+              $\\dfrac{\\partial L}{\\partial w_{21}} = (+0{,}153) \\times x_1 = 0{,}153 \\times 1 = \\mathbf{+0{,}153}$<br>
+              $\\dfrac{\\partial L}{\\partial w_{22}} = (+0{,}153) \\times x_2 = 0{,}153 \\times 2 = \\mathbf{+0{,}306}$<br>
+              $\\dfrac{\\partial L}{\\partial b_2} = (+0{,}153) \\times 1 = \\mathbf{+0{,}153}$
+            </div>
+            <div class="why">Градиент по весу $w_{ij}$ = (градиент по pre-activation нейрона $i$) $\\times$ (вход $x_j$). Поэтому $w_{12}$ получает вдвое больший градиент, чем $w_{11}$: $x_2=2$ вносит больший вклад.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7. Обновляем ВСЕ 9 весов: $w \\gets w - \\eta \\cdot \\nabla$</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Параметр</th><th>Старое</th><th>Градиент</th><th>$-\\eta \\cdot$ grad</th><th>Новое</th></tr>
+                <tr><td>$w_1^{(2)}$</td><td>0.600</td><td>−0.382</td><td>+0.038</td><td><b>0.638</b></td></tr>
+                <tr><td>$w_2^{(2)}$</td><td>−0.400</td><td>−0.306</td><td>+0.031</td><td><b>−0.369</b></td></tr>
+                <tr><td>$b^{(2)}$</td><td>0.200</td><td>−0.382</td><td>+0.038</td><td><b>0.238</b></td></tr>
+                <tr><td>$w_{11}$</td><td>0.500</td><td>−0.229</td><td>+0.023</td><td><b>0.523</b></td></tr>
+                <tr><td>$w_{12}$</td><td>0.200</td><td>−0.458</td><td>+0.046</td><td><b>0.246</b></td></tr>
+                <tr><td>$w_{21}$</td><td>−0.300</td><td>+0.153</td><td>−0.015</td><td><b>−0.315</b></td></tr>
+                <tr><td>$w_{22}$</td><td>0.800</td><td>+0.306</td><td>−0.031</td><td><b>0.769</b></td></tr>
+                <tr><td>$b_1$</td><td>0.100</td><td>−0.229</td><td>+0.023</td><td><b>0.123</b></td></tr>
+                <tr><td>$b_2$</td><td>−0.500</td><td>+0.153</td><td>−0.015</td><td><b>−0.515</b></td></tr>
+              </table>
+            </div>
+            <div class="why">Правило: $w_{new} = w_{old} - \\eta \\cdot \\text{grad}$. Отрицательный градиент → вес увеличивается (мы хотим увеличить $\\hat{y}$). Положительный градиент → вес уменьшается.</div>
+          </div>
+
+          <div class="step" data-step="8">
+            <h4>Шаг 8. Forward pass с новыми весами: loss стал меньше!</h4>
+            <div class="calc">
+              <b>Новый скрытый слой:</b><br>
+              $z_1' = 0{,}523 \\times 1 + 0{,}246 \\times 2 + 0{,}123 = 0{,}523 + 0{,}492 + 0{,}123 = 1{,}138$<br>
+              $a_1' = \\text{ReLU}(1{,}138) = 1{,}138$<br><br>
+              $z_2' = (-0{,}315) \\times 1 + 0{,}769 \\times 2 + (-0{,}515) = -0{,}315 + 1{,}538 - 0{,}515 = 0{,}708$<br>
+              $a_2' = \\text{ReLU}(0{,}708) = 0{,}708$<br><br>
+
+              <b>Новый выход:</b><br>
+              $z_{out}' = 0{,}638 \\times 1{,}138 + (-0{,}369) \\times 0{,}708 + 0{,}238$<br>
+              $= 0{,}726 - 0{,}261 + 0{,}238 = 0{,}703$<br>
+              $\\hat{y}' = \\sigma(0{,}703) = \\dfrac{1}{1+e^{-0{,}703}} = \\dfrac{1}{1+0{,}495} = 0{,}669$<br><br>
+
+              <b>Новый loss:</b><br>
+              $L' = -\\ln(0{,}669) = 0{,}402$
+            </div>
+            <div class="calc">
+              <b>Улучшение:</b> Loss: $0{,}481 \\to 0{,}402$ (снижение на 16,4%)<br>
+              $\\hat{y}$: $0{,}618 \\to 0{,}669$ (ближе к целевому 1.0)
+            </div>
+            <div class="why">Один шаг градиентного спуска: loss снизился с 0,481 до 0,402. Предсказание сдвинулось с 0,618 к 0,669 — ближе к цели $y=1$. Продолжая итерации, сеть будет приближаться всё точнее.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>Один шаг backprop: вычислили градиенты всех 9 параметров. После обновления с $\\eta=0{,}1$ новое предсказание будет ближе к 1,0. Loss снизится с 0,2704 до ~0,24. Так работает каждый шаг обучения нейросети.</p>
+            <p>Все 9 градиентов вычислены chain rule от выхода к входу. После одного шага с $\\eta=0{,}1$: $\\hat{y}$ вырос с 0,618 до 0,669, loss снизился с 0,481 до 0,402 (−16,4%). Backprop вычисляет все градиенты за $O(n)$ — так же быстро, как forward pass.</p>
           </div>
 
           <div class="lesson-box">
-            <b>Главное в backprop:</b> цепное правило позволяет вычислить градиенты всех $n$ параметров за $O(n)$ времени — такой же, как один forward pass. Без этого обучение миллиардных моделей было бы невозможно.
+            <b>Правила backprop для повторения на бумаге:</b><br>
+            1) Начать с $\\partial L / \\partial z_{out} = \\hat{y} - y$ (для BCE+sigmoid).<br>
+            2) Градиент по весу = (grad по pre-activation) $\\times$ (вход этого веса).<br>
+            3) Градиент к предыдущему слою = (grad по pre-activation) $\\times$ (вес ребра).<br>
+            4) Через ReLU: умножить на 1 (если $z>0$) или 0 (если $z \\leq 0$).
           </div>
         `
       },
       {
-        title: 'Эффект числа нейронов',
+        title: '1 vs 4 vs 16 нейронов',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Сравнить сети с 1, 4 и 16 нейронами в скрытом слое на задаче аппроксимации функции $y = \\sin(x)$ на $[0, 2\\pi]$. Понять, почему «больше нейронов» не всегда лучше.</p>
+            <p>Как число нейронов в скрытом слое влияет на <b>границу решений</b>? Сравниваем 1, 4, 16 нейронов на XOR-подобных данных. Покажем, что каждый ReLU-нейрон = одна «линия-разрез» пространства.</p>
           </div>
 
           <div class="example-data-table">
             <table>
-              <tr><th>Архитектура</th><th>Параметров</th><th>Способность</th><th>Риск</th></tr>
-              <tr><td>1→1→1</td><td>4</td><td>Только линейная функция</td><td>Underfitting</td></tr>
-              <tr><td>1→4→1</td><td>17</td><td>Грубое приближение синуса</td><td>Приемлемо</td></tr>
-              <tr><td>1→16→1</td><td>65</td><td>Точная аппроксимация</td><td>Overfitting на малых данных</td></tr>
-              <tr><td>1→64→1</td><td>257</td><td>Идеальная подгонка</td><td>Сильный overfitting</td></tr>
+              <tr><th>Архитектура</th><th>Параметров</th><th>Число линейных сегментов</th><th>Способность</th></tr>
+              <tr><td>2→1→1</td><td>4</td><td>1 прямая</td><td>Только линейно разделимые</td></tr>
+              <tr><td>2→4→1</td><td>17</td><td>до 4 линий → выпуклые области</td><td>XOR, простые кривые</td></tr>
+              <tr><td>2→16→1</td><td>65</td><td>до 16 линий → сложные фигуры</td><td>Произвольные границы</td></tr>
             </table>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Сеть 1→1→1: один нейрон (underfitting)</h4>
-            <div class="calc">
-              Скрытый нейрон: $a = \\text{ReLU}(w_1 x + b_1)$<br>
-              Выход: $\\hat{y} = w_2 \\cdot a + b_2 = w_2 \\cdot \\text{ReLU}(w_1 x + b_1) + b_2$
+            <h4>1 нейрон: одна прямая линия</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="max-width:200px;">
+                <rect width="200" height="200" fill="#eff6ff"/>
+                <rect x="0" y="0" width="200" height="100" fill="#fee2e2" opacity="0.5"/>
+                <line x1="0" y1="100" x2="200" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+                <!-- Points: XOR pattern -->
+                <circle cx="50" cy="50" r="6" fill="#ef4444"/>
+                <circle cx="150" cy="50" r="6" fill="#3b82f6"/>
+                <circle cx="50" cy="150" r="6" fill="#3b82f6"/>
+                <circle cx="150" cy="150" r="6" fill="#ef4444"/>
+                <text x="100" y="195" text-anchor="middle" font-size="10" fill="#64748b">1 нейрон: 1 прямая</text>
+              </svg>
             </div>
-            <div class="why">Один ReLU-нейрон представляет только одну «сломанную прямую» с одним изломом. Синус — волновая функция — принципиально не выражается так. Тренировочный MSE: ~0,2–0,5 — плохо.</div>
+            <div class="calc">
+              $\\hat{y} = \\sigma(w_1 \\cdot \\text{ReLU}(v_1 x_1 + v_2 x_2 + c) + b)$<br>
+              Один ReLU = одна «складка» пространства = одна прямая граница.<br>
+              XOR невозможно разделить одной прямой → <b>ошибка ~50%</b> (случайное угадывание).
+            </div>
+            <div class="why">Один нейрон = один линейный разрез. Для задачи, где классы «переплетены» (как XOR), этого категорически недостаточно.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Сеть 1→4→1: четыре нейрона (адекватно)</h4>
-            <div class="calc">
-              $\\hat{y} = \\sum_{j=1}^{4} v_j \\cdot \\text{ReLU}(w_j x + b_j) + b$ — кусочно-линейная функция с 4 изломами
+            <h4>4 нейрона: можно решить XOR!</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="max-width:200px;">
+                <rect width="200" height="200" fill="#eff6ff"/>
+                <!-- Two triangular red regions -->
+                <polygon points="0,0 100,0 0,100" fill="#fee2e2" opacity="0.5"/>
+                <polygon points="200,200 100,200 200,100" fill="#fee2e2" opacity="0.5"/>
+                <line x1="0" y1="100" x2="100" y2="0" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+                <line x1="100" y1="200" x2="200" y2="100" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+                <!-- XOR points -->
+                <circle cx="50" cy="50" r="6" fill="#ef4444"/>
+                <circle cx="150" cy="50" r="6" fill="#3b82f6"/>
+                <circle cx="50" cy="150" r="6" fill="#3b82f6"/>
+                <circle cx="150" cy="150" r="6" fill="#ef4444"/>
+                <text x="100" y="195" text-anchor="middle" font-size="10" fill="#64748b">4 нейрона: 2+ прямых</text>
+              </svg>
             </div>
             <div class="calc">
-              Каждый нейрон «отвечает» за свой участок: один активен на $[0, \\pi/2]$, второй на $[\\pi/2, \\pi]$, третий на $[\\pi, 3\\pi/2]$, четвёртый на $[3\\pi/2, 2\\pi]$. Вместе — грубое приближение синуса.
+              Каждый из 4 нейронов задаёт свою прямую: $v_j^T x + c_j = 0$.<br>
+              ReLU «включает» нейрон с одной стороны, «выключает» с другой.<br>
+              4 прямых могут огородить замкнутые области (выпуклые многоугольники).<br>
+              XOR = 2 треугольных области → решается 4 нейронами!<br>
+              <b>Ошибка: ~0%</b> на этих данных.
             </div>
-            <div class="why">Теоретически: $n$ ReLU-нейронов дают кусочно-линейную функцию с $n$ изломами. Для синуса на одном периоде — 4 сегмента для грубого приближения, 8–16 — для хорошего.</div>
+            <div class="why">4 нейрона = 4 «разреза», которые могут формировать пересечения и создавать нелинейные (кусочно-линейные) границы. Этого достаточно для XOR.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Сеть 1→16→1: 16 нейронов (хорошо, но опасно)</h4>
-            <div class="calc">
-              16 кусочно-линейных сегментов → точная аппроксимация $\\sin(x)$<br>
-              На 10 тренировочных точках: MSE ≈ 0,001 (хорошо)<br>
-              На тестовых точках (между обучающими): MSE ≈ 0,01 (неплохо)
+            <h4>16 нейронов: произвольно сложные границы</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="max-width:200px;">
+                <rect width="200" height="200" fill="#eff6ff"/>
+                <!-- Complex curved-like boundary via many segments -->
+                <path d="M0,100 Q30,60 60,80 Q80,95 100,70 Q120,45 140,65 Q160,85 180,55 Q190,40 200,50" fill="none" stroke="#ef4444" stroke-width="2"/>
+                <path d="M0,100 Q30,60 60,80 Q80,95 100,70 Q120,45 140,65 Q160,85 180,55 Q190,40 200,50 L200,0 L0,0 Z" fill="#fee2e2" opacity="0.4"/>
+                <!-- Many scattered points -->
+                <circle cx="30" cy="40" r="4" fill="#ef4444"/>
+                <circle cx="70" cy="30" r="4" fill="#ef4444"/>
+                <circle cx="110" cy="45" r="4" fill="#ef4444"/>
+                <circle cx="160" cy="35" r="4" fill="#ef4444"/>
+                <circle cx="40" cy="130" r="4" fill="#3b82f6"/>
+                <circle cx="90" cy="140" r="4" fill="#3b82f6"/>
+                <circle cx="130" cy="120" r="4" fill="#3b82f6"/>
+                <circle cx="170" cy="150" r="4" fill="#3b82f6"/>
+                <text x="100" y="195" text-anchor="middle" font-size="10" fill="#64748b">16 нейронов: ~кривая</text>
+              </svg>
             </div>
-            <div class="why">При малом числе данных 16 нейронов могут «выучить» случайный шум, а не саму функцию. Это overfitting: на train отлично, на test — плохо.</div>
+            <div class="calc">
+              16 нейронов = 16 линейных разрезов пространства.<br>
+              Кусочно-линейная граница с 16 сегментами выглядит почти как кривая.<br>
+              Теорема (Universal Approximation): с достаточным числом нейронов один скрытый слой может аппроксимировать любую непрерывную функцию.<br><br>
+              <b>Но:</b> 65 параметров при 20 точках данных → risk overfitting!<br>
+              Train accuracy: 100%. Test accuracy: может быть 80-90%.
+            </div>
+            <div class="why">Больше нейронов = более гибкая граница. Но гибкость без данных = переобучение. Правило: следите за val loss, используйте dropout и early stopping.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Правило выбора размера сети</h4>
-            <div class="calc">
-              Эмпирическое правило: число параметров ≈ 10–30× числа обучающих примеров<br>
-              10 примеров → 100–300 параметров → сеть 1→20→1 (~40 пар.) или 1→50→1 (~100 пар.)<br>
-              1000 примеров → можно 1→100→50→1 (~10 250 пар.)
+            <h4>Сводная таблица: bias-variance tradeoff</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Нейронов</th><th>Train Acc</th><th>Test Acc</th><th>Bias</th><th>Variance</th><th>Диагноз</th></tr>
+                <tr><td>1</td><td>50%</td><td>50%</td><td>Высокий</td><td>Низкий</td><td>Underfitting</td></tr>
+                <tr><td>4</td><td>98%</td><td>95%</td><td>Низкий</td><td>Низкий</td><td>Оптимум</td></tr>
+                <tr><td>16</td><td>100%</td><td>88%</td><td>Нулевой</td><td>Высокий</td><td>Overfitting</td></tr>
+              </table>
             </div>
-            <div class="why">Это не строгое правило, а ориентир. Современный подход: большая сеть + регуляризация (dropout, weight decay). «Bigger is better» работает при достаточном объёме данных.</div>
-          </div>
-
-          <div class="step" data-step="5">
-            <h4>Bias-Variance tradeoff</h4>
-            <div class="calc">
-              Маленькая сеть (1 нейрон): высокий bias (не может выучить), низкий variance<br>
-              Большая сеть (64 нейрона): низкий bias (выучит что угодно), высокий variance (чувствительна к данным)<br>
-              Оптимум: ранняя остановка, dropout, L2-регуляризация
-            </div>
-            <div class="why">Парадокс современного DL: очень большие модели (млрд параметров) при правильной регуляризации не переобучаются на достаточном объёме данных. Это «double descent» — активная область исследований.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>1 нейрон → underfitting (не выражает синус). 4 нейрона → приемлемо. 16 нейронов → хорошая аппроксимация при достаточном числе данных. Слишком много нейронов при малом объёме данных → overfitting. Правило: валидируй на отложенной выборке и выбирай размер по val loss.</p>
+            <p>1 нейрон = 1 прямая, не решает XOR. 4 нейрона = выпуклые области, решает XOR. 16 нейронов = сложные границы, но риск переобучения. Каждый ReLU-нейрон добавляет одну «складку» в пространстве признаков. Выбирайте по val loss, не по train accuracy.</p>
           </div>
 
           <div class="lesson-box">
-            <b>Практический совет:</b> начинай с небольшой сети, постепенно увеличивай. Следи за val loss: если он начинает расти при падении train loss — ты перешёл за оптимум. Используй early stopping или dropout.
+            <b>Практическое правило:</b> начните с 2-4 нейронов, увеличивайте вдвое, пока val loss падает. Как только val loss стал расти — вы нашли оптимум. Или: берите большую сеть + dropout 0.2-0.5.
           </div>
         `
       },

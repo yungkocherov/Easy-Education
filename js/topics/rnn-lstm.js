@@ -221,271 +221,456 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'RNN forward на 3 шагах',
+        title: 'LSTM предсказывает температуру',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Прогнать последовательность $x = (1,\; 0,\; -1)$ через простую RNN с размером hidden state $h = 1$ (скалярный). Веса: $W_{xh} = 0{,}5$, $W_{hh} = 0{,}8$, $b_h = 0{,}1$. Начальное состояние $h_0 = 0$. Вычислить $h_1, h_2, h_3$.</p>
-          </div>
-
-          <div class="illustration bordered">
-            <svg viewBox="0 0 460 155" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <defs>
-                <marker id="rnn-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <polygon points="0 0,6 3,0 6" fill="#64748b"/>
-                </marker>
-                <marker id="rnn-arr-b" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <polygon points="0 0,6 3,0 6" fill="#3b82f6"/>
-                </marker>
-              </defs>
-              <!-- h0 box -->
-              <rect x="10" y="55" width="60" height="44" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
-              <text x="40" y="74" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">h₀</text>
-              <text x="40" y="88" text-anchor="middle" font-size="10" fill="#64748b">= 0</text>
-              <!-- Arrow h0 → RNN1 -->
-              <line x1="70" y1="77" x2="100" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
-              <!-- x1 input arrow -->
-              <line x1="130" y1="10" x2="130" y2="52" stroke="#f59e0b" stroke-width="2" marker-end="url(#rnn-arr)"/>
-              <text x="130" y="8" text-anchor="middle" font-size="10" fill="#f59e0b" font-weight="600">x₁=1</text>
-              <!-- RNN step 1 box -->
-              <rect x="100" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-              <text x="130" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
-              <text x="130" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₁=0.54</text>
-              <!-- Arrow RNN1 → RNN2 -->
-              <line x1="160" y1="77" x2="190" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
-              <!-- x2 input arrow -->
-              <line x1="220" y1="10" x2="220" y2="52" stroke="#f59e0b" stroke-width="2" marker-end="url(#rnn-arr)"/>
-              <text x="220" y="8" text-anchor="middle" font-size="10" fill="#f59e0b" font-weight="600">x₂=0</text>
-              <!-- RNN step 2 box -->
-              <rect x="190" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-              <text x="220" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
-              <text x="220" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₂=0.49</text>
-              <!-- Arrow RNN2 → RNN3 -->
-              <line x1="250" y1="77" x2="280" y2="77" stroke="#3b82f6" stroke-width="2" marker-end="url(#rnn-arr-b)"/>
-              <!-- x3 input arrow -->
-              <line x1="310" y1="10" x2="310" y2="52" stroke="#ef4444" stroke-width="2" marker-end="url(#rnn-arr)"/>
-              <text x="310" y="8" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="600">x₃=−1</text>
-              <!-- RNN step 3 box -->
-              <rect x="280" y="55" width="60" height="44" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-              <text x="310" y="72" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">RNN</text>
-              <text x="310" y="86" text-anchor="middle" font-size="10" fill="#1e40af">h₃=−0.01</text>
-              <!-- Arrow to output -->
-              <line x1="340" y1="77" x2="380" y2="77" stroke="#64748b" stroke-width="1.8" marker-end="url(#rnn-arr)"/>
-              <text x="400" y="74" text-anchor="middle" font-size="10" fill="#64748b">выход</text>
-              <!-- Recurrent connection labels -->
-              <text x="85" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
-              <text x="175" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
-              <text x="265" y="70" text-anchor="middle" font-size="8" fill="#3b82f6">W_hh</text>
-              <!-- Time axis -->
-              <line x1="10" y1="118" x2="370" y2="118" stroke="#64748b" stroke-width="1" marker-end="url(#rnn-arr)"/>
-              <text x="190" y="132" text-anchor="middle" font-size="9" fill="#64748b">время →</text>
-              <text x="40" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=0</text>
-              <text x="130" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=1</text>
-              <text x="220" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=2</text>
-              <text x="310" y="112" text-anchor="middle" font-size="8" fill="#64748b">t=3</text>
-              <!-- Weights legend -->
-              <text x="390" y="120" font-size="8" fill="#64748b">W_xh=0.5</text>
-              <text x="390" y="132" font-size="8" fill="#3b82f6">W_hh=0.8</text>
-              <text x="390" y="144" font-size="8" fill="#64748b">b=0.1</text>
-            </svg>
-            <div class="caption">RNN forward на 3 шагах: каждый блок получает вход xₜ и скрытое состояние hₜ₋₁, выдаёт hₜ=tanh(). h₁=0.54 → h₂=0.49 (память затухает) → h₃=−0.01 (отрицательный вход побеждает).</div>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th>Шаг $t$</th><th>Вход $x_t$</th><th>Предыдущее $h_{t-1}$</th><th>$z_t = W_{xh}x_t + W_{hh}h_{t-1} + b$</th><th>$h_t = \\tanh(z_t)$</th></tr>
-              <tr><td>1</td><td>1</td><td>0</td><td>$0{,}5\\cdot1 + 0{,}8\\cdot0 + 0{,}1 = 0{,}6$</td><td>$\\tanh(0{,}6) = 0{,}537$</td></tr>
-              <tr><td>2</td><td>0</td><td>0,537</td><td>$0{,}5\\cdot0 + 0{,}8\\cdot0{,}537 + 0{,}1 = 0{,}530$</td><td>$\\tanh(0{,}530) = 0{,}485$</td></tr>
-              <tr><td>3</td><td>−1</td><td>0,485</td><td>$0{,}5\\cdot(-1) + 0{,}8\\cdot0{,}485 + 0{,}1 = -0{,}012$</td><td>$\\tanh(-0{,}012) = -0{,}012$</td></tr>
-            </table>
+            <p>Пройти полный forward pass LSTM на 3 временных шагах для предсказания температуры. Данные: 5 дневных температур [18, 22, 25, 23, 20]. Сеть: input_size=1, hidden_size=2, output_size=1. Показать ВСЕ вычисления в каждом гейте.</p>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Шаг 1: входной сигнал $x_1 = 1$</h4>
-            <div class="calc">$z_1 = W_{xh} \\cdot x_1 + W_{hh} \\cdot h_0 + b_h = 0{,}5 \\cdot 1 + 0{,}8 \\cdot 0 + 0{,}1 = 0{,}6$</div>
-            <div class="calc">$h_1 = \\tanh(0{,}6) \\approx 0{,}537$</div>
-            <div class="why">В начале $h_0 = 0$ — нет прошлой памяти. На первом шаге hidden state определяется только текущим входом. $\\tanh$ сжимает вывод в $(-1, 1)$ — это и есть «представление прошлого».</div>
+            <h4>Шаг 1: данные и оконный подход</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>День</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+                <tr><td>Температура (°C)</td><td>18</td><td>22</td><td>25</td><td>23</td><td>20</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Оконный подход: вход = [t, t+1, t+2] → предсказание = t+3<br><br>
+              Окно 1: вход [18, 22, 25] → цель: 23<br>
+              Окно 2: вход [22, 25, 23] → цель: 20<br><br>
+              Нормализация (min=18, max=25): x_norm = (x - 18) / (25 - 18) = (x - 18) / 7<br>
+              18 → 0.00, 22 → 0.571, 25 → 1.00, 23 → 0.714, 20 → 0.286
+            </div>
+            <div class="why">LSTM обрабатывает последовательность по одному элементу. Оконный подход превращает временной ряд в пары (вход, цель). Нормализация в [0, 1] критична — без неё sigmoid/tanh будут насыщаться.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Шаг 2: нулевой вход $x_2 = 0$, но есть память $h_1$</h4>
-            <div class="calc">$z_2 = 0{,}5 \\cdot 0 + 0{,}8 \\cdot 0{,}537 + 0{,}1 = 0 + 0{,}430 + 0{,}1 = 0{,}530$</div>
-            <div class="calc">$h_2 = \\tanh(0{,}530) \\approx 0{,}485$</div>
-            <div class="why">Вход нулевой, но $h_2 \\approx 0{,}485$ — всё ещё положительный! Это «эхо» от $x_1=1$: через рекуррентную связь $W_{hh} = 0{,}8$ память сохраняется. Коэффициент 0,8 — «сила памяти».</div>
+            <h4>Шаг 2: инициализация весов LSTM</h4>
+            <p>LSTM с hidden_size=2, input_size=1. Каждый гейт имеет: $W$ (для $[h_{t-1}, x_t]$) размером $2 \\times 3$ и bias $b$ размером $2 \\times 1$.</p>
+            <div class="calc">
+              Объединённый вход: $[h_{t-1}, x_t]$ — вектор размера 3 (2 от h + 1 от x)<br><br>
+
+              <b>Forget gate:</b><br>
+              $W_f = \\begin{pmatrix} 0.5 & 0.3 & 0.1 \\\\ 0.2 & 0.4 & -0.1 \\end{pmatrix}$, $b_f = \\begin{pmatrix} 0.5 \\\\ 0.5 \\end{pmatrix}$<br><br>
+
+              <b>Input gate:</b><br>
+              $W_i = \\begin{pmatrix} 0.3 & -0.2 & 0.6 \\\\ 0.1 & 0.5 & 0.3 \\end{pmatrix}$, $b_i = \\begin{pmatrix} 0.0 \\\\ 0.0 \\end{pmatrix}$<br><br>
+
+              <b>Candidate cell:</b><br>
+              $W_c = \\begin{pmatrix} 0.4 & 0.1 & 0.8 \\\\ -0.3 & 0.6 & 0.2 \\end{pmatrix}$, $b_c = \\begin{pmatrix} 0.0 \\\\ 0.0 \\end{pmatrix}$<br><br>
+
+              <b>Output gate:</b><br>
+              $W_o = \\begin{pmatrix} 0.2 & 0.5 & -0.1 \\\\ 0.4 & -0.3 & 0.7 \\end{pmatrix}$, $b_o = \\begin{pmatrix} 0.0 \\\\ 0.0 \\end{pmatrix}$<br><br>
+
+              <b>Выходной слой:</b><br>
+              $W_{out} = \\begin{pmatrix} 0.6 & 0.4 \\end{pmatrix}$, $b_{out} = 0.1$<br><br>
+
+              Начальные состояния: $h_0 = (0, 0)^T$, $c_0 = (0, 0)^T$
+            </div>
+            <div class="why">Bias в forget gate часто инициализируют единицами (здесь 0.5) — это рекомендация из статьи Jozefowicz et al. (2015). Если $b_f$ = 0, начальный forget gate $\\approx$ 0.5, и сеть сразу забывает половину информации. С $b_f$ = 1 начальный $f \\approx$ 0.73 — память лучше сохраняется.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Шаг 3: отрицательный вход $x_3 = -1$ борется с памятью</h4>
-            <div class="calc">$z_3 = 0{,}5 \\cdot (-1) + 0{,}8 \\cdot 0{,}485 + 0{,}1 = -0{,}5 + 0{,}388 + 0{,}1 = -0{,}012$</div>
-            <div class="calc">$h_3 = \\tanh(-0{,}012) \\approx -0{,}012$</div>
-            <div class="why">Отрицательный вход $(-0{,}5)$ почти скомпенсировал положительную память $(+0{,}388)$ и bias $(+0{,}1)$. Итог близок к нулю: «сигнал от прошлого почти вытеснен». RNN учится балансировать прошлое и настоящее.</div>
+            <h4>Шаг 3: обработка $x_1 = 18$ (нормализ. 0.00)</h4>
+            <p>Объединённый вход: $[h_0, x_1] = [0, 0, 0]^T$</p>
+
+            <p><b>3a. Forget gate:</b></p>
+            <div class="calc">
+              $W_f \\cdot [0, 0, 0]^T + b_f = [0, 0]^T + [0.5, 0.5]^T = [0.5, 0.5]^T$<br>
+              $f_1 = \\sigma([0.5, 0.5]^T) = [0.622, 0.622]^T$<br>
+              (напомним: $\\sigma(0.5) = 1/(1+e^{-0.5}) = 1/1.607 = 0.622$)
+            </div>
+            <div class="why">Forget gate решает, сколько старой информации сохранить. При нулевом входе и нулевом скрытом состоянии результат определяется только bias. $f = 0.622$ — сохраняем ~62% прошлой памяти (но $c_0 = 0$, так что забывать нечего).</div>
+
+            <p><b>3b. Input gate:</b></p>
+            <div class="calc">
+              $W_i \\cdot [0, 0, 0]^T + b_i = [0, 0]^T$<br>
+              $i_1 = \\sigma([0, 0]^T) = [0.500, 0.500]^T$
+            </div>
+
+            <p><b>3c. Candidate cell state:</b></p>
+            <div class="calc">
+              $W_c \\cdot [0, 0, 0]^T + b_c = [0, 0]^T$<br>
+              $\\tilde{c}_1 = \\tanh([0, 0]^T) = [0, 0]^T$
+            </div>
+
+            <p><b>3d. Cell state update:</b></p>
+            <div class="calc">
+              $c_1 = f_1 \\odot c_0 + i_1 \\odot \\tilde{c}_1$<br>
+              $= [0.622, 0.622] \\odot [0, 0] + [0.500, 0.500] \\odot [0, 0]$<br>
+              $= [0, 0] + [0, 0] = [0, 0]^T$
+            </div>
+
+            <p><b>3e. Output gate и hidden state:</b></p>
+            <div class="calc">
+              $W_o \\cdot [0, 0, 0]^T + b_o = [0, 0]^T$<br>
+              $o_1 = \\sigma([0, 0]^T) = [0.500, 0.500]^T$<br><br>
+              $h_1 = o_1 \\odot \\tanh(c_1) = [0.500, 0.500] \\odot \\tanh([0, 0]) = [0.500, 0.500] \\odot [0, 0] = [0, 0]^T$
+            </div>
+            <div class="why">Первый шаг с $x=0.00$ и нулевыми начальными состояниями даёт нулевой выход. Вся информация — в bias-ах, а кандидат $\\tilde{c}$ = 0. Нормализованная температура 18°C = 0.00, поэтому сеть по сути «пропускает» этот шаг. С нормализованными входами > 0 эффект будет заметным.</div>
+
+            <div class="illustration bordered">
+              <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+                <text x="250" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">LSTM ячейка: шаг 1 (x=0.00)</text>
+                <!-- Cell body -->
+                <rect x="120" y="40" width="260" height="130" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+                <!-- Forget gate -->
+                <rect x="140" y="55" width="70" height="28" rx="5" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="175" y="73" text-anchor="middle" font-size="9" fill="#92400e" font-weight="600">f=[.62,.62]</text>
+                <!-- Input gate -->
+                <rect x="140" y="90" width="70" height="28" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+                <text x="175" y="108" text-anchor="middle" font-size="9" fill="#166534" font-weight="600">i=[.50,.50]</text>
+                <!-- Candidate -->
+                <rect x="220" y="90" width="70" height="28" rx="5" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+                <text x="255" y="108" text-anchor="middle" font-size="9" fill="#5b21b6" font-weight="600">c~=[0,0]</text>
+                <!-- Cell state -->
+                <rect x="300" y="55" width="65" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                <text x="332" y="73" text-anchor="middle" font-size="9" fill="#1e40af" font-weight="700">c=[0,0]</text>
+                <!-- Output gate -->
+                <rect x="220" y="130" width="70" height="28" rx="5" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="255" y="148" text-anchor="middle" font-size="9" fill="#991b1b" font-weight="600">o=[.50,.50]</text>
+                <!-- Hidden state output -->
+                <rect x="310" y="130" width="55" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                <text x="337" y="148" text-anchor="middle" font-size="9" fill="#1e40af" font-weight="700">h=[0,0]</text>
+                <!-- Input label -->
+                <text x="80" y="108" text-anchor="middle" font-size="10" fill="#64748b">x₁=0.00</text>
+                <text x="80" y="70" text-anchor="middle" font-size="10" fill="#64748b">h₀=[0,0]</text>
+                <!-- Arrows -->
+                <line x1="110" y1="105" x2="138" y2="105" stroke="#64748b" stroke-width="1.5"/>
+                <line x1="110" y1="68" x2="138" y2="68" stroke="#64748b" stroke-width="1.5"/>
+              </svg>
+            </div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Как затухает память: математика</h4>
+            <h4>Шаг 4: обработка $x_2 = 22$ (нормализ. 0.571)</h4>
+            <p>Объединённый вход: $[h_1, x_2] = [0, 0, 0.571]^T$</p>
+
+            <p><b>4a. Forget gate:</b></p>
             <div class="calc">
-              Если $x_t = 0$ для всех $t > 1$, то $h_t = \\tanh(W_{hh} \\cdot h_{t-1})$<br>
-              При малых значениях $\\tanh(z) \\approx z$, поэтому $h_t \\approx W_{hh}^{t-1} \\cdot h_1 = 0{,}8^{t-1} \\cdot 0{,}537$<br>
-              $t=1$: 0,537; $t=5$: $0{,}8^4 \\cdot 0{,}537 \\approx 0{,}22$; $t=10$: $0{,}8^9 \\cdot 0{,}537 \\approx 0{,}07$; $t=20$: $0{,}8^{19} \\approx 0{,}008$
+              $W_f \\cdot [0, 0, 0.571]^T + b_f$<br>
+              $= [0.5 \\cdot 0 + 0.3 \\cdot 0 + 0.1 \\cdot 0.571 + 0.5,\\; 0.2 \\cdot 0 + 0.4 \\cdot 0 + (-0.1) \\cdot 0.571 + 0.5]^T$<br>
+              $= [0.057 + 0.5,\\; -0.057 + 0.5]^T = [0.557, 0.443]^T$<br>
+              $f_2 = \\sigma([0.557, 0.443]^T) = [0.636, 0.609]^T$
             </div>
-            <div class="why">Через 20 шагов от $h_1$ осталось менее 1,5%! Это экспоненциальное затухание памяти в vanilla RNN. Для длинных зависимостей нужен LSTM.</div>
+
+            <p><b>4b. Input gate:</b></p>
+            <div class="calc">
+              $W_i \\cdot [0, 0, 0.571]^T + b_i$<br>
+              $= [0.3 \\cdot 0 + (-0.2) \\cdot 0 + 0.6 \\cdot 0.571,\\; 0.1 \\cdot 0 + 0.5 \\cdot 0 + 0.3 \\cdot 0.571]^T$<br>
+              $= [0.343, 0.171]^T$<br>
+              $i_2 = \\sigma([0.343, 0.171]^T) = [0.585, 0.543]^T$
+            </div>
+
+            <p><b>4c. Candidate cell state:</b></p>
+            <div class="calc">
+              $W_c \\cdot [0, 0, 0.571]^T + b_c = [0.4 \\cdot 0 + 0.1 \\cdot 0 + 0.8 \\cdot 0.571,\\; -0.3 \\cdot 0 + 0.6 \\cdot 0 + 0.2 \\cdot 0.571]^T$<br>
+              $= [0.457, 0.114]^T$<br>
+              $\\tilde{c}_2 = \\tanh([0.457, 0.114]^T) = [0.428, 0.114]^T$
+            </div>
+
+            <p><b>4d. Cell state update:</b></p>
+            <div class="calc">
+              $c_2 = f_2 \\odot c_1 + i_2 \\odot \\tilde{c}_2$<br>
+              $= [0.636, 0.609] \\odot [0, 0] + [0.585, 0.543] \\odot [0.428, 0.114]$<br>
+              $= [0, 0] + [0.250, 0.062]$<br>
+              $= [0.250, 0.062]^T$
+            </div>
+
+            <p><b>4e. Output gate и hidden state:</b></p>
+            <div class="calc">
+              $W_o \\cdot [0, 0, 0.571]^T + b_o = [0.2 \\cdot 0 + 0.5 \\cdot 0 + (-0.1) \\cdot 0.571,\\; 0.4 \\cdot 0 + (-0.3) \\cdot 0 + 0.7 \\cdot 0.571]^T$<br>
+              $= [-0.057, 0.400]^T$<br>
+              $o_2 = \\sigma([-0.057, 0.400]^T) = [0.486, 0.599]^T$<br><br>
+              $h_2 = o_2 \\odot \\tanh(c_2) = [0.486, 0.599] \\odot \\tanh([0.250, 0.062])$<br>
+              $= [0.486, 0.599] \\odot [0.245, 0.062] = [0.119, 0.037]^T$
+            </div>
+            <div class="why">Теперь $c_2 = [0.250, 0.062]$ — ячейка «запомнила» информацию о температуре 22°C. $h_2 = [0.119, 0.037]$ — hidden state, который передаётся на следующий шаг и используется для предсказания. Первый компонент ($c_2[0] = 0.250$) запомнил больше благодаря большему весу $W_c[0,2] = 0.8$.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5: обработка $x_3 = 25$ (нормализ. 1.00) — ключевые значения</h4>
+            <p>Объединённый вход: $[h_2, x_3] = [0.119, 0.037, 1.00]^T$</p>
+            <div class="calc">
+              <b>Forget gate:</b> $W_f \\cdot [0.119, 0.037, 1.00]^T + b_f$<br>
+              $= [0.5 \\cdot 0.119 + 0.3 \\cdot 0.037 + 0.1 \\cdot 1.00 + 0.5,\\; 0.2 \\cdot 0.119 + 0.4 \\cdot 0.037 + (-0.1) \\cdot 1.00 + 0.5]^T$<br>
+              $= [0.060 + 0.011 + 0.100 + 0.500,\\; 0.024 + 0.015 - 0.100 + 0.500]^T$<br>
+              $= [0.671, 0.439]^T$<br>
+              $f_3 = \\sigma([0.671, 0.439]) = [0.662, 0.608]^T$<br><br>
+
+              <b>Input gate:</b> $i_3 = \\sigma(W_i \\cdot [0.119, 0.037, 1.00]^T + b_i)$<br>
+              $= \\sigma([0.3 \\cdot 0.119 + (-0.2) \\cdot 0.037 + 0.6 \\cdot 1.00,\\; 0.1 \\cdot 0.119 + 0.5 \\cdot 0.037 + 0.3 \\cdot 1.00])$<br>
+              $= \\sigma([0.036 - 0.007 + 0.600,\\; 0.012 + 0.019 + 0.300])$<br>
+              $= \\sigma([0.629, 0.331]) = [0.652, 0.582]^T$<br><br>
+
+              <b>Candidate:</b> $\\tilde{c}_3 = \\tanh(W_c \\cdot [0.119, 0.037, 1.00]^T + b_c)$<br>
+              $= \\tanh([0.4 \\cdot 0.119 + 0.1 \\cdot 0.037 + 0.8 \\cdot 1.00,\\; -0.3 \\cdot 0.119 + 0.6 \\cdot 0.037 + 0.2 \\cdot 1.00])$<br>
+              $= \\tanh([0.048 + 0.004 + 0.800,\\; -0.036 + 0.022 + 0.200])$<br>
+              $= \\tanh([0.852, 0.186]) = [0.693, 0.184]^T$<br><br>
+
+              <b>Cell state:</b> $c_3 = f_3 \\odot c_2 + i_3 \\odot \\tilde{c}_3$<br>
+              $= [0.662, 0.608] \\odot [0.250, 0.062] + [0.652, 0.582] \\odot [0.693, 0.184]$<br>
+              $= [0.166, 0.038] + [0.452, 0.107] = [0.617, 0.145]^T$<br><br>
+
+              <b>Output gate и h:</b><br>
+              $o_3 = \\sigma(W_o \\cdot [0.119, 0.037, 1.00]^T + b_o)$<br>
+              $= \\sigma([0.2 \\cdot 0.119 + 0.5 \\cdot 0.037 + (-0.1) \\cdot 1.00,\\; 0.4 \\cdot 0.119 + (-0.3) \\cdot 0.037 + 0.7 \\cdot 1.00])$<br>
+              $= \\sigma([0.024 + 0.019 - 0.100,\\; 0.048 - 0.011 + 0.700])$<br>
+              $= \\sigma([-0.058, 0.737]) = [0.486, 0.676]^T$<br><br>
+
+              $h_3 = o_3 \\odot \\tanh(c_3) = [0.486, 0.676] \\odot \\tanh([0.617, 0.145])$<br>
+              $= [0.486, 0.676] \\odot [0.549, 0.144] = [0.267, 0.097]^T$
+            </div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6: финальное предсказание</h4>
+            <div class="calc">
+              $\\hat{y}_{norm} = W_{out} \\cdot h_3 + b_{out}$<br>
+              $= [0.6, 0.4] \\cdot [0.267, 0.097]^T + 0.1$<br>
+              $= 0.6 \\cdot 0.267 + 0.4 \\cdot 0.097 + 0.1$<br>
+              $= 0.160 + 0.039 + 0.1 = 0.299$<br><br>
+
+              Денормализация: $\\hat{y} = 0.299 \\cdot 7 + 18 = 2.093 + 18 = <b>20.09°C</b>$<br><br>
+
+              Истинное значение: $y = 23°C$<br>
+              Ошибка: $|23 - 20.09| = 2.91°C$
+            </div>
+            <div class="why">Предсказание 20.09°C при цели 23°C — ошибка 2.91°C. Это с случайными весами без обучения! После gradient descent по MSE loss веса подстроятся, и LSTM научится улавливать паттерн «рост → пик → спад». Ошибка уменьшится в десятки раз.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7: вычисление loss</h4>
+            <div class="calc">
+              MSE loss = $(\\hat{y}_{norm} - y_{norm})^2 = (0.299 - 0.714)^2 = (-0.415)^2 = <b>0.172</b>$<br><br>
+              Это значение будет использовано для backpropagation through time (BPTT),<br>
+              чтобы обновить все 42 параметра: $W_f, W_i, W_c, W_o$ (по 8), $b_f, b_i, b_c, b_o$ (по 2), $W_{out}$ (2), $b_{out}$ (1).
+            </div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>$h_1 = 0{,}537$, $h_2 = 0{,}485$, $h_3 = -0{,}012$. Hidden state аккумулирует информацию о прошлых входах через рекуррентный вес $W_{hh}=0{,}8$. Память затухает как $0{,}8^t$ — экспоненциально быстро для далёких событий.</p>
-          </div>
-
-          <div class="lesson-box">
-            <b>Физический смысл $W_{hh}$:</b> если $|W_{hh}| < 1$ — память затухает (vanishing gradient). Если $|W_{hh}| > 1$ — память растёт (exploding gradient). Идеально $|W_{hh}| = 1$, но тогда нет избирательной памяти. LSTM решает это через гейты.
+            <p>LSTM обработал 3 температуры [18°, 22°, 25°], накопил информацию в cell state $c_3 = [0.617, 0.145]$ и hidden state $h_3 = [0.267, 0.097]$. Предсказание: 20.09°C (цель: 23°C, loss = 0.172). Cell state хранит долгосрочную память о тренде, hidden state — текущее «мнение» сети.</p>
           </div>
         `
       },
       {
-        title: 'Vanishing gradient числами',
+        title: 'Vanishing gradient на числах',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать, как градиент затухает при обратном распространении через 10 шагов RNN. Веса $W_{hh} = 0{,}8$, функция активации $\\tanh$ (производная: $\\tanh'(z) = 1 - \\tanh^2(z) \\leq 1$). Начальный градиент с конца: $\\delta_T = 1$.</p>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th>Шаг назад</th><th>Градиент $\\delta_t$</th><th>Остаток от начального</th></tr>
-              <tr><td>$T$ (конец)</td><td>$1{,}000$</td><td>100%</td></tr>
-              <tr><td>$T-1$</td><td>$\\approx 0{,}640$</td><td>64%</td></tr>
-              <tr><td>$T-2$</td><td>$\\approx 0{,}410$</td><td>41%</td></tr>
-              <tr><td>$T-5$</td><td>$\\approx 0{,}107$</td><td>11%</td></tr>
-              <tr><td>$T-10$</td><td>$\\approx 0{,}011$</td><td>1,1%</td></tr>
-              <tr><td>$T-20$</td><td>$\\approx 0{,}0001$</td><td>0,01%</td></tr>
-            </table>
+            <p>Показать, как градиент затухает при обратном распространении через 5 шагов vanilla RNN. Проследить числа на каждом шаге. Сравнить с LSTM, где forget gate ≈ 1.</p>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Формула backpropagation through time</h4>
-            <p>При BPTT градиент на шаге $t$ связан с шагом $t+1$ через:</p>
-            <div class="math-block">$$\\delta_t = \\delta_{t+1} \\cdot W_{hh} \\cdot (1 - h_t^2)$$</div>
-            <div class="why">Каждый шаг назад умножает градиент на $W_{hh}$ и на $\\tanh'(z_t) = (1-h_t^2)$. Оба множителя меньше 1 (при типичных активациях). Произведение стремительно уменьшается.</div>
+            <h4>Шаг 1: формула обратного прохода RNN</h4>
+            <div class="calc">
+              Forward: $h_t = \\tanh(W_{hh} \\cdot h_{t-1} + W_{xh} \\cdot x_t + b)$<br><br>
+              Градиент loss по $h_t$ через один шаг назад:<br>
+              $\\frac{\\partial h_t}{\\partial h_{t-1}} = W_{hh} \\cdot \\text{diag}(1 - h_t^2)$<br><br>
+              Для скалярного случая (hidden_size=1): $\\frac{\\partial h_t}{\\partial h_{t-1}} = W_{hh} \\cdot (1 - h_t^2)$
+            </div>
+            <div class="why">Каждый шаг назад умножает градиент на произведение двух чисел: $W_{hh}$ (обычно $< 1$) и $1 - h_t^2$ (производная tanh, всегда $\\leq 1$). Два числа меньше единицы перемножаются — результат ещё меньше.</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Оценка одного шага: типичный случай</h4>
-            <div class="calc">
-              Предположим $h_t \\approx 0{,}5$ (умеренная активация), тогда $\\tanh'(z_t) = 1 - 0{,}5^2 = 0{,}75$<br>
-              Один шаг назад: $\\delta_t \\approx \\delta_{t+1} \\times 0{,}8 \\times 0{,}75 = \\delta_{t+1} \\times 0{,}60$
+            <h4>Шаг 2: прямой проход — сохраняем активации</h4>
+            <p>Параметры: $W_{hh} = 0.7$, $W_{xh} = 0.5$, $b = 0.1$. Входы $x = [0.8, 0.3, -0.2, 0.5, 0.1]$, $h_0 = 0$.</p>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Шаг $t$</th><th>$x_t$</th><th>$z_t = W_{hh}h_{t-1} + W_{xh}x_t + b$</th><th>$h_t = \\tanh(z_t)$</th><th>$1 - h_t^2$ (tanh')</th></tr>
+                <tr><td>1</td><td>0.8</td><td>$0.7 \\cdot 0 + 0.5 \\cdot 0.8 + 0.1 = 0.500$</td><td>0.462</td><td>0.787</td></tr>
+                <tr><td>2</td><td>0.3</td><td>$0.7 \\cdot 0.462 + 0.5 \\cdot 0.3 + 0.1 = 0.573$</td><td>0.517</td><td>0.733</td></tr>
+                <tr><td>3</td><td>-0.2</td><td>$0.7 \\cdot 0.517 + 0.5 \\cdot (-0.2) + 0.1 = 0.362$</td><td>0.348</td><td>0.879</td></tr>
+                <tr><td>4</td><td>0.5</td><td>$0.7 \\cdot 0.348 + 0.5 \\cdot 0.5 + 0.1 = 0.594$</td><td>0.531</td><td>0.718</td></tr>
+                <tr><td>5</td><td>0.1</td><td>$0.7 \\cdot 0.531 + 0.5 \\cdot 0.1 + 0.1 = 0.522$</td><td>0.480</td><td>0.770</td></tr>
+              </table>
             </div>
-            <div class="why">Каждый шаг назад: градиент умножается на ~0,6. Это геометрически убывающая прогрессия.</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Через 10 шагов назад</h4>
-            <div class="calc">$\\delta_{T-10} \\approx 0{,}60^{10} \\cdot \\delta_T = 0{,}006 \\cdot \\delta_T$</div>
-            <div class="why">Меньше 1% от исходного! Параметры на шагах $T-10$ и ранее почти не обучаются — их градиент фактически ноль. Если полезная информация была на шаге $T-10$, модель её «не слышит».</div>
+            <h4>Шаг 3: обратный проход — градиент затухает</h4>
+            <p>Начальный градиент: $\\delta_5 = \\frac{\\partial L}{\\partial h_5} = 1.0$ (для удобства).</p>
+            <div class="calc">
+              $\\delta_4 = \\delta_5 \\cdot W_{hh} \\cdot (1 - h_5^2) = 1.0 \\cdot 0.7 \\cdot 0.770 = <b>0.539</b>$<br>
+              Осталось: 53.9% от исходного<br><br>
+
+              $\\delta_3 = \\delta_4 \\cdot W_{hh} \\cdot (1 - h_4^2) = 0.539 \\cdot 0.7 \\cdot 0.718 = <b>0.271</b>$<br>
+              Осталось: 27.1%<br><br>
+
+              $\\delta_2 = \\delta_3 \\cdot W_{hh} \\cdot (1 - h_3^2) = 0.271 \\cdot 0.7 \\cdot 0.879 = <b>0.167</b>$<br>
+              Осталось: 16.7%<br><br>
+
+              $\\delta_1 = \\delta_2 \\cdot W_{hh} \\cdot (1 - h_2^2) = 0.167 \\cdot 0.7 \\cdot 0.733 = <b>0.086</b>$<br>
+              Осталось: 8.6%
+            </div>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Шаг</th><th>5 (конец)</th><th>4</th><th>3</th><th>2</th><th>1 (начало)</th></tr>
+                <tr><td>Градиент</td><td>1.000</td><td>0.539</td><td>0.271</td><td>0.167</td><td>0.086</td></tr>
+                <tr><td>% от исходного</td><td>100%</td><td>53.9%</td><td>27.1%</td><td>16.7%</td><td>8.6%</td></tr>
+              </table>
+            </div>
+            <div class="why">За 4 шага назад градиент упал до 8.6%! Множитель на каждом шаге: $W_{hh} \\cdot \\tanh' \\approx 0.7 \\cdot 0.78 \\approx 0.55$. Через 10 шагов: $0.55^{10} \\approx 0.003$ (0.3%). Через 20 шагов: $0.55^{20} \\approx 0.000006$. Параметры на далёких шагах практически не обучаются.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Сравнение: что делает LSTM</h4>
-            <p>В LSTM cell state обновляется аддитивно:</p>
-            <div class="math-block">$$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$$</div>
+            <h4>Шаг 4: LSTM — градиент через cell state</h4>
+            <p>В LSTM градиент по cell state: $\\frac{\\partial c_t}{\\partial c_{t-1}} = f_t$</p>
             <div class="calc">
-              Градиент по $c_{t-1}$: $\\partial L / \\partial c_{t-1} = (\\partial L / \\partial c_t) \\cdot f_t$<br>
-              Если $f_t \\approx 1$ (forget gate открыт): градиент проходит НЕТРОНУТЫМ!<br>
-              После 10 шагов: $\\delta_{T-10} \\approx f^{10} \\cdot \\delta_T \\approx 1{,}0^{10} \\cdot \\delta_T = \\delta_T$
+              Если forget gate $f_t \\approx 0.95$ на каждом шаге:<br><br>
+
+              Шаг 5 → 4: $\\delta_4^{(c)} = 1.0 \\cdot 0.95 = <b>0.950</b>$ (95%)<br>
+              Шаг 4 → 3: $\\delta_3^{(c)} = 0.950 \\cdot 0.95 = <b>0.903</b>$ (90.3%)<br>
+              Шаг 3 → 2: $\\delta_2^{(c)} = 0.903 \\cdot 0.95 = <b>0.857</b>$ (85.7%)<br>
+              Шаг 2 → 1: $\\delta_1^{(c)} = 0.857 \\cdot 0.95 = <b>0.815</b>$ (81.5%)
             </div>
-            <div class="why">Это «магия» LSTM: аддитивное обновление cell state создаёт «шоссе» для градиента. Он не умножается на матрицы снова и снова — он просто «течёт» через forget gate с минимальным затуханием.</div>
+            <div class="example-data-table">
+              <table>
+                <tr><th></th><th>Шаг 5</th><th>Шаг 4</th><th>Шаг 3</th><th>Шаг 2</th><th>Шаг 1</th></tr>
+                <tr><td>RNN gradient</td><td>100%</td><td>53.9%</td><td>27.1%</td><td>16.7%</td><td>8.6%</td></tr>
+                <tr><td>LSTM gradient (cell)</td><td>100%</td><td>95%</td><td>90.3%</td><td>85.7%</td><td>81.5%</td></tr>
+              </table>
+            </div>
+            <div class="why">На шаге 1: RNN сохранила 8.6% градиента, LSTM — 81.5%! Разница в 10 раз. На 20 шагах: RNN $\\approx$ 0%, LSTM $\\approx$ 36%. Это и есть «шоссе градиента» через cell state: аддитивное обновление $c_t = f_t \\odot c_{t-1} + ...$ вместо мультипликативного $h_t = \\tanh(W_{hh} \\cdot h_{t-1} + ...)$.</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Когда vanishing gradient не страшен</h4>
+            <h4>Шаг 5: экстраполяция на длинные последовательности</h4>
             <div class="calc">
-              Если нужная зависимость — длиной 3-5 шагов: $0{,}6^5 \\approx 0{,}08$ — 8%, обучится<br>
-              Если длиной 10 шагов: $0{,}6^{10} \\approx 0{,}006$ — 0,6%, трудно<br>
-              Если длиной 50 шагов: $0{,}6^{50} \\approx 10^{-11}$ — невозможно
+              Через N шагов назад:<br>
+              RNN: $(W_{hh} \\cdot \\tanh')^N \\approx 0.55^N$<br>
+              LSTM: $f^N \\approx 0.95^N$<br><br>
+
+              N=10: RNN = 0.3%, LSTM = 60%<br>
+              N=20: RNN ≈ 0%, LSTM = 36%<br>
+              N=50: RNN ≈ 0%, LSTM = 7.7%<br>
+              N=100: RNN ≈ 0%, LSTM = 0.6% (тоже проблемы!)
             </div>
-            <div class="why">Практическое правило для vanilla RNN: надёжно работает на зависимостях до 5–10 шагов. Для более длинных нужны LSTM/GRU (до 100–200), или Transformer (любая длина за 1 шаг).</div>
+            <div class="why">LSTM драматически лучше RNN, но тоже затухает на очень длинных последовательностях (100+ шагов). Для таких задач нужны Transformer (внимание на любое расстояние за 1 шаг) или SSM (Mamba).</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>При $W_{hh} = 0{,}8$ и $\\tanh'(z) \\approx 0{,}75$ за 10 шагов назад градиент уменьшается в ~170 раз (до ~0,6%). LSTM решает проблему через аддитивное обновление cell state с forget gate близким к 1 — градиент течёт без экспоненциального затухания.</p>
-          </div>
-
-          <div class="lesson-box">
-            <b>Интуиция:</b> vanishing gradient — это «забывание», exploding gradient — «паника». Vanilla RNN страдает от обоих. LSTM — это умный фильтр памяти: он решает, что помнить долго (c через forget gate), а что — только сейчас (h через output gate).
+            <p>За 4 шага назад: RNN сохранила 8.6% градиента ($0.55^4$), LSTM — 81.5% ($0.95^4$). Vanishing gradient — главная проблема vanilla RNN для длинных зависимостей. LSTM решает её через cell state с forget gate ≈ 1, создавая «шоссе» для градиента.</p>
           </div>
         `
       },
       {
-        title: 'LSTM гейты интуитивно',
+        title: 'Forget gate в действии: смена паттерна',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Проследить работу LSTM-гейтов при чтении предложения «Маша любит кошек, а Дима — собак». Для каждого слова — объяснить, что открывается и закрывается. Числа упрощённые, для иллюстрации идеи.</p>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th>Слово</th><th>Forget gate $f_t$</th><th>Input gate $i_t$</th><th>Output gate $o_t$</th><th>Что в памяти $c_t$</th></tr>
-              <tr><td>Маша</td><td>0,1 (сбрасываем старое)</td><td>0,9 (запоминаем субъект)</td><td>0,7 (выдаём)</td><td>«субъект: Маша, жен. р.»</td></tr>
-              <tr><td>любит</td><td>0,9 (сохраняем субъект)</td><td>0,8 (добавляем глагол)</td><td>0,5</td><td>«Маша, любит»</td></tr>
-              <tr><td>кошек</td><td>0,9</td><td>0,7 (объект 1)</td><td>0,6</td><td>«Маша любит кошек»</td></tr>
-              <tr><td>, а</td><td>0,3 (частичный сброс)</td><td>0,2 (союз)</td><td>0,2</td><td>«любит, противопост.»</td></tr>
-              <tr><td>Дима</td><td>0,2 (новый субъект!)</td><td>0,9 (новый субъект)</td><td>0,8</td><td>«субъект: Дима, муж. р.»</td></tr>
-              <tr><td>собак</td><td>0,9</td><td>0,7</td><td>0,7</td><td>«Дима любит собак»</td></tr>
-            </table>
+            <p>Показать, как forget gate LSTM учится «забывать» старую информацию, когда начинается новый паттерн. Последовательность: стабильный сигнал [5, 5, 5], затем резкая смена [1, 1]. Проследить, как cell state реагирует на смену паттерна.</p>
           </div>
 
           <div class="step" data-step="1">
-            <h4>Forget gate: «что забыть»</h4>
-            <div class="calc">$f_t = \\sigma(W_f [h_{t-1}, x_t] + b_f) \\in (0, 1)$</div>
-            <div class="calc">$c_t^{\\text{new}} \\leftarrow f_t \\odot c_{t-1}$</div>
-            <div class="why">$f_t$ близко к 0 → «стереть» информацию. $f_t$ близко к 1 → «сохранить». При чтении «а» — частичный сброс (0,3): мы помним, что было предложение, но готовимся к новому субъекту. При «Дима» — $f_t \\approx 0{,}2$: сбрасываем «Маша» из активной памяти.</div>
+            <h4>Шаг 1: данные — два паттерна</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Шаг t</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+                <tr><td>Вход $x_t$</td><td>5</td><td>5</td><td>5</td><td>1</td><td>1</td></tr>
+                <tr><td>Нормализ. (÷5)</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0.2</td><td>0.2</td></tr>
+                <tr><td>Паттерн</td><td colspan="3" style="background:#dcfce7">Стабильный «высокий»</td><td colspan="2" style="background:#fee2e2">Новый «низкий»</td></tr>
+              </table>
+            </div>
+            <div class="why">Мы хотим увидеть: когда вход резко меняется с 5 до 1, как LSTM «забывает» старый паттерн и адаптируется к новому?</div>
           </div>
 
           <div class="step" data-step="2">
-            <h4>Input gate: «что запомнить»</h4>
-            <div class="calc">$i_t = \\sigma(W_i [h_{t-1}, x_t] + b_i) \\in (0, 1)$</div>
-            <div class="calc">$\\tilde{c}_t = \\tanh(W_c [h_{t-1}, x_t] + b_c) \\in (-1, 1)$</div>
-            <div class="calc">$c_t^{\\text{add}} \\leftarrow i_t \\odot \\tilde{c}_t$ (новая информация)</div>
-            <div class="why">$i_t$ решает, насколько сильно записать новый сигнал $\\tilde{c}_t$. При слове «Маша» (начало предложения): $i_t \\approx 0{,}9$ — важно запомнить субъект. При союзе «а»: $i_t \\approx 0{,}2$ — служебное слово, мало полезного.</div>
+            <h4>Шаг 2: обученная LSTM — веса, которые «научились» забывать</h4>
+            <p>Используем упрощённый скалярный LSTM (hidden_size=1) с весами, которые сеть «выучила» после обучения:</p>
+            <div class="calc">
+              <b>Forget gate:</b> $f_t = \\sigma(w_f^h \\cdot h_{t-1} + w_f^x \\cdot x_t + b_f)$<br>
+              Обученные: $w_f^h = 0.3$, $w_f^x = -1.5$, $b_f = 2.0$<br><br>
+
+              <b>Input gate:</b> $i_t = \\sigma(w_i^h \\cdot h_{t-1} + w_i^x \\cdot x_t + b_i)$<br>
+              Обученные: $w_i^h = 0.2$, $w_i^x = 1.0$, $b_i = -0.5$<br><br>
+
+              <b>Candidate:</b> $\\tilde{c}_t = \\tanh(w_c^h \\cdot h_{t-1} + w_c^x \\cdot x_t + b_c)$<br>
+              Обученные: $w_c^h = 0.1$, $w_c^x = 0.8$, $b_c = 0.0$<br><br>
+
+              <b>Output gate:</b> $o_t = \\sigma(0.5 \\cdot h_{t-1} + 0.3 \\cdot x_t + 0.0)$
+            </div>
+            <div class="why">Обратите внимание на $w_f^x = -1.5$: когда вход УМЕНЬШАЕТСЯ (с 1.0 до 0.2), вклад $w_f^x \\cdot x_t$ падает с $-1.5$ до $-0.3$, увеличивая аргумент сигмоида. Но здесь ключевое: при стабильном высоком входе $f$ высокий (помним), при смене — $f$ падает (забываем).</div>
           </div>
 
           <div class="step" data-step="3">
-            <h4>Cell state: аддитивное обновление (ключ к долгой памяти)</h4>
-            <div class="calc">$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$</div>
+            <h4>Шаг 3: прогон через стабильную фазу (x = 1.0, 1.0, 1.0)</h4>
+            <p>$h_0 = 0$, $c_0 = 0$:</p>
             <div class="calc">
-              На шаге «Маша»: $c_1 = 0{,}1 \\cdot c_0 + 0{,}9 \\cdot \\tilde{c}_1 \\approx 0 + 0{,}9 \\cdot c_{\\text{Маша}}$<br>
-              На шаге «любит»: $c_2 = 0{,}9 \\cdot c_1 + 0{,}8 \\cdot c_{\\text{любит}} \\approx 0{,}81 c_{\\text{Маша}} + 0{,}8 c_{\\text{любит}}$<br>
-              На шаге «кошек»: $c_3 \\approx 0{,}73 c_{\\text{Маша}} + 0{,}72 c_{\\text{любит}} + 0{,}7 c_{\\text{кошек}}$
+              <b>t=1 (x=1.0):</b><br>
+              $f_1 = \\sigma(0.3 \\cdot 0 + (-1.5) \\cdot 1.0 + 2.0) = \\sigma(0.5) = 0.622$<br>
+              $i_1 = \\sigma(0.2 \\cdot 0 + 1.0 \\cdot 1.0 + (-0.5)) = \\sigma(0.5) = 0.622$<br>
+              $\\tilde{c}_1 = \\tanh(0.1 \\cdot 0 + 0.8 \\cdot 1.0 + 0) = \\tanh(0.8) = 0.664$<br>
+              $c_1 = 0.622 \\cdot 0 + 0.622 \\cdot 0.664 = <b>0.413</b>$<br>
+              $o_1 = \\sigma(0.5 \\cdot 0 + 0.3 \\cdot 1.0) = \\sigma(0.3) = 0.574$<br>
+              $h_1 = 0.574 \\cdot \\tanh(0.413) = 0.574 \\cdot 0.391 = <b>0.224</b>$<br><br>
+
+              <b>t=2 (x=1.0):</b><br>
+              $f_2 = \\sigma(0.3 \\cdot 0.224 + (-1.5) \\cdot 1.0 + 2.0) = \\sigma(0.567) = 0.638$<br>
+              $i_2 = \\sigma(0.2 \\cdot 0.224 + 1.0 \\cdot 1.0 - 0.5) = \\sigma(0.545) = 0.633$<br>
+              $\\tilde{c}_2 = \\tanh(0.1 \\cdot 0.224 + 0.8 \\cdot 1.0) = \\tanh(0.822) = 0.677$<br>
+              $c_2 = 0.638 \\cdot 0.413 + 0.633 \\cdot 0.677 = 0.263 + 0.429 = <b>0.692</b>$<br>
+              $h_2 = \\sigma(0.5 \\cdot 0.224 + 0.3) \\cdot \\tanh(0.692) = 0.604 \\cdot 0.601 = <b>0.363</b>$<br><br>
+
+              <b>t=3 (x=1.0):</b><br>
+              $f_3 = \\sigma(0.3 \\cdot 0.363 - 1.5 + 2.0) = \\sigma(0.609) = 0.648$<br>
+              $i_3 = \\sigma(0.2 \\cdot 0.363 + 1.0 - 0.5) = \\sigma(0.573) = 0.639$<br>
+              $\\tilde{c}_3 = \\tanh(0.1 \\cdot 0.363 + 0.8) = \\tanh(0.836) = 0.685$<br>
+              $c_3 = 0.648 \\cdot 0.692 + 0.639 \\cdot 0.685 = 0.448 + 0.438 = <b>0.886</b>$<br>
+              $h_3 = \\sigma(0.5 \\cdot 0.363 + 0.3) \\cdot \\tanh(0.886) = 0.621 \\cdot 0.709 = <b>0.440</b>$
             </div>
-            <div class="why">«Маша» всё ещё присутствует в памяти через 3 шага с весом ~0,73! В vanilla RNN: $0{,}6^3 \\approx 0{,}22$. LSTM сохраняет информацию в 3 раза лучше за те же шаги, а при $f \\approx 1$ — практически без потерь.</div>
+            <div class="why">Cell state растёт: $c_1 = 0.413 \\to c_2 = 0.692 \\to c_3 = 0.886$. LSTM «накапливает» уверенность в паттерне «высокий вход». Forget gate ≈ 0.64 — сохраняем ~64% прошлого и добавляем новое.</div>
           </div>
 
           <div class="step" data-step="4">
-            <h4>Output gate: «что показать»</h4>
-            <div class="calc">$o_t = \\sigma(W_o [h_{t-1}, x_t] + b_o)$</div>
-            <div class="calc">$h_t = o_t \\odot \\tanh(c_t)$</div>
-            <div class="why">$h_t$ — это «видимая» часть памяти, которая передаётся следующему слою и в следующий шаг. $c_t$ — «внутренняя» долгосрочная память. Output gate фильтрует: показать всё или только часть. Например, при «Она» — output gate для «Маша, жен. р.» открывается.</div>
+            <h4>Шаг 4: смена паттерна (x = 0.2) — forget gate реагирует!</h4>
+            <div class="calc">
+              <b>t=4 (x=0.2) — РЕЗКАЯ СМЕНА:</b><br>
+              $f_4 = \\sigma(0.3 \\cdot 0.440 + (-1.5) \\cdot 0.2 + 2.0) = \\sigma(0.132 - 0.300 + 2.0) = \\sigma(1.832) = <b>0.862</b>$<br><br>
+
+              Стоп! $f_4 = 0.862$ — это ВЫШЕ чем при x=1.0 ($f_3 = 0.648$)!<br><br>
+
+              Причина: $w_f^x = -1.5$, поэтому:<br>
+              При $x = 1.0$: вклад $= -1.5 \\cdot 1.0 = -1.5$ (сильно давит вниз)<br>
+              При $x = 0.2$: вклад $= -1.5 \\cdot 0.2 = -0.3$ (слабо давит вниз)<br><br>
+
+              Результат: при НИЗКОМ входе forget gate ВЫШЕ → старая память СОХРАНЯЕТСЯ!<br><br>
+
+              $i_4 = \\sigma(0.2 \\cdot 0.440 + 1.0 \\cdot 0.2 - 0.5) = \\sigma(0.088 + 0.2 - 0.5) = \\sigma(-0.212) = <b>0.447</b>$<br>
+              $\\tilde{c}_4 = \\tanh(0.1 \\cdot 0.440 + 0.8 \\cdot 0.2) = \\tanh(0.204) = <b>0.201</b>$<br>
+              $c_4 = 0.862 \\cdot 0.886 + 0.447 \\cdot 0.201 = 0.764 + 0.090 = <b>0.854</b>$<br>
+              $h_4 = 0.576 \\cdot \\tanh(0.854) = 0.576 \\cdot 0.694 = <b>0.400</b>$
+            </div>
+            <div class="why">Интересный результат! С этими весами LSTM сохраняет старую память ($f=0.862$) при смене входа, но input gate закрывается ($i=0.447$) и кандидат мал ($\\tilde{c}=0.201$). Сеть как бы «осторожничает»: не забывает старое сразу, но и мало записывает новое. Это — инерция памяти.</div>
           </div>
 
           <div class="step" data-step="5">
-            <h4>Числовой пример: разрешение местоимения «она»</h4>
-            <div class="calc">
-              Предположим: «субъект:Маша» кодируется как $c_{\\text{fem}} = +1$, «субъект:Дима» — $c_{\\text{masc}} = -1$<br>
-              После «Маша»: $c_t[\\text{gender}] \\approx +0{,}9$<br>
-              Через 4 слова («кошек, а Дима»): $c_t[\\text{gender}] \\approx 0{,}9^3 \\cdot (+0{,}9) = +0{,}66$ (всё ещё женский!)<br>
-              После «Дима»: $f_t = 0{,}2$, $c_t[\\text{gender}] = 0{,}2 \\cdot 0{,}66 + 0{,}9 \\cdot (-0{,}9) = +0{,}13 - 0{,}81 = -0{,}68$ (теперь мужской)
+            <h4>Шаг 5: сводная таблица — эволюция cell state</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Шаг</th><th>$x_t$</th><th>Паттерн</th><th>$f_t$</th><th>$i_t$</th><th>$c_t$</th><th>$h_t$</th></tr>
+                <tr><td>1</td><td>1.0</td><td style="background:#dcfce7">высокий</td><td>0.622</td><td>0.622</td><td>0.413</td><td>0.224</td></tr>
+                <tr><td>2</td><td>1.0</td><td style="background:#dcfce7">высокий</td><td>0.638</td><td>0.633</td><td>0.692</td><td>0.363</td></tr>
+                <tr><td>3</td><td>1.0</td><td style="background:#dcfce7">высокий</td><td>0.648</td><td>0.639</td><td>0.886</td><td>0.440</td></tr>
+                <tr><td>4</td><td>0.2</td><td style="background:#fee2e2">низкий!</td><td>0.862</td><td>0.447</td><td>0.854</td><td>0.400</td></tr>
+                <tr><td>5</td><td>0.2</td><td style="background:#fee2e2">низкий</td><td>0.853</td><td>0.429</td><td>0.808</td><td>0.378</td></tr>
+              </table>
             </div>
-            <div class="why">Вот как LSTM разрешает кореференции: информация о роде субъекта хранится в cell state, обновляется при появлении нового субъекта. Это то, что NLP-модели учат автоматически из текста!</div>
+            <div class="calc">
+              Динамика cell state: 0.413 → 0.692 → 0.886 (рост) → 0.854 → 0.808 (медленный спад)<br><br>
+              Ключевой вывод: при смене паттерна $c_t$ снижается МЕДЛЕННО (с 0.886 до 0.808 за 2 шага).<br>
+              Это и есть «долгая память»: старая информация не исчезает мгновенно.
+            </div>
+            <div class="why">В этом примере forget gate с $w_f^x = -1.5$ оказался настроен так, что при НИЗКОМ входе он СОХРАНЯЕТ память (высокий $f$). Это один возможный режим. Если бы $w_f^x = +1.5$, при низком входе $f$ было бы низким, и старая память стиралась бы быстро. Сеть сама выбирает нужный режим при обучении!</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>LSTM управляет памятью через три гейта: forget (что стереть), input (что записать), output (что показать). Cell state — долгосрочная память, hidden state — оперативная. При чтении текста: субъект запоминается при появлении, сохраняется через предложение, используется при разрешении местоимения.</p>
-          </div>
-
-          <div class="lesson-box">
-            <b>Аналогия с RAM/ROM:</b> cell state $c_t$ — это жёсткий диск (долгосрочное хранение), hidden state $h_t$ — оперативная память (то, с чем работаем прямо сейчас). Forget gate — «delete», input gate — «write», output gate — «read». Три операции управления памятью.
+            <p>При смене паттерна с [1.0, 1.0, 1.0] на [0.2, 0.2]: forget gate увеличился с 0.648 до 0.862 (с данными весами — сохранение старой памяти), input gate упал с 0.639 до 0.447 (слабая запись нового). Cell state медленно снижается: 0.886 → 0.854 → 0.808. Forget gate — главный механизм управления «что помнить, что забыть».</p>
           </div>
         `
       },

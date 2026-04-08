@@ -226,237 +226,409 @@ App.registerTopic({
 
     examples: [
       {
-        title: 'Тест на болезнь: классика Байеса',
+        title: 'Тест на болезнь: полный Байес',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Болезнь встречается у 1% населения. Тест имеет чувствительность 99% и специфичность 95%. Тест положительный — какова реальная вероятность болезни?</p>
+            <p>Болезнь встречается у 1% населения. Тест: чувствительность 99%, специфичность 95%. Человек получил положительный тест. Какова реальная вероятность болезни? Затем — <b>второй тест</b> тоже положительный. Как обновляется вероятность?</p>
           </div>
+
+          <div class="step" data-step="1">
+            <h4>Шаг 1. Априорные вероятности (prior)</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Параметр</th><th>Обозначение</th><th>Значение</th><th>Смысл</th></tr>
+                <tr><td>Заболеваемость</td><td>P(sick)</td><td>0.01</td><td>1 из 100 болен</td></tr>
+                <tr><td>Здоровые</td><td>P(healthy)</td><td>0.99</td><td>99 из 100 здоровы</td></tr>
+              </table>
+            </div>
+            <div class="why">Prior — это то, что мы знаем <b>до</b> теста. 1% — это prevalence болезни в популяции. Это ключевое число, которое определяет всё дальнейшее.</div>
+          </div>
+
+          <div class="step" data-step="2">
+            <h4>Шаг 2. Likelihood (правдоподобие теста)</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Параметр</th><th>Обозначение</th><th>Значение</th><th>Смысл</th></tr>
+                <tr><td>Чувствительность</td><td>P(test+|sick)</td><td>0.99</td><td>Тест верно находит 99% больных</td></tr>
+                <tr><td>Ложно-отриц.</td><td>P(test−|sick)</td><td>0.01</td><td>1% больных пропускает</td></tr>
+                <tr><td>Ложно-полож.</td><td>P(test+|healthy)</td><td>0.05</td><td>5% здоровых получают «+»</td></tr>
+                <tr><td>Специфичность</td><td>P(test−|healthy)</td><td>0.95</td><td>Тест верно определяет 95% здоровых</td></tr>
+              </table>
+            </div>
+            <div class="why">Likelihood — это P(данные | гипотеза). Тест «хороший»: 99% чувствительность и 95% специфичность. Но при редкой болезни 5% FPR создаёт проблему.</div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h4>Шаг 3. Дерево вероятностей: 10 000 человек</h4>
+            <div class="illustration bordered">
+              <svg viewBox="0 0 500 185" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+                <text x="250" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Дерево вероятностей: 10 000 человек</text>
+                <!-- Root -->
+                <rect x="15" y="48" width="70" height="30" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+                <text x="50" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="#3730a3">10 000</text>
+                <text x="50" y="74" text-anchor="middle" font-size="8" fill="#6366f1">человек</text>
+                <!-- Branch sick -->
+                <line x1="85" y1="55" x2="150" y2="40" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="118" y="38" font-size="8" fill="#ef4444">P=0.01</text>
+                <!-- Branch healthy -->
+                <line x1="85" y1="70" x2="150" y2="120" stroke="#10b981" stroke-width="1.5"/>
+                <text x="118" y="110" font-size="8" fill="#10b981">P=0.99</text>
+                <!-- Sick box -->
+                <rect x="150" y="24" width="70" height="32" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="185" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#991b1b">100</text>
+                <text x="185" y="51" text-anchor="middle" font-size="8" fill="#ef4444">больных</text>
+                <!-- Healthy box -->
+                <rect x="150" y="106" width="70" height="32" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                <text x="185" y="121" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">9 900</text>
+                <text x="185" y="133" text-anchor="middle" font-size="8" fill="#10b981">здоровых</text>
+                <!-- Sick → TP -->
+                <line x1="220" y1="35" x2="280" y2="26" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="250" y="22" font-size="7" fill="#ef4444">P(+|D)=0.99</text>
+                <rect x="280" y="14" width="65" height="26" rx="5" fill="#ef4444"/>
+                <text x="312" y="27" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">99 TP</text>
+                <text x="312" y="37" text-anchor="middle" font-size="7" fill="#fecaca">тест +</text>
+                <!-- Sick → FN -->
+                <line x1="220" y1="45" x2="280" y2="55" stroke="#94a3b8" stroke-width="1"/>
+                <text x="250" y="56" font-size="7" fill="#94a3b8">P(−|D)=0.01</text>
+                <rect x="280" y="46" width="65" height="20" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                <text x="312" y="59" text-anchor="middle" font-size="8" fill="#64748b">1 FN</text>
+                <!-- Healthy → FP -->
+                <line x1="220" y1="115" x2="280" y2="100" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="250" y="100" font-size="7" fill="#f59e0b">P(+|¬D)=0.05</text>
+                <rect x="280" y="88" width="65" height="26" rx="5" fill="#fbbf24"/>
+                <text x="312" y="101" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">495 FP</text>
+                <text x="312" y="111" text-anchor="middle" font-size="7" fill="#78350f">тест +</text>
+                <!-- Healthy → TN -->
+                <line x1="220" y1="130" x2="280" y2="140" stroke="#10b981" stroke-width="1.5"/>
+                <text x="250" y="145" font-size="7" fill="#10b981">P(−|¬D)=0.95</text>
+                <rect x="280" y="130" width="70" height="22" rx="4" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+                <text x="315" y="145" text-anchor="middle" font-size="9" fill="#065f46">9 405 TN</text>
+                <!-- Summary box -->
+                <rect x="370" y="50" width="120" height="70" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="430" y="68" text-anchor="middle" font-size="9" font-weight="700" fill="#92400e">Все тест+:</text>
+                <text x="430" y="82" text-anchor="middle" font-size="9" fill="#92400e">99 + 495 = 594</text>
+                <text x="430" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#ef4444">PPV = 99/594</text>
+                <text x="430" y="114" text-anchor="middle" font-size="11" font-weight="700" fill="#ef4444">= 16.7%</text>
+              </svg>
+              <div class="caption">Из 10 000 человек: 594 получат тест+. Из них только 99 реально больны (16.7%). Остальные 495 — ложная тревога.</div>
+            </div>
+            <div class="calc">
+              Считаем по ветвям дерева:<br>
+              Больных: $10000 \\times 0{,}01 = \\mathbf{100}$<br>
+              Здоровых: $10000 \\times 0{,}99 = \\mathbf{9900}$<br><br>
+              TP (больны, тест+): $100 \\times 0{,}99 = \\mathbf{99}$<br>
+              FN (больны, тест−): $100 \\times 0{,}01 = \\mathbf{1}$<br>
+              FP (здоровы, тест+): $9900 \\times 0{,}05 = \\mathbf{495}$<br>
+              TN (здоровы, тест−): $9900 \\times 0{,}95 = \\mathbf{9405}$
+            </div>
+            <div class="why">Ключевое наблюдение: 495 ложных тревог vs 99 реальных больных. FP в 5 раз больше TP! Причина: здоровых (9900) в 99 раз больше, чем больных (100).</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4. Вычисляем P(test+): полная вероятность</h4>
+            <div class="calc">
+              $P(\\text{test}+) = P(+|\\text{sick}) \\cdot P(\\text{sick}) + P(+|\\text{healthy}) \\cdot P(\\text{healthy})$<br><br>
+              $= 0{,}99 \\times 0{,}01 + 0{,}05 \\times 0{,}99$<br><br>
+              $= 0{,}0099 + 0{,}0495 = \\mathbf{0{,}0594}$<br><br>
+              Или по дереву: $594 / 10000 = 0{,}0594$ — то же самое!
+            </div>
+            <div class="why">5,94% людей получат положительный тест. Это знаменатель формулы Байеса — нормировочная константа.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Формула Байеса: P(sick | test+)</h4>
+            <div class="calc">
+              $P(\\text{sick}|+) = \\dfrac{P(+|\\text{sick}) \\cdot P(\\text{sick})}{P(+)}$<br><br>
+              $= \\dfrac{0{,}99 \\times 0{,}01}{0{,}0594}$<br><br>
+              $= \\dfrac{0{,}0099}{0{,}0594} = \\mathbf{0{,}1667 \\approx 16{,}7\\%}$<br><br>
+              Или по дереву: $99 / (99 + 495) = 99 / 594 = 0{,}1667$ — то же самое!
+            </div>
+            <div class="why">Шокирующий результат: тест «99% точный», но при положительном результате вероятность болезни лишь 16,7%! Причина: prior P(sick) = 1% слишком мал — большинство «+» это FP.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. Второй тест: обновляем prior!</h4>
+            <div class="calc">
+              После первого теста: $P(\\text{sick}) = 0{,}167$ (это новый prior!)<br>
+              $P(\\text{healthy}) = 1 - 0{,}167 = 0{,}833$<br><br>
+              Второй тест тоже «+»:<br>
+              $P(+) = 0{,}99 \\times 0{,}167 + 0{,}05 \\times 0{,}833$<br>
+              $= 0{,}1653 + 0{,}0417 = 0{,}2070$<br><br>
+              $P(\\text{sick}|++) = \\dfrac{0{,}99 \\times 0{,}167}{0{,}2070} = \\dfrac{0{,}1653}{0{,}2070} = \\mathbf{0{,}799 \\approx 80\\%}$
+            </div>
+            <div class="why">Два положительных теста: вероятность выросла с 1% → 16,7% → 80%! Каждый тест обновляет prior. Это и есть <b>байесовское обновление</b>: posterior первого шага становится prior для следующего.</div>
+          </div>
+
           <div class="example-data-table">
             <table>
-              <tr><th>Параметр</th><th>Значение</th><th>Смысл</th></tr>
-              <tr><td>P(D)</td><td>0.01</td><td>Заболеваемость (prior)</td></tr>
-              <tr><td>P(¬D)</td><td>0.99</td><td>Здоровые</td></tr>
-              <tr><td>P(+|D)</td><td>0.99</td><td>Чувствительность (sensitivity)</td></tr>
-              <tr><td>P(+|¬D)</td><td>0.05</td><td>Ложно-положительные (1−specificity)</td></tr>
+              <tr><th>Момент</th><th>Prior P(sick)</th><th>Тест</th><th>Posterior P(sick)</th></tr>
+              <tr><td>До тестов</td><td>0.010 (1%)</td><td>—</td><td>0.010</td></tr>
+              <tr><td>После 1-го теста +</td><td>0.010</td><td>+</td><td><b>0.167 (16.7%)</b></td></tr>
+              <tr><td>После 2-го теста +</td><td>0.167</td><td>+</td><td><b>0.799 (80%)</b></td></tr>
             </table>
-          </div>
-          <div class="step" data-step="1">
-            <h4>Шаг 1: мысленный эксперимент — 10 000 человек</h4>
-            <div class="calc">
-              Больные: 10000 · 0.01 = <b>100 человек</b><br>
-              Здоровые: 10000 · 0.99 = <b>9900 человек</b><br><br>
-              Из 100 больных: тест «+» у 100·0.99 = <b>99 человек</b> (TP)<br>
-              Из 100 больных: тест «−» у 100·0.01 = 1 человек (FN)<br><br>
-              Из 9900 здоровых: тест «+» у 9900·0.05 = <b>495 человек</b> (FP!)<br>
-              Из 9900 здоровых: тест «−» у 9900·0.95 = 9405 человек (TN)
-            </div>
-            <div class="why">Ключевое: 495 ложных тревог при только 99 реальных больных. Редкая болезнь → много FP.</div>
-          </div>
-          <div class="step" data-step="2">
-            <h4>Шаг 2: применить формулу Байеса</h4>
-            <div class="calc">
-              P(+) = P(+|D)·P(D) + P(+|¬D)·P(¬D)<br>
-              = 0.99·0.01 + 0.05·0.99<br>
-              = 0.0099 + 0.0495 = <b>0.0594</b><br><br>
-              P(D|+) = P(+|D)·P(D) / P(+)<br>
-              = (0.99 · 0.01) / 0.0594<br>
-              = 0.0099 / 0.0594 = <b>0.1667 ≈ 16.7%</b>
-            </div>
-            <div class="why">Только 16.7%! Хотя тест очень точный, заболеваемость 1% делает большинство положительных тестов ложными.</div>
-          </div>
-          <div class="step" data-step="3">
-            <h4>Шаг 3: второй тест после положительного первого</h4>
-            <div class="calc">
-              Теперь prior P(D) = 0.167 (после первого положительного теста)<br><br>
-              P(+) = 0.99·0.167 + 0.05·0.833<br>
-              = 0.1653 + 0.0417 = 0.2070<br><br>
-              P(D|++) = 0.99·0.167 / 0.2070<br>
-              = 0.1653 / 0.2070 = <b>0.799 ≈ 80%</b>
-            </div>
-            <div class="why">Два положительных теста: вероятность болезни 80%. Это и есть байесовское обновление: каждое наблюдение обновляет prior.</div>
-          </div>
-          <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево вероятностей: тест на болезнь (10 000 чел.)</text>
-              <!-- Root node -->
-              <text x="60" y="55" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">10000</text>
-              <text x="60" y="68" text-anchor="middle" font-size="9" fill="#64748b">человек</text>
-              <!-- Branch to sick -->
-              <line x1="75" y1="58" x2="165" y2="50" stroke="#ef4444" stroke-width="1.5"/>
-              <text x="120" y="44" text-anchor="middle" font-size="9" fill="#ef4444">P(D)=0.01</text>
-              <!-- Branch to healthy -->
-              <line x1="75" y1="68" x2="165" y2="115" stroke="#10b981" stroke-width="1.5"/>
-              <text x="120" y="105" text-anchor="middle" font-size="9" fill="#10b981">P(¬D)=0.99</text>
-              <!-- Sick node -->
-              <rect x="165" y="32" width="80" height="36" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
-              <text x="205" y="49" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">100</text>
-              <text x="205" y="62" text-anchor="middle" font-size="8" fill="#ef4444">больных</text>
-              <!-- Healthy node -->
-              <rect x="165" y="97" width="80" height="36" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
-              <text x="205" y="114" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">9900</text>
-              <text x="205" y="127" text-anchor="middle" font-size="8" fill="#10b981">здоровых</text>
-              <!-- From sick: TP and FN -->
-              <line x1="245" y1="46" x2="310" y2="36" stroke="#ef4444" stroke-width="1.5"/>
-              <text x="278" y="30" text-anchor="middle" font-size="8" fill="#ef4444">P(+|D)=0.99</text>
-              <line x1="245" y1="54" x2="310" y2="68" stroke="#64748b" stroke-width="1"/>
-              <text x="278" y="67" text-anchor="middle" font-size="8" fill="#64748b">P(−|D)=0.01</text>
-              <!-- TP box -->
-              <rect x="310" y="22" width="75" height="28" rx="5" fill="#ef4444"/>
-              <text x="347" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">99 TP</text>
-              <text x="347" y="46" text-anchor="middle" font-size="8" fill="#fee2e2">тест +</text>
-              <!-- FN box -->
-              <rect x="310" y="58" width="75" height="24" rx="5" fill="#fee2e2" stroke="#64748b" stroke-width="1"/>
-              <text x="347" y="73" text-anchor="middle" font-size="9" fill="#64748b">1 FN</text>
-              <!-- From healthy: FP and TN -->
-              <line x1="245" y1="108" x2="310" y2="100" stroke="#ef4444" stroke-width="1.5"/>
-              <text x="278" y="96" text-anchor="middle" font-size="8" fill="#ef4444">P(+|¬D)=0.05</text>
-              <line x1="245" y1="120" x2="310" y2="136" stroke="#10b981" stroke-width="1.5"/>
-              <text x="278" y="141" text-anchor="middle" font-size="8" fill="#10b981">P(−|¬D)=0.95</text>
-              <!-- FP box -->
-              <rect x="310" y="86" width="75" height="28" rx="5" fill="#fbbf24"/>
-              <text x="347" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">495 FP</text>
-              <text x="347" y="110" text-anchor="middle" font-size="8" fill="#78350f">тест +</text>
-              <!-- TN box -->
-              <rect x="310" y="122" width="75" height="24" rx="5" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
-              <text x="347" y="137" text-anchor="middle" font-size="9" fill="#065f46">9405 TN</text>
-              <!-- PPV label -->
-              <text x="393" y="60" font-size="9" fill="#334155" font-weight="600">PPV =</text>
-              <text x="393" y="72" font-size="9" fill="#334155">99/(99+495)</text>
-              <text x="393" y="84" font-size="10" fill="#ef4444" font-weight="700">≈ 16.7%</text>
-            </svg>
-            <div class="caption">Дерево вероятностей для 10 000 человек. При положительном тесте: 99 TP (реально больны) и 495 FP (здоровы, но тест ошибся). PPV = 16.7% — только каждый 6-й с положительным тестом реально болен.</div>
           </div>
 
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>После 1 теста: P(болен|+) ≈ 16.7%. После 2 тестов: ≈ 80%. Контринтуитивно, но правильно: при редкой болезни даже точный тест часто ошибается (много FP).</p>
+            <p>P(sick | 1 тест+) = 16,7%. P(sick | 2 теста+) = 80%. При редкой болезни один тест недостаточен — нужен повторный. Формула Байеса: $P(H|D) = P(D|H) \\cdot P(H) / P(D)$.</p>
           </div>
+
           <div class="lesson-box">
-            PPV (positive predictive value) = P(D|+) зависит от prevalence. При prevalence=50%: PPV ≈ 95%. При prevalence=0.1%: PPV ≈ 2%. Именно поэтому массовый скрининг редких болезней даёт много ложных тревог.
+            <b>Почему врачи назначают повторные тесты:</b> PPV зависит от prevalence. При P(sick)=1%: PPV=16.7%. При P(sick)=50%: PPV=95%. Повторный тест повышает «эффективный prior» и резко улучшает PPV. Массовый скрининг редких болезней без повторных тестов — плохая идея.
           </div>
         `,
       },
       {
-        title: 'Naive Bayes для спама',
+        title: 'Naive Bayes для 3 писем',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Классифицировать письмо «купить срочно бесплатно» как спам или не-спам с помощью Naive Bayes.</p>
+            <p>3 обучающих письма, словарь из 5 слов. Обучить Naive Bayes <b>с нуля</b>, используя Laplace smoothing ($\\alpha = 1$). Затем классифицировать новое письмо «деньги бесплатно».</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Слово</th><th>P(слово|спам)</th><th>P(слово|хам)</th></tr>
-              <tr><td>купить</td><td>0.30</td><td>0.05</td></tr>
-              <tr><td>срочно</td><td>0.40</td><td>0.02</td></tr>
-              <tr><td>бесплатно</td><td>0.25</td><td>0.01</td></tr>
-              <tr><td colspan="3">P(спам) = 0.30, P(хам) = 0.70</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: вычислить P(x|спам) и P(x|хам)</h4>
-            <div class="calc">
-              Предположение «наивности»: слова независимы друг от друга<br><br>
-              P(x|спам) = P(купить|спам) · P(срочно|спам) · P(бесплатно|спам)<br>
-              = 0.30 · 0.40 · 0.25 = <b>0.030</b><br><br>
-              P(x|хам) = P(купить|хам) · P(срочно|хам) · P(бесплатно|хам)<br>
-              = 0.05 · 0.02 · 0.01 = <b>0.000010</b>
+            <h4>Шаг 1. Обучающие данные: 3 письма</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>№</th><th>Текст</th><th>Класс</th></tr>
+                <tr><td>1</td><td>«деньги акция бесплатно»</td><td>спам</td></tr>
+                <tr><td>2</td><td>«встреча проект завтра»</td><td>хам</td></tr>
+                <tr><td>3</td><td>«деньги проект акция»</td><td>спам</td></tr>
+              </table>
             </div>
-            <div class="why">«Наивность»: в реальности «купить» и «бесплатно» коррелируют в спаме, но мы игнорируем это. Несмотря на это, Naive Bayes часто хорошо работает.</div>
+            <div class="calc">
+              Словарь $V$: {деньги, акция, бесплатно, встреча, проект, завтра} → $|V| = 6$<br>
+              Спам: 2 письма (№1, №3). Хам: 1 письмо (№2).<br>
+              P(спам) = 2/3 = 0.667, P(хам) = 1/3 = 0.333
+            </div>
+            <div class="why">Prior основан на частоте классов в обучении. 2 из 3 писем — спам, поэтому P(спам) > P(хам). В реальности prior обычно 50/50 или подбирается.</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: применить Байес</h4>
-            <div class="calc">
-              P(спам|x) ∝ P(x|спам) · P(спам)<br>
-              = 0.030 · 0.30 = <b>0.009000</b><br><br>
-              P(хам|x) ∝ P(x|хам) · P(хам)<br>
-              = 0.000010 · 0.70 = <b>0.000007</b><br><br>
-              Нормировочная константа Z = 0.009000 + 0.000007 = 0.009007<br><br>
-              P(спам|x) = 0.009000 / 0.009007 ≈ <b>0.9992</b>
+            <h4>Шаг 2. Считаем частоты слов по классам</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Слово</th><th>count(спам)</th><th>count(хам)</th></tr>
+                <tr><td>деньги</td><td>2</td><td>0</td></tr>
+                <tr><td>акция</td><td>2</td><td>0</td></tr>
+                <tr><td>бесплатно</td><td>1</td><td>0</td></tr>
+                <tr><td>встреча</td><td>0</td><td>1</td></tr>
+                <tr><td>проект</td><td>1</td><td>1</td></tr>
+                <tr><td>завтра</td><td>0</td><td>1</td></tr>
+                <tr><td><b>Всего слов</b></td><td><b>6</b></td><td><b>3</b></td></tr>
+              </table>
             </div>
+            <div class="why">Проблема: «бесплатно» встречается 0 раз в хаме → P(бесплатно|хам) = 0 → всё произведение = 0. Нужен Laplace smoothing!</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: log-пространство для численной стабильности</h4>
+            <h4>Шаг 3. Laplace smoothing: $P(w|c) = \\dfrac{\\text{count}(w,c) + \\alpha}{\\text{total}(c) + \\alpha \\cdot |V|}$</h4>
             <div class="calc">
-              При длинных письмах произведения уходят в 0 (underflow)<br>
-              Решение: логарифмировать<br><br>
-              log P(x|спам) = log(0.30) + log(0.40) + log(0.25)<br>
-              = −1.204 + (−0.916) + (−1.386) = <b>−3.506</b><br><br>
-              log P(x|хам) = log(0.05) + log(0.02) + log(0.01)<br>
-              = −2.996 + (−3.912) + (−4.605) = <b>−11.513</b><br><br>
-              Разница: −3.506 − (−11.513) = 8.007<br>
-              Спам в e^8 ≈ 3000 раз вероятнее хама
+              $\\alpha = 1$ (добавляем 1 «виртуальное» вхождение каждого слова)<br>
+              $|V| = 6$ слов в словаре<br><br>
+              <b>Для спама:</b> знаменатель = $6 + 1 \\times 6 = 12$<br>
+              $P(\\text{деньги}|\\text{спам}) = (2+1)/12 = 3/12 = \\mathbf{0{,}250}$<br>
+              $P(\\text{акция}|\\text{спам}) = (2+1)/12 = 3/12 = \\mathbf{0{,}250}$<br>
+              $P(\\text{бесплатно}|\\text{спам}) = (1+1)/12 = 2/12 = \\mathbf{0{,}167}$<br>
+              $P(\\text{встреча}|\\text{спам}) = (0+1)/12 = 1/12 = \\mathbf{0{,}083}$<br>
+              $P(\\text{проект}|\\text{спам}) = (1+1)/12 = 2/12 = \\mathbf{0{,}167}$<br>
+              $P(\\text{завтра}|\\text{спам}) = (0+1)/12 = 1/12 = \\mathbf{0{,}083}$
+            </div>
+            <div class="calc">
+              <b>Для хама:</b> знаменатель = $3 + 1 \\times 6 = 9$<br>
+              $P(\\text{деньги}|\\text{хам}) = (0+1)/9 = 1/9 = \\mathbf{0{,}111}$<br>
+              $P(\\text{акция}|\\text{хам}) = (0+1)/9 = 1/9 = \\mathbf{0{,}111}$<br>
+              $P(\\text{бесплатно}|\\text{хам}) = (0+1)/9 = 1/9 = \\mathbf{0{,}111}$<br>
+              $P(\\text{встреча}|\\text{хам}) = (1+1)/9 = 2/9 = \\mathbf{0{,}222}$<br>
+              $P(\\text{проект}|\\text{хам}) = (1+1)/9 = 2/9 = \\mathbf{0{,}222}$<br>
+              $P(\\text{завтра}|\\text{хам}) = (1+1)/9 = 2/9 = \\mathbf{0{,}222}$
+            </div>
+            <div class="why">Laplace smoothing ($\\alpha=1$): все нулевые вероятности стали ненулевыми. Без smoothing любое слово, не встреченное в классе, «убивает» весь класс (произведение = 0).</div>
+          </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4. Сводная таблица вероятностей</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Слово</th><th>P(w|спам)</th><th>P(w|хам)</th><th>Ratio спам/хам</th></tr>
+                <tr><td>деньги</td><td>0.250</td><td>0.111</td><td>2.25x</td></tr>
+                <tr><td>акция</td><td>0.250</td><td>0.111</td><td>2.25x</td></tr>
+                <tr><td>бесплатно</td><td>0.167</td><td>0.111</td><td>1.50x</td></tr>
+                <tr><td>встреча</td><td>0.083</td><td>0.222</td><td>0.38x</td></tr>
+                <tr><td>проект</td><td>0.167</td><td>0.222</td><td>0.75x</td></tr>
+                <tr><td>завтра</td><td>0.083</td><td>0.222</td><td>0.38x</td></tr>
+              </table>
             </div>
           </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Классифицируем: «деньги бесплатно»</h4>
+            <div class="calc">
+              <b>Наивное предположение:</b> слова независимы внутри класса.<br><br>
+              $P(\\text{«деньги бесплатно»}|\\text{спам}) = P(\\text{деньги}|\\text{спам}) \\times P(\\text{бесплатно}|\\text{спам})$<br>
+              $= 0{,}250 \\times 0{,}167 = \\mathbf{0{,}04175}$<br><br>
+
+              $P(\\text{«деньги бесплатно»}|\\text{хам}) = P(\\text{деньги}|\\text{хам}) \\times P(\\text{бесплатно}|\\text{хам})$<br>
+              $= 0{,}111 \\times 0{,}111 = \\mathbf{0{,}01232}$
+            </div>
+            <div class="why">Likelihood для спама в ~3.4 раза выше. Но нужно ещё учесть prior!</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. Применяем Байес: posterior</h4>
+            <div class="calc">
+              $P(\\text{спам}|x) \\propto P(x|\\text{спам}) \\cdot P(\\text{спам})$<br>
+              $= 0{,}04175 \\times 0{,}667 = \\mathbf{0{,}02785}$<br><br>
+
+              $P(\\text{хам}|x) \\propto P(x|\\text{хам}) \\cdot P(\\text{хам})$<br>
+              $= 0{,}01232 \\times 0{,}333 = \\mathbf{0{,}00410}$<br><br>
+
+              <b>Нормировка:</b> $Z = 0{,}02785 + 0{,}00410 = 0{,}03195$<br><br>
+
+              $P(\\text{спам}|x) = 0{,}02785 / 0{,}03195 = \\mathbf{0{,}872 \\approx 87{,}2\\%}$<br>
+              $P(\\text{хам}|x) = 0{,}00410 / 0{,}03195 = \\mathbf{0{,}128 \\approx 12{,}8\\%}$
+            </div>
+            <div class="why">87,2% вероятность спама. «Деньги» и «бесплатно» — оба слова сильнее ассоциированы со спамом, плюс prior 2/3 тоже в пользу спама.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7. Проверка в log-пространстве (для длинных текстов)</h4>
+            <div class="calc">
+              $\\log P(\\text{спам}|x) \\propto \\log P(\\text{спам}) + \\log P(\\text{деньги}|\\text{спам}) + \\log P(\\text{бесплатно}|\\text{спам})$<br>
+              $= \\ln(0{,}667) + \\ln(0{,}250) + \\ln(0{,}167)$<br>
+              $= -0{,}405 + (-1{,}386) + (-1{,}792) = \\mathbf{-3{,}583}$<br><br>
+
+              $\\log P(\\text{хам}|x) \\propto \\ln(0{,}333) + \\ln(0{,}111) + \\ln(0{,}111)$<br>
+              $= -1{,}099 + (-2{,}198) + (-2{,}198) = \\mathbf{-5{,}495}$<br><br>
+
+              Разница: $-3{,}583 - (-5{,}495) = 1{,}912$<br>
+              Спам в $e^{1{,}912} \\approx 6{,}8$ раз вероятнее хама.
+            </div>
+            <div class="why">В log-пространстве произведения → суммы. Это предотвращает underflow при длинных текстах (десятки слов → произведение стремится к 0).</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>P(спам|«купить срочно бесплатно») ≈ 99.9%. Это спам! Отношение вероятностей спам/хам = 0.009/0.000007 ≈ 1286:1.</p>
+            <p>«деньги бесплатно» → P(спам) = 87,2%. Naive Bayes с Laplace smoothing ($\\alpha=1$): 3 письма, 6 слов в словаре — и классификатор уже работает. В log-пространстве: спам в 6,8 раз вероятнее хама.</p>
           </div>
+
           <div class="lesson-box">
-            Laplace smoothing: если слово не встречалось в обучении → P=0 → произведение = 0. Решение: P(w|c) = (count(w,c)+1) / (count(c)+|V|), где |V| — размер словаря. Всегда применять при Naive Bayes!
+            <b>Naive Bayes на практике:</b> 1) Всегда используйте Laplace smoothing ($\\alpha=1$ или $\\alpha=0{,}1$). 2) Работайте в log-пространстве. 3) «Наивность» (независимость слов) — грубое допущение, но NB удивительно хорошо работает для текстов, особенно при малом количестве данных.
           </div>
         `,
       },
       {
-        title: 'Обновление Beta prior',
+        title: 'Beta posterior обновление',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Показать байесовское обновление на примере монеты: начать с uninformative prior и обновлять по мере бросков.</p>
+            <p>Монета: prior Beta(2, 2) (слабое предположение о «честности»). Наблюдаем 10 бросков: 7 орлов, 3 решки. Вычислить posterior, E[p], mode, и 95% credible interval. Показать сдвиг распределения.</p>
           </div>
-          <div class="example-data-table">
-            <table>
-              <tr><th>Момент</th><th>Броски</th><th>Орлов</th><th>Prior Beta</th><th>Posterior Beta</th><th>E[p]</th></tr>
-              <tr><td>Начало</td><td>0</td><td>0</td><td>Beta(1,1)</td><td>Beta(1,1)</td><td>0.50</td></tr>
-              <tr><td>После 5</td><td>5</td><td>4</td><td>Beta(1,1)</td><td>Beta(5,2)</td><td>5/7≈0.71</td></tr>
-              <tr><td>После 20</td><td>20</td><td>14</td><td>Beta(1,1)</td><td>Beta(15,7)</td><td>15/22≈0.68</td></tr>
-              <tr><td>После 100</td><td>100</td><td>68</td><td>Beta(1,1)</td><td>Beta(69,33)</td><td>69/102≈0.68</td></tr>
-            </table>
-          </div>
+
           <div class="step" data-step="1">
-            <h4>Шаг 1: что такое Beta prior</h4>
+            <h4>Шаг 1. Prior: Beta(2, 2) — что это значит?</h4>
             <div class="calc">
-              Beta(α, β) — распределение на [0,1]<br>
-              Alpha (α) = «виртуальные орлы», Beta (β) = «виртуальные решки»<br><br>
-              Beta(1,1) = равномерное — «не знаем ничего о монете»<br>
-              Beta(5,5) = «похоже на честную монету» (было 5+5 орлов/решек)<br>
-              Beta(10,1) = «похоже на нечестную в пользу орла»<br><br>
-              E[p] = α/(α+β)
+              Beta($\\alpha$, $\\beta$) — распределение на [0, 1]<br>
+              $\\alpha = 2$ — «виртуальных орлов», $\\beta = 2$ — «виртуальных решек»<br><br>
+              $E[p] = \\dfrac{\\alpha}{\\alpha + \\beta} = \\dfrac{2}{2+2} = \\mathbf{0{,}500}$<br><br>
+              $\\text{Mode}[p] = \\dfrac{\\alpha - 1}{\\alpha + \\beta - 2} = \\dfrac{1}{2} = \\mathbf{0{,}500}$<br><br>
+              $\\text{Var}[p] = \\dfrac{\\alpha \\beta}{(\\alpha+\\beta)^2(\\alpha+\\beta+1)} = \\dfrac{4}{16 \\cdot 5} = \\mathbf{0{,}050}$<br>
+              $\\text{Std}[p] = \\sqrt{0{,}050} = 0{,}224$
             </div>
-            <div class="why">Сопряжённый prior для биномиального правдоподобия — Beta. Это значит posterior тоже Beta: аналитически удобно!</div>
+            <div class="why">Beta(2,2) — слабый prior: «мы немного верим, что монета честная (p ≈ 0.5), но легко изменим мнение при данных». Сила prior = $\\alpha + \\beta = 4$ (эквивалент 4 «виртуальных» бросков).</div>
           </div>
+
           <div class="step" data-step="2">
-            <h4>Шаг 2: правило обновления</h4>
-            <div class="calc">
-              Prior: Beta(α, β)<br>
-              Наблюдаем: h орлов из n бросков<br>
-              Posterior: Beta(α + h, β + n − h)<br><br>
-              5 бросков, 4 орла:<br>
-              Beta(1,1) → Beta(1+4, 1+1) = <b>Beta(5, 2)</b><br>
-              E[p] = 5/(5+2) = 0.714<br><br>
-              Ещё 15 бросков, 10 орлов:<br>
-              Beta(5,2) → Beta(5+10, 2+5) = <b>Beta(15, 7)</b><br>
-              E[p] = 15/22 = 0.682
+            <h4>Шаг 2. Данные: 10 бросков, 7 орлов, 3 решки</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Бросок</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+                <tr><td>Результат</td><td>О</td><td>Р</td><td>О</td><td>О</td><td>О</td><td>Р</td><td>О</td><td>О</td><td>Р</td><td>О</td></tr>
+              </table>
             </div>
+            <div class="calc">
+              Орлов (h) = 7, Решек (t) = 3, Всего (n) = 10<br>
+              Частотная оценка: $\\hat{p}_{MLE} = 7/10 = 0{,}700$
+            </div>
+            <div class="why">MLE-оценка = 0.7, но с 10 бросками это неуверенная оценка. Байесовский подход: комбинируем prior + данные → получаем распределение, а не точку.</div>
           </div>
+
           <div class="step" data-step="3">
-            <h4>Шаг 3: влияние силы prior</h4>
+            <h4>Шаг 3. Правило обновления: conjugate prior</h4>
             <div class="calc">
-              Слабый prior Beta(1,1): после 5 орлов из 5 → E[p]=5/7≈0.71<br>
-              Сильный prior Beta(10,10): после 5 орлов из 5 → Beta(15,10), E[p]=15/25=0.60<br><br>
-              При 1000 бросков: оба prior сходятся к истинному p<br>
-              Сильный prior «тянет» результат к центру (shrinkage)<br><br>
-              Сила prior = α+β («виртуальные наблюдения»)<br>
-              Beta(10,10) = «эквивалентно 20 предварительным броскам»
+              <b>Формула:</b> Beta($\\alpha$, $\\beta$) + (h орлов, t решек) = Beta($\\alpha + h$, $\\beta + t$)<br><br>
+              Prior: Beta(2, 2)<br>
+              Данные: h = 7, t = 3<br><br>
+              <b>Posterior:</b> Beta(2 + 7, 2 + 3) = <b>Beta(9, 5)</b>
             </div>
-            <div class="why">Сильный prior нужен, когда данных мало. Слабый — когда данных много. При n→∞ prior не важен.</div>
+            <div class="why">Conjugate prior — это магия: posterior имеет ту же форму (Beta), что и prior. Просто прибавляем наблюдения к параметрам. Не нужно считать интегралы!</div>
           </div>
+
+          <div class="step" data-step="4">
+            <h4>Шаг 4. Характеристики posterior Beta(9, 5)</h4>
+            <div class="calc">
+              $E[p] = \\dfrac{9}{9+5} = \\dfrac{9}{14} = \\mathbf{0{,}643}$<br><br>
+              $\\text{Mode}[p] = \\dfrac{9-1}{9+5-2} = \\dfrac{8}{12} = \\mathbf{0{,}667}$<br><br>
+              $\\text{Var}[p] = \\dfrac{9 \\times 5}{14^2 \\times 15} = \\dfrac{45}{2940} = 0{,}0153$<br>
+              $\\text{Std}[p] = \\sqrt{0{,}0153} = \\mathbf{0{,}124}$
+            </div>
+            <div class="why">Среднее сдвинулось: 0.500 → 0.643 (к MLE 0.700). Std уменьшился: 0.224 → 0.124 (мы стали увереннее). Posterior = компромисс между prior и данными.</div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h4>Шаг 5. Сравнение prior vs posterior</h4>
+            <div class="example-data-table">
+              <table>
+                <tr><th>Характеристика</th><th>Prior Beta(2,2)</th><th>Posterior Beta(9,5)</th><th>MLE</th></tr>
+                <tr><td>E[p]</td><td>0.500</td><td><b>0.643</b></td><td>0.700</td></tr>
+                <tr><td>Mode[p]</td><td>0.500</td><td><b>0.667</b></td><td>0.700</td></tr>
+                <tr><td>Std[p]</td><td>0.224</td><td><b>0.124</b></td><td>—</td></tr>
+                <tr><td>«Виртуальных» бросков</td><td>4</td><td><b>14</b></td><td>10</td></tr>
+              </table>
+            </div>
+            <div class="calc">
+              Posterior E[p] = 0.643 — это взвешенное среднее:<br>
+              $E[p]_{\\text{post}} = \\dfrac{\\alpha + \\beta}{\\alpha + \\beta + n} \\cdot E[p]_{\\text{prior}} + \\dfrac{n}{\\alpha + \\beta + n} \\cdot \\hat{p}_{MLE}$<br>
+              $= \\dfrac{4}{14} \\cdot 0{,}500 + \\dfrac{10}{14} \\cdot 0{,}700$<br>
+              $= 0{,}143 + 0{,}500 = \\mathbf{0{,}643}$ — сходится!
+            </div>
+            <div class="why">Posterior = взвешенное среднее prior и MLE. Вес prior = 4/14 (29%), вес данных = 10/14 (71%). С ростом n вес данных растёт → posterior → MLE.</div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h4>Шаг 6. 95% credible interval</h4>
+            <div class="calc">
+              Для Beta(9, 5) 95% credible interval (числовое приближение):<br>
+              2.5-й перцентиль ≈ <b>0.387</b><br>
+              97.5-й перцентиль ≈ <b>0.855</b><br><br>
+              95% CI: $p \\in [0{,}387,\\; 0{,}855]$<br><br>
+              Содержит ли интервал 0.5 (честная монета)? → <b>Да!</b><br>
+              → Мы пока не можем отвергнуть гипотезу о честной монете.
+            </div>
+            <div class="why">Credible interval (байесовский): «параметр $p$ лежит в [0.387, 0.855] с вероятностью 95%». Это прямая интерпретация! В отличие от confidence interval, который так интерпретировать нельзя.</div>
+          </div>
+
+          <div class="step" data-step="7">
+            <h4>Шаг 7. Что если данных больше? 70 орлов из 100</h4>
+            <div class="calc">
+              Prior: Beta(2, 2). Данные: h=70, t=30.<br>
+              Posterior: Beta(72, 32)<br><br>
+              $E[p] = 72/104 = 0{,}692$ (очень близко к MLE = 0.700)<br>
+              $\\text{Std}[p] = \\sqrt{\\dfrac{72 \\times 32}{104^2 \\times 105}} = 0{,}045$<br><br>
+              95% CI: $[0{,}600,\\; 0{,}777]$<br>
+              Содержит ли 0.5? → <b>Нет!</b> Монета нечестная.
+            </div>
+            <div class="why">С 100 бросками: prior почти не влияет (2/104 = 2%), posterior ≈ MLE. Интервал сузился (std 0.224 → 0.045). С достаточным количеством данных байесовский вывод сходится к частотному.</div>
+          </div>
+
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>После 100 бросков (68 орлов): E[p] = 69/102 ≈ 0.676. Монета, скорее всего, нечестная. 95% credible interval: Beta(69,33) → [0.584, 0.763] — не включает 0.5.</p>
+            <p>Prior Beta(2,2) + 7 орлов из 10 = Posterior Beta(9,5). E[p] сдвинулся с 0.500 к 0.643 (между prior и MLE). 95% CI: [0.387, 0.855] — ещё включает 0.5. При 70/100: posterior Beta(72,32), E[p]=0.692, CI не включает 0.5 — монета нечестная.</p>
           </div>
+
           <div class="lesson-box">
-            Credible interval (байесовский) vs Confidence interval (частотный): разная интерпретация. «Параметр с 95% вероятностью лежит в [0.58, 0.76]» — это credible interval. Confidence interval так интерпретировать нельзя!
+            <b>Beta-binomial — итог:</b> Prior Beta($\\alpha$, $\\beta$) + данные (h, t) = Posterior Beta($\\alpha+h$, $\\beta+t$). Posterior = компромисс prior/data, взвешенный по «числу наблюдений». При $n \\to \\infty$: posterior → MLE, prior не важен. Используйте credible interval для принятия решений.
           </div>
         `,
       },
