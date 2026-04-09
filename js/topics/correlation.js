@@ -728,7 +728,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BB%D1%8F%D1%86%D0%B8%D1%8F" target="_blank">Habr: корреляция</a> — статьи о корреляционном анализе на Хабре</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BB%D1%8F%D1%86%D0%B8%D1%8F%20%D0%9F%D0%B8%D1%80%D1%81%D0%BE%D0%BD%D0%B0%20%D0%A1%D0%BF%D0%B8%D1%80%D0%BC%D0%B5%D0%BD%D0%B0" target="_blank">Habr: корреляция</a> — статьи о корреляционном анализе на Хабре</li>
         <li><a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient" target="_blank">Wikipedia: Pearson correlation coefficient</a> — формула, свойства и ограничения корреляции Пирсона</li>
       </ul>
       <h3>📚 Документация</h3>

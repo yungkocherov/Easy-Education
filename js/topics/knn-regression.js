@@ -600,7 +600,7 @@ for name, model in models.items():
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/149693/" target="_blank">Метод ближайших соседей на Habr</a> — разбор kNN с примерами применения</li>
+        <li><a href="https://habr.com/ru/search/?q=kNN%20%D1%80%D0%B5%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D1%8F%20%D0%B1%D0%BB%D0%B8%D0%B6%D0%B0%D0%B9%D1%88%D0%B8%D0%B5%20%D1%81%D0%BE%D1%81%D0%B5%D0%B4%D0%B8" target="_blank">Метод ближайших соседей на Habr</a> — разбор kNN с примерами применения</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

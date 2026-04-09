@@ -865,7 +865,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/469535/" target="_blank">Habr: Алгоритм k-means</a> — разбор с примерами на Python</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BA%D0%BB%D0%B0%D1%81%D1%82%D0%B5%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F%20k-means" target="_blank">Habr: Алгоритм k-means</a> — разбор с примерами на Python</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

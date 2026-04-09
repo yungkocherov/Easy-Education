@@ -1179,7 +1179,7 @@ for epoch in range(10):
       <h3>📖 Статьи</h3>
       <ul>
         <li><a href="https://cs231n.stanford.edu/" target="_blank">CS231n Stanford: Convolutional Neural Networks</a> — классический курс по CNN для компьютерного зрения</li>
-        <li><a href="https://habr.com/ru/articles/309508/" target="_blank">Habr: Свёрточные нейронные сети</a> — разбор архитектуры с примерами</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%81%D0%B2%D1%91%D1%80%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B5%D0%B9%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D0%B5%D1%82%D0%B8%20CNN" target="_blank">Habr: Свёрточные нейронные сети</a> — разбор архитектуры с примерами</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

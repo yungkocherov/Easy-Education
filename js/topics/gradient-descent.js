@@ -804,7 +804,7 @@ print(f"Найдены: w={w:.3f} (истинное 3), b={b:.3f} (истинн�
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/471522/" target="_blank">Habr: Градиентный спуск</a> — SGD, Mini-batch, Adam и их сравнение с кодом</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B3%D1%80%D0%B0%D0%B4%D0%B8%D0%B5%D0%BD%D1%82%D0%BD%D1%8B%D0%B9%20%D1%81%D0%BF%D1%83%D1%81%D0%BA%20%D0%BE%D0%BF%D1%82%D0%B8%D0%BC%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F" target="_blank">Habr: Градиентный спуск</a> — SGD, Mini-batch, Adam и их сравнение с кодом</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

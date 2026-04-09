@@ -724,8 +724,8 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D0%BE%D0%B2%D0%B0%D1%8F+%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0" target="_blank">Habr: продуктовая аналитика</a> — метрики, когортный анализ, воронки на Хабре</li>
-        <li><a href="https://habr.com/ru/search/?q=unit+%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B0" target="_blank">Habr: unit-экономика</a> — LTV, CAC, ARPU и расчёт unit-экономики</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0%20%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D0%BA%D0%B8%20%D0%B2%D0%BE%D1%80%D0%BE%D0%BD%D0%BA%D0%B0" target="_blank">Habr: продуктовая аналитика</a> — метрики, когортный анализ, воронки на Хабре</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0%20%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D0%BA%D0%B8%20%D0%B2%D0%BE%D1%80%D0%BE%D0%BD%D0%BA%D0%B0" target="_blank">Habr: unit-экономика</a> — LTV, CAC, ARPU и расчёт unit-экономики</li>
         <li><a href="https://en.wikipedia.org/wiki/Customer_lifetime_value" target="_blank">Wikipedia: Customer Lifetime Value</a> — формулы и методы расчёта LTV</li>
       </ul>
       <h3>📚 Документация и инструменты</h3>

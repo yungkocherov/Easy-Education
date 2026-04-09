@@ -811,7 +811,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/767950/" target="_blank">Habr: Isolation Forest</a> — разбор алгоритма с кодом и примерами на реальных данных</li>
+        <li><a href="https://habr.com/ru/search/?q=isolation%20forest%20%D0%B0%D0%BD%D0%BE%D0%BC%D0%B0%D0%BB%D0%B8%D0%B8" target="_blank">Habr: Isolation Forest</a> — разбор алгоритма с кодом и примерами на реальных данных</li>
         <li><a href="https://arxiv.org/abs/1811.02141" target="_blank">Оригинальная статья: Isolation Forest (Liu et al.)</a> — расширенная версия с Extended Isolation Forest</li>
       </ul>
       <h3>📚 Документация</h3>

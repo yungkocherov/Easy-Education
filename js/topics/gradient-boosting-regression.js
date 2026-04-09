@@ -1075,7 +1075,7 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/327250/" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация на русском языке</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B3%D1%80%D0%B0%D0%B4%D0%B8%D0%B5%D0%BD%D1%82%D0%BD%D1%8B%D0%B9%20%D0%B1%D1%83%D1%81%D1%82%D0%B8%D0%BD%D0%B3%20%D1%80%D0%B5%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D1%8F" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация на русском языке</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

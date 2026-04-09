@@ -822,7 +822,7 @@ print('UnderSampling F1:', f1_score(y_test, lr.predict(X_test), average='macro')
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/393455/" target="_blank">Дисбаланс классов на Habr</a> — стратегии работы с несбалансированными данными на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B4%D0%B8%D1%81%D0%B1%D0%B0%D0%BB%D0%B0%D0%BD%D1%81%20%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%BE%D0%B2%20SMOTE" target="_blank">Дисбаланс классов на Habr</a> — стратегии работы с несбалансированными данными на русском</li>
         <li><a href="https://arxiv.org/abs/1106.1813" target="_blank">Оригинальная статья SMOTE (Chawla et al.)</a> — исходная научная публикация алгоритма SMOTE</li>
       </ul>
       <h3>📚 Документация</h3>

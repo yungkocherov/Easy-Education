@@ -792,7 +792,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/304214/" target="_blank">Habr: PCA — метод главных компонент</a> — математика и практика с примерами</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%20%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%20PCA" target="_blank">Habr: PCA — метод главных компонент</a> — математика и практика с примерами</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

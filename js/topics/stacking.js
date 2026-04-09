@@ -672,7 +672,7 @@ print("Stacking AUC:", roc_auc_score(y_test, stacking.predict_proba(X_test)[:, 1
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/327250/" target="_blank">Stacking на Habr</a> — практическое руководство по stacking с кодом</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%81%D1%82%D0%B5%D0%BA%D0%B8%D0%BD%D0%B3%20%D0%B0%D0%BD%D1%81%D0%B0%D0%BC%D0%B1%D0%BB%D1%8C%20%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B5%D0%B9" target="_blank">Stacking на Habr</a> — практическое руководство по stacking с кодом</li>
         <li><a href="https://mlwave.com/kaggle-ensembling-guide/" target="_blank">Kaggle Ensembling Guide (MLWave)</a> — исчерпывающий гайд по ансамблированию для соревнований</li>
       </ul>
       <h3>📚 Документация</h3>

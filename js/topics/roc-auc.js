@@ -783,7 +783,7 @@ print(f'Average Precision: {ap:.4f}')</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/280094/" target="_blank">ROC-AUC на Habr</a> — теория и интерпретация ROC/PR кривых на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=ROC%20AUC%20%D0%BA%D1%80%D0%B8%D0%B2%D0%B0%D1%8F" target="_blank">ROC-AUC на Habr</a> — теория и интерпретация ROC/PR кривых на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

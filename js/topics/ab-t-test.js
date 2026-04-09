@@ -632,7 +632,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=t-%D1%82%D0%B5%D1%81%D1%82+%D1%81%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D1%85" target="_blank">Habr: t-тест средних</a> — применение t-теста для сравнения средних значений</li>
+        <li><a href="https://habr.com/ru/search/?q=t-%D1%82%D0%B5%D1%81%D1%82%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%81%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D1%85" target="_blank">Habr: t-тест средних</a> — применение t-теста для сравнения средних значений</li>
         <li><a href="https://en.wikipedia.org/wiki/Welch%27s_t-test" target="_blank">Wikipedia: Welch's t-test</a> — описание t-теста Уэлча и его преимущества</li>
       </ul>
       <h3>📚 Документация</h3>

@@ -838,7 +838,7 @@ print(f"P(болезнь | +тест) = {p_disease_given_pos:.1%}")
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D1%8F+%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D1%82%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9" target="_blank">Habr: теория вероятностей</a> — русскоязычные статьи о теории вероятностей</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%BB%D0%BE%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D1%82%D0%BD%D0%BE%D1%81%D1%82%D0%B8" target="_blank">Habr: теория вероятностей</a> — русскоязычные статьи о теории вероятностей</li>
         <li><a href="https://en.wikipedia.org/wiki/Probability_density_function" target="_blank">Wikipedia: Probability density function (PDF)</a> — определение и свойства функции плотности вероятности</li>
         <li><a href="https://en.wikipedia.org/wiki/Conditional_probability" target="_blank">Wikipedia: Conditional probability</a> — условная вероятность и формула Байеса</li>
       </ul>

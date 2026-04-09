@@ -759,7 +759,7 @@ for name, pipe in pipelines.items():
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/452524/" target="_blank">Habr: NLP — с чего начать</a> — обзор методов от BoW до BERT с практическими примерами</li>
+        <li><a href="https://habr.com/ru/search/?q=NLP%20%D0%BE%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0%20%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%B0%20TF-IDF%20Word2Vec" target="_blank">Habr: NLP — с чего начать</a> — обзор методов от BoW до BERT с практическими примерами</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

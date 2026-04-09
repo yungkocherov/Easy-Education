@@ -648,7 +648,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D1%85%D0%B8-%D0%BA%D0%B2%D0%B0%D0%B4%D1%80%D0%B0%D1%82" target="_blank">Habr: хи-квадрат</a> — применение хи-квадрат теста в A/B тестировании</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%85%D0%B8-%D0%BA%D0%B2%D0%B0%D0%B4%D1%80%D0%B0%D1%82%20%D1%82%D0%B5%D1%81%D1%82" target="_blank">Habr: хи-квадрат</a> — применение хи-квадрат теста в A/B тестировании</li>
         <li><a href="https://en.wikipedia.org/wiki/Chi-squared_test" target="_blank">Wikipedia: Chi-squared test</a> — математическое описание и условия применения</li>
       </ul>
       <h3>📚 Документация</h3>

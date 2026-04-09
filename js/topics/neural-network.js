@@ -1103,7 +1103,7 @@ plt.legend(); plt.show()
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/312450/" target="_blank">Habr: Нейронные сети с нуля</a> — реализация MLP и backpropagation на Python</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BD%D0%B5%D0%B9%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D0%B5%D1%82%D0%B8%20backpropagation" target="_blank">Habr: Нейронные сети с нуля</a> — реализация MLP и backpropagation на Python</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

@@ -910,7 +910,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/264915/" target="_blank">Регуляризация на Habr</a> — L1, L2 и Elastic Net с математикой и кодом на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F%20Ridge%20Lasso%20L1%20L2" target="_blank">Регуляризация на Habr</a> — L1, L2 и Elastic Net с математикой и кодом на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

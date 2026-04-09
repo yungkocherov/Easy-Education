@@ -1071,7 +1071,7 @@ print(f"Размер словаря: {tokenizer.vocab_size:,}")   # ~30 000 у B
       <ul>
         <li><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention Is All You Need (Vaswani et al., 2017)</a> — оригинальная статья, представившая архитектуру Transformer</li>
         <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">Jay Alammar: The Illustrated Transformer</a> — лучшее визуальное объяснение трансформера</li>
-        <li><a href="https://habr.com/ru/articles/486358/" target="_blank">Habr: Трансформер</a> — разбор архитектуры с кодом на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%84%D0%BE%D1%80%D0%BC%D0%B5%D1%80%20attention%20%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC%20%D0%B2%D0%BD%D0%B8%D0%BC%D0%B0%D0%BD%D0%B8%D1%8F" target="_blank">Habr: Трансформер</a> — разбор архитектуры с кодом на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

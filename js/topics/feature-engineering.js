@@ -670,7 +670,7 @@ for train_idx, val_idx in kf.split(df):
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/279773/" target="_blank">Feature Engineering на Habr</a> — разбор методов обработки и создания признаков на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=feature%20engineering%20%D0%BF%D1%80%D0%B8%D0%B7%D0%BD%D0%B0%D0%BA%D0%B8" target="_blank">Feature Engineering на Habr</a> — разбор методов обработки и создания признаков на русском</li>
         <li><a href="https://www.kaggle.com/learn/feature-engineering" target="_blank">Kaggle: Feature Engineering micro-course</a> — практический мини-курс с упражнениями</li>
       </ul>
       <h3>📚 Документация</h3>

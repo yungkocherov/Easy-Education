@@ -861,7 +861,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/368977/" target="_blank">Bias-Variance на Habr</a> — разбор компромисса на русском языке с примерами</li>
+        <li><a href="https://habr.com/ru/search/?q=bias%20variance%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%80%D0%BE%D0%BC%D0%B8%D1%81%D1%81%20%D1%81%D0%BC%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B4%D0%B8%D1%81%D0%BF%D0%B5%D1%80%D1%81%D0%B8%D1%8F" target="_blank">Bias-Variance на Habr</a> — разбор компромисса на русском языке с примерами</li>
         <li><a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" target="_blank">Understanding the Bias-Variance Tradeoff (Scott Fortmann-Roe)</a> — классическое интерактивное эссе с визуализациями</li>
       </ul>
       <h3>📚 Документация</h3>

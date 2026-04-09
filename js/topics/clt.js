@@ -691,7 +691,7 @@ print(f"95% ДИ: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D1%82%D0%B5%D0%BE%D1%80%D0%B5%D0%BC%D0%B0" target="_blank">Habr: центральная предельная теорема</a> — статьи о ЦПТ и её применении</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D1%82%D0%B5%D0%BE%D1%80%D0%B5%D0%BC%D0%B0" target="_blank">Habr: центральная предельная теорема</a> — статьи о ЦПТ и её применении</li>
         <li><a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">Wikipedia: Central limit theorem</a> — строгая формулировка и условия применимости</li>
       </ul>
       <h3>📚 Документация</h3>

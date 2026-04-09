@@ -799,7 +799,7 @@ plt.show()  # Выброс 450 виден как отдельная точка</
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0" target="_blank">Habr: описательная статистика</a> — подборка русскоязычных статей на Хабре</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0%20%D1%81%D1%80%D0%B5%D0%B4%D0%BD%D0%B5%D0%B5%20%D0%BC%D0%B5%D0%B4%D0%B8%D0%B0%D0%BD%D0%B0" target="_blank">Habr: описательная статистика</a> — подборка русскоязычных статей на Хабре</li>
         <li><a href="https://en.wikipedia.org/wiki/Descriptive_statistics" target="_blank">Wikipedia: Descriptive statistics</a> — обзор методов описательной статистики</li>
       </ul>
       <h3>📚 Документация</h3>

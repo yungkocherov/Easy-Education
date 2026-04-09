@@ -745,7 +745,7 @@ for p, d, q in [(1,1,0), (0,1,1), (1,1,1), (2,1,1)]:
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=ARIMA+%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5+%D1%80%D1%8F%D0%B4%D1%8B" target="_blank">Habr: ARIMA и временные ряды</a> — практические статьи о работе с временными рядами</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%80%D1%8F%D0%B4%D1%8B%20ARIMA%20%D0%BF%D1%80%D0%BE%D0%B3%D0%BD%D0%BE%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5" target="_blank">Habr: ARIMA и временные ряды</a> — практические статьи о работе с временными рядами</li>
         <li><a href="https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average" target="_blank">Wikipedia: ARIMA</a> — математическое описание модели ARIMA</li>
       </ul>
       <h3>📚 Документация</h3>

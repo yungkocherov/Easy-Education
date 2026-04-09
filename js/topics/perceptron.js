@@ -816,7 +816,7 @@ plt.tight_layout(); plt.show()
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/312450/" target="_blank">Habr: Перцептрон</a> — история, математика и реализация с нуля</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BF%D0%B5%D1%80%D1%86%D0%B5%D0%BF%D1%82%D1%80%D0%BE%D0%BD%20%D0%BD%D0%B5%D0%B9%D1%80%D0%BE%D0%BD" target="_blank">Habr: Перцептрон</a> — история, математика и реализация с нуля</li>
         <li><a href="https://en.wikipedia.org/wiki/Perceptron" target="_blank">Wikipedia: Perceptron</a> — история создания, математика и теорема сходимости</li>
       </ul>
       <h3>📚 Документация</h3>

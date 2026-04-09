@@ -881,7 +881,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/182052/" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=random%20forest%20%D1%80%D0%B5%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D1%8F" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

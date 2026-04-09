@@ -737,7 +737,7 @@ print(df.round(3))</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/228963/" target="_blank">Метрики качества классификации на Habr</a> — подробный разбор всех метрик на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D0%BA%D0%B8%20%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D0%B8%20precision%20recall%20F1" target="_blank">Метрики качества классификации на Habr</a> — подробный разбор всех метрик на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

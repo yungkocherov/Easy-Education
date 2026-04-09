@@ -1045,7 +1045,7 @@ print(classification_report(y_te, svc_best.predict(X_te_s), target_names=data.ta
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/484148/" target="_blank">SVM на Habr</a> — разбор метода опорных векторов на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%20%D0%BE%D0%BF%D0%BE%D1%80%D0%BD%D1%8B%D1%85%20%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BE%D0%B2%20SVM" target="_blank">SVM на Habr</a> — разбор метода опорных векторов на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

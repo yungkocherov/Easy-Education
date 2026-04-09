@@ -775,7 +775,7 @@ Fold 3: train [1..140], test [141..160]</pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/350218/" target="_blank">Кросс-валидация на Habr</a> — подробный разбор методов кросс-валидации на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BA%D1%80%D0%BE%D1%81%D1%81-%D0%B2%D0%B0%D0%BB%D0%B8%D0%B4%D0%B0%D1%86%D0%B8%D1%8F%20cross%20validation" target="_blank">Кросс-валидация на Habr</a> — подробный разбор методов кросс-валидации на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

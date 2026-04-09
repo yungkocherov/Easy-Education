@@ -1069,7 +1069,7 @@ print(f"Для классификации: {last_hidden.shape}")
       <h3>📖 Статьи</h3>
       <ul>
         <li><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank">Colah's blog: Understanding LSTM Networks</a> — классическое визуальное объяснение LSTM</li>
-        <li><a href="https://habr.com/ru/articles/484896/" target="_blank">Habr: LSTM и GRU</a> — разбор архитектур с кодом на PyTorch</li>
+        <li><a href="https://habr.com/ru/search/?q=LSTM%20%D1%80%D0%B5%D0%BA%D1%83%D1%80%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B5%D0%B9%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D0%B5%D1%82%D0%B8" target="_blank">Habr: LSTM и GRU</a> — разбор архитектур с кодом на PyTorch</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

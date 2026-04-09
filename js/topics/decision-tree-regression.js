@@ -615,7 +615,7 @@ plt.show()
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/171759/" target="_blank">Деревья решений на Habr</a> — разбор CART для классификации и регрессии</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%20%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B9%20%D1%80%D0%B5%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D1%8F" target="_blank">Деревья решений на Habr</a> — разбор CART для классификации и регрессии</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>

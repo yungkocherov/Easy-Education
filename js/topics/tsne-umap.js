@@ -642,7 +642,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/657053/" target="_blank">Habr: t-SNE и UMAP</a> — сравнение методов с практическими примерами</li>
+        <li><a href="https://habr.com/ru/search/?q=t-SNE%20UMAP%20%D0%B2%D0%B8%D0%B7%D1%83%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F" target="_blank">Habr: t-SNE и UMAP</a> — сравнение методов с практическими примерами</li>
         <li><a href="https://distill.pub/2016/misread-tsne/" target="_blank">Distill.pub: How to Use t-SNE Effectively</a> — интерактивный разбор типичных ошибок интерпретации</li>
       </ul>
       <h3>📚 Документация</h3>

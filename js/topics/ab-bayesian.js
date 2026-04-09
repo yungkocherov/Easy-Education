@@ -589,7 +589,7 @@ plt.show()</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/search/?q=%D0%B1%D0%B0%D0%B9%D0%B5%D1%81%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9+AB+%D1%82%D0%B5%D1%81%D1%82" target="_blank">Habr: байесовский A/B тест</a> — практические руководства по байесовскому тестированию</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%B1%D0%B0%D0%B9%D0%B5%D1%81%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%20AB%20%D1%82%D0%B5%D1%81%D1%82" target="_blank">Habr: байесовский A/B тест</a> — практические руководства по байесовскому тестированию</li>
         <li><a href="https://en.wikipedia.org/wiki/Bayesian_inference" target="_blank">Wikipedia: Bayesian inference</a> — байесовский вывод: формальное описание</li>
       </ul>
       <h3>📚 Документация и инструменты</h3>

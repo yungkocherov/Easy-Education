@@ -651,7 +651,7 @@ for s in strategies:
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/482830/" target="_blank">Пропуски в данных на Habr</a> — типы пропущенности, MCAR/MAR/MNAR и методы обработки</li>
+        <li><a href="https://habr.com/ru/search/?q=%D0%BE%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0%20%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA%D0%BE%D0%B2%20imputation" target="_blank">Пропуски в данных на Habr</a> — типы пропущенности, MCAR/MAR/MNAR и методы обработки</li>
         <li><a href="https://github.com/iskandr/fancyimpute" target="_blank">fancyimpute — GitHub</a> — библиотека с MICE, KNN и другими продвинутыми импутерами</li>
       </ul>
       <h3>📚 Документация</h3>

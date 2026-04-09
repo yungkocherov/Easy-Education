@@ -1135,7 +1135,7 @@ print(f'CV ROC-AUC: {grid.best_score_:.4f}')</code></pre>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>
-        <li><a href="https://habr.com/ru/articles/182052/" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
+        <li><a href="https://habr.com/ru/search/?q=%D1%81%D0%BB%D1%83%D1%87%D0%B0%D0%B9%D0%BD%D1%8B%D0%B9%20%D0%BB%D0%B5%D1%81%20random%20forest" target="_blank">Random Forest на Habr</a> — разбор алгоритма и параметров на русском</li>
       </ul>
       <h3>📚 Документация</h3>
       <ul>
