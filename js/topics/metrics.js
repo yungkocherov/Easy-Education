@@ -9,6 +9,11 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('intro-ml')">Что такое ML</a> ·
+        <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты работаешь на почте и сортируешь письма: важные — в коробку «срочно», остальные — «обычно». Твой начальник спрашивает: «Как ты работаешь?»</p>

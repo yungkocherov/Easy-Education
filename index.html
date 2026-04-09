@@ -35,7 +35,7 @@
         <div class="welcome-features">
           <div class="welcome-feature">
             <div class="welcome-icon">📚</div>
-            <div><b>51 тема</b> — от статистики до трансформеров</div>
+            <div><b>57 тем</b> — от статистики до трансформеров</div>
           </div>
           <div class="welcome-feature">
             <div class="welcome-icon">🎮</div>
@@ -59,7 +59,120 @@
           </div>
         </div>
 
-        <p class="hint">💡 Начните с <b>Описательной статистики</b>, если вы новичок, или сразу переходите к интересующей модели в меню слева.</p>
+        <p class="hint">💡 Начните с <b>Что такое Machine Learning</b>, если вы совсем новичок, или выберите маршрут ниже.</p>
+
+        <div class="learning-paths">
+          <h3 class="paths-title">Маршруты обучения</h3>
+
+          <div class="path-card path-analyst">
+            <div class="path-header">
+              <span class="path-icon">📊</span>
+              <span class="path-name">Аналитик данных</span>
+            </div>
+            <p class="path-desc">Статистика, A/B тесты, продуктовая аналитика — всё для работы с данными и принятия решений.</p>
+            <div class="path-steps">
+              <a onclick="App.selectTopic('descriptive-stats')">Описательная статистика</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('probability-basics')">Теория вероятности</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('distributions')">Распределения</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('clt')">ЦПТ</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('hypothesis-testing')">Проверка гипотез</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('correlation')">Корреляция</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('ab-testing-intro')">A/B тесты</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('ab-z-test')">Z-тест</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('ab-t-test')">T-тест</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('ab-chi-square')">Хи-квадрат</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('ab-bayesian')">Байесовский A/B</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('causal-inference')">Причинный вывод</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('product-analytics')">Product Analytics</a>
+            </div>
+          </div>
+
+          <div class="path-card path-ml">
+            <div class="path-header">
+              <span class="path-icon">🤖</span>
+              <span class="path-name">ML-инженер</span>
+            </div>
+            <p class="path-desc">От основ до ансамблей: регрессия, классификация, кластеризация и все ключевые модели.</p>
+            <div class="path-steps">
+              <a onclick="App.selectTopic('intro-ml')">Что такое ML</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('descriptive-stats')">Описательная статистика</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('metrics')">Метрики</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('cross-validation')">Кросс-валидация</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('bias-variance')">Bias-Variance</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('regularization')">Регуляризация</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('decision-tree')">Деревья решений</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('random-forest')">Random Forest</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('gradient-boosting')">Gradient Boosting</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('svm')">SVM</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('feature-engineering')">Feature Engineering</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('kmeans')">K-Means</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('pca')">PCA</a>
+            </div>
+          </div>
+
+          <div class="path-card path-dl">
+            <div class="path-header">
+              <span class="path-icon">🧠</span>
+              <span class="path-name">DL-инженер</span>
+            </div>
+            <p class="path-desc">Нейронные сети от перцептрона до трансформеров: градиентный спуск, CNN, RNN, Attention.</p>
+            <div class="path-steps">
+              <a onclick="App.selectTopic('intro-ml')">Что такое ML</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('bias-variance')">Bias-Variance</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('regularization')">Регуляризация</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('perceptron')">Перцептрон</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('neural-network')">MLP</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('cnn')">CNN</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('nlp-basics')">Основы NLP</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('rnn-lstm')">RNN / LSTM</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('transformer')">Transformer</a>
+              <span class="path-arrow">→</span>
+              <a onclick="App.selectTopic('transfer-learning')">Transfer Learning</a>
+            </div>
+          </div>
+        </div>
 
         <div class="welcome-footer">
           <a href="https://github.com/yungkocherov/Easy-Education" target="_blank">GitHub</a>
@@ -103,6 +216,7 @@
   <script src="js/topics/product-analytics.js"></script>
 
   <!-- Topics: Основы ML -->
+  <script src="js/topics/intro-ml.js"></script>
   <script src="js/topics/feature-engineering.js"></script>
   <script src="js/topics/missing-data.js"></script>
   <script src="js/topics/metrics.js"></script>
@@ -113,6 +227,8 @@
   <script src="js/topics/bias-variance.js"></script>
   <script src="js/topics/regularization.js"></script>
   <script src="js/topics/smote.js"></script>
+  <script src="js/topics/hyperparameter-tuning.js"></script>
+  <script src="js/topics/recsys.js"></script>
 
   <!-- Topics: Регрессия -->
   <script src="js/topics/linear-regression.js"></script>
@@ -130,6 +246,7 @@
   <script src="js/topics/gradient-boosting.js"></script>
   <script src="js/topics/svm.js"></script>
   <script src="js/topics/bayesian.js"></script>
+  <script src="js/topics/boosting-comparison.js"></script>
 
   <!-- Topics: Кластеризация и снижение размерности -->
   <script src="js/topics/kmeans.js"></script>
@@ -146,6 +263,8 @@
   <script src="js/topics/nlp-basics.js"></script>
   <script src="js/topics/rnn-lstm.js"></script>
   <script src="js/topics/transformer.js"></script>
+  <script src="js/topics/transfer-learning.js"></script>
+  <script src="js/topics/generative-models.js"></script>
 
   <!-- Init -->
   <script>window.addEventListener('DOMContentLoaded', () => App.init());</script>

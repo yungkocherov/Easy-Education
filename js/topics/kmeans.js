@@ -9,6 +9,11 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('intro-ml')">Что такое ML</a> ·
+        <a onclick="App.selectTopic('descriptive-stats')">Описательная статистика</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты рассаживаешь гостей на свадьбе по столам. У тебя 100 гостей и 10 столов. Идея простая: похожие люди за один стол, разные — за разные. Но как понять «похожие»?</p>

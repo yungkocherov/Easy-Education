@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('decision-tree')">Решающее дерево</a> ·
+        <a onclick="App.selectTopic('random-forest')">Random Forest</a> ·
+        <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты учишь человека стрелять из лука. Первый выстрел — промах на 30 см вправо. Второй выстрел с поправкой — промах на 15 см влево (перекорректировал). Третий — уже всего 5 см от центра. Постепенно, <b>исправляя ошибки предыдущих попыток</b>, ты становишься всё точнее.</p>

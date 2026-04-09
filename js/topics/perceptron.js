@@ -9,6 +9,11 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a> ·
+        <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, как работает нейрон в мозге. К нему приходят сигналы от множества других нейронов. Каждый сигнал имеет свой <b>вес</b>: один нейрон «убедительнее» другого. Если взвешенная сумма сигналов превысила <b>порог</b> — нейрон «выстреливает», активируется.</p>

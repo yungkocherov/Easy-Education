@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('neural-network')">Многослойный перцептрон</a> ·
+        <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a> ·
+        <a onclick="App.selectTopic('nlp-basics')">Основы NLP</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты читаешь детектив. Ты не можешь понять «кто убийца» на 200-й странице, если забыл, что было на 50-й. Ты <b>помнишь</b> ключевые факты: «у героя алиби», «дверь была заперта», «подозреваемый курил сигареты "Рассвет"». По ходу чтения эти факты обновляются: что-то забывается, что-то добавляется.</p>
@@ -127,7 +133,12 @@ App.registerTopic({
       <h4>Обновление cell state</h4>
       <div class="math-block">$$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$$</div>
 
-      <p>Ключевой момент: cell state обновляется <b>аддитивно</b> — то есть градиенты проходят через неё без экспоненциального затухания. Поэтому LSTM может помнить сотни шагов назад.</p>
+      <div class="key-concept">
+        <div class="kc-label">Почему cell state решает vanishing gradients</div>
+        <p>В vanilla RNN градиент проходит через <b>умножение</b> на $W_{hh}$ на каждом шаге: $\\frac{\\partial h_t}{\\partial h_{t-1}} = \\text{diag}(\\tanh') \\cdot W_{hh}$. За 20 шагов: $0.5^{20} = 0.000001$ — градиент исчез.</p>
+        <p>В LSTM градиент по cell state: $\\frac{\\partial c_t}{\\partial c_{t-1}} = f_t$ — это просто <b>поэлементное умножение на forget gate</b>. Если $f_t \\approx 0.95$, то за 20 шагов: $0.95^{20} \\approx 0.36$ — <b>36% градиента сохранилось</b>!</p>
+        <p>Сравни: RNN теряет 99.9999% градиента, LSTM сохраняет 36%. Cell state — это <b>«шоссе» для градиента</b>: информация течёт по нему без сжатия через нелинейности и матричные умножения. Именно поэтому формула $c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t$ использует <b>сложение</b>, а не умножение на матрицу.</p>
+      </div>
 
       <h3>🔧 GRU — упрощённая LSTM</h3>
       <p><span class="term" data-tip="Gated Recurrent Unit. Упрощённая версия LSTM с двумя гейтами вместо трёх. Меньше параметров, часто работает не хуже.">GRU</span> (2014) — более простая версия LSTM:</p>

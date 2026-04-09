@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('neural-network')">Многослойный перцептрон</a> ·
+        <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a> ·
+        <a onclick="App.selectTopic('regularization')">Регуляризация</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты ищешь друга в толпе. Ты не смотришь на всех 10 000 людей одновременно — ты сканируешь толпу маленькими «окошками», проверяя каждое: «это он?». Причём <b>одно и то же</b> лицо друга ты ищешь везде — неважно, в центре толпы или с краю.</p>

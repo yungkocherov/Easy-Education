@@ -9,6 +9,11 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('kmeans')">K-Means</a> ·
+        <a onclick="App.selectTopic('descriptive-stats')">Описательная статистика</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь ночной город сверху. Видишь скопления огней — это жилые районы. Между ними — тёмные пустоши и случайные одинокие фонари вдоль дорог. Как определить «район»? Район — это <b>густое</b> скопление огней, отделённое пустотой от других скоплений.</p>

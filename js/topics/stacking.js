@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('random-forest')">Random Forest</a> ·
+        <a onclick="App.selectTopic('gradient-boosting')">Gradient Boosting</a> ·
+        <a onclick="App.selectTopic('cross-validation')">Кросс-валидация</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты судишь конкурс. Есть три эксперта: врач, инженер и экономист. Каждый оценивает участника с точки зрения своей экспертизы. Затем есть <b>арбитр</b> — опытный менеджер, который знает, насколько можно доверять каждому эксперту и как правильно взвешивать их мнения.</p>

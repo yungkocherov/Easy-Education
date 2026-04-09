@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('decision-tree')">Решающее дерево</a> ·
+        <a onclick="App.selectTopic('bias-variance')">Bias-Variance</a> ·
+        <a onclick="App.selectTopic('cross-validation')">Кросс-валидация</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты просишь нескольких экспертов оценить стоимость картины. Один коллекционер скажет 100, другой 120, третий 80, четвёртый 110. Каждый может ошибиться, но <b>среднее</b> обычно ближе к правде, чем любое отдельное мнение.</p>

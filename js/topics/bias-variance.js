@@ -9,6 +9,11 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('intro-ml')">Что такое ML</a> ·
+        <a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты стреляешь в мишень. У тебя два типа ошибок:</p>

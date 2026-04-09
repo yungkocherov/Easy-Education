@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('perceptron')">Перцептрон</a> ·
+        <a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a> ·
+        <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь конвейер на фабрике. Сырьё (данные) проходит через много станций, на каждой оно <b>преобразуется</b>: очищается, сортируется, комбинируется, обрабатывается. На выходе — готовый продукт. Каждая станция умеет делать что-то простое, но вместе они создают сложный продукт.</p>

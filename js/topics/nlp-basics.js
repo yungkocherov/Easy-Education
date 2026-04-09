@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('intro-ml')">Что такое ML</a> ·
+        <a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a> ·
+        <a onclick="App.selectTopic('metrics')">Метрики</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Компьютер не умеет «читать» в человеческом смысле. Для него слово «кошка» — просто строка символов. Чтобы найти связи между словами, сравнивать тексты и делать предсказания, нужен <b>переводчик: от слов к числам</b>.</p>
@@ -108,12 +114,58 @@ App.registerTopic({
       <p><span class="term" data-tip="Word2Vec. Нейросетевой метод обучения плотных векторов для слов. Слова с похожим контекстом получают похожие векторы. Обучается на задаче предсказания соседних слов.">Word2Vec</span> (Mikolov, 2013) — революция в NLP. Идея: <b>«слово — это его контекст»</b>. Слова, которые встречаются рядом с похожими словами, получают похожие векторы.</p>
       <p>Вместо разреженного вектора длиной |V| (10 000–100 000) каждое слово кодируется <b>плотным вектором</b> из 100–300 чисел. И в этом пространстве работает алгебра:</p>
       <div class="math-block">$$\\vec{\\text{король}} - \\vec{\\text{мужчина}} + \\vec{\\text{женщина}} \\approx \\vec{\\text{королева}}$$</div>
-      <p>Два режима обучения: <b>CBOW</b> (предсказать слово по контексту) и <b>Skip-gram</b> (предсказать контекст по слову). Skip-gram лучше для редких слов.</p>
+      <p>Word2Vec обучается нейросетью с одним скрытым слоем. Два режима:</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" style="max-width:640px;">
+          <!-- CBOW -->
+          <text x="150" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">CBOW</text>
+          <text x="150" y="32" text-anchor="middle" font-size="10" fill="#64748b">контекст → слово</text>
+          <rect x="20" y="45" width="80" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="60" y="63" text-anchor="middle" font-size="10" fill="#1e40af">кот</text>
+          <rect x="20" y="80" width="80" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="60" y="98" text-anchor="middle" font-size="10" fill="#1e40af">сидел</text>
+          <rect x="20" y="150" width="80" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="60" y="168" text-anchor="middle" font-size="10" fill="#1e40af">коврике</text>
+          <line x1="100" y1="59" x2="130" y2="125" stroke="#3b82f6" stroke-width="1.5"/>
+          <line x1="100" y1="94" x2="130" y2="125" stroke="#3b82f6" stroke-width="1.5"/>
+          <line x1="100" y1="164" x2="130" y2="125" stroke="#3b82f6" stroke-width="1.5"/>
+          <rect x="130" y="110" width="70" height="30" rx="6" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/><text x="165" y="129" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">скрытый</text>
+          <line x1="200" y1="125" x2="230" y2="125" stroke="#16a34a" stroke-width="1.5"/>
+          <rect x="230" y="110" width="60" height="30" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="260" y="129" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">на</text>
+          <text x="260" y="155" text-anchor="middle" font-size="9" fill="#64748b">предсказание</text>
+
+          <!-- Skip-gram -->
+          <text x="480" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Skip-gram</text>
+          <text x="480" y="32" text-anchor="middle" font-size="10" fill="#64748b">слово → контекст</text>
+          <rect x="400" y="110" width="60" height="30" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="430" y="129" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">на</text>
+          <line x1="460" y1="125" x2="490" y2="125" stroke="#16a34a" stroke-width="1.5"/>
+          <rect x="490" y="110" width="70" height="30" rx="6" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/><text x="525" y="129" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">скрытый</text>
+          <line x1="560" y1="125" x2="580" y2="59" stroke="#3b82f6" stroke-width="1.5"/>
+          <line x1="560" y1="125" x2="580" y2="94" stroke="#3b82f6" stroke-width="1.5"/>
+          <line x1="560" y1="125" x2="580" y2="164" stroke="#3b82f6" stroke-width="1.5"/>
+          <rect x="580" y="45" width="50" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="605" y="63" text-anchor="middle" font-size="10" fill="#1e40af">кот</text>
+          <rect x="580" y="80" width="50" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="605" y="98" text-anchor="middle" font-size="10" fill="#1e40af">сидел</text>
+          <rect x="580" y="150" width="55" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="607" y="168" text-anchor="middle" font-size="10" fill="#1e40af">коврике</text>
+        </svg>
+        <div class="caption"><b>CBOW</b>: по контекстным словам предсказываем центральное. <b>Skip-gram</b>: по центральному слову предсказываем контекст. Skip-gram лучше для редких слов, CBOW быстрее.</div>
+      </div>
+
+      <p><b>CBOW</b> усредняет векторы контекстных слов и предсказывает центральное — быстрый, хорош на частых словах. <b>Skip-gram</b> берёт центральное слово и предсказывает каждое контекстное по отдельности — медленнее, но лучше для редких слов и маленьких корпусов.</p>
 
       <h3>🌐 Современные эмбеддинги: BERT и GPT</h3>
       <p>Word2Vec даёт одинаковый вектор слову «банк» в предложениях «банк реки» и «банк выдал кредит». <b>Контекстуальные эмбеддинги</b> (BERT, GPT) это исправляют: вектор слова зависит от всего предложения.</p>
-      <p>BERT (2018, Google) — трансформер, обученный предсказывать замаскированные слова в предложении. Понимает двунаправленный контекст. GPT — обучен предсказывать следующее слово (однонаправленный).</p>
-      <p>Для большинства практических задач достаточно TF-IDF + простая модель. Переходи к BERT когда точности недостаточно или задача сложная (QA, NER, перевод).</p>
+
+      <table>
+        <tr><th></th><th>BERT (2018, Google)</th><th>GPT (2018 → 2023+, OpenAI)</th></tr>
+        <tr><td><b>Архитектура</b></td><td>Encoder Transformer</td><td>Decoder Transformer</td></tr>
+        <tr><td><b>Направление</b></td><td>Двунаправленный — видит слова слева <b>и</b> справа</td><td>Однонаправленный — видит только слова <b>слева</b></td></tr>
+        <tr><td><b>Обучение</b></td><td>Маскируем 15% слов, модель их угадывает (MLM)</td><td>Предсказывает следующее слово (LM)</td></tr>
+        <tr><td><b>Лучше для</b></td><td>Понимание: классификация, NER, QA</td><td>Генерация: тексты, код, чат, диалог</td></tr>
+        <tr><td><b>Пример</b></td><td>«Кот [MASK] на коврике» → «сидел»</td><td>«Кот сидел на» → «коврике»</td></tr>
+      </table>
+
+      <div class="key-concept">
+        <div class="kc-label">Практическое правило</div>
+        <p>Для 80% NLP-задач достаточно <b>TF-IDF + линейная модель</b>. Переходи к BERT/GPT когда точности недостаточно, задача требует понимания контекста (QA, NER, перевод), или данных мало и нужен transfer learning.</p>
+      </div>
 
       <h3>⚡ FastText: подслова и OOV</h3>
       <p><span class="term" data-tip="FastText (Facebook, 2016). Расширение Word2Vec: каждое слово раскладывается на n-граммы символов. Вектор слова = сумма векторов его n-грамм. Работает со словами вне словаря (OOV).">FastText</span> решает главный недостаток Word2Vec: слова вне словаря (OOV). Если модель не видела слово «непредсказуемость» — Word2Vec не знает что делать. FastText разбивает слово на символьные n-граммы («непред», «предск», ...) и строит вектор из них. Редкие и новые слова обрабатываются корректно.</p>

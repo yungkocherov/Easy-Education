@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('random-forest')">Random Forest</a> ·
+        <a onclick="App.selectTopic('gradient-boosting')">Gradient Boosting</a> ·
+        <a onclick="App.selectTopic('metrics')">Метрики</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что банк отказал тебе в кредите — и ты хочешь знать <b>почему</b>. Модель выдала «отказ», но что именно повлияло: низкий доход? возраст? кредитная история? Без объяснения модель — это <b>чёрный ящик</b>: на вход подали данные, на выходе получили решение, а что внутри — неизвестно.</p>

@@ -9,6 +9,12 @@ App.registerTopic({
 
   tabs: {
     theory: `
+      <div class="prerequisites">
+        <b>Перед этой темой:</b>
+        <a onclick="App.selectTopic('intro-ml')">Что такое ML</a> ·
+        <a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a> ·
+        <a onclick="App.selectTopic('metrics')">Метрики</a>
+      </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты повар. Сырые данные — это необработанные продукты: картошка в земле, мясо с костями, специи целиком. Модель машинного обучения — это печь: она умеет печь, но не умеет чистить и нарезать. <b>Feature engineering — это готовка</b>: правильно нарезать, замариновать, соединить ингредиенты перед тем как поставить в печь.</p>
