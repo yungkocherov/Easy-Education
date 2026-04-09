@@ -658,8 +658,8 @@ print(f"Лучший accuracy: {search.best_score_:.4f}")</code></pre>
     links: `
       <h3>Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=5nYqrGMEMJA" target="_blank">StatQuest: Hyperparameter Tuning</a> -- подбор гиперпараметров с нуля, наглядно</li>
-        <li><a href="https://www.youtube.com/watch?v=ttE0F7fghfk" target="_blank">Sentdex: GridSearchCV in sklearn</a> -- практический пример GridSearch в Python</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest (канал)</a> -- подбор гиперпараметров с нуля, наглядно</li>
+        <li><a href="https://www.youtube.com/watch?v=ttE0F7fghfk" target="_blank">Hyperparameter Optimization (Siraj Raval)</a> -- практический пример GridSearch в Python</li>
       </ul>
       <h3>Статьи</h3>
       <ul>

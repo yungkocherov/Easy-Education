@@ -584,8 +584,8 @@ plt.show()</code></pre>
       <h3>📺 Видео</h3>
       <ul>
         <li><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank">3Blue1Brown: Bayes theorem</a> — визуальное объяснение теоремы Байеса</li>
-        <li><a href="https://www.youtube.com/watch?v=9TDjifpGj-k" target="_blank">StatQuest: Bayesian Statistics</a> — байесовская статистика: prior, likelihood, posterior</li>
-        <li><a href="https://www.youtube.com/watch?v=lFd7n_nKzpk" target="_blank">StatQuest: Beta Distribution</a> — бета-распределение как prior для конверсий</li>
+        <li><a href="https://www.youtube.com/watch?v=9TDjifpGj-k" target="_blank">Bayesian Statistics (Crash Course)</a> — байесовская статистика: prior, likelihood, posterior</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">The Beta Distribution (StatQuest channel)</a> — бета-распределение как prior для конверсий</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

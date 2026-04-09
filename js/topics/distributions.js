@@ -829,7 +829,7 @@ print("Нормальное" if p > 0.05 else "Не нормальное")</code
       <h3>📺 Видео</h3>
       <ul>
         <li><a href="https://www.youtube.com/watch?v=rzFX5NWojp0" target="_blank">StatQuest: Normal Distribution, Clearly Explained</a> — нормальное распределение: интуиция и формулы</li>
-        <li><a href="https://www.youtube.com/watch?v=Fvi9A_tEmXQ" target="_blank">StatQuest: The Poisson Distribution and Poisson Process</a> — распределение Пуассона с примерами</li>
+        <li><a href="https://www.youtube.com/watch?v=Fvi9A_tEmXQ" target="_blank">Probability density functions (Khan Academy)</a> — распределение Пуассона с примерами</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/random-variables-stats-library" target="_blank">Khan Academy: Random variables and probability distributions</a> — курс по случайным величинам и распределениям</li>
       </ul>
       <h3>📖 Статьи</h3>

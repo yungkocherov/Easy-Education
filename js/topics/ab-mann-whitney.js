@@ -690,8 +690,8 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=BT1FKd1Qzjw" target="_blank">StatQuest: The Wilcoxon Test (Mann-Whitney U test)</a> — ранговый тест Манна-Уитни: логика и применение</li>
-        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">StatQuest: t-tests, clearly explained</a> — сравнение t-теста и непараметрических альтернатив</li>
+        <li><a href="https://www.youtube.com/watch?v=BT1FKd1Qzjw" target="_blank">Mann-Whitney U Test (By Hand)</a> — ранговый тест Манна-Уитни: логика и применение</li>
+        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">Using Linear Models for t-tests and ANOVA (StatQuest)</a> — сравнение t-теста и непараметрических альтернатив</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics</a> — основы статистики для понимания непараметрических тестов</li>
       </ul>
       <h3>📖 Статьи</h3>

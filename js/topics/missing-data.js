@@ -647,7 +647,7 @@ for s in strategies:
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=EYySNJU8Tz0" target="_blank">Missing Data Imputation — обзор методов</a> — разбор стратегий обработки пропусков</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest (канал)</a> — разбор стратегий обработки пропусков</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

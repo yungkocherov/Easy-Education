@@ -654,7 +654,7 @@ for feat, weight in sorted(exp.as_list(), key=lambda x: abs(x[1]), reverse=True)
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=VB9uV-x0gtg" target="_blank">StatQuest: SHAP Values</a> — интуиция за SHAP values на примерах</li>
+        <li><a href="https://www.youtube.com/watch?v=VB9uV-x0gtg" target="_blank">Shapley Additive Explanations (SHAP)</a> — интуиция за SHAP values на примерах</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

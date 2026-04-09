@@ -763,7 +763,7 @@ print(result[0]["generated_text"])
       <ul>
         <li><a href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank">3Blue1Brown: Neural networks</a> — основа для понимания генеративных моделей</li>
         <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest</a> — поиск по «VAE», «GAN», «Diffusion» для пошагового разбора</li>
-        <li><a href="https://www.youtube.com/watch?v=J-lmV6Kkxbw" target="_blank">Yannic Kilcher: DDPM</a> — разбор статьи по Diffusion моделям</li>
+        <li><a href="https://www.youtube.com/watch?v=HoKDTa5jHvg" target="_blank">Yannic Kilcher: DDPM</a> — разбор статьи по Diffusion моделям</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

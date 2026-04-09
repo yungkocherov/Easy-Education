@@ -642,8 +642,8 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=2QeDRsxSF9M" target="_blank">StatQuest: Chi-Square Tests</a> — хи-квадрат тест независимости и тест согласия с примерами</li>
-        <li><a href="https://www.youtube.com/watch?v=7_cs1YlZoug" target="_blank">StatQuest: Fisher's Exact Test</a> — точный тест Фишера для малых выборок (альтернатива χ²)</li>
+        <li><a href="https://www.youtube.com/watch?v=2QeDRsxSF9M" target="_blank">Chi-Square Test (Khan Academy)</a> — хи-квадрат тест независимости и тест согласия с примерами</li>
+        <li><a href="https://www.youtube.com/watch?v=7_cs1YlZoug" target="_blank">Chi-Square Tests (Crash Course Statistics)</a> — точный тест Фишера для малых выборок (альтернатива χ²)</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/inference-categorical-data-chi-square-tests" target="_blank">Khan Academy: Chi-square tests</a> — хи-квадрат тесты с интерактивными упражнениями</li>
       </ul>
       <h3>📖 Статьи</h3>

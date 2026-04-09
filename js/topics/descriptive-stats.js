@@ -793,7 +793,7 @@ plt.show()  # Выброс 450 виден как отдельная точка</
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=XNgt7F6FqDU" target="_blank">StatQuest: Histograms, Clearly Explained</a> — наглядное объяснение гистограмм и их параметров</li>
+        <li><a href="https://www.youtube.com/watch?v=qBigTkBLU6g" target="_blank">StatQuest: Histograms, Clearly Explained</a> — наглядное объяснение гистограмм и их параметров</li>
         <li><a href="https://www.youtube.com/watch?v=SzZ6GpcfoQY" target="_blank">StatQuest: Mean, Variance and Standard Deviation</a> — среднее, дисперсия и стандартное отклонение</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data" target="_blank">Khan Academy: Summarizing quantitative data</a> — интерактивный курс по описательной статистике</li>
       </ul>

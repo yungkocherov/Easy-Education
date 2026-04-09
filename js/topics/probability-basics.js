@@ -832,7 +832,7 @@ print(f"P(болезнь | +тест) = {p_disease_given_pos:.1%}")
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=uzkc-qNVoOk" target="_blank">StatQuest: Probability is not Likelihood</a> — разница между вероятностью и функцией правдоподобия</li>
+        <li><a href="https://www.youtube.com/watch?v=uzkc-qNVoOk" target="_blank">Probability explained (Khan Academy)</a> — разница между вероятностью и функцией правдоподобия</li>
         <li><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank">3Blue1Brown: Bayes theorem</a> — визуальное объяснение теоремы Байеса</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/probability-library" target="_blank">Khan Academy: Basic probability</a> — основы теории вероятностей с упражнениями</li>
       </ul>

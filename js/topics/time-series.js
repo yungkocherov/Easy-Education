@@ -739,8 +739,8 @@ for p, d, q in [(1,1,0), (0,1,1), (1,1,1), (2,1,1)]:
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=GE3JOFwTWVM" target="_blank">StatQuest: Time Series Analysis</a> — введение в анализ временных рядов и ARIMA</li>
-        <li><a href="https://www.youtube.com/watch?v=bpUoxqn5SkY" target="_blank">StatQuest: ACF and PACF</a> — автокорреляционная и частичная автокорреляционная функции</li>
+        <li><a href="https://www.youtube.com/watch?v=GE3JOFwTWVM" target="_blank">What is Time Series Analysis?</a> — введение в анализ временных рядов и ARIMA</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest (канал)</a> — автокорреляционная и частичная автокорреляционная функции</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics and Probability</a> — основы статистики, полезные для понимания временных рядов</li>
       </ul>
       <h3>📖 Статьи</h3>

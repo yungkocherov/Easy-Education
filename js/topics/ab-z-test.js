@@ -594,7 +594,7 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=5ABpqVSx33I" target="_blank">StatQuest: Z-scores and Z-tests</a> — z-оценки и z-тесты: когда и как применять</li>
+        <li><a href="https://www.youtube.com/watch?v=5ABpqVSx33I" target="_blank">Z-statistics vs. T-statistics (Khan Academy)</a> — z-оценки и z-тесты: когда и как применять</li>
         <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values, clearly explained</a> — интерпретация p-value при тестировании конверсий</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample/tests-about-population-proportion/v/simple-hypothesis-testing" target="_blank">Khan Academy: Tests about a population proportion</a> — z-тест для пропорций с упражнениями</li>
       </ul>

@@ -626,8 +626,8 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">StatQuest: t-tests, clearly explained</a> — t-тест для двух выборок: интуиция и расчёт</li>
-        <li><a href="https://www.youtube.com/watch?v=AGh66ZPpOSQ" target="_blank">StatQuest: Welch's t-test</a> — t-тест Уэлча при неравных дисперсиях</li>
+        <li><a href="https://www.youtube.com/watch?v=NF5_btOaCig" target="_blank">Using Linear Models for t-tests and ANOVA (StatQuest)</a> — t-тест для двух выборок: интуиция и расчёт</li>
+        <li><a href="https://www.youtube.com/watch?v=AGh66ZPpOSQ" target="_blank">T-Tests: A Matched Pair (Crash Course Statistics)</a> — t-тест Уэлча при неравных дисперсиях</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-two-sample/two-sample-t-test-for-difference-of-means/v/two-sample-t-test-and-robustness" target="_blank">Khan Academy: Two-sample t-test</a> — двухвыборочный t-тест с примерами</li>
       </ul>
       <h3>📖 Статьи</h3>

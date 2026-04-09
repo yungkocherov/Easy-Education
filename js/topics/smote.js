@@ -818,7 +818,7 @@ print('UnderSampling F1:', f1_score(y_test, lr.predict(X_test), average='macro')
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=FheTDyCzzuk" target="_blank">Imbalanced datasets and SMOTE explained</a> — разбор проблемы дисбаланса и метода SMOTE</li>
+        <li><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest (канал)</a> — разбор проблемы дисбаланса и метода SMOTE</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

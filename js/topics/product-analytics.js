@@ -718,7 +718,7 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=lHI5oEgNkrk" target="_blank">StatQuest: Designing Experiments</a> — принципы дизайна экспериментов для продуктовой аналитики</li>
+        <li><a href="https://www.youtube.com/watch?v=lHI5oEgNkrk" target="_blank">Power and Sample Size (StatQuest)</a> — принципы дизайна экспериментов для продуктовой аналитики</li>
         <li><a href="https://www.youtube.com/watch?v=vemZtEM63GY" target="_blank">StatQuest: p-values</a> — как интерпретировать результаты продуктовых A/B тестов</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics and Probability</a> — статистические основы для продуктового аналитика</li>
       </ul>

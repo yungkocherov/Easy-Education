@@ -672,7 +672,7 @@ for train_idx, val_idx in kf.split(df):
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=68ABAU_V8qI" target="_blank">Feature Engineering — Kaggle курс (intro)</a> — обзор ключевых техник от Kaggle</li>
+        <li><a href="https://www.youtube.com/watch?v=68ABAU_V8qI" target="_blank">Feature Engineering (PyData London)</a> — обзор ключевых техник от Kaggle</li>
       </ul>
       <h3>📖 Статьи</h3>
       <ul>

@@ -722,8 +722,8 @@ plt.show()</code></pre>
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=xZ_z8KWkhXE" target="_blank">StatQuest: Correlation and Covariance</a> — корреляция и ковариация: разница и применение</li>
-        <li><a href="https://www.youtube.com/watch?v=Ypgo4qUBt5o" target="_blank">StatQuest: Spearman's Rank Correlation</a> — ранговая корреляция Спирмена</li>
+        <li><a href="https://www.youtube.com/watch?v=xZ_z8KWkhXE" target="_blank">Pearson's Correlation, Clearly Explained (StatQuest)</a> — корреляция и ковариация: разница и применение</li>
+        <li><a href="https://www.youtube.com/watch?v=Ypgo4qUBt5o" target="_blank">What Is Correlation?</a> — ранговая корреляция Спирмена</li>
         <li><a href="https://www.khanacademy.org/math/ap-statistics/bivariate-data-ap/correlation-coefficient-r/v/calculating-correlation-coefficient-r" target="_blank">Khan Academy: Correlation coefficient</a> — вычисление и интерпретация коэффициента корреляции</li>
       </ul>
       <h3>📖 Статьи</h3>
