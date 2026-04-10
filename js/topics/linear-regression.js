@@ -711,34 +711,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Матричная форма</h3>
-      <div class="math-block">$$\\hat{\\mathbf{y}} = X \\mathbf{w}$$</div>
-
-      <h4>Функция потерь</h4>
-      <div class="math-block">$$L(\\mathbf{w}) = \\|y - X\\mathbf{w}\\|^2 = (y - Xw)^T(y - Xw)$$</div>
-
-      <h4>Аналитическое решение (нормальное уравнение)</h4>
-      <div class="math-block">$$\\nabla_\\mathbf{w} L = -2 X^T(y - X\\mathbf{w}) = 0 \\implies \\mathbf{w}^* = (X^T X)^{-1} X^T y$$</div>
-
-      <h4>Градиентный спуск</h4>
-      <div class="math-block">$$\\mathbf{w}_{t+1} = \\mathbf{w}_t - \\eta \\cdot \\frac{2}{n} X^T (X\\mathbf{w}_t - y)$$</div>
-
-      <h4>Регуляризованные варианты</h4>
-      <p><b>Ridge (L2):</b></p>
-      <div class="math-block">$$L(\\mathbf{w}) = \\|y - X\\mathbf{w}\\|^2 + \\lambda \\|\\mathbf{w}\\|_2^2$$</div>
-      <p><b>Lasso (L1):</b></p>
-      <div class="math-block">$$L(\\mathbf{w}) = \\|y - X\\mathbf{w}\\|^2 + \\lambda \\|\\mathbf{w}\\|_1$$</div>
-
-      <h4>Метрики качества</h4>
-      <ul>
-        <li>MSE: $\\frac{1}{n}\\sum(y_i - \\hat{y}_i)^2$</li>
-        <li>RMSE: $\\sqrt{MSE}$</li>
-        <li>MAE: $\\frac{1}{n}\\sum|y_i - \\hat{y}_i|$</li>
-        <li>R²: $1 - \\frac{SS_{res}}{SS_{tot}}$</li>
-      </ul>
-    `,
-
     extra: `
       <h3>Предположения линейной регрессии (LINE)</h3>
       <ul>

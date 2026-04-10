@@ -1020,29 +1020,6 @@ print(f"Для классификации: {last_hidden.shape}")
       </div>
     `,
 
-    math: `
-      <h3>Vanilla RNN</h3>
-      <div class="math-block">$$h_t = \\tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)$$</div>
-      <div class="math-block">$$y_t = W_{hy} h_t + b_y$$</div>
-
-      <h3>LSTM</h3>
-      <div class="math-block">$$f_t = \\sigma(W_f [h_{t-1}, x_t] + b_f) \\quad \\text{forget}$$</div>
-      <div class="math-block">$$i_t = \\sigma(W_i [h_{t-1}, x_t] + b_i) \\quad \\text{input}$$</div>
-      <div class="math-block">$$\\tilde{c}_t = \\tanh(W_c [h_{t-1}, x_t] + b_c) \\quad \\text{candidate}$$</div>
-      <div class="math-block">$$c_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t \\quad \\text{cell update}$$</div>
-      <div class="math-block">$$o_t = \\sigma(W_o [h_{t-1}, x_t] + b_o) \\quad \\text{output}$$</div>
-      <div class="math-block">$$h_t = o_t \\odot \\tanh(c_t)$$</div>
-
-      <h3>GRU</h3>
-      <div class="math-block">$$z_t = \\sigma(W_z [h_{t-1}, x_t]) \\quad \\text{update}$$</div>
-      <div class="math-block">$$r_t = \\sigma(W_r [h_{t-1}, x_t]) \\quad \\text{reset}$$</div>
-      <div class="math-block">$$\\tilde{h}_t = \\tanh(W [r_t \\odot h_{t-1}, x_t])$$</div>
-      <div class="math-block">$$h_t = (1 - z_t) \\odot h_{t-1} + z_t \\odot \\tilde{h}_t$$</div>
-
-      <h3>Backprop Through Time (BPTT)</h3>
-      <p>Разворачиваем RNN во времени в глубокую сеть, применяем обычный backprop. Через T шагов — T-слойная сеть с разделяемыми весами.</p>
-    `,
-
     extra: `
       <h3>seq2seq (encoder-decoder)</h3>
       <p>Encoder RNN читает вход, кодирует в вектор. Decoder RNN генерирует выход. Основа машинного перевода до Transformer.</p>

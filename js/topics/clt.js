@@ -644,26 +644,6 @@ print(f"95% ДИ: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Формулировка</h3>
-      <p>Пусть $X_1, X_2, \\dots, X_n$ — независимые одинаково распределённые случайные величины с $E[X_i] = \\mu$ и $\\mathrm{Var}(X_i) = \\sigma^2 < \\infty$.</p>
-
-      <p>Обозначим $\\bar{X}_n = \\frac{1}{n}\\sum_{i=1}^{n} X_i$. Тогда:</p>
-
-      <div class="math-block">$$\\frac{\\bar{X}_n - \\mu}{\\sigma / \\sqrt{n}} \\xrightarrow{d} N(0, 1) \\quad \\text{при } n \\to \\infty$$</div>
-
-      <p>Эквивалентная запись:</p>
-      <div class="math-block">$$\\bar{X}_n \\approx N\\left(\\mu, \\frac{\\sigma^2}{n}\\right)$$</div>
-
-      <h4>Стандартная ошибка среднего</h4>
-      <div class="math-block">$$SE(\\bar{X}) = \\frac{\\sigma}{\\sqrt{n}}$$</div>
-      <p>Выборка в 4 раза больше → ошибка среднего в 2 раза меньше. Точность растёт как $\\sqrt{n}$.</p>
-
-      <h4>Закон больших чисел (следствие)</h4>
-      <div class="math-block">$$\\bar{X}_n \\xrightarrow{P} \\mu$$</div>
-      <p>Выборочное среднее сходится к истинному при $n \\to \\infty$.</p>
-    `,
-
     extra: `
       <h3>Когда ЦПТ «не спасает»</h3>
       <ul>

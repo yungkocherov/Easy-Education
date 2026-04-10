@@ -1004,26 +1004,32 @@ print(classification_report(y_te, svc_best.predict(X_te_s), target_names=data.ta
           </ul>
         </div>
       </div>
-    `,
 
-    math: `
-      <h3>Primal задача (hard margin)</h3>
-      <div class="math-block">$$\\min_{\\mathbf{w}, b} \\frac{1}{2} \\|\\mathbf{w}\\|^2 \\quad \\text{при} \\quad y_i(\\mathbf{w}^T \\mathbf{x}_i + b) \\geq 1$$</div>
-
-      <h3>Soft margin</h3>
-      <div class="math-block">$$\\min_{\\mathbf{w}, b, \\xi} \\frac{1}{2} \\|\\mathbf{w}\\|^2 + C \\sum_i \\xi_i$$</div>
-      <div class="math-block">$$\\text{при } y_i(\\mathbf{w}^T \\mathbf{x}_i + b) \\geq 1 - \\xi_i, \\quad \\xi_i \\geq 0$$</div>
-
-      <h3>Dual задача</h3>
-      <div class="math-block">$$\\max_\\alpha \\sum_i \\alpha_i - \\frac{1}{2} \\sum_{i,j} \\alpha_i \\alpha_j y_i y_j K(x_i, x_j)$$</div>
-      <div class="math-block">$$\\text{при } 0 \\leq \\alpha_i \\leq C, \\quad \\sum_i \\alpha_i y_i = 0$$</div>
-
-      <h3>Предсказание</h3>
-      <div class="math-block">$$f(x) = \\sum_{i \\in SV} \\alpha_i y_i K(x_i, x) + b$$</div>
-      <p>Где $SV = \\{i : \\alpha_i > 0\\}$ — опорные векторы.</p>
-
-      <h3>Связь margin и ‖w‖</h3>
-      <p>Margin = $\\frac{2}{\\|\\mathbf{w}\\|}$. Минимизация $\\|\\mathbf{w}\\|^2$ = максимизация margin.</p>
+      <h3>🧭 Когда использовать vs когда НЕ использовать</h3>
+      <table>
+        <tr><th>✅ Используй когда</th><th>❌ НЕ используй когда</th></tr>
+        <tr>
+          <td>Небольшие/средние данные (до ~100 тыс. строк)</td>
+          <td>Большие данные (&gt; 500k) — обучение занимает часы</td>
+        </tr>
+        <tr>
+          <td>Высокая размерность (тексты, геномы) — SVM эффективен</td>
+          <td>Нужны вероятности — SVM их не даёт напрямую (нужен Platt scaling)</td>
+        </tr>
+        <tr>
+          <td>Данные линейно разделимы или с кастомным ядром</td>
+          <td>Много классов — multi-class SVM неэффективен</td>
+        </tr>
+        <tr>
+          <td>Нужна гарантированная граница с максимальным margin</td>
+          <td>Нужна интерпретируемость — RBF SVM это чёрный ящик</td>
+        </tr>
+        <tr>
+          <td>Небольшие выборки с шумом — SVM устойчив</td>
+          <td>Смесь категориальных и числовых признаков — лучше деревья</td>
+        </tr>
+      </table>
+      <p><b>Альтернативы:</b> Logistic Regression для линейных границ с вероятностями, XGBoost для табличных данных, нейросети для неструктурированных.</p>
     `,
 
     extra: `

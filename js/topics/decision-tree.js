@@ -973,36 +973,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Меры неопределённости</h3>
-
-      <h4>Gini impurity</h4>
-      <div class="math-block">$$\\text{Gini}(S) = 1 - \\sum_{c=1}^{C} p_c^2$$</div>
-      <p>$p_c$ — доля класса c в узле S.</p>
-
-      <h4>Энтропия</h4>
-      <div class="math-block">$$H(S) = -\\sum_{c=1}^{C} p_c \\log_2 p_c$$</div>
-
-      <h4>Information Gain</h4>
-      <div class="math-block">$$IG(S, A) = H(S) - \\sum_{v \\in \\text{vals}(A)} \\frac{|S_v|}{|S|} H(S_v)$$</div>
-
-      <h4>Для регрессии (MSE)</h4>
-      <div class="math-block">$$\\text{MSE}(S) = \\frac{1}{|S|} \\sum_{i \\in S} (y_i - \\bar{y}_S)^2$$</div>
-
-      <h3>Алгоритм CART</h3>
-      <ol>
-        <li>Для каждого признака и порога вычислить impurity после разбиения.</li>
-        <li>Выбрать разбиение с максимальным снижением impurity.</li>
-        <li>Рекурсивно применить к детям, пока не достигнут стоп-критерий.</li>
-      </ol>
-
-      <h3>Prepruning vs Postpruning</h3>
-      <ul>
-        <li><b>Pre-pruning</b>: остановка роста по критериям (max_depth, min_samples).</li>
-        <li><b>Post-pruning</b>: построить большое дерево, потом обрезать (cost-complexity pruning, параметр α).</li>
-      </ul>
-    `,
-
     extra: `
       <h3>Cost-Complexity Pruning</h3>
       <p>Минимизируем $R(T) + \\alpha |T|$, где R(T) — ошибка, |T| — число листьев. Параметр α ищется через CV.</p>

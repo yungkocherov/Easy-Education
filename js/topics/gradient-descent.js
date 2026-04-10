@@ -753,26 +753,6 @@ print(f"Найдены: w={w:.3f} (истинное 3), b={b:.3f} (истинн�
       </div>
     `,
 
-    math: `
-      <h3>Базовое обновление</h3>
-      <div class="math-block">$$\\mathbf{w}_{t+1} = \\mathbf{w}_t - \\eta \\nabla L(\\mathbf{w}_t)$$</div>
-
-      <h3>SGD с momentum</h3>
-      <div class="math-block">$$v_{t+1} = \\beta v_t + \\nabla L(\\mathbf{w}_t), \\quad \\mathbf{w}_{t+1} = \\mathbf{w}_t - \\eta v_{t+1}$$</div>
-      <p>Накапливаем направление — помогает проходить плато и гасит колебания.</p>
-
-      <h3>Adam</h3>
-      <div class="math-block">$$m_t = \\beta_1 m_{t-1} + (1-\\beta_1) g_t$$</div>
-      <div class="math-block">$$v_t = \\beta_2 v_{t-1} + (1-\\beta_2) g_t^2$$</div>
-      <div class="math-block">$$\\mathbf{w}_{t+1} = \\mathbf{w}_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$$</div>
-      <p>Адаптивный learning rate для каждого параметра. Дефолт в большинстве DL-фреймворков.</p>
-
-      <h3>Сходимость (выпуклая L)</h3>
-      <p>Для выпуклой L с L-Lipschitz градиентом при $\\eta < 2/L$:</p>
-      <div class="math-block">$$L(\\mathbf{w}_T) - L^* \\leq \\frac{\\|\\mathbf{w}_0 - \\mathbf{w}^*\\|^2}{2\\eta T}$$</div>
-      <p>Сходимость $O(1/T)$.</p>
-    `,
-
     extra: `
       <h3>Learning rate schedules</h3>
       <ul>

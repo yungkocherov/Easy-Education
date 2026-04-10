@@ -730,26 +730,6 @@ print(f'Average Precision: {ap:.4f}')</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Определения</h3>
-      <div class="math-block">$$\\text{TPR}(t) = \\frac{|\\{i : \\hat{p}_i \\geq t, y_i = 1\\}|}{|\\{i : y_i = 1\\}|}$$</div>
-      <div class="math-block">$$\\text{FPR}(t) = \\frac{|\\{i : \\hat{p}_i \\geq t, y_i = 0\\}|}{|\\{i : y_i = 0\\}|}$$</div>
-
-      <h3>AUC как вероятность</h3>
-      <div class="math-block">$$\\text{AUC} = P(\\hat{p}_{\\text{pos}} > \\hat{p}_{\\text{neg}})$$</div>
-
-      <h3>Формула через ранги</h3>
-      <p>Пусть $R_i$ — ранг i-го положительного примера в отсортированных score. Тогда:</p>
-      <div class="math-block">$$\\text{AUC} = \\frac{\\sum_{i \\in \\text{pos}} R_i - \\frac{n_+ (n_+ + 1)}{2}}{n_+ \\cdot n_-}$$</div>
-      <p>(Связь с U-статистикой Манна-Уитни.)</p>
-
-      <h3>Связь с Gini</h3>
-      <div class="math-block">$$\\text{Gini} = 2 \\cdot \\text{AUC} - 1$$</div>
-
-      <h3>AUPRC baseline</h3>
-      <p>Для случайной модели $\\text{AUPRC} = P(y=1)$ — доля положительных.</p>
-    `,
-
     extra: `
       <h3>ROC vs PR при дисбалансе</h3>
       <p>Пример: 1% положительных. Модель находит 90% из них (TPR=0.9), но с 5% FPR.</p>

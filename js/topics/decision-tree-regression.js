@@ -553,25 +553,18 @@ plt.show()
 # Обратите внимание: за x=10 линия "застывает" — это экстраполяция</code></pre>
     `,
 
-    math: `
-      <h3>Критерий разбиения (MSE)</h3>
-      <div class="math-block">$$\\text{MSE}_{split} = \\frac{n_L}{n} \\cdot \\frac{1}{n_L}\\sum_{i\\in L}(y_i - \\bar{y}_L)^2 + \\frac{n_R}{n} \\cdot \\frac{1}{n_R}\\sum_{i\\in R}(y_i - \\bar{y}_R)^2$$</div>
-
-      <h3>Предсказание листа</h3>
-      <div class="math-block">$$\\hat{y}_{\\text{лист}} = \\bar{y}_R = \\frac{1}{|R|} \\sum_{i \\in R} y_i \\quad \\text{(MSE-критерий)}$$</div>
-      <div class="math-block">$$\\hat{y}_{\\text{лист}} = \\text{median}(\\{y_i : i \\in R\\}) \\quad \\text{(MAE-критерий)}$$</div>
-
-      <h3>Снижение MSE (Impurity Decrease)</h3>
-      <div class="math-block">$$\\Delta\\text{MSE} = \\text{MSE}_{\\text{parent}} - \\text{MSE}_{split}$$</div>
-      <p>Разбиваем узел только если $\\Delta\\text{MSE} \\geq$ min_impurity_decrease.</p>
-
-      <h3>Feature Importance</h3>
-      <div class="math-block">$$\\text{FI}_j = \\sum_{\\text{узлы, где делим по }j} \\frac{n_{\\text{узел}}}{n} \\cdot \\Delta\\text{MSE}_{\\text{узел}}$$</div>
-      <p>Нормируется так, чтобы сумма всех FI = 1.</p>
-
-      <h3>Предсказание (кусочно-постоянная функция)</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\sum_{j=1}^{J} \\bar{y}_{R_j} \\cdot \\mathbb{1}[x \\in R_j]$$</div>
-    `,
+    applications: `
+      <h3>Где применяется Decision Tree Regression</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Недвижимость</b></td><td>Оценка стоимости по площади, району, этажу — интерпретируемые правила</td></tr>
+        <tr><td><b>Финансы</b></td><td>Предсказание дохода, расходов сегмента клиентов</td></tr>
+        <tr><td><b>Промышленность</b></td><td>Предсказание расхода материалов, времени производства</td></tr>
+        <tr><td><b>Исследовательский анализ</b></td><td>Быстрая визуализация нелинейных зависимостей в данных</td></tr>
+        <tr><td><b>Как компонент</b></td><td>Базовый блок для Random Forest и Gradient Boosting</td></tr>
+        <tr><td><b>Объяснение моделей</b></td><td>Surrogate model — имитирует поведение чёрного ящика интерпретируемыми правилами</td></tr>
+      </table>
+        `,
 
     proscons: `
       <div class="proscons">

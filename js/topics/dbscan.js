@@ -755,33 +755,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Определения</h3>
-      <ul>
-        <li><b>ε-окрестность</b>: $N_\\epsilon(p) = \\{q \\in D : d(p, q) \\leq \\epsilon\\}$</li>
-        <li><b>Core point</b>: $|N_\\epsilon(p)| \\geq \\text{minPts}$</li>
-        <li><b>Directly density-reachable</b>: q достижима из p напрямую, если p core и $q \\in N_\\epsilon(p)$.</li>
-        <li><b>Density-reachable</b>: есть цепочка $p = p_1, p_2, \\dots, p_n = q$ из direct достижений.</li>
-        <li><b>Density-connected</b>: существует o, из которого density-reachable и p, и q.</li>
-      </ul>
-
-      <h3>Формальное определение кластера</h3>
-      <p>Кластер C ⊆ D удовлетворяет:</p>
-      <ol>
-        <li><b>Maximality</b>: если $p \\in C$ и q density-reachable из p, то $q \\in C$.</li>
-        <li><b>Connectivity</b>: $\\forall p, q \\in C$, они density-connected.</li>
-      </ol>
-
-      <h3>Сложность</h3>
-      <ul>
-        <li>Наивно: $O(n^2)$.</li>
-        <li>С KD-tree / R-tree: $O(n \\log n)$.</li>
-      </ul>
-
-      <h3>Выбор ε через k-distance plot</h3>
-      <p>Для каждой точки найти расстояние до k-го ближайшего соседа (k = min_samples). Отсортировать. «Колено» графика — хорошее значение ε.</p>
-    `,
-
     extra: `
       <h3>HDBSCAN — эволюция DBSCAN</h3>
       <p>Автоматически определяет разные плотности, не требует eps. Строит иерархию кластеров и выбирает стабильные.</p>

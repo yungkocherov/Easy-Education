@@ -810,28 +810,19 @@ plt.tight_layout()
 plt.show()</code></pre>
     `,
 
-    math: `
-      <h3>Усреднение ансамбля</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\frac{1}{T} \\sum_{t=1}^{T} h_t(x)$$</div>
-
-      <h3>Разложение ошибки на bias и variance</h3>
-      <div class="math-block">$$\\mathbb{E}[(y - \\hat{y})^2] = \\text{Bias}^2(\\hat{y}) + \\text{Var}(\\hat{y}) + \\sigma^2_{\\text{шум}}$$</div>
-
-      <h3>Дисперсия ансамбля деревьев</h3>
-      <div class="math-block">$$\\text{Var}(\\hat{y}_{RF}) = \\rho \\sigma^2 + \\frac{1 - \\rho}{T} \\sigma^2$$</div>
-      <p>Где $\\rho$ — корреляция между деревьями, $\\sigma^2$ — дисперсия одного дерева, $T$ — число деревьев.</p>
-
-      <h3>OOB предсказание</h3>
-      <div class="math-block">$$\\hat{y}_{OOB}(x_i) = \\frac{1}{|\\mathcal{T}_{-i}|} \\sum_{t \\in \\mathcal{T}_{-i}} h_t(x_i)$$</div>
-      <p>$\\mathcal{T}_{-i}$ — деревья, не видевшие $x_i$ при обучении.</p>
-
-      <h3>Критерий разбиения узла (MSE)</h3>
-      <div class="math-block">$$\\text{MSE}_\\text{узел} = \\frac{1}{n_\\text{узел}} \\sum_{i \\in \\text{узел}} (y_i - \\bar{y}_\\text{узел})^2$$</div>
-      <div class="math-block">$$\\Delta = \\text{MSE}_{\\text{родитель}} - \\frac{n_L}{n} \\text{MSE}_L - \\frac{n_R}{n} \\text{MSE}_R \\to \\max$$</div>
-
-      <h3>MDI Feature Importance</h3>
-      <div class="math-block">$$\\text{Imp}_j = \\frac{1}{T} \\sum_{t=1}^T \\sum_{v : \\text{split by } j} \\frac{n_v}{n} \\cdot \\Delta_v$$</div>
-    `,
+    applications: `
+      <h3>Где применяется Random Forest Regression</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Недвижимость</b></td><td>Оценка стоимости квартир/домов (Zillow Zestimate частично RF)</td></tr>
+        <tr><td><b>Финансы</b></td><td>Прогноз доходности, дефолтов, оценка рисков</td></tr>
+        <tr><td><b>Медицина</b></td><td>Прогноз длительности лечения, дозировок, риска осложнений</td></tr>
+        <tr><td><b>Биоинформатика</b></td><td>Предсказание свойств белков, активности молекул</td></tr>
+        <tr><td><b>Экология</b></td><td>Моделирование распределения видов, прогноз урожайности</td></tr>
+        <tr><td><b>Feature importance</b></td><td>Быстрый способ узнать, какие признаки важны (EDA этап)</td></tr>
+        <tr><td><b>Бейзлайн для табличных данных</b></td><td>Работает из коробки, почти не требует настройки</td></tr>
+      </table>
+        `,
 
     proscons: `
       <div class="proscons">

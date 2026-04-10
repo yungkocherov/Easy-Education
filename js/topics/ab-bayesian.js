@@ -523,33 +523,16 @@ plt.legend()
 plt.show()</code></pre>
     `,
 
-    math: `
-      <h3>Основные формулы</h3>
-
-      <h4>Байесовское обновление (Beta-Binomial)</h4>
-      <div class="math-block">$$\\text{Prior: } \\theta \\sim \\text{Beta}(\\alpha_0, \\beta_0)$$</div>
-      <div class="math-block">$$\\text{Likelihood: } k \\mid \\theta, n \\sim \\text{Binomial}(n, \\theta)$$</div>
-      <div class="math-block">$$\\text{Posterior: } \\theta \\mid k, n \\sim \\text{Beta}(\\alpha_0 + k,\\; \\beta_0 + n - k)$$</div>
-
-      <h4>Параметры posterior</h4>
-      <div class="math-block">$$E[\\theta \\mid k, n] = \\frac{\\alpha_0 + k}{\\alpha_0 + \\beta_0 + n}, \\quad \\text{Var}[\\theta \\mid k,n] = \\frac{(\\alpha+k)(\\beta+n-k)}{(\\alpha+\\beta+n)^2(\\alpha+\\beta+n+1)}$$</div>
-
-      <h4>Вероятность превосходства (аналитически)</h4>
-      <div class="math-block">$$P(\\theta_B > \\theta_A) = \\sum_{i=0}^{\\alpha_B - 1} \\frac{B(\\alpha_A + i,\\; \\beta_A + \\beta_B)}{(\\beta_B + i)\\, B(1+i,\\, \\beta_B)\\, B(\\alpha_A,\\, \\beta_A)}$$</div>
-      <p>На практике используется Монте-Карло.</p>
-
-      <h4>Expected Loss</h4>
-      <div class="math-block">$$\\text{Loss}(B) = E[\\max(\\theta_A - \\theta_B,\\, 0)] = \\int_0^1\\int_0^1 \\max(\\theta_A - \\theta_B,0)\\, p(\\theta_A)\\, p(\\theta_B)\\, d\\theta_A\\, d\\theta_B$$</div>
-
-      <h4>Monte Carlo оценка</h4>
-      <div class="math-block">$$\\hat{P}(B>A) = \\frac{1}{N}\\sum_{i=1}^{N} \\mathbf{1}[\\theta_B^{(i)} > \\theta_A^{(i)}], \\quad \\theta_k^{(i)} \\sim \\text{Beta}(\\alpha_k,\\beta_k)$$</div>
-
-      <h4>Сопряжённые семейства для других метрик</h4>
+    applications: `
+      <h3>Где применяется Bayesian A/B</h3>
       <table>
-        <tr><th>Метрика</th><th>Likelihood</th><th>Prior</th><th>Posterior</th></tr>
-        <tr><td>Конверсия</td><td>Binomial</td><td>Beta(α,β)</td><td>Beta(α+k, β+n−k)</td></tr>
-        <tr><td>Счётчики (клики/сессию)</td><td>Poisson(λ)</td><td>Gamma(a,b)</td><td>Gamma(a+k, b+n)</td></tr>
-        <tr><td>Непрерывная (выручка)</td><td>Normal(μ,σ²)</td><td>Normal(μ₀,σ₀²)</td><td>Normal (формула)</td></tr>
+        <tr><th>Область</th><th>Применение</th></tr>
+        <tr><td><b>Продуктовый A/B</b></td><td>Быстрая остановка теста: как только P(B&gt;A) ≥ 95%, не ждём фиксированный срок</td></tr>
+        <tr><td><b>Низкий трафик</b></td><td>Работает при малых выборках — prior даёт разумные результаты даже на 100 наблюдениях</td></tr>
+        <tr><td><b>Multi-armed bandits</b></td><td>Thompson Sampling — байесовский подход для онлайн-оптимизации (реклама, рекомендации)</td></tr>
+        <tr><td><b>Медицинские испытания</b></td><td>Этично остановить испытание раньше, если одно лечение явно лучше</td></tr>
+        <tr><td><b>Принятие бизнес-решений</b></td><td>Expected Loss напрямую переводится в ожидаемые потери в деньгах</td></tr>
+        <tr><td><b>Последовательное тестирование</b></td><td>Нет проблемы peeking: можно смотреть результаты в любой момент</td></tr>
       </table>
     `,
 

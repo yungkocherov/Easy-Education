@@ -859,28 +859,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Теорема Байеса</h3>
-      <div class="math-block">$$P(\\theta \\mid D) = \\frac{P(D \\mid \\theta) P(\\theta)}{P(D)}$$</div>
-
-      <h3>Naive Bayes классификатор</h3>
-      <div class="math-block">$$\\hat{c} = \\arg\\max_c P(c) \\prod_{j} P(x_j \\mid c)$$</div>
-      <p>На практике — суммирование логов (для устойчивости):</p>
-      <div class="math-block">$$\\hat{c} = \\arg\\max_c [\\log P(c) + \\sum_j \\log P(x_j \\mid c)]$$</div>
-
-      <h3>Gaussian NB</h3>
-      <div class="math-block">$$P(x_j \\mid c) = \\frac{1}{\\sqrt{2\\pi\\sigma_{c,j}^2}} \\exp\\left(-\\frac{(x_j - \\mu_{c,j})^2}{2\\sigma_{c,j}^2}\\right)$$</div>
-
-      <h3>Multinomial NB (с Laplace smoothing)</h3>
-      <div class="math-block">$$P(x_j \\mid c) = \\frac{N_{c,j} + \\alpha}{N_c + \\alpha V}$$</div>
-      <p>$N_{c,j}$ — сколько раз токен j встретился в классе c; $N_c$ — всего токенов в классе; V — размер словаря; α = 1 для Лапласа.</p>
-
-      <h3>Beta-Binomial (сопряжённое)</h3>
-      <p>Prior Beta(α, β), likelihood — Binomial. Posterior:</p>
-      <div class="math-block">$$\\text{Beta}(\\alpha + k, \\beta + n - k)$$</div>
-      <p>где k успехов в n испытаниях.</p>
-    `,
-
     extra: `
       <h3>Сопряжённые распределения</h3>
       <p>Когда posterior имеет тот же вид, что prior. Удобно — обновление сводится к изменению параметров:</p>

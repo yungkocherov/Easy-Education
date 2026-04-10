@@ -533,29 +533,18 @@ for name, model in models.items():
     print(f"{name}: R²={r2:.3f}, RMSE={rmse:.3f}")</code></pre>
     `,
 
-    math: `
-      <h3>Предсказание (равновесный kNN)</h3>
-      <div class="math-block">$$\\hat{y}(x^*) = \\frac{1}{k} \\sum_{i \\in N_k(x^*)} y_i$$</div>
-      <p>$N_k(x^*)$ — индексы k ближайших соседей к точке $x^*$.</p>
-
-      <h3>Предсказание (взвешенный kNN)</h3>
-      <div class="math-block">$$\\hat{y}(x^*) = \\frac{\\sum_{i \\in N_k} w_i \\cdot y_i}{\\sum_{i \\in N_k} w_i}, \\quad w_i = \\frac{1}{d(x^*, x_i)^p}$$</div>
-      <p>Обычно $p=1$ (обратное расстояние) или $p=2$ (обратный квадрат расстояния).</p>
-
-      <h3>Евклидово расстояние</h3>
-      <div class="math-block">$$d(x, z) = \\sqrt{\\sum_{j=1}^{p} (x_j - z_j)^2}$$</div>
-
-      <h3>MSE (метрика качества регрессии)</h3>
-      <div class="math-block">$$\\text{MSE} = \\frac{1}{n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2$$</div>
-
-      <h3>Bias-Variance разложение</h3>
-      <div class="math-block">$$\\mathbb{E}[(y - \\hat{y})^2] = \\text{Bias}^2 + \\text{Variance} + \\sigma^2_{\\text{noise}}$$</div>
-      <p>Маленькое k → высокая дисперсия. Большое k → высокое смещение. Оптимум — через кросс-валидацию.</p>
-
-      <h3>Ядерная регрессия (обобщение)</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\frac{\\sum_i K\\left(\\frac{d(x, x_i)}{h}\\right) y_i}{\\sum_i K\\left(\\frac{d(x, x_i)}{h}\\right)}$$</div>
-      <p>kNN — частный случай при $K$ = индикаторной функции (ящичное ядро). Гауссово ядро даёт более гладкую аппроксимацию.</p>
-    `,
+    applications: `
+      <h3>Где применяется KNN Regression</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Недвижимость</b></td><td>Оценка квартиры по похожим в том же районе</td></tr>
+        <tr><td><b>Рекомендательные системы</b></td><td>Item-item / user-user CF: оценка на основе похожих товаров/пользователей</td></tr>
+        <tr><td><b>Медицина</b></td><td>Прогноз параметров пациента по похожим случаям в анамнезе</td></tr>
+        <tr><td><b>Прогноз погоды</b></td><td>Нахождение аналогов в истории наблюдений (аналоговый прогноз)</td></tr>
+        <tr><td><b>Заполнение пропусков</b></td><td>KNN imputation — заполнение NaN по ближайшим соседям</td></tr>
+        <tr><td><b>Бейзлайн</b></td><td>Простая модель для быстрой проверки — если KNN плох, данные шумные</td></tr>
+      </table>
+        `,
 
     proscons: `
       <div class="proscons">

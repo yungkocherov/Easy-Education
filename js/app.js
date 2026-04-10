@@ -80,7 +80,6 @@ const App = (function () {
     python: '🐍 Python',
     applications: 'Применение',
     proscons: 'Плюсы / Минусы',
-    math: 'Математика',
     extra: 'Дополнительно',
     links: '📎 Ссылки',
   };

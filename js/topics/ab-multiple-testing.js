@@ -548,31 +548,17 @@ print(f"  Теоретическая: {theory:.1%}")
 print(f"  (при α={alpha} и {n_metrics} метриках)")</code></pre>
     `,
 
-    math: `
-      <h3>Основные формулы</h3>
-
-      <h4>Инфляция FWER без поправки</h4>
-      <div class="math-block">$$\\text{FWER} = 1 - (1 - \\alpha)^m \\xrightarrow{m \\to \\infty} 1$$</div>
-
-      <h4>Поправка Бонферрони</h4>
-      <div class="math-block">$$\\alpha_{\\text{adj}} = \\frac{\\alpha}{m} \\quad \\Rightarrow \\quad \\text{FWER} \\leq \\alpha$$</div>
-
-      <h4>Поправка Шидака (точнее Бонферрони при независимости)</h4>
-      <div class="math-block">$$\\alpha_{\\text{Šidák}} = 1 - (1-\\alpha)^{1/m} \\quad \\text{(чуть больше Бонферрони)}$$</div>
-
-      <h4>Метод Холма (step-down)</h4>
-      <div class="math-block">$$\\alpha_k^{\\text{Holm}} = \\frac{\\alpha}{m - k + 1}, \\quad k = 1, 2, \\ldots, m \\text{ (по возрастанию } p_k\\text{)}$$</div>
-      <p>Отвергаем $H_{(1)}, \\ldots, H_{(k^*)}$, где $k^*$ — наибольший индекс до первого нарушения.</p>
-
-      <h4>Метод Бенджамини-Хохберга (BH)</h4>
-      <div class="math-block">$$\\text{Отвергаем } H_{(i)} \\text{ для всех } i \\leq k^*, \\quad k^* = \\max\\left\\{k : p_{(k)} \\leq \\frac{k}{m} q^*\\right\\}$$</div>
-      <p>Гарантирует: $\\text{FDR} \\leq q^*$ при независимых (или положительно-зависимых) тестах.</p>
-
-      <h4>Adjusted p-values (BH)</h4>
-      <div class="math-block">$$\\tilde{p}_k^{\\text{BH}} = \\min\\left(1,\\; \\min_{j \\geq k} \\frac{m}{j} p_{(j)}\\right)$$</div>
-
-      <h4>Число пар для k вариантов</h4>
-      <div class="math-block">$$\\binom{k}{2} = \\frac{k(k-1)}{2} \\quad \\text{попарных сравнений}$$</div>
+    applications: `
+      <h3>Где важен контроль множественных сравнений</h3>
+      <table>
+        <tr><th>Область</th><th>Риск без поправки</th></tr>
+        <tr><td><b>A/B тесты с многими метриками</b></td><td>10 метрик × 5% → 40% шанс ложного срабатывания хоть в одной</td></tr>
+        <tr><td><b>A/B/C/D тесты</b></td><td>Несколько вариантов vs контроль — каждая пара требует поправки</td></tr>
+        <tr><td><b>Исследование фичей</b></td><td>Поиск «полезных» признаков среди сотен — легко найти ложные</td></tr>
+        <tr><td><b>Геномика и биоинформатика</b></td><td>Тысячи генов × p=0.05 → FDR-контроль (Бенджамини-Хохберг)</td></tr>
+        <tr><td><b>Когортный анализ</b></td><td>Сравнение сегментов: мобильные, десктоп, iOS, Android — десятки сравнений</td></tr>
+        <tr><td><b>Data dredging (p-hacking)</b></td><td>Главная защита от случайных «открытий» при множественной проверке</td></tr>
+      </table>
     `,
 
     proscons: `

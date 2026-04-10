@@ -811,28 +811,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Вывод разложения</h3>
-      <p>Пусть $y = f(x) + \\epsilon$, $E[\\epsilon] = 0$, $\\text{Var}(\\epsilon) = \\sigma^2$. Обозначим $\\hat{f}$ — модель, обученная на случайной выборке.</p>
-      <div class="math-block">$$E[(y - \\hat{f}(x_0))^2] = E[(f(x_0) + \\epsilon - \\hat{f}(x_0))^2]$$</div>
-      <div class="math-block">$$= E[(f - \\hat{f})^2] + \\sigma^2$$</div>
-      <div class="math-block">$$= (f - E[\\hat{f}])^2 + E[(\\hat{f} - E[\\hat{f}])^2] + \\sigma^2$$</div>
-      <div class="math-block">$$= \\text{Bias}^2 + \\text{Variance} + \\text{Noise}$$</div>
-
-      <h3>Bias и Variance отдельно</h3>
-      <div class="math-block">$$\\text{Bias}[\\hat{f}(x_0)] = E[\\hat{f}(x_0)] - f(x_0)$$</div>
-      <div class="math-block">$$\\text{Var}[\\hat{f}(x_0)] = E[(\\hat{f}(x_0) - E[\\hat{f}(x_0)])^2]$$</div>
-
-      <h3>Как оценить эмпирически</h3>
-      <p>Bootstrap:</p>
-      <ol>
-        <li>Сгенерировать много выборок (или bootstrap samples).</li>
-        <li>Обучить модель на каждой.</li>
-        <li>Получить много предсказаний $\\hat{f}_i(x_0)$.</li>
-        <li>Среднее — оценка $E[\\hat{f}]$, дисперсия — оценка variance.</li>
-      </ol>
-    `,
-
     extra: `
       <h3>Learning curves</h3>
       <p>График: train/val ошибка vs размер выборки.</p>

@@ -1044,29 +1044,6 @@ plt.legend(); plt.show()
       </div>
     `,
 
-    math: `
-      <h3>Forward pass</h3>
-      <div class="math-block">$$\\mathbf{z}^{(l)} = W^{(l)} \\mathbf{a}^{(l-1)} + \\mathbf{b}^{(l)}, \\quad \\mathbf{a}^{(l)} = \\sigma(\\mathbf{z}^{(l)})$$</div>
-
-      <h3>Loss для классификации (BCE)</h3>
-      <div class="math-block">$$L = -\\frac{1}{n}\\sum_{i=1}^{n}[y_i \\log \\hat{y}_i + (1-y_i)\\log(1-\\hat{y}_i)]$$</div>
-
-      <h3>Backpropagation</h3>
-      <p>Определим $\\delta^{(l)} = \\frac{\\partial L}{\\partial \\mathbf{z}^{(l)}}$. Тогда:</p>
-      <div class="math-block">$$\\delta^{(L)} = \\nabla_{\\mathbf{a}} L \\odot \\sigma'(\\mathbf{z}^{(L)})$$</div>
-      <div class="math-block">$$\\delta^{(l)} = (W^{(l+1)T} \\delta^{(l+1)}) \\odot \\sigma'(\\mathbf{z}^{(l)})$$</div>
-      <div class="math-block">$$\\frac{\\partial L}{\\partial W^{(l)}} = \\delta^{(l)} (\\mathbf{a}^{(l-1)})^T, \\quad \\frac{\\partial L}{\\partial \\mathbf{b}^{(l)}} = \\delta^{(l)}$$</div>
-
-      <h3>Обновление</h3>
-      <div class="math-block">$$W^{(l)} \\gets W^{(l)} - \\eta \\frac{\\partial L}{\\partial W^{(l)}}$$</div>
-
-      <h3>Инициализация весов</h3>
-      <ul>
-        <li><b>Xavier/Glorot</b>: $W \\sim N(0, 1/n_{in})$ — для tanh.</li>
-        <li><b>He</b>: $W \\sim N(0, 2/n_{in})$ — для ReLU.</li>
-      </ul>
-    `,
-
     extra: `
       <h3>Регуляризация</h3>
       <ul>

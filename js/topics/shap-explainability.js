@@ -611,6 +611,20 @@ for feat, weight in sorted(exp.as_list(), key=lambda x: abs(x[1]), reverse=True)
     print(f'  {feat:40}: {weight:+.4f}')</code></pre>
     `,
 
+    applications: `
+      <h3>Где применяется SHAP</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Регуляторика (финансы)</b></td><td>Объяснение отказа в кредите — требуется по закону (GDPR, Equal Credit Opportunity Act)</td></tr>
+        <tr><td><b>Медицина</b></td><td>Понимание, почему модель предсказывает высокий риск — для врача и пациента</td></tr>
+        <tr><td><b>Отладка моделей</b></td><td>Поиск утечек данных (leakage), нелогичных зависимостей, data drift</td></tr>
+        <tr><td><b>Feature selection</b></td><td>Отбор важных признаков по глобальным SHAP values</td></tr>
+        <tr><td><b>Fairness audit</b></td><td>Проверка, не зависит ли модель от protected features (пол, раса)</td></tr>
+        <tr><td><b>Объяснение клиенту</b></td><td>B2B ML-продукты: «почему модель так решила»</td></tr>
+        <tr><td><b>Научные исследования</b></td><td>Замена классической статистики — какие факторы влияют на результат</td></tr>
+      </table>
+        `,
+
     proscons: `
       <div class="proscons">
         <div class="pros">

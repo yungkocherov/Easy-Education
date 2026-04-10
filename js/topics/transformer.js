@@ -1034,29 +1034,6 @@ print(f"Размер словаря: {tokenizer.vocab_size:,}")   # ~30 000 у B
       </div>
     `,
 
-    math: `
-      <h3>Scaled Dot-Product Attention</h3>
-      <div class="math-block">$$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V$$</div>
-      <p>$Q \\in \\mathbb{R}^{n \\times d_k}$, $K \\in \\mathbb{R}^{n \\times d_k}$, $V \\in \\mathbb{R}^{n \\times d_v}$.</p>
-
-      <h3>Multi-Head Attention</h3>
-      <div class="math-block">$$\\text{head}_i = \\text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$</div>
-      <div class="math-block">$$\\text{MHA}(Q, K, V) = \\text{Concat}(\\text{head}_1, \\dots, \\text{head}_h) W^O$$</div>
-
-      <h3>Positional Encoding (sinusoidal)</h3>
-      <div class="math-block">$$PE_{(pos, 2i)} = \\sin\\left(\\frac{pos}{10000^{2i/d}}\\right)$$</div>
-      <div class="math-block">$$PE_{(pos, 2i+1)} = \\cos\\left(\\frac{pos}{10000^{2i/d}}\\right)$$</div>
-
-      <h3>Transformer Block</h3>
-      <div class="math-block">$$x' = x + \\text{MHA}(\\text{LN}(x))$$</div>
-      <div class="math-block">$$y = x' + \\text{FFN}(\\text{LN}(x'))$$</div>
-      <div class="math-block">$$\\text{FFN}(x) = \\text{ReLU}(xW_1 + b_1) W_2 + b_2$$</div>
-
-      <h3>Causal mask (для decoder)</h3>
-      <p>Запрещаем смотреть в будущее:</p>
-      <div class="math-block">$$\\text{mask}_{i,j} = \\begin{cases} 0, & j \\leq i \\\\ -\\infty, & j > i \\end{cases}$$</div>
-    `,
-
     extra: `
       <h3>Семейства моделей</h3>
       <table>

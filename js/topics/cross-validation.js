@@ -735,29 +735,6 @@ print(f'Nested CV ROC-AUC: {nested_scores.mean():.3f} ± {nested_scores.std():.3
       </div>
     `,
 
-    math: `
-      <h3>K-Fold оценка</h3>
-      <p>Датасет $D$ разбивается на $D_1, \\dots, D_k$:</p>
-      <div class="math-block">$$\\text{CV}_k = \\frac{1}{k}\\sum_{i=1}^{k} \\text{metric}(M_i, D_i)$$</div>
-      <p>$M_i$ — модель, обученная на $D \\setminus D_i$.</p>
-
-      <h3>Стандартная ошибка</h3>
-      <div class="math-block">$$\\text{SE}(\\text{CV}_k) = \\frac{\\sigma}{\\sqrt{k}}$$</div>
-      <p>где σ — std по фолдам.</p>
-
-      <h3>LOO bias-variance</h3>
-      <ul>
-        <li><b>LOO (k=n)</b>: почти несмещённая оценка, но высокая дисперсия (модели почти идентичны).</li>
-        <li><b>5-10 fold</b>: небольшое смещение, умеренная дисперсия.</li>
-        <li><b>Hold-out</b>: большая дисперсия, но быстро.</li>
-      </ul>
-      <p>Стандартный выбор k=5 или k=10 — хороший компромисс.</p>
-
-      <h3>Nested CV</h3>
-      <p>Две вложенные петли: внешняя для оценки, внутренняя для настройки:</p>
-      <div class="math-block">$$\\text{Nested CV} = \\frac{1}{k_{out}}\\sum_{i=1}^{k_{out}} \\text{metric}(\\text{BestModel}_i, D_i^{out})$$</div>
-    `,
-
     extra: `
       <h3>Time Series Split</h3>
       <p>Для временных рядов нельзя использовать будущее для обучения. Схема:</p>

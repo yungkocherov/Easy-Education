@@ -777,30 +777,6 @@ print("Нормальное" if p > 0.05 else "Не нормальное")</code
       </div>
     `,
 
-    math: `
-      <h3>Плотности и PMF</h3>
-
-      <h4>Нормальное $N(\\mu, \\sigma^2)$</h4>
-      <div class="math-block">$$f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} \\exp\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right)$$</div>
-      <p>$E[X] = \\mu$, $\\mathrm{Var}(X) = \\sigma^2$.</p>
-
-      <h4>Равномерное $U(a, b)$</h4>
-      <div class="math-block">$$f(x) = \\frac{1}{b-a}, \\quad x \\in [a, b]$$</div>
-      <p>$E[X] = \\frac{a+b}{2}$, $\\mathrm{Var}(X) = \\frac{(b-a)^2}{12}$.</p>
-
-      <h4>Биномиальное $\\text{Bin}(n, p)$</h4>
-      <div class="math-block">$$P(X=k) = \\binom{n}{k} p^k (1-p)^{n-k}$$</div>
-      <p>$E[X] = np$, $\\mathrm{Var}(X) = np(1-p)$.</p>
-
-      <h4>Пуассоновское $\\text{Poisson}(\\lambda)$</h4>
-      <div class="math-block">$$P(X=k) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$$</div>
-      <p>$E[X] = \\lambda$, $\\mathrm{Var}(X) = \\lambda$.</p>
-
-      <h4>Экспоненциальное $\\text{Exp}(\\lambda)$</h4>
-      <div class="math-block">$$f(t) = \\lambda e^{-\\lambda t}, \\quad t \\geq 0$$</div>
-      <p>$E[T] = 1/\\lambda$, $\\mathrm{Var}(T) = 1/\\lambda^2$.</p>
-    `,
-
     extra: `
       <h3>Как проверить, что данные нормальны?</h3>
       <ul>

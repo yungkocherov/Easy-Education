@@ -773,25 +773,6 @@ plt.tight_layout(); plt.show()
       </div>
     `,
 
-    math: `
-      <h3>Модель</h3>
-      <div class="math-block">$$\\hat{y} = \\text{sign}(\\mathbf{w}^T \\mathbf{x}) = \\begin{cases} +1, & \\mathbf{w}^T \\mathbf{x} \\geq 0 \\\\ -1, & \\text{иначе} \\end{cases}$$</div>
-
-      <h3>Правило обновления</h3>
-      <div class="math-block">$$\\mathbf{w}_{t+1} = \\mathbf{w}_t + \\eta \\cdot y_i \\cdot \\mathbf{x}_i \\quad \\text{если } \\hat{y}_i \\neq y_i$$</div>
-
-      <h3>Теорема сходимости (Новиков)</h3>
-      <p>Пусть данные линейно разделимы с зазором $\\gamma > 0$: $\\exists \\mathbf{w}^*$ с $\\|\\mathbf{w}^*\\| = 1$ и $y_i \\mathbf{w}^{*T} \\mathbf{x}_i \\geq \\gamma$ для всех i. Пусть $R = \\max \\|\\mathbf{x}_i\\|$.</p>
-      <p>Тогда число ошибок перцептрона:</p>
-      <div class="math-block">$$\\text{errors} \\leq \\left(\\frac{R}{\\gamma}\\right)^2$$</div>
-
-      <h3>Связь с SVM</h3>
-      <p>Перцептрон находит <b>любую</b> разделяющую гиперплоскость. SVM — гиперплоскость с <b>максимальным зазором</b>. Если данные не разделимы, SVM всё равно работает с soft margin.</p>
-
-      <h3>Мини-батч версия</h3>
-      <p>Вместо обновления на одном примере, усредняем градиенты по батчу. Более стабильное обучение.</p>
-    `,
-
     extra: `
       <h3>Pocket algorithm</h3>
       <p>Если данные не разделимы, обычный перцептрон зацикливается. Pocket хранит «лучшие найденные» веса: обновляет «pocket weights» только если они дают меньше ошибок. Даёт разумное решение и для неразделимых данных.</p>

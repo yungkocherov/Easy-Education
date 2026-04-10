@@ -856,30 +856,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Ridge (L2)</h3>
-      <div class="math-block">$$\\mathbf{w}^* = \\arg\\min_\\mathbf{w} \\|y - X\\mathbf{w}\\|^2 + \\lambda \\|\\mathbf{w}\\|_2^2$$</div>
-      <p>Аналитическое решение:</p>
-      <div class="math-block">$$\\mathbf{w}^* = (X^T X + \\lambda I)^{-1} X^T y$$</div>
-
-      <h3>Lasso (L1)</h3>
-      <div class="math-block">$$\\mathbf{w}^* = \\arg\\min_\\mathbf{w} \\|y - X\\mathbf{w}\\|^2 + \\lambda \\|\\mathbf{w}\\|_1$$</div>
-      <p>Нет closed-form. Решается координатным спуском или проксимальными методами.</p>
-
-      <h3>Soft-thresholding (для Lasso)</h3>
-      <div class="math-block">$$S_\\lambda(z) = \\text{sign}(z) \\cdot \\max(|z| - \\lambda, 0)$$</div>
-
-      <h3>Elastic Net</h3>
-      <div class="math-block">$$\\mathbf{w}^* = \\arg\\min \\|y - X\\mathbf{w}\\|^2 + \\lambda_1 \\|\\mathbf{w}\\|_1 + \\lambda_2 \\|\\mathbf{w}\\|_2^2$$</div>
-
-      <h3>Байесовская интерпретация</h3>
-      <ul>
-        <li><b>L2 = Gaussian prior</b> на веса: $w_j \\sim N(0, 1/\\lambda)$.</li>
-        <li><b>L1 = Laplace prior</b>: $w_j \\sim \\text{Laplace}(0, 1/\\lambda)$.</li>
-        <li>MAP оценка → регуляризованная задача.</li>
-      </ul>
-    `,
-
     extra: `
       <h3>Геометрия L1 vs L2</h3>
       <p>Контур L2 — окружность/сфера. Контур L1 — ромб с углами на осях координат. Оптимум при пересечении контура loss с контуром штрафа. L1 с большей вероятностью попадает в угол (зануляет компоненты).</p>

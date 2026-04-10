@@ -47,15 +47,15 @@ App.registerTopic({
           <rect x="235" y="25" width="100" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
           <text x="285" y="44" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Mean/Median</text>
           <text x="285" y="60" text-anchor="middle" font-size="9" fill="#1e40af">24|180|70</text>
-          <text x="285" y="75" text-anchor="middle" font-size="9" fill="#1e40af">31|<b>170</b>|85</text>
-          <text x="285" y="90" text-anchor="middle" font-size="9" fill="#1e40af"><b>34</b>|165|60</text>
+          <text x="285" y="75" text-anchor="middle" font-size="9" fill="#1e40af">31|<tspan font-weight="700">170</tspan>|85</text>
+          <text x="285" y="90" text-anchor="middle" font-size="9" fill="#1e40af"><tspan font-weight="700">34</tspan>|165|60</text>
           <text x="285" y="100" text-anchor="middle" font-size="9" fill="#64748b">(медиана)</text>
           <!-- KNN impute -->
           <rect x="345" y="25" width="100" height="80" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
           <text x="395" y="44" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">KNN Imputer</text>
           <text x="395" y="60" text-anchor="middle" font-size="9" fill="#065f46">24|180|70</text>
-          <text x="395" y="75" text-anchor="middle" font-size="9" fill="#065f46">31|<b>172</b>|85</text>
-          <text x="395" y="90" text-anchor="middle" font-size="9" fill="#065f46"><b>27</b>|165|60</text>
+          <text x="395" y="75" text-anchor="middle" font-size="9" fill="#065f46">31|<tspan font-weight="700">172</tspan>|85</text>
+          <text x="395" y="90" text-anchor="middle" font-size="9" fill="#065f46"><tspan font-weight="700">27</tspan>|165|60</text>
           <text x="395" y="100" text-anchor="middle" font-size="9" fill="#64748b">(по соседям)</text>
           <!-- Indicator -->
           <rect x="455" y="25" width="100" height="80" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
@@ -582,6 +582,20 @@ for s in strategies:
     score = cross_val_score(pipe, X, y, cv=5, scoring='roc_auc').mean()
     print(f'{s}: {score:.4f}')</code></pre>
     `,
+
+    applications: `
+      <h3>Где критична обработка пропусков</h3>
+      <table>
+        <tr><th>Область</th><th>Типичный сценарий</th></tr>
+        <tr><td><b>Опросы и анкеты</b></td><td>Респонденты пропускают вопросы (MAR — зависит от других ответов)</td></tr>
+        <tr><td><b>Медицина</b></td><td>Не все анализы у всех пациентов — разные протоколы</td></tr>
+        <tr><td><b>Сенсорные данные</b></td><td>Датчики иногда выходят из строя или теряют связь (MCAR)</td></tr>
+        <tr><td><b>Финансы</b></td><td>Новые клиенты без кредитной истории — пропуск не случаен</td></tr>
+        <tr><td><b>Log-данные</b></td><td>События, которые не происходили (разные значения: 0 vs null vs missing)</td></tr>
+        <tr><td><b>Legacy системы</b></td><td>Исторические данные с меняющейся схемой → много пропусков в старых записях</td></tr>
+      </table>
+      <p><b>Важно:</b> механизм пропусков (MCAR/MAR/MNAR) определяет подход. Игнорирование MNAR приводит к смещённым моделям.</p>
+        `,
 
     proscons: `
       <h3>Сравнение методов обработки пропусков</h3>

@@ -654,39 +654,19 @@ plt.tight_layout()
 plt.show()</code></pre>
     `,
 
-    math: `
-      <h3>Основные формулы</h3>
-
-      <h4>LTV (Lifetime Value)</h4>
-      <div class="math-block">$$\\text{LTV} = \\frac{\\text{ARPU}}{\\text{Churn Rate}}$$</div>
-      <div class="math-block">$$\\text{LTV}_{\\text{profit}} = \\frac{\\text{ARPU} \\times \\text{Gross Margin}}{\\text{Churn Rate}}$$</div>
-      <div class="math-block">$$\\text{LTV}_{\\text{discount}} = \\frac{\\text{ARPU} \\times \\text{GM}}{\\text{Churn} + r_{\\text{monthly}}}$$</div>
-
-      <h4>Средняя продолжительность жизни клиента</h4>
-      <div class="math-block">$$T = \\frac{1}{\\text{Churn Rate}}$$</div>
-
-      <h4>Churn и Retention</h4>
-      <div class="math-block">$$\\text{Retention}_N = \\frac{|\\text{когорта активна на день } N|}{|\\text{когорта в день 0}|}$$</div>
-      <div class="math-block">$$\\text{Churn} = 1 - \\text{Retention}_1$$</div>
-
-      <h4>Stickiness (вовлечённость)</h4>
-      <div class="math-block">$$\\text{Stickiness} = \\frac{\\text{DAU}}{\\text{MAU}}$$</div>
-
-      <h4>CAC и Unit-экономика</h4>
-      <div class="math-block">$$\\text{CAC} = \\frac{\\text{Расходы на маркетинг + продажи}}{\\text{Новых клиентов}}$$</div>
-      <div class="math-block">$$\\text{LTV/CAC} \\geq 3 \\quad \\text{(здоровый бизнес)}$$</div>
-      <div class="math-block">$$\\text{Payback Period} = \\frac{\\text{CAC}}{\\text{ARPU} \\times \\text{GM}} \\text{ месяцев}$$</div>
-
-      <h4>AARRR-воронка</h4>
-      <div class="math-block">$$\\text{CR}_{i \\to i+1} = \\frac{n_{i+1}}{n_i}, \\quad \\text{Overall CR} = \\prod_{i=1}^{k-1} \\text{CR}_{i \\to i+1}$$</div>
-
-      <h4>k-factor (вирусность)</h4>
-      <div class="math-block">$$k = i \\times c$$</div>
-      <p>Где $i$ — среднее число приглашений от одного пользователя, $c$ — конверсия приглашения. Если $k > 1$ — вирусный рост.</p>
-
-      <h4>NPS (Net Promoter Score)</h4>
-      <div class="math-block">$$\\text{NPS} = \\%\\text{Promoters (9-10)} - \\%\\text{Detractors (0-6)}$$</div>
-    `,
+    applications: `
+      <h3>Где применяется Product Analytics</h3>
+      <table>
+        <tr><th>Тип продукта</th><th>Ключевые метрики</th></tr>
+        <tr><td><b>SaaS / B2B</b></td><td>MRR, churn, LTV, CAC, NPS, feature adoption, activation rate</td></tr>
+        <tr><td><b>E-commerce</b></td><td>Конверсия, AOV, CR по воронке, retention, cart abandonment</td></tr>
+        <tr><td><b>Social / Media</b></td><td>DAU/MAU, stickiness, engagement, time spent, viral coefficient</td></tr>
+        <tr><td><b>Mobile apps</b></td><td>Install → активация, D1/D7/D30 retention, session length, ARPU</td></tr>
+        <tr><td><b>Marketplaces</b></td><td>GMV, take rate, liquidity, cross-side network effects</td></tr>
+        <tr><td><b>FinTech</b></td><td>Активация счёта, средний баланс, частота транзакций, cross-sell</td></tr>
+        <tr><td><b>Gaming</b></td><td>K-factor, LTV, monetization funnel, ARPPU, уровни retention</td></tr>
+      </table>
+        `,
 
     proscons: `
       <div class="proscons">

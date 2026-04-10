@@ -754,6 +754,21 @@ for name, pipe in pipelines.items():
     print(f"{name}: accuracy = {acc:.4f}")</code></pre>
     `,
 
+    applications: `
+      <h3>Где применяются базовые NLP-методы</h3>
+      <table>
+        <tr><th>Задача</th><th>Подход</th></tr>
+        <tr><td><b>Классификация текста</b></td><td>Спам, тональность, категоризация статей → TF-IDF + LinearSVC</td></tr>
+        <tr><td><b>Поиск похожих документов</b></td><td>TF-IDF + cosine similarity (для тысяч документов)</td></tr>
+        <tr><td><b>Рекомендации контента</b></td><td>Content-based: статьи/фильмы по эмбеддингам описаний</td></tr>
+        <tr><td><b>Named Entity Recognition</b></td><td>Извлечение имён, мест, организаций → BERT fine-tune</td></tr>
+        <tr><td><b>Автоматический перевод</b></td><td>seq2seq Transformer (Google Translate, DeepL)</td></tr>
+        <tr><td><b>Чат-боты</b></td><td>Intent classification + slot filling на базе эмбеддингов</td></tr>
+        <tr><td><b>Модерация контента</b></td><td>Классификация токсичности, спама, фейков</td></tr>
+        <tr><td><b>Суммаризация</b></td><td>Extractive (TextRank) или abstractive (Transformer)</td></tr>
+      </table>
+        `,
+
     proscons: `
       <h3>BoW vs TF-IDF vs Word2Vec vs BERT</h3>
       <div class="example-data-table">

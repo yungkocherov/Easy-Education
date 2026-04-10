@@ -562,37 +562,16 @@ ax.legend()
 plt.show()</code></pre>
     `,
 
-    math: `
-      <h3>t-тест для средних — полная математика</h3>
-
-      <h4>Welch's t-тест (рекомендованный)</h4>
-      <div class="math-block">$$t = \\frac{\\bar{x}_A - \\bar{x}_B}{\\sqrt{\\dfrac{s_A^2}{n_A} + \\dfrac{s_B^2}{n_B}}}$$</div>
-
-      <h4>Степени свободы Welch-Satterthwaite</h4>
-      <div class="math-block">$$df = \\frac{\\left(\\dfrac{s_A^2}{n_A} + \\dfrac{s_B^2}{n_B}\\right)^2}{\\dfrac{(s_A^2/n_A)^2}{n_A-1} + \\dfrac{(s_B^2/n_B)^2}{n_B-1}}$$</div>
-
-      <h4>Student's t-тест (равные дисперсии)</h4>
-      <div class="math-block">$$s_p^2 = \\frac{(n_A-1)s_A^2 + (n_B-1)s_B^2}{n_A+n_B-2}, \\quad t = \\frac{\\bar{x}_A - \\bar{x}_B}{s_p\\sqrt{\\frac{1}{n_A}+\\frac{1}{n_B}}}$$</div>
-
-      <h4>Парный t-тест</h4>
-      <div class="math-block">$$d_i = x_{B,i} - x_{A,i}, \\quad t = \\frac{\\bar{d}}{s_d/\\sqrt{n}}, \\quad df = n-1$$</div>
-
-      <h4>Cohen's d</h4>
-      <div class="math-block">$$d = \\frac{|\\bar{x}_A - \\bar{x}_B|}{s_p}, \\quad \\text{где } s_p = \\sqrt{\\frac{(n_A-1)s_A^2+(n_B-1)s_B^2}{n_A+n_B-2}}$$</div>
-
-      <h4>95% CI для разности средних</h4>
-      <div class="math-block">$$(\\bar{x}_B - \\bar{x}_A) \\pm t_{\\alpha/2,df} \\cdot \\sqrt{\\frac{s_A^2}{n_A} + \\frac{s_B^2}{n_B}}$$</div>
-
-      <h4>Нужный размер выборки (по Cohen's d)</h4>
-      <div class="math-block">$$n \\approx \\frac{2(z_{\\alpha/2}+z_\\beta)^2}{d^2} = \\frac{2 \\times 7.84}{d^2} \\approx \\frac{15.7}{d^2}$$</div>
-      <p>При $\\alpha=0.05$, мощность 80%: d=0.2→n=394, d=0.5→n=63, d=0.8→n=25.</p>
-
-      <h4>t-критические значения (двусторонний, α=0.05)</h4>
+    applications: `
+      <h3>Где применяется t-тест</h3>
       <table>
-        <tr><th>df</th><th>t_крит</th><th>df</th><th>t_крит</th></tr>
-        <tr><td>5</td><td>2.571</td><td>30</td><td>2.042</td></tr>
-        <tr><td>10</td><td>2.228</td><td>60</td><td>2.000</td></tr>
-        <tr><td>20</td><td>2.086</td><td>∞</td><td>1.960</td></tr>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>A/B тестирование</b></td><td>Сравнение среднего чека, среднего времени на сайте, LTV</td></tr>
+        <tr><td><b>Клинические испытания</b></td><td>Сравнение эффективности препарата vs плацебо (небольшие выборки)</td></tr>
+        <tr><td><b>Контроль качества</b></td><td>Проверка соответствия среднего параметра эталону (one-sample t-test)</td></tr>
+        <tr><td><b>Education research</b></td><td>Сравнение результатов двух методов обучения</td></tr>
+        <tr><td><b>Психология</b></td><td>Сравнение показателей до/после интервенции (paired t-test)</td></tr>
+        <tr><td><b>ML benchmark</b></td><td>Сравнение точности моделей на нескольких прогонах (paired t-test)</td></tr>
       </table>
     `,
 

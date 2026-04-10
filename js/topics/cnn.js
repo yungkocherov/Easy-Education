@@ -1122,26 +1122,6 @@ for epoch in range(10):
       </div>
     `,
 
-    math: `
-      <h3>2D свёртка (дискретная)</h3>
-      <div class="math-block">$$(I * K)(i, j) = \\sum_{m} \\sum_{n} I(i+m, j+n) \\cdot K(m, n)$$</div>
-
-      <h3>Размеры выхода</h3>
-      <div class="math-block">$$H_{out} = \\left\\lfloor \\frac{H_{in} + 2p - k}{s} \\right\\rfloor + 1$$</div>
-      <p>где p — padding, k — kernel size, s — stride.</p>
-
-      <h3>Количество параметров</h3>
-      <p>Для conv-слоя с входом $C_{in}$ каналов, $C_{out}$ фильтров размера $k \\times k$:</p>
-      <div class="math-block">$$\\text{params} = k^2 \\cdot C_{in} \\cdot C_{out} + C_{out}$$</div>
-
-      <h3>Receptive field</h3>
-      <p>Область входа, влияющая на один нейрон выхода. Растёт с глубиной. Для n сложенных свёрток k×k (stride=1):</p>
-      <div class="math-block">$$RF = 1 + n(k - 1)$$</div>
-
-      <h3>Backward через свёртку</h3>
-      <p>Градиент по K = свёртка входа с градиентом выхода. Градиент по входу = full-свёртка повёрнутого K с градиентом выхода.</p>
-    `,
-
     extra: `
       <h3>Известные архитектуры</h3>
       <ul>

@@ -685,32 +685,6 @@ print(df.round(3))</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Формулы</h3>
-      <div class="math-block">$$\\text{Accuracy} = \\frac{TP + TN}{TP + TN + FP + FN}$$</div>
-      <div class="math-block">$$\\text{Precision} = \\frac{TP}{TP + FP}$$</div>
-      <div class="math-block">$$\\text{Recall} = \\frac{TP}{TP + FN}$$</div>
-      <div class="math-block">$$F_1 = \\frac{2 \\cdot \\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}}$$</div>
-      <div class="math-block">$$F_\\beta = (1 + \\beta^2) \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\beta^2 \\cdot \\text{Precision} + \\text{Recall}}$$</div>
-      <p>β > 1 — больше вес Recall, β < 1 — больше вес Precision.</p>
-
-      <h3>Multi-class averaging</h3>
-      <ul>
-        <li><b>Macro</b>: среднее метрик по классам (равный вес каждому классу).</li>
-        <li><b>Micro</b>: общие TP/FP/FN, потом метрика (равный вес каждому примеру).</li>
-        <li><b>Weighted</b>: macro, но с весами по числу примеров в классе.</li>
-      </ul>
-
-      <h3>Для регрессии</h3>
-      <ul>
-        <li>MAE: $\\frac{1}{n}\\sum|y_i - \\hat{y}_i|$</li>
-        <li>MSE: $\\frac{1}{n}\\sum(y_i - \\hat{y}_i)^2$</li>
-        <li>RMSE: $\\sqrt{MSE}$</li>
-        <li>MAPE: $\\frac{1}{n}\\sum\\frac{|y_i - \\hat{y}_i|}{|y_i|}$</li>
-        <li>$R^2 = 1 - \\frac{\\sum(y_i - \\hat{y}_i)^2}{\\sum(y_i - \\bar{y})^2}$</li>
-      </ul>
-    `,
-
     extra: `
       <h3>Business metrics vs ML metrics</h3>
       <p>F1 = 0.75 не говорит, заработает ли модель денег. Мосты между ML-метриками и бизнесом:</p>

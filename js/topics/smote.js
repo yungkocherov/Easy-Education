@@ -763,25 +763,6 @@ print('UnderSampling F1:', f1_score(y_test, lr.predict(X_test), average='macro')
       </div>
     `,
 
-    math: `
-      <h3>SMOTE формула</h3>
-      <p>Для точки $x_i$ из меньшинства и случайно выбранного соседа $x_{nn}$ из kNN:</p>
-      <div class="math-block">$$x_{\\text{new}} = x_i + \\alpha \\cdot (x_{nn} - x_i), \\quad \\alpha \\sim U[0, 1]$$</div>
-
-      <h3>Class weights</h3>
-      <p>Взвешенная функция потерь:</p>
-      <div class="math-block">$$L = \\sum_i w_{c(i)} \\cdot \\ell(y_i, \\hat{y}_i)$$</div>
-      <p>Обычно $w_c = \\frac{n}{K \\cdot n_c}$ для баланса.</p>
-
-      <h3>Focal Loss</h3>
-      <p>Для подавления «лёгких» примеров:</p>
-      <div class="math-block">$$\\text{FL}(p_t) = -(1 - p_t)^\\gamma \\log(p_t)$$</div>
-      <p>$\\gamma > 0$ — если модель уже уверена, штраф мал.</p>
-
-      <h3>Cost-sensitive classification</h3>
-      <p>Матрица стоимостей ошибок $C_{ij}$ = стоимость предсказать i, когда реально j. Минимизируем ожидаемую стоимость.</p>
-    `,
-
     extra: `
       <h3>Варианты SMOTE</h3>
       <ul>

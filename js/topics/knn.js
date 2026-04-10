@@ -682,31 +682,6 @@ plt.show()</code></pre>
       </div>
     `,
 
-    math: `
-      <h3>Формулы расстояний</h3>
-
-      <h4>Евклидово</h4>
-      <div class="math-block">$$d(\\mathbf{x}, \\mathbf{z}) = \\sqrt{\\sum_{j=1}^{p} (x_j - z_j)^2}$$</div>
-
-      <h4>Манхеттенское</h4>
-      <div class="math-block">$$d(\\mathbf{x}, \\mathbf{z}) = \\sum_{j=1}^{p} |x_j - z_j|$$</div>
-
-      <h4>Минковского (обобщение)</h4>
-      <div class="math-block">$$d(\\mathbf{x}, \\mathbf{z}) = \\left(\\sum_{j=1}^{p} |x_j - z_j|^q\\right)^{1/q}$$</div>
-
-      <h4>Косинусное</h4>
-      <div class="math-block">$$d(\\mathbf{x}, \\mathbf{z}) = 1 - \\frac{\\mathbf{x} \\cdot \\mathbf{z}}{\\|\\mathbf{x}\\| \\|\\mathbf{z}\\|}$$</div>
-
-      <h3>Классификация</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\arg\\max_c \\sum_{i \\in N_k(x)} \\mathbb{1}[y_i = c]$$</div>
-
-      <h3>Регрессия</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\frac{1}{k} \\sum_{i \\in N_k(x)} y_i$$</div>
-
-      <h3>Взвешенный kNN</h3>
-      <div class="math-block">$$\\hat{y}(x) = \\frac{\\sum_i w_i y_i}{\\sum_i w_i}, \\quad w_i = \\frac{1}{d(x, x_i)^2}$$</div>
-    `,
-
     extra: `
       <h3>Проклятие размерности</h3>
       <p>В высокой размерности все точки становятся примерно одинаково далёкими друг от друга. Различие между ближайшим и дальним соседом уменьшается. kNN плохо работает при p > 20.</p>

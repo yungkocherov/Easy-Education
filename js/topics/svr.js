@@ -547,33 +547,19 @@ for name, model in models.items():
     print(f'{name:20}: RMSE={rmse:.4f}, R²={r2:.4f}, SV={nsv}')</code></pre>
     `,
 
-    math: `
-      <h3>ε-нечувствительная функция потерь</h3>
-      <div class="math-block">$$L_\\varepsilon(y, f) = \\begin{cases} 0, & |y - f| \\leq \\varepsilon \\\\ |y - f| - \\varepsilon, & |y - f| > \\varepsilon \\end{cases}$$</div>
-
-      <h3>Задача оптимизации (primal)</h3>
-      <div class="math-block">$$\\min_{w, b, \\xi, \\xi^*} \\frac{1}{2}\\|w\\|^2 + C \\sum_{i=1}^n (\\xi_i + \\xi_i^*)$$</div>
-      <p>При условиях: $y_i - w^T x_i - b \\leq \\varepsilon + \\xi_i^*$, $\\quad w^T x_i + b - y_i \\leq \\varepsilon + \\xi_i$, $\\quad \\xi_i, \\xi_i^* \\geq 0$</p>
-
-      <h3>Двойственная задача (dual)</h3>
-      <div class="math-block">$$\\max_{\\alpha, \\alpha^*} -\\varepsilon \\sum_i (\\alpha_i + \\alpha_i^*) + \\sum_i y_i(\\alpha_i - \\alpha_i^*) - \\frac{1}{2}\\sum_{i,j}(\\alpha_i - \\alpha_i^*)(\\alpha_j - \\alpha_j^*)K(x_i, x_j)$$</div>
-      <p>при условиях: $0 \\leq \\alpha_i, \\alpha_i^* \\leq C$, $\\quad \\sum_i (\\alpha_i - \\alpha_i^*) = 0$</p>
-
-      <h3>Функция предсказания</h3>
-      <div class="math-block">$$f(x) = \\sum_{i \\in SV} (\\alpha_i^* - \\alpha_i) K(x_i, x) + b$$</div>
-
-      <h3>Условия KKT для SVR</h3>
-      <p>Точка $x_i$ — опорный вектор, если $\\alpha_i > 0$ или $\\alpha_i^* > 0$:</p>
-      <ul>
-        <li>$\\alpha_i > 0 \\Leftrightarrow$ точка лежит на верхней границе или снаружи сверху</li>
-        <li>$\\alpha_i^* > 0 \\Leftrightarrow$ точка лежит на нижней границе или снаружи снизу</li>
-        <li>Точки строго внутри трубы: $\\alpha_i = \\alpha_i^* = 0$</li>
-      </ul>
-
-      <h3>Связь ε и C с компромиссом bias-variance</h3>
-      <div class="math-block">$$\\text{Сложность модели} \\propto \\frac{1}{\\varepsilon} \\cdot C$$</div>
-      <p>Большой ε или малый C → простая модель (высокий bias, низкая variance). Малый ε или большой C → сложная модель (низкий bias, высокая variance).</p>
-    `,
+    applications: `
+      <h3>Где применяется SVR</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Финансовые прогнозы</b></td><td>Прогноз цен акций, волатильности (малые выборки, нелинейность)</td></tr>
+        <tr><td><b>Химия и материаловедение</b></td><td>Предсказание свойств молекул по структуре (QSAR модели)</td></tr>
+        <tr><td><b>Биоинформатика</b></td><td>Предсказание активности, связывания белок-лиганд</td></tr>
+        <tr><td><b>Геофизика</b></td><td>Интерполяция разреженных измерений (скважины, сейсмика)</td></tr>
+        <tr><td><b>Управление процессами</b></td><td>Soft sensors — предсказание сложно измеримых параметров по простым</td></tr>
+        <tr><td><b>Маленькие датасеты</b></td><td>Когда данных &lt; 1000 и важна устойчивость к выбросам (через ε-tube)</td></tr>
+      </table>
+      <p><b>Не подходит для:</b> больших данных (O(n²) память), когда нужна интерпретируемость.</p>
+        `,
 
     proscons: `
       <div class="proscons">

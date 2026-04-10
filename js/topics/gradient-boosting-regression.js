@@ -984,39 +984,19 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
     print(f'{name}: Test RMSE = {rmse:.4f}')</code></pre>
     `,
 
-    math: `
-      <h3>Алгоритм Gradient Boosting (MSE)</h3>
-      <p><b>Инициализация:</b></p>
-      <div class="math-block">$$F_0(x) = \\arg\\min_\\gamma \\sum_{i=1}^n L(y_i, \\gamma) = \\bar{y}$$</div>
-
-      <p><b>Итерация m=1,...,M:</b></p>
-      <div class="math-block">$$r_i^{(m)} = -\\left[\\frac{\\partial L(y_i, F(x_i))}{\\partial F(x_i)}\\right]_{F=F_{m-1}} = y_i - F_{m-1}(x_i)$$</div>
-      <div class="math-block">$$h_m = \\arg\\min_h \\sum_i (r_i^{(m)} - h(x_i))^2$$</div>
-      <div class="math-block">$$F_m(x) = F_{m-1}(x) + \\eta \\cdot h_m(x)$$</div>
-
-      <h3>Функции потерь и псевдо-остатки</h3>
-      <div class="example-data-table">
-        <table>
-          <tr><th>Loss</th><th>L(y, F)</th><th>Псевдо-остаток $-\\partial L / \\partial F$</th></tr>
-          <tr><td>MSE</td><td>$(y-F)^2/2$</td><td>$y - F$</td></tr>
-          <tr><td>MAE</td><td>$|y-F|$</td><td>$\\text{sign}(y - F)$</td></tr>
-          <tr><td>Huber</td><td>$(r^2/2$ if $|r|\\leq\\delta)$</td><td>$r$ if $|r|\\leq\\delta$, else $\\delta\\cdot\\text{sign}(r)$</td></tr>
-          <tr><td>Quantile (α)</td><td>Pinball</td><td>$\\alpha$ if $r>0$, else $\\alpha - 1$</td></tr>
-        </table>
-      </div>
-
-      <h3>XGBoost: второй порядок Тейлора</h3>
-      <div class="math-block">$$L^{(m)} \\approx \\sum_i \\left[ g_i h_m(x_i) + \\frac{1}{2} k_i h_m^2(x_i) \\right] + \\Omega(h_m)$$</div>
-      <p>Где $g_i = \\partial L/\\partial F_{m-1}$ — градиент, $k_i = \\partial^2 L/\\partial F_{m-1}^2$ — гессиан.</p>
-      <div class="math-block">$$\\Omega(h) = \\gamma T + \\frac{1}{2}\\lambda \\sum_{j=1}^T w_j^2$$</div>
-      <p>$T$ — число листьев, $w_j$ — значение листа $j$.</p>
-
-      <h3>Оптимальные значения листьев (XGBoost)</h3>
-      <div class="math-block">$$w_j^* = -\\frac{\\sum_{i \\in I_j} g_i}{\\sum_{i \\in I_j} k_i + \\lambda}$$</div>
-
-      <h3>Gain от разбиения</h3>
-      <div class="math-block">$$\\text{Gain} = \\frac{1}{2}\\left[\\frac{G_L^2}{H_L+\\lambda} + \\frac{G_R^2}{H_R+\\lambda} - \\frac{(G_L+G_R)^2}{H_L+H_R+\\lambda}\\right] - \\gamma$$</div>
-    `,
+    applications: `
+      <h3>Где применяется Gradient Boosting Regression</h3>
+      <table>
+        <tr><th>Область</th><th>Задача</th></tr>
+        <tr><td><b>Kaggle-соревнования</b></td><td>XGBoost/LightGBM/CatBoost доминируют в топах на табличных данных</td></tr>
+        <tr><td><b>Финансы</b></td><td>Прогноз цен, дохода, рисков (LGD, PD), оценка стоимости активов</td></tr>
+        <tr><td><b>Retail и логистика</b></td><td>Прогноз спроса, оптимизация остатков, прогноз доставки</td></tr>
+        <tr><td><b>Страхование</b></td><td>Расчёт премий, прогноз выплат, оценка рисков</td></tr>
+        <tr><td><b>Прогноз продаж</b></td><td>Долгосрочное планирование, сезонность, эффект акций</td></tr>
+        <tr><td><b>Энергетика</b></td><td>Прогноз потребления электроэнергии, цен на рынке</td></tr>
+        <tr><td><b>Медицина</b></td><td>Прогноз длительности госпитализации, дозировки препаратов</td></tr>
+      </table>
+        `,
 
     proscons: `
       <div class="proscons">
