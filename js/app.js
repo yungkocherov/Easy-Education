@@ -107,6 +107,21 @@ const App = (function () {
 
   let currentSubTabIdx = 0;
 
+  // Выполняет inline <script> теги внутри элемента.
+  // innerHTML не запускает скрипты — приходится делать это вручную.
+  function executeInlineScripts(container) {
+    const scripts = container.querySelectorAll('script');
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');
+      // Копируем атрибуты (src, type и т.д.)
+      for (const attr of oldScript.attributes) {
+        newScript.setAttribute(attr.name, attr.value);
+      }
+      newScript.textContent = oldScript.textContent;
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }
+
   function renderTabContent(topic) {
     destroyCharts();
     const el = document.getElementById('tab-content');
@@ -141,16 +156,19 @@ const App = (function () {
       }
       pane.appendChild(body);
       el.appendChild(pane);
+      executeInlineScripts(body);
       if (st && typeof st.init === 'function') st.init(body);
     } else if (typeof tabData === 'string') {
       pane.innerHTML = tabData;
       el.appendChild(pane);
+      executeInlineScripts(pane);
     } else if (typeof tabData === 'function') {
       el.appendChild(pane);
       tabData(pane);
     } else if (tabData && typeof tabData === 'object' && tabData.html) {
       pane.innerHTML = tabData.html;
       el.appendChild(pane);
+      executeInlineScripts(pane);
       if (typeof tabData.init === 'function') tabData.init(pane);
     }
 
