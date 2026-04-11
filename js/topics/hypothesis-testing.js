@@ -141,6 +141,69 @@ App.registerTopic({
         <li><b>Непараметрические (без предположения о распределении)</b> — Манн-Уитни, Уилкоксон, Крускал-Уоллис.</li>
       </ul>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <defs>
+            <linearGradient id="pvG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.2"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="pvTail" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.55"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/></linearGradient>
+          </defs>
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Визуализация p-value</text>
+          <text x="280" y="32" text-anchor="middle" font-size="10" fill="#64748b">Распределение тестовой статистики при H₀</text>
+          <line x1="30" y1="175" x2="540" y2="175" stroke="#475569" stroke-width="1.5"/>
+          <!-- Bell curve (H0 distribution) -->
+          <path d="M30,175 C60,174 120,170 160,160 Q220,135 280,50 Q340,135 400,160 Q440,170 500,174 L540,175 L540,175 L30,175 Z" fill="url(#pvG)" stroke="#6366f1" stroke-width="2"/>
+          <!-- Observed statistic position (say t=2.3) and right tail shaded -->
+          <!-- Shade from x=410 to 540 (right tail = p-value) -->
+          <path d="M410,158 Q430,165 460,170 Q490,173 540,175 L540,175 L410,175 Z" fill="url(#pvTail)" stroke="#dc2626" stroke-width="2"/>
+          <line x1="410" y1="158" x2="410" y2="195" stroke="#dc2626" stroke-width="2"/>
+          <text x="410" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">наблюдаемая t</text>
+          <!-- Arrow pointing to p-value area -->
+          <text x="475" y="130" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="600">p-value</text>
+          <text x="475" y="144" text-anchor="middle" font-size="9" fill="#7f1d1d">(площадь хвоста)</text>
+          <path d="M470,148 L465,163" stroke="#dc2626" stroke-width="1.5" fill="none" marker-end="url(#arrowP)"/>
+          <defs><marker id="arrowP" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#dc2626"/></marker></defs>
+          <!-- H0 label -->
+          <text x="280" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">Если H₀ верна,</text>
+          <text x="280" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">статистика распределена так</text>
+          <!-- Axis -->
+          <text x="280" y="192" text-anchor="middle" font-size="10" fill="#64748b">0</text>
+          <line x1="280" y1="175" x2="280" y2="180" stroke="#64748b"/>
+        </svg>
+        <div class="caption">p-value = площадь хвоста за наблюдаемой статистикой. Маленький p-value → наблюдаемый результат «экстремальный» при H₀, есть основания её отвергнуть.</div>
+      </div>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <defs>
+            <linearGradient id="h0G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="h1G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="alphaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.65"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="betaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0891b2" stop-opacity="0.5"/><stop offset="100%" stop-color="#0891b2" stop-opacity="0.1"/></linearGradient>
+          </defs>
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Ошибки I и II рода: α и β</text>
+          <line x1="20" y1="190" x2="540" y2="190" stroke="#475569" stroke-width="1.5"/>
+          <!-- H0 bell, centered at 200 -->
+          <path d="M20,190 C50,189 100,185 130,175 Q170,150 200,60 Q230,150 270,175 C290,182 310,187 340,189 L340,190 L20,190 Z" fill="url(#h0G)" stroke="#4338ca" stroke-width="2"/>
+          <!-- H1 bell, centered at 380 -->
+          <path d="M220,190 C250,188 290,183 320,170 Q360,140 380,60 Q400,140 440,170 Q480,185 540,190 L540,190 L220,190 Z" fill="url(#h1G)" stroke="#b45309" stroke-width="2"/>
+          <!-- Critical value c -->
+          <line x1="310" y1="40" x2="310" y2="200" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="310" y="215" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">критич. значение c</text>
+          <!-- Alpha area: right tail of H0 beyond c -->
+          <path d="M310,170 Q320,180 340,188 L340,190 L310,190 Z" fill="url(#alphaG)" stroke="#dc2626" stroke-width="1.5"/>
+          <text x="340" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">α</text>
+          <text x="340" y="178" text-anchor="middle" font-size="9" fill="#7f1d1d">(I рода)</text>
+          <!-- Beta area: left of c under H1 -->
+          <path d="M220,190 C250,188 290,183 310,172 L310,190 L220,190 Z" fill="url(#betaG)" stroke="#0891b2" stroke-width="1.5"/>
+          <text x="260" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#0891b2">β</text>
+          <text x="260" y="183" text-anchor="middle" font-size="9" fill="#164e63">(II рода)</text>
+          <!-- Centers labeled -->
+          <text x="200" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">H₀ верна</text>
+          <text x="380" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">H₁ верна</text>
+        </svg>
+        <div class="caption">Два распределения: под H₀ (синее) и под H₁ (оранжевое). Граница c разделяет «отвергаем/не отвергаем». Красная площадь = α (ложная тревога). Голубая = β (пропуск эффекта). Мощность теста = 1 − β.</div>
+      </div>
+
       <h3>⚠️ Что p-value НЕ означает</h3>
       <ul>
         <li>❌ «Вероятность того, что $H_0$ верна». Это вероятность данных <b>при условии</b> $H_0$.</li>

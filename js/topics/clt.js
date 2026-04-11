@@ -85,6 +85,51 @@ App.registerTopic({
       </ul>
       <p>Чтобы удвоить точность, нужно <b>учетверить</b> размер выборки. Это закон убывающей отдачи в статистике.</p>
 
+      <h3>📈 Эмерджентность нормального: прогрессия n</h3>
+      <p>Один из самых наглядных способов почувствовать ЦПТ — посмотреть, как меняется распределение средних при росте n. Возьмём в качестве «исходных данных» равномерное распределение U(0, 1) — оно совсем не похоже на колокол.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Распределение средних из U(0,1) при разном n</text>
+          <text x="350" y="34" text-anchor="middle" font-size="10" fill="#64748b">Начинаем с равномерного — не похоже на колокол. С ростом n форма становится нормальной.</text>
+          <!-- n=1 (just uniform) -->
+          <g>
+            <text x="100" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#f59e0b">n = 1 (исходное)</text>
+            <line x1="40" y1="220" x2="160" y2="220" stroke="#475569" stroke-width="1"/>
+            <rect x="48" y="120" width="104" height="100" fill="#fed7aa" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="100" y="240" text-anchor="middle" font-size="9" fill="#64748b">U(0,1) — равномерное</text>
+            <text x="100" y="252" text-anchor="middle" font-size="9" fill="#64748b">плоский «прямоугольник»</text>
+          </g>
+          <!-- n=2 (triangle) -->
+          <g>
+            <text x="270" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#fb923c">n = 2</text>
+            <line x1="210" y1="220" x2="330" y2="220" stroke="#475569" stroke-width="1"/>
+            <path d="M218,220 L270,120 L322,220 Z" fill="#fed7aa" stroke="#f97316" stroke-width="1.8"/>
+            <text x="270" y="240" text-anchor="middle" font-size="9" fill="#64748b">Уже треугольник —</text>
+            <text x="270" y="252" text-anchor="middle" font-size="9" fill="#64748b">не равномерное!</text>
+          </g>
+          <!-- n=5 (rounded) -->
+          <g>
+            <text x="440" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">n = 5</text>
+            <line x1="380" y1="220" x2="500" y2="220" stroke="#475569" stroke-width="1"/>
+            <path d="M388,220 Q400,210 412,180 Q428,140 440,115 Q452,140 468,180 Q480,210 492,220 Z" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1.8"/>
+            <text x="440" y="240" text-anchor="middle" font-size="9" fill="#64748b">Уже похоже на колокол</text>
+            <text x="440" y="252" text-anchor="middle" font-size="9" fill="#64748b">SE = σ/√5 ≈ σ/2.24</text>
+          </g>
+          <!-- n=30 (perfect bell) -->
+          <g>
+            <text x="610" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">n = 30</text>
+            <line x1="550" y1="220" x2="670" y2="220" stroke="#475569" stroke-width="1"/>
+            <path d="M558,220 Q580,218 595,200 Q605,170 610,115 Q615,170 625,200 Q640,218 662,220 Z" fill="#dbeafe" stroke="#1e40af" stroke-width="1.8"/>
+            <text x="610" y="240" text-anchor="middle" font-size="9" fill="#64748b">Идеальный колокол</text>
+            <text x="610" y="252" text-anchor="middle" font-size="9" fill="#64748b">SE = σ/√30 (узкий)</text>
+          </g>
+          <!-- Bottom annotation -->
+          <text x="350" y="285" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">→ Чем больше n, тем уже и «нормальнее» распределение средних →</text>
+        </svg>
+        <div class="caption">Магия ЦПТ: даже из равномерного (плоского) распределения уже при n=5 возникает почти-колокол, при n=30 — практически идеальный нормальный. Это работает с любым исходным распределением.</div>
+      </div>
+
       <h3>🧮 Сколько должно быть n?</h3>
       <p>ЦПТ — это предельная теорема: «при $n \\to \\infty$». В реальности же нужно знать, когда аппроксимация «достаточно хороша». Правила большого пальца:</p>
       <ul>
@@ -94,7 +139,7 @@ App.registerTopic({
         <li><b>С очень тяжёлыми хвостами:</b> может потребоваться $n \\geq 1000$ или вообще не работать.</li>
       </ul>
 
-      <div class="callout tip">💡 Можно проверить применимость ЦПТ практически: взять несколько выборок из твоих данных, посчитать средние, посмотреть на их Q-Q plot. Если на прямой — ЦПТ работает.</div>
+      <div class="callout tip">💡 Можно проверить применимость ЦПТ практически: взять несколько выборок из твоих данных, посчитать средние, посмотреть на их <a onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a>. Если на прямой — ЦПТ работает.</div>
 
       <h3>⚠️ Когда ЦПТ «не работает»</h3>
       <ul>

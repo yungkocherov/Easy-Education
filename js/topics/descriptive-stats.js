@@ -125,6 +125,98 @@ App.registerTopic({
         <li><b>Эксцесс (kurtosis)</b> — насколько «тяжёлые» хвосты, то есть часто ли встречаются экстремальные значения.</li>
       </ul>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="350" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Три формы распределения и взаимное положение среднего/медианы/моды</text>
+          <!-- LEFT: left-skewed -->
+          <g>
+            <text x="115" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">Левый скос (skewness &lt; 0)</text>
+            <line x1="25" y1="170" x2="205" y2="170" stroke="#475569" stroke-width="1.5"/>
+            <!-- Bars (increasing) -->
+            <rect x="30" y="158" width="12" height="12" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="45" y="148" width="12" height="22" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="60" y="135" width="12" height="35" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="75" y="115" width="12" height="55" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="90" y="95" width="12" height="75" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="105" y="75" width="12" height="95" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="120" y="55" width="12" height="115" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="135" y="50" width="12" height="120" fill="#fbbf24" fill-opacity="0.85" stroke="#b45309" stroke-width="1.5"/>
+            <rect x="150" y="70" width="12" height="100" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="165" y="115" width="12" height="55" fill="#fbbf24" fill-opacity="0.75"/>
+            <rect x="180" y="150" width="12" height="20" fill="#fbbf24" fill-opacity="0.75"/>
+            <!-- Indicators -->
+            <line x1="100" y1="175" x2="100" y2="190" stroke="#dc2626" stroke-width="2"/>
+            <text x="100" y="203" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">среднее</text>
+            <line x1="125" y1="175" x2="125" y2="190" stroke="#0284c7" stroke-width="2"/>
+            <text x="125" y="203" text-anchor="middle" font-size="9" fill="#0284c7" font-weight="600">медиана</text>
+            <line x1="141" y1="175" x2="141" y2="190" stroke="#059669" stroke-width="2"/>
+            <text x="155" y="213" text-anchor="middle" font-size="9" fill="#059669" font-weight="600">мода</text>
+          </g>
+          <!-- CENTER: symmetric -->
+          <g>
+            <text x="350" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Симметричное (skewness ≈ 0)</text>
+            <line x1="250" y1="170" x2="450" y2="170" stroke="#475569" stroke-width="1.5"/>
+            <rect x="256" y="158" width="12" height="12" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="271" y="140" width="12" height="30" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="286" y="115" width="12" height="55" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="301" y="85" width="12" height="85" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="316" y="60" width="12" height="110" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="331" y="50" width="12" height="120" fill="#60a5fa" fill-opacity="0.85" stroke="#1e40af" stroke-width="1.5"/>
+            <rect x="346" y="60" width="12" height="110" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="361" y="85" width="12" height="85" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="376" y="115" width="12" height="55" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="391" y="140" width="12" height="30" fill="#60a5fa" fill-opacity="0.75"/>
+            <rect x="406" y="158" width="12" height="12" fill="#60a5fa" fill-opacity="0.75"/>
+            <!-- Mean = median = mode all at center -->
+            <line x1="337" y1="175" x2="337" y2="200" stroke="#1e40af" stroke-width="2"/>
+            <text x="337" y="213" text-anchor="middle" font-size="9" fill="#1e40af" font-weight="600">среднее = медиана = мода</text>
+          </g>
+          <!-- RIGHT: right-skewed -->
+          <g>
+            <text x="585" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Правый скос (skewness &gt; 0)</text>
+            <line x1="495" y1="170" x2="675" y2="170" stroke="#475569" stroke-width="1.5"/>
+            <rect x="500" y="150" width="12" height="20" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="515" y="115" width="12" height="55" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="530" y="70" width="12" height="100" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="545" y="50" width="12" height="120" fill="#f97316" fill-opacity="0.85" stroke="#92400e" stroke-width="1.5"/>
+            <rect x="560" y="55" width="12" height="115" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="575" y="75" width="12" height="95" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="590" y="95" width="12" height="75" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="605" y="115" width="12" height="55" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="620" y="135" width="12" height="35" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="635" y="148" width="12" height="22" fill="#f97316" fill-opacity="0.75"/>
+            <rect x="650" y="158" width="12" height="12" fill="#f97316" fill-opacity="0.75"/>
+            <!-- Mode, median, mean -->
+            <line x1="551" y1="175" x2="551" y2="190" stroke="#059669" stroke-width="2"/>
+            <text x="540" y="213" text-anchor="middle" font-size="9" fill="#059669" font-weight="600">мода</text>
+            <line x1="570" y1="175" x2="570" y2="190" stroke="#0284c7" stroke-width="2"/>
+            <text x="570" y="203" text-anchor="middle" font-size="9" fill="#0284c7" font-weight="600">медиана</text>
+            <line x1="595" y1="175" x2="595" y2="190" stroke="#dc2626" stroke-width="2"/>
+            <text x="600" y="203" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">среднее</text>
+          </g>
+        </svg>
+        <div class="caption">Три формы распределения. При скосе мода, медиана и среднее расходятся: в правом скосе мода &lt; медианы &lt; среднего (хвост тянет среднее). Симметричное — все три совпадают.</div>
+      </div>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Одно и то же среднее, разное стандартное отклонение</text>
+          <line x1="40" y1="165" x2="520" y2="165" stroke="#475569" stroke-width="1.5"/>
+          <!-- mean line -->
+          <line x1="280" y1="30" x2="280" y2="175" stroke="#64748b" stroke-width="1" stroke-dasharray="4"/>
+          <text x="280" y="188" text-anchor="middle" font-size="10" fill="#64748b">μ = 100</text>
+          <!-- Narrow: σ=5 -->
+          <path d="M40,165 Q200,164 240,160 Q270,150 280,50 Q290,150 320,160 Q360,164 520,165" fill="none" stroke="#059669" stroke-width="2.5"/>
+          <text x="180" y="60" text-anchor="end" font-size="11" font-weight="600" fill="#059669">σ = 5 (данные кучкуются)</text>
+          <line x1="185" y1="58" x2="255" y2="85" stroke="#059669" stroke-width="1"/>
+          <!-- Wide: σ=20 -->
+          <path d="M40,165 Q120,155 180,140 Q240,120 280,100 Q320,120 380,140 Q440,155 520,165" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+          <text x="450" y="70" text-anchor="end" font-size="11" font-weight="600" fill="#dc2626">σ = 20 (данные разлетаются)</text>
+          <line x1="450" y1="75" x2="380" y2="125" stroke="#dc2626" stroke-width="1"/>
+        </svg>
+        <div class="caption">Два распределения с одинаковым средним (μ = 100), но разным σ. Зелёное (σ = 5) — узкое и острое, значения кучкуются вокруг 100. Красное (σ = 20) — широкое и пологое, значения разлетаются гораздо сильнее.</div>
+      </div>
+
       <h3>⚠️ Частые заблуждения</h3>
       <ul>
         <li><b>«Среднее — это типичное значение»</b> — не всегда. При правом скосе большинство значений <b>ниже</b> среднего.</li>
@@ -159,6 +251,14 @@ App.registerTopic({
         <li>Среднее и дисперсия — ключевые параметры нормального распределения.</li>
         <li>ЦПТ показывает, что выборочное <b>среднее</b> всегда распределено примерно нормально — поэтому именно оно, а не медиана, лежит в основе большинства тестов.</li>
         <li>В ML при препроцессинге почти всегда стандартизируют признаки: $x_{new} = (x - \\bar{x}) / s$.</li>
+      </ul>
+
+      <h3>📊 Графики, которые здесь упомянуты — отдельные темы в глоссарии</h3>
+      <ul>
+        <li><a onclick="App.selectTopic('viz-histogram')">Гистограмма</a> — главный инструмент визуализации формы распределения.</li>
+        <li><a onclick="App.selectTopic('viz-box-plot')">Box plot (ящик с усами)</a> — компактная визуализация квартилей и выбросов.</li>
+        <li><a onclick="App.selectTopic('viz-violin-plot')">Violin plot</a> — гибрид box plot и плотности.</li>
+        <li><a onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> — визуальная проверка нормальности.</li>
       </ul>
     `,
 

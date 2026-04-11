@@ -71,18 +71,147 @@ App.registerTopic({
 
       <h4>📊 Нормальное (Gaussian) — $N(\\mu, \\sigma^2)$</h4>
       <p>Главное распределение статистики. Симметричный «колокол» вокруг среднего $\\mu$. Ширина колокола задаётся $\\sigma$ (стандартным отклонением).</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <defs>
+            <linearGradient id="nG68" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="nG95" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="nG997" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.25"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.03"/></linearGradient>
+          </defs>
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Нормальное распределение и правило 68–95–99.7</text>
+          <!-- Axis -->
+          <line x1="40" y1="195" x2="520" y2="195" stroke="#475569" stroke-width="1.5"/>
+          <!-- Tick marks for -3σ..+3σ, center at 280, spacing 60 -->
+          <g font-size="10" fill="#64748b" text-anchor="middle">
+            <text x="100" y="215">μ−3σ</text>
+            <text x="160" y="215">μ−2σ</text>
+            <text x="220" y="215">μ−σ</text>
+            <text x="280" y="215" font-weight="700" fill="#1e40af">μ</text>
+            <text x="340" y="215">μ+σ</text>
+            <text x="400" y="215">μ+2σ</text>
+            <text x="460" y="215">μ+3σ</text>
+          </g>
+          <!-- ±3σ area (99.7%) -->
+          <path d="M100,195 Q160,193 220,170 Q250,140 280,50 Q310,140 340,170 Q400,193 460,195 L460,195 L100,195 Z" fill="url(#nG997)"/>
+          <!-- ±2σ area (95%) -->
+          <path d="M160,195 Q195,190 220,170 Q250,140 280,50 Q310,140 340,170 Q365,190 400,195 L400,195 L160,195 Z" fill="url(#nG95)"/>
+          <!-- ±1σ area (68%) -->
+          <path d="M220,195 Q240,180 250,155 Q265,110 280,50 Q295,110 310,155 Q320,180 340,195 L340,195 L220,195 Z" fill="url(#nG68)"/>
+          <!-- Bell curve outline -->
+          <path d="M50,195 Q100,194 160,190 Q200,185 220,170 Q250,140 280,50 Q310,140 340,170 Q360,185 400,190 Q460,194 510,195" fill="none" stroke="#1e40af" stroke-width="2.5"/>
+          <!-- Mean line -->
+          <line x1="280" y1="195" x2="280" y2="50" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <!-- Labels for percentages -->
+          <text x="280" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">68%</text>
+          <text x="200" y="150" text-anchor="end" font-size="11" fill="#1e40af">95%</text>
+          <line x1="205" y1="150" x2="220" y2="155" stroke="#1e40af" stroke-width="1"/>
+          <text x="360" y="150" text-anchor="start" font-size="11" fill="#1e40af">95%</text>
+          <line x1="355" y1="150" x2="340" y2="155" stroke="#1e40af" stroke-width="1"/>
+          <text x="140" y="175" text-anchor="end" font-size="10" fill="#475569">99.7%</text>
+          <line x1="145" y1="175" x2="160" y2="185" stroke="#475569" stroke-width="1"/>
+        </svg>
+        <div class="caption">Правило 68–95–99.7 на графике. В пределах одного сигма (зелёная зона) — 68% значений, в двух (синяя) — 95%, в трёх (серая) — 99.7%. За 3σ — менее 0.3% «экстремумов».</div>
+      </div>
+
       <p><b>Почему оно везде:</b> благодаря <span class="term" data-tip="Центральная предельная теорема. Утверждает, что среднее любых случайных величин (с конечной дисперсией) стремится к нормальному при большой выборке.">ЦПТ</span> — сумма большого числа независимых случайных факторов стремится к нормальному. Рост человека = сумма сотен генетических и средовых факторов → нормальное. Ошибка измерения = сумма многих мелких погрешностей → нормальное.</p>
       <p><b>Правило 68–95–99.7:</b> в пределах $\\mu \\pm \\sigma$ лежит ~68% значений, в $\\mu \\pm 2\\sigma$ — 95%, в $\\mu \\pm 3\\sigma$ — 99.7%. Это «правило трёх сигм».</p>
       <p><b>Где встречается:</b> рост, вес, IQ, ошибки измерений, шум в сигналах, остатки регрессии.</p>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Влияние параметров μ и σ</text>
+          <line x1="30" y1="160" x2="540" y2="160" stroke="#475569" stroke-width="1.5"/>
+          <!-- narrow σ=0.5 centered at 200 -->
+          <path d="M30,160 Q140,159 180,150 Q195,140 200,40 Q205,140 220,150 Q260,159 540,160" fill="none" stroke="#10b981" stroke-width="2.5"/>
+          <text x="200" y="30" text-anchor="middle" font-size="10" fill="#059669">σ=0.5 (узкий)</text>
+          <!-- standard σ=1 centered at 300 -->
+          <path d="M30,160 Q170,157 230,140 Q270,110 300,70 Q330,110 370,140 Q430,157 540,160" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+          <text x="300" y="60" text-anchor="middle" font-size="10" fill="#1e40af">σ=1</text>
+          <!-- wide σ=2 centered at 380 -->
+          <path d="M30,160 Q200,156 290,140 Q340,115 380,100 Q420,115 470,140 Q520,156 540,160" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="380" y="90" text-anchor="middle" font-size="10" fill="#92400e">σ=2 (широкий)</text>
+          <!-- means as ticks -->
+          <line x1="200" y1="158" x2="200" y2="166" stroke="#059669"/>
+          <line x1="300" y1="158" x2="300" y2="166" stroke="#1e40af"/>
+          <line x1="380" y1="158" x2="380" y2="166" stroke="#92400e"/>
+          <text x="200" y="180" text-anchor="middle" font-size="10" fill="#059669">μ=2</text>
+          <text x="300" y="180" text-anchor="middle" font-size="10" fill="#1e40af">μ=5</text>
+          <text x="380" y="180" text-anchor="middle" font-size="10" fill="#92400e">μ=8</text>
+        </svg>
+        <div class="caption">μ сдвигает колокол влево/вправо. σ меняет его ширину: маленькая σ — узкий острый пик, большая σ — широкий пологий.</div>
+      </div>
+
       <h4>📐 Равномерное (uniform) — $U(a, b)$</h4>
       <p>Все значения на отрезке $[a, b]$ одинаково вероятны. Никаких «любимых» значений нет — это максимум неопределённости на ограниченном отрезке.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed">Равномерное распределение U(a, b)</text>
+          <line x1="40" y1="140" x2="520" y2="140" stroke="#475569" stroke-width="1.5"/>
+          <!-- PDF rectangle -->
+          <rect x="140" y="60" width="280" height="80" fill="#a78bfa" fill-opacity="0.35" stroke="#7c3aed" stroke-width="2.5"/>
+          <!-- Horizontal line indicating 1/(b-a) -->
+          <line x1="140" y1="60" x2="420" y2="60" stroke="#7c3aed" stroke-width="2.5"/>
+          <!-- vertical drops -->
+          <line x1="140" y1="60" x2="140" y2="140" stroke="#7c3aed" stroke-width="2.5"/>
+          <line x1="420" y1="60" x2="420" y2="140" stroke="#7c3aed" stroke-width="2.5"/>
+          <text x="140" y="158" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="600">a</text>
+          <text x="420" y="158" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="600">b</text>
+          <text x="280" y="100" text-anchor="middle" font-size="11" fill="#5b21b6">f(x) = 1/(b−a)</text>
+          <text x="125" y="55" text-anchor="end" font-size="10" fill="#64748b">1/(b−a)</text>
+          <line x1="130" y1="60" x2="138" y2="60" stroke="#64748b"/>
+          <text x="30" y="100" font-size="10" fill="#64748b" transform="rotate(-90 30 100)">плотность</text>
+          <text x="475" y="158" font-size="10" fill="#64748b">x</text>
+        </svg>
+        <div class="caption">PDF равномерного — горизонтальная линия на отрезке [a, b]. Вне отрезка плотность равна нулю. Площадь под прямоугольником = 1 (как у любой плотности).</div>
+      </div>
+
       <p><b>Где встречается:</b> базовый источник случайности в компьютерах (rand()), справедливый жребий, углы в изотропных процессах.</p>
       <p><b>Важная роль:</b> из равномерного можно <b>сгенерировать</b> любое другое распределение через <span class="term" data-tip="Inverse Transform Sampling. Если F — функция распределения, то F⁻¹(U), где U ~ Uniform[0,1], даёт случайную величину с распределением F.">метод обратного преобразования</span>.</p>
 
       <h4>🪙 Биномиальное — $\\text{Bin}(n, p)$</h4>
       <p>Число «успехов» в $n$ независимых испытаниях, где в каждом успех происходит с вероятностью $p$.</p>
       <p><b>Пример:</b> бросаем монету 10 раз — сколько выпадет орлов? Это $\\text{Bin}(10, 0.5)$. Значения могут быть 0, 1, ..., 10.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#0369a1">Биномиальное Bin(10, p) — PMF</text>
+          <line x1="40" y1="175" x2="540" y2="175" stroke="#475569" stroke-width="1.5"/>
+          <!-- x axis labels 0..10, spacing ~45px starting at 55 -->
+          <g font-size="10" fill="#64748b" text-anchor="middle">
+            <text x="55" y="192">0</text><text x="100" y="192">1</text><text x="145" y="192">2</text>
+            <text x="190" y="192">3</text><text x="235" y="192">4</text><text x="280" y="192">5</text>
+            <text x="325" y="192">6</text><text x="370" y="192">7</text><text x="415" y="192">8</text>
+            <text x="460" y="192">9</text><text x="505" y="192">10</text>
+          </g>
+          <text x="280" y="210" text-anchor="middle" font-size="10" fill="#64748b">число успехов k</text>
+          <!-- Bars for p=0.5 (symmetric) -->
+          <!-- approx values: 0.001, 0.010, 0.044, 0.117, 0.205, 0.246, 0.205, 0.117, 0.044, 0.010, 0.001 -->
+          <!-- max 0.246 → 140px tall. scale factor = 570 -->
+          <g fill="#0284c7" fill-opacity="0.75" stroke="#0369a1" stroke-width="1">
+            <rect x="47" y="174" width="16" height="1"/>
+            <rect x="92" y="169" width="16" height="6"/>
+            <rect x="137" y="150" width="16" height="25"/>
+            <rect x="182" y="108" width="16" height="67"/>
+            <rect x="227" y="58" width="16" height="117"/>
+            <rect x="272" y="35" width="16" height="140"/>
+            <rect x="317" y="58" width="16" height="117"/>
+            <rect x="362" y="108" width="16" height="67"/>
+            <rect x="407" y="150" width="16" height="25"/>
+            <rect x="452" y="169" width="16" height="6"/>
+            <rect x="497" y="174" width="16" height="1"/>
+          </g>
+          <text x="280" y="28" text-anchor="middle" font-size="11" fill="#0369a1" font-weight="600">p = 0.5 — симметрично, пик в np = 5</text>
+          <!-- small legend for p=0.3 and p=0.7 as dots -->
+          <g font-size="10" fill="#64748b">
+            <text x="95" y="45">p=0.3 → смещение влево (np=3)</text>
+            <text x="400" y="60">p=0.7 → вправо (np=7)</text>
+          </g>
+        </svg>
+        <div class="caption">PMF биномиального при p=0.5 симметрична и достигает максимума при k = np. При p &lt; 0.5 пик смещается влево, при p &gt; 0.5 — вправо.</div>
+      </div>
+
       <p><b>Параметры интуитивно:</b></p>
       <ul>
         <li>Среднее число успехов: $np$</li>
@@ -93,6 +222,55 @@ App.registerTopic({
       <h4>📞 Пуассоновское — $\\text{Poisson}(\\lambda)$</h4>
       <p>Число редких независимых событий за фиксированный интервал времени или в пространстве. Параметр $\\lambda$ — <b>среднее</b> число событий на интервал.</p>
       <p><b>Пример:</b> в колл-центр приходит в среднем 5 звонков в минуту. Сколько придёт за следующую минуту? Это $\\text{Poisson}(5)$. Может быть 0, 1, 2, 3, ..., но ~8+ уже маловероятно.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#b91c1c">Пуассон: Poisson(λ) — PMF</text>
+          <line x1="40" y1="175" x2="540" y2="175" stroke="#475569" stroke-width="1.5"/>
+          <g font-size="10" fill="#64748b" text-anchor="middle">
+            <text x="55" y="192">0</text><text x="95" y="192">1</text><text x="135" y="192">2</text>
+            <text x="175" y="192">3</text><text x="215" y="192">4</text><text x="255" y="192">5</text>
+            <text x="295" y="192">6</text><text x="335" y="192">7</text><text x="375" y="192">8</text>
+            <text x="415" y="192">9</text><text x="455" y="192">10</text><text x="495" y="192">11</text>
+          </g>
+          <text x="280" y="210" text-anchor="middle" font-size="10" fill="#64748b">число событий k</text>
+          <!-- Poisson(3) bars -->
+          <!-- k=0..11: 0.050, 0.149, 0.224, 0.224, 0.168, 0.101, 0.050, 0.022, 0.008, 0.003, 0.001, 0 -->
+          <!-- max 0.224 → 140px -->
+          <g fill="#dc2626" fill-opacity="0.35" stroke="#b91c1c" stroke-width="1.5">
+            <rect x="48" y="144" width="14" height="31"/>
+            <rect x="88" y="82" width="14" height="93"/>
+            <rect x="128" y="35" width="14" height="140"/>
+            <rect x="168" y="35" width="14" height="140"/>
+            <rect x="208" y="70" width="14" height="105"/>
+            <rect x="248" y="112" width="14" height="63"/>
+            <rect x="288" y="144" width="14" height="31"/>
+            <rect x="328" y="161" width="14" height="14"/>
+            <rect x="368" y="170" width="14" height="5"/>
+            <rect x="408" y="173" width="14" height="2"/>
+            <rect x="448" y="174" width="14" height="1"/>
+          </g>
+          <text x="148" y="28" text-anchor="middle" font-size="11" fill="#b91c1c" font-weight="600">λ = 3</text>
+          <!-- Poisson(7) bars overlaid -->
+          <g fill="#0284c7" fill-opacity="0.25" stroke="#0369a1" stroke-width="1.5">
+            <rect x="64" y="174" width="14" height="1"/>
+            <rect x="104" y="170" width="14" height="5"/>
+            <rect x="144" y="160" width="14" height="15"/>
+            <rect x="184" y="138" width="14" height="37"/>
+            <rect x="224" y="112" width="14" height="63"/>
+            <rect x="264" y="96" width="14" height="79"/>
+            <rect x="304" y="82" width="14" height="93"/>
+            <rect x="344" y="82" width="14" height="93"/>
+            <rect x="384" y="96" width="14" height="79"/>
+            <rect x="424" y="117" width="14" height="58"/>
+            <rect x="464" y="140" width="14" height="35"/>
+            <rect x="504" y="158" width="14" height="17"/>
+          </g>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#0369a1" font-weight="600">λ = 7</text>
+        </svg>
+        <div class="caption">Пуассон становится симметричным с ростом λ. При λ=3 пик на 2-3, хвост правый. При λ=7 уже почти симметрично. При λ&gt;20 приближается к нормальному.</div>
+      </div>
+
       <p><b>Условия применимости:</b></p>
       <ul>
         <li>События происходят независимо друг от друга.</li>
@@ -103,6 +281,32 @@ App.registerTopic({
 
       <h4>⏱ Экспоненциальное — $\\text{Exp}(\\lambda)$</h4>
       <p>Непрерывный «брат» Пуассона. Если события происходят по Пуассону с интенсивностью $\\lambda$, то <b>время между</b> соседними событиями распределено экспоненциально.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <defs>
+            <linearGradient id="expGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#059669" stop-opacity="0.4"/><stop offset="100%" stop-color="#059669" stop-opacity="0.05"/></linearGradient>
+          </defs>
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Экспоненциальное Exp(λ) — PDF</text>
+          <line x1="50" y1="160" x2="540" y2="160" stroke="#475569" stroke-width="1.5"/>
+          <line x1="50" y1="40" x2="50" y2="160" stroke="#475569" stroke-width="1.5"/>
+          <!-- λ=1 curve: f(x) = e^-x; scale: x in 0..6, each unit = 80px; y = 120*e^-x -->
+          <path d="M50,40 Q110,70 170,88 Q230,102 290,115 Q350,128 410,140 Q470,150 540,157 L540,160 L50,160 Z" fill="url(#expGrad)" stroke="#059669" stroke-width="2.5"/>
+          <!-- Another curve: λ=0.5 (flatter) -->
+          <path d="M50,100 Q150,115 250,125 Q350,138 450,148 Q500,154 540,157" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <text x="150" y="85" fill="#059669" font-size="11" font-weight="600">λ = 1 (средний интервал = 1)</text>
+          <text x="280" y="135" fill="#0369a1" font-size="11" font-weight="600">λ = 0.5 (средний = 2)</text>
+          <!-- Axis ticks -->
+          <g font-size="10" fill="#64748b" text-anchor="middle">
+            <text x="50" y="178">0</text><text x="130" y="178">1</text><text x="210" y="178">2</text>
+            <text x="290" y="178">3</text><text x="370" y="178">4</text><text x="450" y="178">5</text>
+          </g>
+          <text x="495" y="178" font-size="10" fill="#64748b">время</text>
+          <text x="30" y="50" font-size="10" fill="#64748b">f(x)</text>
+        </svg>
+        <div class="caption">PDF экспоненциального — убывающая экспонента. Маленькие интервалы (близкие к 0) самые частые, большие — редкие. Среднее интервала = 1/λ.</div>
+      </div>
+
       <p><b>Пример:</b> если приходит в среднем 5 клиентов в час ($\\lambda = 5$), то время до следующего клиента распределено экспоненциально со средним $1/\\lambda = 12$ минут.</p>
       <p><b>Особенность — «отсутствие памяти»:</b> если ты ждал автобус 10 минут, твои шансы на ближайшие 5 минут такие же, как в начале. Прошедшее время не влияет.</p>
       <p><b>Где встречается:</b> время ожидания в очереди, время до отказа лампочки, интервалы между запросами к серверу.</p>
@@ -121,8 +325,8 @@ App.registerTopic({
 
       <h3>🔬 Как определить распределение данных</h3>
       <ul>
-        <li><b>Гистограмма</b> — первый и главный инструмент. Видишь форму — сразу есть гипотеза.</li>
-        <li><span class="term" data-tip="Q-Q plot (Quantile-Quantile plot). Сравнивает квантили твоих данных с квантилями эталонного распределения (обычно нормального). Если точки на диагонали — распределение совпадает.">Q-Q plot</span> — если точки на прямой, распределение близко к теоретическому.</li>
+        <li><a onclick="App.selectTopic('viz-histogram')"><b>Гистограмма</b></a> — первый и главный инструмент. Видишь форму — сразу есть гипотеза.</li>
+        <li><a onclick="App.selectTopic('viz-qq-plot')"><b>Q-Q plot</b></a> — если точки на прямой, распределение близко к теоретическому.</li>
         <li><b>Тесты согласия:</b> Шапиро-Уилка, Колмогорова-Смирнова — формально проверяют соответствие.</li>
         <li><b>Descriptive stats:</b> сравни среднее и медиану. Если заметно отличаются — есть скос.</li>
       </ul>

@@ -56,6 +56,35 @@ App.registerTopic({
       <p><span class="term" data-tip="Стационарный ряд. Ряд, у которого среднее, дисперсия и автоковариация постоянны во времени. Большинство классических методов прогнозирования требуют стационарности.">Стационарность</span> — критически важное свойство. Ряд стационарен, если его среднее и дисперсия не меняются со временем.</p>
       <p>Почему важно: ARIMA и большинство классических методов предполагают стационарность. Нестационарный ряд (с трендом) даст «ложную» корреляцию между несвязанными переменными.</p>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="350" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Стационарный vs нестационарный ряд</text>
+          <!-- TOP: stationary -->
+          <g>
+            <text x="350" y="38" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">Стационарный: среднее и дисперсия постоянны</text>
+            <line x1="40" y1="130" x2="670" y2="130" stroke="#94a3b8" stroke-width="1"/>
+            <line x1="40" y1="60" x2="40" y2="130" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Mean line -->
+            <line x1="40" y1="95" x2="670" y2="95" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="650" y="91" font-size="9" fill="#059669">μ</text>
+            <!-- Stationary series: fluctuates around mean -->
+            <polyline points="40,90 60,82 80,100 100,88 120,105 140,85 160,95 180,108 200,88 220,100 240,82 260,95 280,105 300,85 320,100 340,88 360,105 380,90 400,100 420,85 440,108 460,90 480,98 500,88 520,105 540,85 560,100 580,92 600,108 620,85 640,98 660,90" fill="none" stroke="#059669" stroke-width="1.8"/>
+          </g>
+          <!-- BOTTOM: non-stationary with trend -->
+          <g>
+            <text x="350" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Нестационарный: среднее растёт (тренд)</text>
+            <line x1="40" y1="250" x2="670" y2="250" stroke="#94a3b8" stroke-width="1"/>
+            <line x1="40" y1="175" x2="40" y2="250" stroke="#94a3b8" stroke-width="1"/>
+            <!-- Trend line -->
+            <line x1="40" y1="240" x2="670" y2="180" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="650" y="178" font-size="9" fill="#dc2626">μ(t) ↑</text>
+            <!-- Non-stationary series with upward drift -->
+            <polyline points="40,238 60,230 80,245 100,228 120,238 140,215 160,225 180,230 200,210 220,218 240,200 260,210 280,215 300,195 320,205 340,188 360,200 380,190 400,198 420,180 440,195 460,178 480,188 500,182 520,195 540,175 560,188 580,172 600,185 620,168 640,180 660,165" fill="none" stroke="#dc2626" stroke-width="1.8"/>
+          </g>
+        </svg>
+        <div class="caption">Стационарный ряд (сверху) колеблется вокруг постоянного среднего. Нестационарный (снизу) имеет тренд — среднее меняется во времени. Нестационарность — причина «ложных» корреляций и плохих прогнозов.</div>
+      </div>
+
       <h4>Как проверить: тест Дики-Фуллера</h4>
       <p>Расширенный тест Дики-Фуллера (ADF) проверяет гипотезу H₀: ряд нестационарен (есть единичный корень). Если p-value < 0.05 — отвергаем H₀, ряд стационарен.</p>
 
@@ -69,6 +98,86 @@ App.registerTopic({
       <h3>🔁 Автокорреляция (ACF и PACF)</h3>
       <p><span class="term" data-tip="ACF (Autocorrelation Function). Корреляция ряда с его собственной задержанной версией. ACF(k) = cor(Yt, Yt-k). Помогает определить порядок MA компоненты.">ACF (Autocorrelation Function)</span> показывает корреляцию ряда с самим собой при задержке k.</p>
       <p><span class="term" data-tip="PACF (Partial Autocorrelation Function). Прямая корреляция Yt и Yt-k, исключая влияние промежуточных лагов. Помогает определить порядок AR компоненты.">PACF (Partial Autocorrelation Function)</span> — та же корреляция, но за вычетом влияния промежуточных лагов.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="350" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">ACF-коррелограмма: 3 типичных паттерна</text>
+          <!-- WHITE NOISE -->
+          <g>
+            <text x="120" y="36" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Белый шум</text>
+            <line x1="30" y1="140" x2="220" y2="140" stroke="#475569" stroke-width="1"/>
+            <line x1="30" y1="60" x2="30" y2="220" stroke="#475569" stroke-width="1"/>
+            <line x1="30" y1="60" x2="220" y2="60" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>
+            <line x1="30" y1="220" x2="220" y2="220" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>
+            <!-- Significance bounds (±1.96/√n dashed) -->
+            <line x1="30" y1="115" x2="220" y2="115" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <line x1="30" y1="165" x2="220" y2="165" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <!-- Lag 0: always 1 -->
+            <line x1="42" y1="140" x2="42" y2="60" stroke="#0284c7" stroke-width="2.5"/>
+            <!-- Other lags: small random values -->
+            <line x1="58" y1="140" x2="58" y2="128" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="74" y1="140" x2="74" y2="148" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="90" y1="140" x2="90" y2="135" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="106" y1="140" x2="106" y2="150" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="122" y1="140" x2="122" y2="132" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="138" y1="140" x2="138" y2="146" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="154" y1="140" x2="154" y2="137" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="170" y1="140" x2="170" y2="143" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="186" y1="140" x2="186" y2="134" stroke="#0284c7" stroke-width="2.5"/>
+            <line x1="202" y1="140" x2="202" y2="145" stroke="#0284c7" stroke-width="2.5"/>
+            <text x="25" y="64" text-anchor="end" font-size="8" fill="#64748b">1</text>
+            <text x="25" y="143" text-anchor="end" font-size="8" fill="#64748b">0</text>
+            <text x="25" y="223" text-anchor="end" font-size="8" fill="#64748b">−1</text>
+            <text x="120" y="245" text-anchor="middle" font-size="9" fill="#64748b">лаг</text>
+            <text x="120" y="260" text-anchor="middle" font-size="9" fill="#64748b">Все лаги в пределах порога</text>
+          </g>
+          <!-- TREND -->
+          <g>
+            <text x="350" y="36" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">Ряд с трендом</text>
+            <line x1="260" y1="140" x2="450" y2="140" stroke="#475569" stroke-width="1"/>
+            <line x1="260" y1="60" x2="260" y2="220" stroke="#475569" stroke-width="1"/>
+            <line x1="260" y1="115" x2="450" y2="115" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <line x1="260" y1="165" x2="450" y2="165" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <!-- Slow decay -->
+            <line x1="272" y1="140" x2="272" y2="60" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="288" y1="140" x2="288" y2="65" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="304" y1="140" x2="304" y2="72" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="320" y1="140" x2="320" y2="80" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="336" y1="140" x2="336" y2="88" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="352" y1="140" x2="352" y2="96" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="368" y1="140" x2="368" y2="104" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="384" y1="140" x2="384" y2="110" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="400" y1="140" x2="400" y2="116" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="416" y1="140" x2="416" y2="120" stroke="#f59e0b" stroke-width="2.5"/>
+            <line x1="432" y1="140" x2="432" y2="124" stroke="#f59e0b" stroke-width="2.5"/>
+            <text x="350" y="245" text-anchor="middle" font-size="9" fill="#64748b">лаг</text>
+            <text x="350" y="260" text-anchor="middle" font-size="9" fill="#64748b">Медленное затухание</text>
+          </g>
+          <!-- SEASONAL -->
+          <g>
+            <text x="580" y="36" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">Сезонный ряд (период 4)</text>
+            <line x1="490" y1="140" x2="680" y2="140" stroke="#475569" stroke-width="1"/>
+            <line x1="490" y1="60" x2="490" y2="220" stroke="#475569" stroke-width="1"/>
+            <line x1="490" y1="115" x2="680" y2="115" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <line x1="490" y1="165" x2="680" y2="165" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+            <!-- Periodic spikes every 4 lags -->
+            <line x1="502" y1="140" x2="502" y2="60" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="518" y1="140" x2="518" y2="135" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="534" y1="140" x2="534" y2="150" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="550" y1="140" x2="550" y2="136" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="566" y1="140" x2="566" y2="75" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="582" y1="140" x2="582" y2="148" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="598" y1="140" x2="598" y2="133" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="614" y1="140" x2="614" y2="146" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="630" y1="140" x2="630" y2="85" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="646" y1="140" x2="646" y2="150" stroke="#8b5cf6" stroke-width="2.5"/>
+            <line x1="662" y1="140" x2="662" y2="135" stroke="#8b5cf6" stroke-width="2.5"/>
+            <text x="580" y="245" text-anchor="middle" font-size="9" fill="#64748b">лаг</text>
+            <text x="580" y="260" text-anchor="middle" font-size="9" fill="#64748b">Пики на лагах 4, 8, 12…</text>
+          </g>
+        </svg>
+        <div class="caption">По форме ACF-графика можно диагностировать характер ряда. Белый шум: все столбики в пределах голубых порогов. Тренд: медленное затухание. Сезонность: всплески на кратных периоду лагах.</div>
+      </div>
       <p>Правила выбора порядков ARIMA по ACF/PACF:</p>
       <ul>
         <li>PACF обрывается на лаге p → AR(p)</li>

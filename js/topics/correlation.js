@@ -129,7 +129,100 @@ App.registerTopic({
 
       <p><b>Пример:</b> $y = x^2$ на симметричном диапазоне. Связь очевидна, но $r = 0$. Потому что положительные и отрицательные отклонения компенсируются.</p>
 
-      <p>Именно поэтому <b>всегда рисуют scatter plot</b>, прежде чем доверять числу корреляции.</p>
+      <p>Именно поэтому <b>всегда рисуют</b> <a onclick="App.selectTopic('viz-scatter-plot')">scatter plot</a>, прежде чем доверять числу корреляции.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="350" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Квартет Анскомба: 4 датасета с одинаковой корреляцией r ≈ 0.82</text>
+          <text x="350" y="32" text-anchor="middle" font-size="10" fill="#64748b">Одинаковые среднее, std, r — но совершенно разные формы. Всегда визуализируй!</text>
+          <!-- Frame A: linear -->
+          <g>
+            <rect x="30" y="50" width="280" height="130" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="170" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#0369a1">A — честная линейная связь</text>
+            <line x1="50" y1="165" x2="290" y2="165" stroke="#94a3b8"/>
+            <line x1="50" y1="80" x2="50" y2="165" stroke="#94a3b8"/>
+            <!-- Regression line -->
+            <line x1="55" y1="155" x2="285" y2="90" stroke="#0369a1" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+            <!-- Anscombe dataset 1 -->
+            <circle cx="100" cy="140" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="130" cy="128" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="155" cy="115" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="180" cy="108" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="210" cy="120" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="235" cy="100" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="255" cy="95" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="275" cy="85" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="90" cy="150" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="70" cy="155" r="4" fill="#0369a1" opacity="0.85"/>
+            <circle cx="220" cy="105" r="4" fill="#0369a1" opacity="0.85"/>
+          </g>
+          <!-- Frame B: curve -->
+          <g>
+            <rect x="390" y="50" width="280" height="130" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="530" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">B — чёткая кривая (нелинейная)</text>
+            <line x1="410" y1="165" x2="650" y2="165" stroke="#94a3b8"/>
+            <line x1="410" y1="80" x2="410" y2="165" stroke="#94a3b8"/>
+            <line x1="415" y1="155" x2="645" y2="90" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+            <!-- Parabola -->
+            <circle cx="425" cy="155" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="450" cy="135" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="475" cy="115" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="500" cy="100" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="525" cy="88" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="550" cy="82" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="575" cy="82" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="600" cy="88" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="625" cy="98" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="645" cy="110" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="660" cy="128" r="4" fill="#b45309" opacity="0.85"/>
+          </g>
+          <!-- Frame C: outlier pulls line -->
+          <g>
+            <rect x="30" y="210" width="280" height="130" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="170" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">C — идеальная линия + 1 выброс</text>
+            <line x1="50" y1="325" x2="290" y2="325" stroke="#94a3b8"/>
+            <line x1="50" y1="240" x2="50" y2="325" stroke="#94a3b8"/>
+            <line x1="55" y1="315" x2="285" y2="250" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+            <!-- Perfect line points -->
+            <circle cx="80" cy="310" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="105" cy="300" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="130" cy="290" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="155" cy="280" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="180" cy="270" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="205" cy="260" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="225" cy="253" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="245" cy="245" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="265" cy="238" r="4" fill="#dc2626" opacity="0.85"/>
+            <circle cx="280" cy="232" r="4" fill="#dc2626" opacity="0.85"/>
+            <!-- Outlier -->
+            <circle cx="235" cy="285" r="5" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+            <text x="255" y="290" font-size="10" fill="#7f1d1d">выброс</text>
+          </g>
+          <!-- Frame D: vertical + outlier -->
+          <g>
+            <rect x="390" y="210" width="280" height="130" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="530" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">D — вертикальная группа + выброс</text>
+            <line x1="410" y1="325" x2="650" y2="325" stroke="#94a3b8"/>
+            <line x1="410" y1="240" x2="410" y2="325" stroke="#94a3b8"/>
+            <line x1="415" y1="315" x2="645" y2="250" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+            <!-- Vertical column at x=460 -->
+            <circle cx="460" cy="305" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="290" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="275" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="260" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="295" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="280" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="265" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="250" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="310" r="4" fill="#7c3aed" opacity="0.85"/>
+            <circle cx="460" cy="315" r="4" fill="#7c3aed" opacity="0.85"/>
+            <!-- Far outlier -->
+            <circle cx="640" cy="255" r="5" fill="#7c3aed" stroke="#4c1d95" stroke-width="2"/>
+            <text x="615" y="275" font-size="10" fill="#4c1d95">выброс</text>
+          </g>
+        </svg>
+        <div class="caption">Четыре датасета имеют одинаковые среднее, std и корреляцию r ≈ 0.82, но совершенно разную структуру. В C и D «высокая корреляция» — фикция, вызванная одним выбросом. В B — линейная модель неадекватна. Без визуализации эти различия не поймать.</div>
+      </div>
 
       <h3>🧮 Корреляция Спирмена — альтернатива для нелинейных связей</h3>
       <p><span class="term" data-tip="Spearman's rank correlation. Корреляция Пирсона, применённая к рангам данных, а не к самим значениям. Ловит любые монотонные связи, устойчива к выбросам.">Корреляция Спирмена</span> $\\rho$ — это корреляция Пирсона, применённая не к самим значениям, а к их <b>рангам</b> (порядковым номерам в отсортированной выборке).</p>

@@ -13,6 +13,7 @@ const App = (function () {
     { id: 'ml-cls', name: 'Классификация' },
     { id: 'ml-unsup', name: 'Кластеризация и снижение размерности' },
     { id: 'dl', name: 'Нейронные сети' },
+    { id: 'viz', name: '📊 Визуализации (глоссарий)' },
   ];
   let currentTopicId = null;
   let currentTabKey = null;
