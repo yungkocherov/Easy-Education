@@ -45,7 +45,7 @@ App.registerTopic({
         <li><b>Рост дерева: leaf-wise</b> — вместо всех узлов одного уровня, выбирает лист с <b>максимальным loss reduction</b>. Даёт более точные, но асимметричные деревья.</li>
         <li><b>GOSS (Gradient-based One-Side Sampling)</b> — оставляет объекты с большим градиентом (большой ошибкой), случайно сэмплирует остальные. Меньше данных — быстрее.</li>
         <li><b>EFB (Exclusive Feature Bundling)</b> — объединяет редко совпадающие признаки (sparse features) для уменьшения размерности.</li>
-        <li><b>Histogram-based splits</b> — бинирует непрерывные признаки в 255 бинов, ищет сплит по гистограмме. $O(\\text{bins})$ вместо $O(n)$.</li>
+        <li><b>Histogram-based splits</b> — бинирует непрерывные признаки в 255 бинов, ищет сплит по <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмме</a>. $O(\\text{bins})$ вместо $O(n)$.</li>
       </ul>
 
       <div class="key-concept">

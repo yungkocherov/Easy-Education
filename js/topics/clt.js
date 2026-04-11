@@ -17,40 +17,48 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
-          <!-- Left: ugly uniform histogram -->
-          <text x="100" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#f59e0b">Исходные данные</text>
-          <text x="100" y="34" text-anchor="middle" font-size="10" fill="#64748b">(любое распределение)</text>
-          <!-- Histogram bars: uniform-ish with slight randomness -->
-          <rect x="20" y="60" width="22" height="90" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <rect x="44" y="55" width="22" height="95" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <rect x="68" y="65" width="22" height="85" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <rect x="92" y="58" width="22" height="92" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <rect x="116" y="62" width="22" height="88" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <rect x="140" y="57" width="22" height="93" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b" stroke-width="1.5" rx="1"/>
-          <line x1="18" y1="152" x2="166" y2="152" stroke="#64748b" stroke-width="1.5"/>
-          <!-- Arrow in middle -->
-          <text x="270" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="#6366f1">n &#x2192; &#x221E;</text>
-          <text x="270" y="100" text-anchor="middle" font-size="10" fill="#64748b">средние выборок</text>
-          <line x1="190" y1="110" x2="255" y2="110" stroke="#6366f1" stroke-width="2"/>
-          <polygon points="255,106 265,110 255,114" fill="#6366f1"/>
-          <line x1="285" y1="110" x2="350" y2="110" stroke="#6366f1" stroke-width="2"/>
-          <polygon points="350,106 360,110 350,114" fill="#6366f1"/>
-          <!-- Right: bell curve of sample means -->
-          <text x="470" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#6366f1">&#1057;&#1088;&#1077;&#1076;&#1085;&#1080;&#1077; &#1074;&#1099;&#1073;&#1086;&#1088;&#1086;&#1082;</text>
-          <text x="470" y="34" text-anchor="middle" font-size="10" fill="#64748b">(&#1074;&#1089;&#1077;&#1075;&#1076;&#1072; &#1085;&#1086;&#1088;&#1084;&#1072;&#1083;&#1100;&#1085;&#1086;&#1077;)</text>
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="cltGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#6366f1" stop-opacity="0.5"/>
               <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/>
             </linearGradient>
           </defs>
-          <path d="M370,152 C380,152 400,150 420,138 C440,122 455,90 470,52 C480,30 490,50 500,72 C515,105 530,130 550,145 C560,150 568,152 570,152" fill="url(#cltGrad)" stroke="#6366f1" stroke-width="2.5"/>
-          <line x1="470" y1="52" x2="470" y2="156" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <text x="470" y="166" text-anchor="middle" font-size="11" fill="#6366f1">&#956;</text>
-          <line x1="370" y1="152" x2="570" y2="152" stroke="#64748b" stroke-width="1.5"/>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">ЦПТ в действии</text>
+          <!-- Left: uniform histogram -->
+          <text x="120" y="55" text-anchor="middle" font-size="12" font-weight="600" fill="#f59e0b">Исходные данные</text>
+          <text x="120" y="72" text-anchor="middle" font-size="10" fill="#64748b">(любое распределение)</text>
+          <line x1="30" y1="220" x2="230" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <g fill="#fbbf24" fill-opacity="0.55" stroke="#b45309" stroke-width="1.5">
+            <rect x="35" y="100" width="30" height="120"/>
+            <rect x="68" y="95" width="30" height="125"/>
+            <rect x="101" y="105" width="30" height="115"/>
+            <rect x="134" y="98" width="30" height="122"/>
+            <rect x="167" y="102" width="30" height="118"/>
+            <rect x="200" y="100" width="30" height="120"/>
+          </g>
+          <!-- Arrow -->
+          <text x="380" y="125" text-anchor="middle" font-size="14" font-weight="700" fill="#6366f1">n → ∞</text>
+          <text x="380" y="145" text-anchor="middle" font-size="11" fill="#64748b">средние выборок</text>
+          <line x1="265" y1="160" x2="495" y2="160" stroke="#6366f1" stroke-width="2.5"/>
+          <polygon points="495,154 510,160 495,166" fill="#6366f1"/>
+          <!-- Right: nice bell curve -->
+          <text x="640" y="55" text-anchor="middle" font-size="12" font-weight="600" fill="#6366f1">Средние выборок</text>
+          <text x="640" y="72" text-anchor="middle" font-size="10" fill="#64748b">(всегда нормальное)</text>
+          <line x1="540" y1="220" x2="740" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <path id="clt-intro-area" d="" fill="url(#cltGrad)"/>
+          <path id="clt-intro-outline" d="" fill="none" stroke="#6366f1" stroke-width="2.8"/>
+          <line x1="640" y1="80" x2="640" y2="225" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="640" y="245" text-anchor="middle" font-size="14" fill="#6366f1" font-weight="700">μ</text>
         </svg>
         <div class="caption">ЦПТ в действии: какое бы ни было исходное распределение (равномерное, скошенное, дискретное), распределение выборочных средних при большом n всегда стремится к нормальному колоколу вокруг истинного μ.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          U.setPath(document, 'clt-intro-area', U.normalSegmentPath(640, 220, 80, 100, -3, 3));
+          U.setPath(document, 'clt-intro-outline', U.normalOutlinePath(640, 220, 80, 100));
+        })();
+        </script>
       </div>
 
       <h3>💡 Формулировка</h3>
@@ -89,45 +97,58 @@ App.registerTopic({
       <p>Один из самых наглядных способов почувствовать ЦПТ — посмотреть, как меняется распределение средних при росте n. Возьмём в качестве «исходных данных» равномерное распределение U(0, 1) — оно совсем не похоже на колокол.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
-          <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Распределение средних из U(0,1) при разном n</text>
-          <text x="350" y="34" text-anchor="middle" font-size="10" fill="#64748b">Начинаем с равномерного — не похоже на колокол. С ростом n форма становится нормальной.</text>
-          <!-- n=1 (just uniform) -->
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="max-width:900px;">
+          <text x="450" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Распределение средних из U(0,1) при разном n</text>
+          <text x="450" y="40" text-anchor="middle" font-size="11" fill="#64748b">Начинаем с равномерного — не похоже на колокол. С ростом n форма становится нормальной.</text>
+
+          <!-- n=1 (uniform) -->
           <g>
-            <text x="100" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#f59e0b">n = 1 (исходное)</text>
-            <line x1="40" y1="220" x2="160" y2="220" stroke="#475569" stroke-width="1"/>
-            <rect x="48" y="120" width="104" height="100" fill="#fed7aa" stroke="#f59e0b" stroke-width="1.5"/>
-            <text x="100" y="240" text-anchor="middle" font-size="9" fill="#64748b">U(0,1) — равномерное</text>
-            <text x="100" y="252" text-anchor="middle" font-size="9" fill="#64748b">плоский «прямоугольник»</text>
+            <text x="120" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#f59e0b">n = 1 (исходное)</text>
+            <line x1="40" y1="240" x2="200" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <rect x="50" y="120" width="140" height="120" fill="#fed7aa" fill-opacity="0.65" stroke="#f59e0b" stroke-width="2"/>
+            <text x="120" y="265" text-anchor="middle" font-size="11" fill="#64748b">U(0,1) — равномерное</text>
+            <text x="120" y="282" text-anchor="middle" font-size="11" fill="#64748b">плоский «прямоугольник»</text>
           </g>
           <!-- n=2 (triangle) -->
           <g>
-            <text x="270" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#fb923c">n = 2</text>
-            <line x1="210" y1="220" x2="330" y2="220" stroke="#475569" stroke-width="1"/>
-            <path d="M218,220 L270,120 L322,220 Z" fill="#fed7aa" stroke="#f97316" stroke-width="1.8"/>
-            <text x="270" y="240" text-anchor="middle" font-size="9" fill="#64748b">Уже треугольник —</text>
-            <text x="270" y="252" text-anchor="middle" font-size="9" fill="#64748b">не равномерное!</text>
+            <text x="340" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#fb923c">n = 2</text>
+            <line x1="260" y1="240" x2="420" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <path d="M270,240 L340,110 L410,240 Z" fill="#fdba74" fill-opacity="0.65" stroke="#ea580c" stroke-width="2"/>
+            <text x="340" y="265" text-anchor="middle" font-size="11" fill="#64748b">Уже треугольник —</text>
+            <text x="340" y="282" text-anchor="middle" font-size="11" fill="#64748b">не равномерное!</text>
           </g>
-          <!-- n=5 (rounded) -->
+          <!-- n=5 (smooth bell-like) -->
           <g>
-            <text x="440" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">n = 5</text>
-            <line x1="380" y1="220" x2="500" y2="220" stroke="#475569" stroke-width="1"/>
-            <path d="M388,220 Q400,210 412,180 Q428,140 440,115 Q452,140 468,180 Q480,210 492,220 Z" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1.8"/>
-            <text x="440" y="240" text-anchor="middle" font-size="9" fill="#64748b">Уже похоже на колокол</text>
-            <text x="440" y="252" text-anchor="middle" font-size="9" fill="#64748b">SE = σ/√5 ≈ σ/2.24</text>
+            <text x="560" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">n = 5</text>
+            <line x1="480" y1="240" x2="640" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <path id="clt-prog-n5-area" d="" fill="#ddd6fe" fill-opacity="0.7"/>
+            <path id="clt-prog-n5" d="" fill="none" stroke="#7c3aed" stroke-width="2.2"/>
+            <text x="560" y="265" text-anchor="middle" font-size="11" fill="#64748b">Уже похоже на колокол</text>
+            <text x="560" y="282" text-anchor="middle" font-size="11" fill="#64748b">SE = σ/√5 ≈ σ/2.24</text>
           </g>
-          <!-- n=30 (perfect bell) -->
+          <!-- n=30 (sharp bell) -->
           <g>
-            <text x="610" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">n = 30</text>
-            <line x1="550" y1="220" x2="670" y2="220" stroke="#475569" stroke-width="1"/>
-            <path d="M558,220 Q580,218 595,200 Q605,170 610,115 Q615,170 625,200 Q640,218 662,220 Z" fill="#dbeafe" stroke="#1e40af" stroke-width="1.8"/>
-            <text x="610" y="240" text-anchor="middle" font-size="9" fill="#64748b">Идеальный колокол</text>
-            <text x="610" y="252" text-anchor="middle" font-size="9" fill="#64748b">SE = σ/√30 (узкий)</text>
+            <text x="780" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">n = 30</text>
+            <line x1="700" y1="240" x2="860" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <path id="clt-prog-n30-area" d="" fill="#dbeafe" fill-opacity="0.7"/>
+            <path id="clt-prog-n30" d="" fill="none" stroke="#1e40af" stroke-width="2.2"/>
+            <text x="780" y="265" text-anchor="middle" font-size="11" fill="#64748b">Идеальный колокол</text>
+            <text x="780" y="282" text-anchor="middle" font-size="11" fill="#64748b">SE = σ/√30 (узкий)</text>
           </g>
-          <!-- Bottom annotation -->
-          <text x="350" y="285" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">→ Чем больше n, тем уже и «нормальнее» распределение средних →</text>
+          <text x="450" y="305" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">→ Чем больше n, тем уже и «нормальнее» распределение средних →</text>
         </svg>
         <div class="caption">Магия ЦПТ: даже из равномерного (плоского) распределения уже при n=5 возникает почти-колокол, при n=30 — практически идеальный нормальный. Это работает с любым исходным распределением.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // n=5: «средне» широкий
+          U.setPath(document, 'clt-prog-n5-area', U.normalSegmentPath(560, 240, 110, 70, -3, 3));
+          U.setPath(document, 'clt-prog-n5', U.normalOutlinePath(560, 240, 110, 70));
+          // n=30: уже / выше (peakY ниже = пик выше). halfWidth меньше — узкий колокол.
+          U.setPath(document, 'clt-prog-n30-area', U.normalSegmentPath(780, 240, 95, 55, -3, 3));
+          U.setPath(document, 'clt-prog-n30', U.normalOutlinePath(780, 240, 95, 55));
+        })();
+        </script>
       </div>
 
       <h3>🧮 Сколько должно быть n?</h3>
@@ -698,7 +719,7 @@ print(f"95% ДИ: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
       </ul>
 
       <h3>Практическое правило</h3>
-      <p>Для симметричных распределений n ≥ 15 обычно достаточно. Для сильно скошенных — n ≥ 50-100. Проверить можно Q-Q plot выборочных средних.</p>
+      <p>Для симметричных распределений n ≥ 15 обычно достаточно. Для сильно скошенных — n ≥ 50-100. Проверить можно <a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> выборочных средних.</p>
 
       <h3>Бутстрэп как альтернатива</h3>
       <p>Вместо опоры на ЦПТ можно делать ресемплирование с возвращением: многократно семплируем n элементов из исходной выборки и считаем статистику. Распределение бутстрэп-статистик приближает истинное распределение оценки.</p>

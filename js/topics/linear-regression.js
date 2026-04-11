@@ -199,7 +199,7 @@ App.registerTopic({
           <p>Проверки, которые нужно делать перед доверием к модели:</p>
           <ul>
             <li><b>Residual plot</b> — график остатков vs предсказаний. Должно быть случайное облако. Если видишь паттерн — модель что-то не ловит.</li>
-            <li><b>Q-Q plot остатков</b> — проверка нормальности.</li>
+            <li><b><a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> остатков</b> — проверка нормальности.</li>
             <li><b>VIF (Variance Inflation Factor)</b> — диагностика мультиколлинеарности. VIF > 10 — проблема.</li>
             <li><b>Outlier detection</b> — Cook's distance, leverage.</li>
           </ul>
@@ -723,7 +723,7 @@ plt.show()</code></pre>
       <h3>Диагностика</h3>
       <ul>
         <li><b>Residual plot</b> — ошибки должны быть случайным облаком без паттернов.</li>
-        <li><b>Q-Q plot ошибок</b> — для проверки нормальности.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> ошибок</b> — для проверки нормальности.</li>
         <li><b>VIF</b> — для детекции мультиколлинеарности (VIF > 10 — плохо).</li>
       </ul>
 

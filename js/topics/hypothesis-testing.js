@@ -46,53 +46,64 @@ App.registerTopic({
       <p>Правило: если <b>p < α</b>, отвергаем $H_0$ и говорим «результат статистически значим».</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 190" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="htBellGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0.05"/>
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0.08"/>
             </linearGradient>
-            <linearGradient id="htLeftGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
-            </linearGradient>
-            <linearGradient id="htRightGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
+            <linearGradient id="htTailGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.1"/>
             </linearGradient>
           </defs>
-          <!-- Baseline -->
-          <line x1="20" y1="155" x2="540" y2="155" stroke="#64748b" stroke-width="1.5"/>
-          <!-- Full bell curve path (clip will be applied via separate fills) -->
-          <!-- Left rejection region (shaded red) -->
-          <path d="M30,155 C40,155 60,153 80,145 C95,136 105,120 110,105 L110,155 Z" fill="url(#htLeftGrad)" stroke="#ef4444" stroke-width="1.5"/>
-          <!-- Right rejection region (shaded red) -->
-          <path d="M450,105 C455,120 465,136 480,145 C500,153 520,155 530,155 L450,155 Z" fill="url(#htRightGrad)" stroke="#ef4444" stroke-width="1.5"/>
-          <!-- Middle: full bell -->
-          <path d="M30,155 C40,155 60,153 80,145 C95,136 105,120 110,105 C140,55 180,22 280,18 C380,22 420,55 450,105 C455,120 465,136 480,145 C500,153 520,155 530,155" fill="none" stroke="#6366f1" stroke-width="2.5"/>
-          <!-- Middle region fill (green) -->
-          <path d="M110,105 C140,55 180,22 280,18 C380,22 420,55 450,105 L450,155 L110,155 Z" fill="url(#htBellGrad)"/>
-          <!-- Critical value lines -->
-          <line x1="110" y1="105" x2="110" y2="160" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
-          <line x1="450" y1="105" x2="450" y2="160" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
-          <!-- Labels on tails -->
-          <text x="65" y="100" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">&#1054;&#1090;&#1074;&#1077;&#1088;&#1075;&#1072;&#1077;&#1084;</text>
-          <text x="65" y="113" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">H&#x2080;</text>
-          <text x="65" y="126" text-anchor="middle" font-size="9" fill="#ef4444">&#945;/2</text>
-          <text x="495" y="100" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">&#1054;&#1090;&#1074;&#1077;&#1088;&#1075;&#1072;&#1077;&#1084;</text>
-          <text x="495" y="113" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">H&#x2080;</text>
-          <text x="495" y="126" text-anchor="middle" font-size="9" fill="#ef4444">&#945;/2</text>
-          <!-- Middle label -->
-          <text x="280" y="85" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">&#1053;&#1077; &#1086;&#1090;&#1074;&#1077;&#1088;&#1075;&#1072;&#1077;&#1084; H&#x2080;</text>
-          <text x="280" y="100" text-anchor="middle" font-size="10" fill="#10b981">1 &#x2212; &#945;</text>
-          <!-- Critical value labels -->
-          <text x="110" y="175" text-anchor="middle" font-size="10" fill="#ef4444">&#x2212;z&#x03B1;/2</text>
-          <text x="450" y="175" text-anchor="middle" font-size="10" fill="#ef4444">+z&#x03B1;/2</text>
-          <text x="280" y="172" text-anchor="middle" font-size="10" fill="#64748b">0 (H&#x2080;)</text>
-          <!-- Center tick -->
-          <line x1="280" y1="155" x2="280" y2="162" stroke="#64748b" stroke-width="1.5"/>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Двусторонний критерий: критическая область</text>
+          <line x1="60" y1="220" x2="700" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <!-- Generated bell curve and segments -->
+          <path id="ht-central-area" d="" fill="url(#htBellGrad)"/>
+          <path id="ht-left-tail" d="" fill="url(#htTailGrad)" stroke="#dc2626" stroke-width="1.8"/>
+          <path id="ht-right-tail" d="" fill="url(#htTailGrad)" stroke="#dc2626" stroke-width="1.8"/>
+          <path id="ht-bell-outline" d="" fill="none" stroke="#4338ca" stroke-width="2.8"/>
+          <!-- Critical value lines (will be set by init) -->
+          <line id="ht-line-left" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
+          <line id="ht-line-right" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
+          <!-- Tail labels -->
+          <text x="130" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">Отвергаем H₀</text>
+          <text x="130" y="188" text-anchor="middle" font-size="12" fill="#7f1d1d">α / 2</text>
+          <text x="630" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">Отвергаем H₀</text>
+          <text x="630" y="188" text-anchor="middle" font-size="12" fill="#7f1d1d">α / 2</text>
+          <!-- Center label -->
+          <text x="380" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">Не отвергаем H₀</text>
+          <text x="380" y="135" text-anchor="middle" font-size="12" fill="#065f46">1 − α</text>
+          <!-- Axis labels -->
+          <text id="ht-label-left" x="0" y="245" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="700">−z₍α/2₎</text>
+          <text x="380" y="245" text-anchor="middle" font-size="12" fill="#64748b" font-weight="700">0</text>
+          <text id="ht-label-right" x="0" y="245" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="700">+z₍α/2₎</text>
+          <line x1="380" y1="220" x2="380" y2="228" stroke="#64748b"/>
         </svg>
-        <div class="caption">Двусторонний критерий: красные хвосты — области отвержения H₀ (каждая по α/2). Если тестовая статистика попадает в хвост — результат статистически значим.</div>
+        <div class="caption">Двусторонний критерий: красные хвосты — критическая область отвержения H₀ (каждая площадью α/2). Если тестовая статистика попадает в хвост — результат значим, отвергаем H₀.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var cx = 380, baselineY = 220, peakY = 50, halfWidth = 270;
+          U.setPath(document, 'ht-bell-outline', U.normalOutlinePath(cx, baselineY, peakY, halfWidth));
+          U.setPath(document, 'ht-central-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -2, 2));
+          U.setPath(document, 'ht-left-tail', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -3, -2));
+          U.setPath(document, 'ht-right-tail', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, 2, 3));
+          // Critical lines at ±2σ
+          var leftX = cx - (2 / 3) * halfWidth;  // ≈ 200
+          var rightX = cx + (2 / 3) * halfWidth;
+          var critY = baselineY - Math.exp(-0.5 * 4) * (baselineY - peakY);
+          var l = document.getElementById('ht-line-left');
+          l.setAttribute('x1', leftX); l.setAttribute('x2', leftX);
+          l.setAttribute('y1', critY); l.setAttribute('y2', baselineY + 8);
+          var r = document.getElementById('ht-line-right');
+          r.setAttribute('x1', rightX); r.setAttribute('x2', rightX);
+          r.setAttribute('y1', critY); r.setAttribute('y2', baselineY + 8);
+          document.getElementById('ht-label-left').setAttribute('x', leftX);
+          document.getElementById('ht-label-right').setAttribute('x', rightX);
+        })();
+        </script>
       </div>
 
       <h3>💡 Полная процедура теста</h3>
@@ -142,66 +153,108 @@ App.registerTopic({
       </ul>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
-            <linearGradient id="pvG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.2"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
-            <linearGradient id="pvTail" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.55"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="pvG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.25"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="pvTail" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.6"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/></linearGradient>
           </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Визуализация p-value</text>
-          <text x="280" y="32" text-anchor="middle" font-size="10" fill="#64748b">Распределение тестовой статистики при H₀</text>
-          <line x1="30" y1="175" x2="540" y2="175" stroke="#475569" stroke-width="1.5"/>
-          <!-- Bell curve (H0 distribution) -->
-          <path d="M30,175 C60,174 120,170 160,160 Q220,135 280,50 Q340,135 400,160 Q440,170 500,174 L540,175 L540,175 L30,175 Z" fill="url(#pvG)" stroke="#6366f1" stroke-width="2"/>
-          <!-- Observed statistic position (say t=2.3) and right tail shaded -->
-          <!-- Shade from x=410 to 540 (right tail = p-value) -->
-          <path d="M410,158 Q430,165 460,170 Q490,173 540,175 L540,175 L410,175 Z" fill="url(#pvTail)" stroke="#dc2626" stroke-width="2"/>
-          <line x1="410" y1="158" x2="410" y2="195" stroke="#dc2626" stroke-width="2"/>
-          <text x="410" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">наблюдаемая t</text>
-          <!-- Arrow pointing to p-value area -->
-          <text x="475" y="130" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="600">p-value</text>
-          <text x="475" y="144" text-anchor="middle" font-size="9" fill="#7f1d1d">(площадь хвоста)</text>
-          <path d="M470,148 L465,163" stroke="#dc2626" stroke-width="1.5" fill="none" marker-end="url(#arrowP)"/>
-          <defs><marker id="arrowP" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#dc2626"/></marker></defs>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Визуализация p-value</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Распределение тестовой статистики при H₀</text>
+          <line x1="60" y1="220" x2="700" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <path id="pv-area" d="" fill="url(#pvG)"/>
+          <path id="pv-outline" d="" fill="none" stroke="#6366f1" stroke-width="2.8"/>
+          <path id="pv-tail" d="" fill="url(#pvTail)" stroke="#dc2626" stroke-width="2"/>
+          <line id="pv-stat-line" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2.5"/>
+          <text id="pv-stat-label" x="0" y="248" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">наблюдаемая t</text>
+          <!-- p-value annotation -->
+          <text x="610" y="120" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">p-value</text>
+          <text x="610" y="140" text-anchor="middle" font-size="11" fill="#7f1d1d">(площадь хвоста)</text>
+          <line x1="610" y1="148" x2="595" y2="195" stroke="#dc2626" stroke-width="1.5"/>
           <!-- H0 label -->
-          <text x="280" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">Если H₀ верна,</text>
-          <text x="280" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">статистика распределена так</text>
-          <!-- Axis -->
-          <text x="280" y="192" text-anchor="middle" font-size="10" fill="#64748b">0</text>
-          <line x1="280" y1="175" x2="280" y2="180" stroke="#64748b"/>
+          <text x="380" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">Если H₀ верна,</text>
+          <text x="380" y="118" text-anchor="middle" font-size="13" font-weight="600" fill="#4338ca">статистика распределена так</text>
         </svg>
         <div class="caption">p-value = площадь хвоста за наблюдаемой статистикой. Маленький p-value → наблюдаемый результат «экстремальный» при H₀, есть основания её отвергнуть.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var cx = 380, baselineY = 220, peakY = 60, halfWidth = 280;
+          U.setPath(document, 'pv-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -3, 3));
+          U.setPath(document, 'pv-outline', U.normalOutlinePath(cx, baselineY, peakY, halfWidth));
+          // Right tail starting at t = +1.7
+          U.setPath(document, 'pv-tail', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, 1.7, 3));
+          var statX = cx + (1.7 / 3) * halfWidth;
+          var statY = baselineY - Math.exp(-0.5 * 1.7 * 1.7) * (baselineY - peakY);
+          var l = document.getElementById('pv-stat-line');
+          l.setAttribute('x1', statX); l.setAttribute('x2', statX);
+          l.setAttribute('y1', statY); l.setAttribute('y2', baselineY + 8);
+          document.getElementById('pv-stat-label').setAttribute('x', statX);
+        })();
+        </script>
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
-            <linearGradient id="h0G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
-            <linearGradient id="h1G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="h0G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="h1G" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0.05"/></linearGradient>
             <linearGradient id="alphaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.65"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/></linearGradient>
-            <linearGradient id="betaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0891b2" stop-opacity="0.5"/><stop offset="100%" stop-color="#0891b2" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="betaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0891b2" stop-opacity="0.55"/><stop offset="100%" stop-color="#0891b2" stop-opacity="0.1"/></linearGradient>
           </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Ошибки I и II рода: α и β</text>
-          <line x1="20" y1="190" x2="540" y2="190" stroke="#475569" stroke-width="1.5"/>
-          <!-- H0 bell, centered at 200 -->
-          <path d="M20,190 C50,189 100,185 130,175 Q170,150 200,60 Q230,150 270,175 C290,182 310,187 340,189 L340,190 L20,190 Z" fill="url(#h0G)" stroke="#4338ca" stroke-width="2"/>
-          <!-- H1 bell, centered at 380 -->
-          <path d="M220,190 C250,188 290,183 320,170 Q360,140 380,60 Q400,140 440,170 Q480,185 540,190 L540,190 L220,190 Z" fill="url(#h1G)" stroke="#b45309" stroke-width="2"/>
-          <!-- Critical value c -->
-          <line x1="310" y1="40" x2="310" y2="200" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
-          <text x="310" y="215" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">критич. значение c</text>
-          <!-- Alpha area: right tail of H0 beyond c -->
-          <path d="M310,170 Q320,180 340,188 L340,190 L310,190 Z" fill="url(#alphaG)" stroke="#dc2626" stroke-width="1.5"/>
-          <text x="340" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">α</text>
-          <text x="340" y="178" text-anchor="middle" font-size="9" fill="#7f1d1d">(I рода)</text>
-          <!-- Beta area: left of c under H1 -->
-          <path d="M220,190 C250,188 290,183 310,172 L310,190 L220,190 Z" fill="url(#betaG)" stroke="#0891b2" stroke-width="1.5"/>
-          <text x="260" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#0891b2">β</text>
-          <text x="260" y="183" text-anchor="middle" font-size="9" fill="#164e63">(II рода)</text>
-          <!-- Centers labeled -->
-          <text x="200" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">H₀ верна</text>
-          <text x="380" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">H₁ верна</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Ошибки I и II рода: α и β</text>
+          <line x1="40" y1="250" x2="720" y2="250" stroke="#475569" stroke-width="1.5"/>
+          <!-- H0 area + outline (centered at cx_h0) -->
+          <path id="err-h0-area" d="" fill="url(#h0G)"/>
+          <path id="err-h0-outline" d="" fill="none" stroke="#4338ca" stroke-width="2.5"/>
+          <path id="err-h1-area" d="" fill="url(#h1G)"/>
+          <path id="err-h1-outline" d="" fill="none" stroke="#b45309" stroke-width="2.5"/>
+          <!-- Alpha (right tail of H0 beyond critical) -->
+          <path id="err-alpha" d="" fill="url(#alphaG)" stroke="#dc2626" stroke-width="1.5"/>
+          <!-- Beta (left tail of H1 below critical) -->
+          <path id="err-beta" d="" fill="url(#betaG)" stroke="#0891b2" stroke-width="1.5"/>
+          <!-- Critical value line -->
+          <line id="err-crit" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="4,3"/>
+          <text id="err-crit-label" x="0" y="278" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">критич. значение c</text>
+          <!-- Alpha label -->
+          <text id="err-alpha-label" x="0" y="155" text-anchor="middle" font-size="16" font-weight="800" fill="#dc2626">α</text>
+          <text id="err-alpha-sub" x="0" y="172" text-anchor="middle" font-size="10" fill="#7f1d1d">(ошибка I рода)</text>
+          <!-- Beta label -->
+          <text id="err-beta-label" x="0" y="155" text-anchor="middle" font-size="16" font-weight="800" fill="#0891b2">β</text>
+          <text id="err-beta-sub" x="0" y="172" text-anchor="middle" font-size="10" fill="#164e63">(ошибка II рода)</text>
+          <!-- Distribution labels -->
+          <text id="err-h0-title" x="0" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">H₀ верна</text>
+          <text id="err-h1-title" x="0" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#b45309">H₁ верна</text>
+          <!-- Bottom legend -->
+          <text x="380" y="305" text-anchor="middle" font-size="11" fill="#64748b">Мощность теста = 1 − β = вероятность правильно отвергнуть ложную H₀</text>
         </svg>
-        <div class="caption">Два распределения: под H₀ (синее) и под H₁ (оранжевое). Граница c разделяет «отвергаем/не отвергаем». Красная площадь = α (ложная тревога). Голубая = β (пропуск эффекта). Мощность теста = 1 − β.</div>
+        <div class="caption">Два распределения: под H₀ (синее) и под H₁ (оранжевое). Граница c разделяет «отвергаем/не отвергаем». Красная площадь = α (ложная тревога). Голубая = β (пропуск эффекта).</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var baselineY = 250, peakY = 80, halfWidth = 130;
+          var cxH0 = 250, cxH1 = 510;
+          U.setPath(document, 'err-h0-outline', U.normalOutlinePath(cxH0, baselineY, peakY, halfWidth));
+          U.setPath(document, 'err-h0-area', U.normalSegmentPath(cxH0, baselineY, peakY, halfWidth, -3, 3));
+          U.setPath(document, 'err-h1-outline', U.normalOutlinePath(cxH1, baselineY, peakY, halfWidth));
+          U.setPath(document, 'err-h1-area', U.normalSegmentPath(cxH1, baselineY, peakY, halfWidth, -3, 3));
+          // Critical value at +1.5σ from H0 (which is also -1.5σ from H1 because они на 3σ apart)
+          var critX = cxH0 + (1.5 / 3) * halfWidth;
+          U.setPath(document, 'err-alpha', U.normalSegmentPath(cxH0, baselineY, peakY, halfWidth, 1.5, 3));
+          U.setPath(document, 'err-beta', U.normalSegmentPath(cxH1, baselineY, peakY, halfWidth, -3, -1.5));
+          var critLine = document.getElementById('err-crit');
+          critLine.setAttribute('x1', critX); critLine.setAttribute('x2', critX);
+          critLine.setAttribute('y1', 60); critLine.setAttribute('y2', 258);
+          document.getElementById('err-crit-label').setAttribute('x', critX);
+          document.getElementById('err-h0-title').setAttribute('x', cxH0);
+          document.getElementById('err-h1-title').setAttribute('x', cxH1);
+          // Position alpha label inside the right tail of H0 (slightly above baseline)
+          document.getElementById('err-alpha-label').setAttribute('x', critX + 30);
+          document.getElementById('err-alpha-sub').setAttribute('x', critX + 30);
+          // Beta label inside the left tail of H1
+          document.getElementById('err-beta-label').setAttribute('x', critX - 30);
+          document.getElementById('err-beta-sub').setAttribute('x', critX - 30);
+        })();
+        </script>
       </div>
 
       <h3>⚠️ Что p-value НЕ означает</h3>

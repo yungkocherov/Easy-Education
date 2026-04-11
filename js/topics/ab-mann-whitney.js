@@ -23,7 +23,7 @@ App.registerTopic({
         <li><b>Порядковые (ординальные) данные</b> — оценки 1–5, рейтинги NPS (0–10), уровни сложности. Арифметика над «звёздочками» бессмысленна: разница между 1 и 2 звёздами не равна разнице между 4 и 5.</li>
         <li><b>Выбросы</b> — один «кит» (пользователь с аномально большой суммой заказа) сдвигает среднее, но почти не меняет ранги.</li>
         <li><b>Маленькие выборки</b> — при n &lt; 30 нельзя полагаться на ЦПТ для нормальной аппроксимации, а проверить нормальность на малой выборке практически невозможно.</li>
-        <li><b>Явные нарушения нормальности</b> — Q-Q plot показывает сильные отклонения, тест Шапиро-Уилка значим.</li>
+        <li><b>Явные нарушения нормальности</b> — <a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> показывает сильные отклонения, тест Шапиро-Уилка значим.</li>
       </ul>
 
       <div class="key-concept">
@@ -282,7 +282,7 @@ Skewness группы A:
             <p>При нарушении нормальности Манн-Уитни надёжнее. Выброс 128 «обманул» t-тест, завысив дисперсию группы A. Ранговый подход выявил реальную разницу (медианы 41 vs 71 сек).</p>
           </div>
 
-          <div class="lesson-box">Правило выбора: если Q-Q plot показывает отклонения или тест Шапиро-Уилка значим — используй Манн-Уитни. При нормальных данных t-тест чуть мощнее (95.5% эффективности у МУ).</div>
+          <div class="lesson-box">Правило выбора: если <a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> показывает отклонения или тест Шапиро-Уилка значим — используй Манн-Уитни. При нормальных данных t-тест чуть мощнее (95.5% эффективности у МУ).</div>
         `
       },
       {
@@ -473,7 +473,7 @@ p-value (двусторонний) ≈ <b>0.003</b></div>
               responsive: true, maintainAspectRatio: false,
               plugins: {
                 legend: { display: true },
-                title: { display: true, text: 'Перекрытые гистограммы A и B' },
+                title: { display: true, text: 'Перекрытые <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> A и B' },
               },
               scales: {
                 x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } },
@@ -613,7 +613,7 @@ else:
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
-# Гистограммы
+# <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограммы</a>
 ax1.hist(group_A, bins=30, alpha=0.5, label='A', color='blue')
 ax1.hist(group_B, bins=30, alpha=0.5, label='B', color='green')
 ax1.axvline(np.median(group_A), color='blue', linestyle='--')
@@ -621,9 +621,9 @@ ax1.axvline(np.median(group_B), color='green', linestyle='--')
 ax1.set_title("Распределения (скошенные)")
 ax1.legend()
 
-# Boxplot
-ax2.boxplot([group_A, group_B], labels=['A', 'B'])
-ax2.set_title("Boxplot: A vs B")
+# <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a>
+ax2.<a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a>([group_A, group_B], labels=['A', 'B'])
+ax2.set_title("<a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a>: A vs B")
 ax2.set_ylabel("Время (сек)")
 
 plt.tight_layout()

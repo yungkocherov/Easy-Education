@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'viz-violin-plot',
-  category: 'viz',
+  category: 'glossary',
   title: 'Violin Plot',
   summary: 'Гибрид box plot и density plot: показывает и квартили, и форму распределения.',
 

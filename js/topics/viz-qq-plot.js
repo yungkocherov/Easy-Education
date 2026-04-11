@@ -3,7 +3,7 @@
    ========================================================================== */
 App.registerTopic({
   id: 'viz-qq-plot',
-  category: 'viz',
+  category: 'glossary',
   title: 'Q-Q Plot',
   summary: 'Quantile-Quantile plot: сравнивает квантили выборки с теоретическим распределением.',
 

@@ -74,7 +74,7 @@ App.registerTopic({
       <p><span class="term" data-tip="InterQuartile Range. Диапазон, в котором лежат центральные 50% данных. Не зависит от крайних значений, поэтому устойчив к выбросам.">IQR</span> = Q3 − Q1 — диапазон, где лежат <b>центральные 50%</b> наблюдений. Это «устойчивый» аналог std.</p>
 
       <h3>🧮 Стандартная пятёрка чисел (five-number summary)</h3>
-      <p>Минимум, Q1, медиана, Q3, максимум — даёт быстрое понимание всей формы распределения. Графически это отображается как <span class="term" data-tip="Графическое представление пятёрки чисел: ящик — от Q1 до Q3, линия внутри — медиана, усы — до крайних «нормальных» значений, точки — выбросы.">boxplot</span>.</p>
+      <p>Минимум, Q1, медиана, Q3, максимум — даёт быстрое понимание всей формы распределения. Графически это отображается как <span class="term" data-tip="Графическое представление пятёрки чисел: ящик — от Q1 до Q3, линия внутри — медиана, усы — до крайних «нормальных» значений, точки — выбросы."><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a></span>.</p>
 
       <div class="illustration bordered">
         <svg viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
@@ -107,10 +107,10 @@ App.registerTopic({
           <line x1="360" y1="165" x2="360" y2="175" stroke="#10b981" stroke-width="1.5"/>
           <text x="280" y="168" text-anchor="middle" font-size="11" fill="#10b981" dy="12">IQR = Q3 − Q1</text>
         </svg>
-        <div class="caption">Boxplot (ящик с усами): ящик охватывает центральные 50% данных (IQR), линия внутри — медиана, усы тянутся до крайних «нормальных» значений, красная точка — выброс.</div>
+        <div class="caption"><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a> (<a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">ящик с усами</a>): ящик охватывает центральные 50% данных (IQR), линия внутри — медиана, усы тянутся до крайних «нормальных» значений, красная точка — выброс.</div>
       </div>
 
-      <div class="callout tip">💡 <b>Правило большого пальца:</b> если распределение симметрично и без выбросов → смотри на среднее и std. Если есть выбросы или сильный скос → используй медиану и IQR. Всегда рисуй <span class="term" data-tip="Столбчатая диаграмма, показывающая, сколько значений попадает в каждый интервал. Визуализирует форму распределения.">гистограмму</span> или boxplot перед выводами.</div>
+      <div class="callout tip">💡 <b>Правило большого пальца:</b> если распределение симметрично и без выбросов → смотри на среднее и std. Если есть выбросы или сильный скос → используй медиану и IQR. Всегда рисуй <span class="term" data-tip="Столбчатая диаграмма, показывающая, сколько значений попадает в каждый интервал. Визуализирует форму распределения."><a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a></span> или <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a> перед выводами.</div>
 
       <h3>🔬 Форма распределения</h3>
       <p>Помимо центра и разброса, распределение может быть <b>несимметричным</b>. Это описывают:</p>
@@ -126,95 +126,160 @@ App.registerTopic({
       </ul>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
-          <text x="350" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Три формы распределения и взаимное положение среднего/медианы/моды</text>
-          <!-- LEFT: left-skewed -->
+        <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" style="max-width:900px;">
+          <text x="450" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Три формы распределения и взаимное положение моды / медианы / среднего</text>
+
+          <!-- LEFT panel: left-skewed (long tail to the LEFT) -->
           <g>
-            <text x="115" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">Левый скос (skewness &lt; 0)</text>
-            <line x1="25" y1="170" x2="205" y2="170" stroke="#475569" stroke-width="1.5"/>
-            <!-- Bars (increasing) -->
-            <rect x="30" y="158" width="12" height="12" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="45" y="148" width="12" height="22" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="60" y="135" width="12" height="35" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="75" y="115" width="12" height="55" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="90" y="95" width="12" height="75" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="105" y="75" width="12" height="95" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="120" y="55" width="12" height="115" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="135" y="50" width="12" height="120" fill="#fbbf24" fill-opacity="0.85" stroke="#b45309" stroke-width="1.5"/>
-            <rect x="150" y="70" width="12" height="100" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="165" y="115" width="12" height="55" fill="#fbbf24" fill-opacity="0.75"/>
-            <rect x="180" y="150" width="12" height="20" fill="#fbbf24" fill-opacity="0.75"/>
-            <!-- Indicators -->
-            <line x1="100" y1="175" x2="100" y2="190" stroke="#dc2626" stroke-width="2"/>
-            <text x="100" y="203" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">среднее</text>
-            <line x1="125" y1="175" x2="125" y2="190" stroke="#0284c7" stroke-width="2"/>
-            <text x="125" y="203" text-anchor="middle" font-size="9" fill="#0284c7" font-weight="600">медиана</text>
-            <line x1="141" y1="175" x2="141" y2="190" stroke="#059669" stroke-width="2"/>
-            <text x="155" y="213" text-anchor="middle" font-size="9" fill="#059669" font-weight="600">мода</text>
+            <text x="150" y="50" text-anchor="middle" font-size="13" font-weight="600" fill="#b45309">Левый скос (skewness &lt; 0)</text>
+            <line x1="30" y1="240" x2="280" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <!-- Bell-like curve, shifted toward right (mode at right side) -->
+            <path id="ds-skew-left" d="" fill="#fcd34d" fill-opacity="0.5" stroke="#b45309" stroke-width="2.5"/>
+            <!-- Vertical lines for mean (left), median (middle), mode (right) -->
+            <line x1="120" y1="100" x2="120" y2="240" stroke="#dc2626" stroke-width="2.2"/>
+            <line x1="160" y1="80" x2="160" y2="240" stroke="#0284c7" stroke-width="2.2"/>
+            <line x1="200" y1="65" x2="200" y2="240" stroke="#059669" stroke-width="2.2"/>
+            <!-- Stacked labels with leader lines, separated vertically -->
+            <text x="120" y="270" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="700">среднее</text>
+            <text x="160" y="290" text-anchor="middle" font-size="11" fill="#0284c7" font-weight="700">медиана</text>
+            <text x="200" y="310" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">мода</text>
+            <!-- Leader lines from labels to ticks at the baseline -->
+            <line x1="120" y1="245" x2="120" y2="262" stroke="#dc2626" stroke-width="1.5"/>
+            <line x1="160" y1="245" x2="160" y2="282" stroke="#0284c7" stroke-width="1.5"/>
+            <line x1="200" y1="245" x2="200" y2="302" stroke="#059669" stroke-width="1.5"/>
+            <text x="155" y="335" text-anchor="middle" font-size="11" fill="#475569" font-style="italic">среднее &lt; медиана &lt; мода</text>
           </g>
-          <!-- CENTER: symmetric -->
+
+          <!-- CENTER panel: symmetric -->
           <g>
-            <text x="350" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Симметричное (skewness ≈ 0)</text>
-            <line x1="250" y1="170" x2="450" y2="170" stroke="#475569" stroke-width="1.5"/>
-            <rect x="256" y="158" width="12" height="12" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="271" y="140" width="12" height="30" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="286" y="115" width="12" height="55" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="301" y="85" width="12" height="85" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="316" y="60" width="12" height="110" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="331" y="50" width="12" height="120" fill="#60a5fa" fill-opacity="0.85" stroke="#1e40af" stroke-width="1.5"/>
-            <rect x="346" y="60" width="12" height="110" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="361" y="85" width="12" height="85" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="376" y="115" width="12" height="55" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="391" y="140" width="12" height="30" fill="#60a5fa" fill-opacity="0.75"/>
-            <rect x="406" y="158" width="12" height="12" fill="#60a5fa" fill-opacity="0.75"/>
-            <!-- Mean = median = mode all at center -->
-            <line x1="337" y1="175" x2="337" y2="200" stroke="#1e40af" stroke-width="2"/>
-            <text x="337" y="213" text-anchor="middle" font-size="9" fill="#1e40af" font-weight="600">среднее = медиана = мода</text>
+            <text x="450" y="50" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">Симметричное (skewness ≈ 0)</text>
+            <line x1="330" y1="240" x2="580" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <path id="ds-skew-sym" d="" fill="#bfdbfe" fill-opacity="0.55" stroke="#1e40af" stroke-width="2.5"/>
+            <!-- Single combined vertical at center -->
+            <line x1="455" y1="60" x2="455" y2="240" stroke="#1e40af" stroke-width="2.5"/>
+            <text x="455" y="270" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">мода</text>
+            <text x="455" y="288" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">=</text>
+            <text x="455" y="306" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">медиана</text>
+            <text x="455" y="324" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">=</text>
+            <text x="455" y="342" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">среднее</text>
           </g>
-          <!-- RIGHT: right-skewed -->
+
+          <!-- RIGHT panel: right-skewed (long tail to the RIGHT) -->
           <g>
-            <text x="585" y="35" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Правый скос (skewness &gt; 0)</text>
-            <line x1="495" y1="170" x2="675" y2="170" stroke="#475569" stroke-width="1.5"/>
-            <rect x="500" y="150" width="12" height="20" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="515" y="115" width="12" height="55" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="530" y="70" width="12" height="100" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="545" y="50" width="12" height="120" fill="#f97316" fill-opacity="0.85" stroke="#92400e" stroke-width="1.5"/>
-            <rect x="560" y="55" width="12" height="115" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="575" y="75" width="12" height="95" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="590" y="95" width="12" height="75" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="605" y="115" width="12" height="55" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="620" y="135" width="12" height="35" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="635" y="148" width="12" height="22" fill="#f97316" fill-opacity="0.75"/>
-            <rect x="650" y="158" width="12" height="12" fill="#f97316" fill-opacity="0.75"/>
-            <!-- Mode, median, mean -->
-            <line x1="551" y1="175" x2="551" y2="190" stroke="#059669" stroke-width="2"/>
-            <text x="540" y="213" text-anchor="middle" font-size="9" fill="#059669" font-weight="600">мода</text>
-            <line x1="570" y1="175" x2="570" y2="190" stroke="#0284c7" stroke-width="2"/>
-            <text x="570" y="203" text-anchor="middle" font-size="9" fill="#0284c7" font-weight="600">медиана</text>
-            <line x1="595" y1="175" x2="595" y2="190" stroke="#dc2626" stroke-width="2"/>
-            <text x="600" y="203" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">среднее</text>
+            <text x="750" y="50" text-anchor="middle" font-size="13" font-weight="600" fill="#92400e">Правый скос (skewness &gt; 0)</text>
+            <line x1="630" y1="240" x2="880" y2="240" stroke="#475569" stroke-width="1.5"/>
+            <path id="ds-skew-right" d="" fill="#fdba74" fill-opacity="0.55" stroke="#92400e" stroke-width="2.5"/>
+            <!-- Mode (left), median (mid), mean (right) -->
+            <line x1="705" y1="65" x2="705" y2="240" stroke="#059669" stroke-width="2.2"/>
+            <line x1="745" y1="80" x2="745" y2="240" stroke="#0284c7" stroke-width="2.2"/>
+            <line x1="785" y1="100" x2="785" y2="240" stroke="#dc2626" stroke-width="2.2"/>
+            <text x="705" y="270" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">мода</text>
+            <text x="745" y="290" text-anchor="middle" font-size="11" fill="#0284c7" font-weight="700">медиана</text>
+            <text x="785" y="310" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="700">среднее</text>
+            <line x1="705" y1="245" x2="705" y2="262" stroke="#059669" stroke-width="1.5"/>
+            <line x1="745" y1="245" x2="745" y2="282" stroke="#0284c7" stroke-width="1.5"/>
+            <line x1="785" y1="245" x2="785" y2="302" stroke="#dc2626" stroke-width="1.5"/>
+            <text x="745" y="335" text-anchor="middle" font-size="11" fill="#475569" font-style="italic">мода &lt; медиана &lt; среднее</text>
           </g>
         </svg>
-        <div class="caption">Три формы распределения. При скосе мода, медиана и среднее расходятся: в правом скосе мода &lt; медианы &lt; среднего (хвост тянет среднее). Симметричное — все три совпадают.</div>
+        <div class="caption">Три формы распределения. При <b>правом скосе</b> длинный хвост тянется вправо, и среднее «тянется» за ним: мода &lt; медиана &lt; среднее. При <b>левом скосе</b> наоборот. Симметричное — все три совпадают.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Симметричное: обычная нормальная, центр 455, halfWidth 110
+          U.setPath(document, 'ds-skew-sym', U.normalOutlinePath(455, 240, 60, 110));
+          // Левый скос — это «нормальная», смещённая так, что хвост слева.
+          // Мы рисуем кривую с пиком справа от центра панели.
+          // Пик у x=200 (мода), длинный хвост идёт влево.
+          // Используем экспоненциальную с инверсией для левого хвоста.
+          var leftSkew = buildLeftSkewPath(155, 240, 60, 200);
+          document.getElementById('ds-skew-left').setAttribute('d', leftSkew);
+          var rightSkew = buildRightSkewPath(755, 240, 60, 705);
+          document.getElementById('ds-skew-right').setAttribute('d', rightSkew);
+
+          function buildRightSkewPath(centerPanelX, baselineY, peakY, modeX) {
+            // Лог-нормально-подобная форма: быстрый рост от 0 до моды, медленный спад
+            // x от modeX-60 до modeX+170
+            var pts = [];
+            var x0 = modeX - 60;
+            var x1 = modeX + 175;
+            var n = 150;
+            for (var i = 0; i <= n; i++) {
+              var x = x0 + (x1 - x0) * i / n;
+              var t = (x - modeX) / 50; // нормализованный
+              var pdf;
+              if (t < -1) {
+                pdf = 0;
+              } else if (t < 0) {
+                // Быстрый подъём слева от моды
+                pdf = Math.pow(1 + t, 4);
+              } else {
+                // Медленный экспоненциальный спад
+                pdf = Math.exp(-t * 1.0);
+              }
+              var y = baselineY - pdf * (baselineY - peakY);
+              pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+            }
+            var d = 'M' + pts[0][0] + ',' + baselineY;
+            for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+            d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+            return d;
+          }
+
+          function buildLeftSkewPath(centerPanelX, baselineY, peakY, modeX) {
+            // Зеркальный
+            var pts = [];
+            var x0 = modeX - 175;
+            var x1 = modeX + 60;
+            var n = 150;
+            for (var i = 0; i <= n; i++) {
+              var x = x0 + (x1 - x0) * i / n;
+              var t = (x - modeX) / 50;
+              var pdf;
+              if (t > 1) {
+                pdf = 0;
+              } else if (t > 0) {
+                pdf = Math.pow(1 - t, 4);
+              } else {
+                pdf = Math.exp(t * 1.0);
+              }
+              var y = baselineY - pdf * (baselineY - peakY);
+              pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+            }
+            var d = 'M' + pts[0][0] + ',' + baselineY;
+            for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+            d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+            return d;
+          }
+        })();
+        </script>
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Одно и то же среднее, разное стандартное отклонение</text>
-          <line x1="40" y1="165" x2="520" y2="165" stroke="#475569" stroke-width="1.5"/>
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Одно и то же среднее, разное стандартное отклонение</text>
+          <line x1="50" y1="220" x2="710" y2="220" stroke="#475569" stroke-width="1.5"/>
           <!-- mean line -->
-          <line x1="280" y1="30" x2="280" y2="175" stroke="#64748b" stroke-width="1" stroke-dasharray="4"/>
-          <text x="280" y="188" text-anchor="middle" font-size="10" fill="#64748b">μ = 100</text>
-          <!-- Narrow: σ=5 -->
-          <path d="M40,165 Q200,164 240,160 Q270,150 280,50 Q290,150 320,160 Q360,164 520,165" fill="none" stroke="#059669" stroke-width="2.5"/>
-          <text x="180" y="60" text-anchor="end" font-size="11" font-weight="600" fill="#059669">σ = 5 (данные кучкуются)</text>
-          <line x1="185" y1="58" x2="255" y2="85" stroke="#059669" stroke-width="1"/>
-          <!-- Wide: σ=20 -->
-          <path d="M40,165 Q120,155 180,140 Q240,120 280,100 Q320,120 380,140 Q440,155 520,165" fill="none" stroke="#dc2626" stroke-width="2.5"/>
-          <text x="450" y="70" text-anchor="end" font-size="11" font-weight="600" fill="#dc2626">σ = 20 (данные разлетаются)</text>
-          <line x1="450" y1="75" x2="380" y2="125" stroke="#dc2626" stroke-width="1"/>
+          <line x1="380" y1="40" x2="380" y2="230" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="380" y="248" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600">μ = 100</text>
+          <!-- Narrow σ=5: peak high (60), narrow halfWidth -->
+          <path id="ds-narrow" d="" fill="none" stroke="#059669" stroke-width="3"/>
+          <!-- Wide σ=20: peak lower (170), wide halfWidth -->
+          <path id="ds-wide" d="" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <!-- Legend -->
+          <text x="180" y="80" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">σ = 5 (данные кучкуются)</text>
+          <text x="600" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#dc2626">σ = 20 (данные разлетаются)</text>
         </svg>
-        <div class="caption">Два распределения с одинаковым средним (μ = 100), но разным σ. Зелёное (σ = 5) — узкое и острое, значения кучкуются вокруг 100. Красное (σ = 20) — широкое и пологое, значения разлетаются гораздо сильнее.</div>
+        <div class="caption">Два распределения с одинаковым средним (μ = 100), но разным σ. Зелёное (σ = 5) — узкое и высокое, значения кучкуются вокруг 100. Красное (σ = 20) — широкое и пологое, значения разлетаются гораздо сильнее.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Узкое распределение: халф-ширина 60 (соответствует ±3·5=15 единиц), пик высокий
+          U.setPath(document, 'ds-narrow', U.normalOutlinePath(380, 220, 50, 60));
+          // Широкое: халф-ширина 240 (±3·20=60 единиц), пик ниже (peakY=170 → высота 50)
+          U.setPath(document, 'ds-wide', U.normalOutlinePath(380, 220, 170, 240));
+        })();
+        </script>
       </div>
 
       <h3>⚠️ Частые заблуждения</h3>
@@ -257,7 +322,7 @@ App.registerTopic({
       <ul>
         <li><a onclick="App.selectTopic('viz-histogram')">Гистограмма</a> — главный инструмент визуализации формы распределения.</li>
         <li><a onclick="App.selectTopic('viz-box-plot')">Box plot (ящик с усами)</a> — компактная визуализация квартилей и выбросов.</li>
-        <li><a onclick="App.selectTopic('viz-violin-plot')">Violin plot</a> — гибрид box plot и плотности.</li>
+        <li><a onclick="App.selectTopic('viz-violin-plot')">Violin plot</a> — гибрид <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">box plot</a> и плотности.</li>
         <li><a onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a> — визуальная проверка нормальности.</li>
       </ul>
     `,
@@ -456,7 +521,7 @@ App.registerTopic({
         `
       },
       {
-        title: 'Квартили, IQR и boxplot',
+        title: 'Квартили, IQR и <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a>',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
@@ -513,7 +578,7 @@ Q3 = <b>80</b></div>
 Верхняя граница = Q3 + 1.5 × IQR = 80 + 1.5 × 15 = 80 + 22.5 = <b>102.5</b></div>
             <p>Все значения ниже 42.5 или выше 102.5 — <b>выбросы</b>.</p>
             <p>Проверяем: пульс 120 > 102.5 → <b>выброс!</b> Все остальные в пределах нормы.</p>
-            <div class="why">Правило 1.5×IQR — стандартный метод из boxplot. Множитель 1.5 выбран исторически: для нормального распределения он помечает ~0.7% самых крайних значений.</div>
+            <div class="why">Правило 1.5×IQR — стандартный метод из <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a>. Множитель 1.5 выбран исторически: для нормального распределения он помечает ~0.7% самых крайних значений.</div>
           </div>
 
           <div class="step" data-step="6">
@@ -523,7 +588,7 @@ Q1  = 65
 Q2  = 72 (медиана)
 Q3  = 80
 Max = 120 (выброс!)</div>
-            <p>Эти 5 чисел — основа boxplot. «Ящик» от Q1 до Q3, линия внутри — медиана, «усы» до крайних не-выбросов, отдельные точки — выбросы.</p>
+            <p>Эти 5 чисел — основа <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a>. «Ящик» от Q1 до Q3, линия внутри — медиана, «усы» до крайних не-выбросов, отдельные точки — выбросы.</p>
           </div>
 
           <div class="answer-box">
@@ -533,7 +598,7 @@ Max = 120 (выброс!)</div>
 
           <div class="illustration bordered">
             <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Boxplot: пульс 11 пациентов</text>
+              <text x="230" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b"><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a>: пульс 11 пациентов</text>
               <!-- axis: values 58..120, map to x 40..420, scale=(420-40)/(120-58)=380/62≈6.13 -->
               <!-- x = 40 + (val-58)*6.13 -->
               <!-- Min=58→40, Q1=65→82.9, Q2=72→124.9, Q3=80→173.8, max(non-outlier)=85→204.5, outlier=120→451 clamp to 430 -->
@@ -568,10 +633,10 @@ Max = 120 (выброс!)</div>
               <text x="430" y="55" text-anchor="middle" font-size="10" fill="#ef4444">выброс</text>
               <line x1="430" y1="58" x2="430" y2="78" stroke="#ef4444" stroke-width="1"/>
             </svg>
-            <div class="caption">Boxplot: ящик — от Q1 до Q3 (IQR=15), линия внутри — медиана (72), усы — до крайних «нормальных» значений (58 и 85). Пульс 120 вышел за порог 1.5×IQR — показан отдельной точкой-выбросом.</div>
+            <div class="caption"><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a>: ящик — от Q1 до Q3 (IQR=15), линия внутри — медиана (72), усы — до крайних «нормальных» значений (58 и 85). Пульс 120 вышел за порог 1.5×IQR — показан отдельной точкой-выбросом.</div>
           </div>
 
-          <div class="lesson-box">Квартили и IQR — «робастная» альтернатива среднему и std: они устойчивы к выбросам. В boxplot всё наглядно видно: центр, разброс и подозрительные точки.</div>
+          <div class="lesson-box">Квартили и IQR — «робастная» альтернатива среднему и std: они устойчивы к выбросам. В <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a> всё наглядно видно: центр, разброс и подозрительные точки.</div>
         `
       },
       {
@@ -705,7 +770,7 @@ Max = 120 (выброс!)</div>
           const q3 = App.Util.quantile(data, 0.75);
           const iqr = q3 - q1;
 
-          // Гистограмма с фиксированным range
+          // <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> с фиксированным range
           const histRange = [-20, Math.max(outVal + 20, 120)];
           const hist = App.Util.histogram(data, 40, histRange);
           const ctx = container.querySelector('#dstat-chart').getContext('2d');
@@ -795,12 +860,12 @@ print(s.describe())
 # 75%       86.25
 # max      450.0</code></pre>
 
-      <h3>📈 Boxplot в Matplotlib</h3>
+      <h3>📈 <a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a> в Matplotlib</h3>
       <pre><code>import matplotlib.pyplot as plt
 
 data = [60, 65, 70, 75, 80, 85, 90, 450]
-plt.boxplot(data, vert=False)
-plt.title("Boxplot зарплат")
+plt.<a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a>(data, vert=False)
+plt.title("<a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a> зарплат")
 plt.xlabel("тыс. руб.")
 plt.show()  # Выброс 450 виден как отдельная точка</code></pre>
     `,
@@ -853,7 +918,7 @@ plt.show()  # Выброс 450 виден как отдельная точка</
         <li><b>Kurtosis > 3</b> — «тяжёлые хвосты» (больше выбросов, чем у нормального).</li>
       </ul>
 
-      <h4>Boxplot</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Boxplot</a></h4>
       <p>Графическое представление пятёрки чисел: min, Q1, median, Q3, max. Точки за пределами Q1−1.5·IQR и Q3+1.5·IQR считаются выбросами.</p>
 
       <h4>Робастные статистики</h4>
@@ -869,7 +934,7 @@ plt.show()  # Выброс 450 виден как отдельная точка</
     links: `
       <h3>📺 Видео</h3>
       <ul>
-        <li><a href="https://www.youtube.com/watch?v=qBigTkBLU6g" target="_blank">StatQuest: Histograms, Clearly Explained</a> — наглядное объяснение гистограмм и их параметров</li>
+        <li><a href="https://www.youtube.com/watch?v=qBigTkBLU6g" target="_blank">StatQuest: Histograms, Clearly Explained</a> — наглядное объяснение <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмм</a> и их параметров</li>
         <li><a href="https://www.youtube.com/watch?v=SzZ6GpcfoQY" target="_blank">StatQuest: Mean, Variance and Standard Deviation</a> — среднее, дисперсия и стандартное отклонение</li>
         <li><a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data" target="_blank">Khan Academy: Summarizing quantitative data</a> — интерактивный курс по описательной статистике</li>
       </ul>

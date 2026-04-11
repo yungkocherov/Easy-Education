@@ -423,7 +423,7 @@ App.registerTopic({
     simulation: {
       html: `
         <h3>Симуляция: BoW и TF-IDF</h3>
-        <p>Выбери набор предложений. Включай и выключай стоп-слова. Смотри на BoW и TF-IDF гистограммы.</p>
+        <p>Выбери набор предложений. Включай и выключай стоп-слова. Смотри на BoW и TF-IDF <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a>.</p>
         <div class="sim-container">
           <div class="sim-controls" id="nlp-controls"></div>
           <div class="sim-output">

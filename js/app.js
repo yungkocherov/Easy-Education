@@ -13,7 +13,7 @@ const App = (function () {
     { id: 'ml-cls', name: 'Классификация' },
     { id: 'ml-unsup', name: 'Кластеризация и снижение размерности' },
     { id: 'dl', name: 'Нейронные сети' },
-    { id: 'viz', name: '📊 Визуализации (глоссарий)' },
+    { id: 'glossary', name: '📚 Глоссарий' },
   ];
   let currentTopicId = null;
   let currentTabKey = null;
@@ -302,6 +302,100 @@ const App = (function () {
     // Нормальное PDF
     normalPDF(x, mu = 0, sigma = 1) {
       return Math.exp(-0.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
+    },
+
+    /* ---------- Генераторы SVG path для распределений ---------- */
+    // Возвращает path для замкнутой области под нормальной кривой.
+    // cx — пиксельная координата центра (μ)
+    // baselineY — y оси
+    // peakY — y верхушки кривой (peakY < baselineY)
+    // halfWidth — пикселей на ±sigmaUnits сигм
+    normalAreaPath(cx, baselineY, peakY, halfWidth, sigmaUnits = 3, n = 120) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = -sigmaUnits + (2 * sigmaUnits * i) / n;
+        const x = cx + (t / sigmaUnits) * halfWidth;
+        const pdf = Math.exp(-0.5 * t * t);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${baselineY}`;
+      for (const [x, y] of pts) d += ` L${x},${y}`;
+      d += ` L${pts[pts.length - 1][0]},${baselineY} Z`;
+      return d;
+    },
+
+    // Открытая полилиния (только контур, без заливки)
+    normalOutlinePath(cx, baselineY, peakY, halfWidth, sigmaUnits = 3, n = 120) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = -sigmaUnits + (2 * sigmaUnits * i) / n;
+        const x = cx + (t / sigmaUnits) * halfWidth;
+        const pdf = Math.exp(-0.5 * t * t);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
+
+    // Сегмент площади между [lo, hi] (в σ единицах)
+    normalSegmentPath(cx, baselineY, peakY, halfWidth, lo, hi, sigmaUnits = 3, n = 80) {
+      const aLo = Math.max(lo, -sigmaUnits);
+      const aHi = Math.min(hi, sigmaUnits);
+      const xLo = cx + (aLo / sigmaUnits) * halfWidth;
+      const xHi = cx + (aHi / sigmaUnits) * halfWidth;
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = aLo + ((aHi - aLo) * i) / n;
+        const x = cx + (t / sigmaUnits) * halfWidth;
+        const pdf = Math.exp(-0.5 * t * t);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${Math.round(xLo * 10) / 10},${baselineY}`;
+      for (const [x, y] of pts) d += ` L${x},${y}`;
+      d += ` L${Math.round(xHi * 10) / 10},${baselineY} Z`;
+      return d;
+    },
+
+    // Экспоненциальное распределение PDF: f(x) = λe^(-λx)
+    // x0 — пиксельная координата x = 0
+    // length — пикселей на 6/λ единиц по оси x (покрывает 99.75%)
+    exponentialPath(x0, baselineY, peakY, length, lambda = 1, n = 120) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const xData = (6 * i) / n;
+        const x = x0 + (xData / 6) * length;
+        const pdf = Math.exp(-lambda * xData);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${baselineY}`;
+      for (const [x, y] of pts) d += ` L${x},${y}`;
+      d += ` L${pts[pts.length - 1][0]},${baselineY} Z`;
+      return d;
+    },
+
+    exponentialOutline(x0, baselineY, peakY, length, lambda = 1, n = 120) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const xData = (6 * i) / n;
+        const x = x0 + (xData / 6) * length;
+        const pdf = Math.exp(-lambda * xData);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
+
+    // Утилита: вставить path в SVG с указанным id (внутри container)
+    setPath(container, id, d) {
+      const el = container.querySelector(`#${id}`);
+      if (el) el.setAttribute('d', d);
     },
     // Нормальное CDF (приближение)
     normalCDF(x, mu = 0, sigma = 1) {

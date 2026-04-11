@@ -73,45 +73,52 @@ App.registerTopic({
       <p>Главное распределение статистики. Симметричный «колокол» вокруг среднего $\\mu$. Ширина колокола задаётся $\\sigma$ (стандартным отклонением).</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
-            <linearGradient id="nG68" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/></linearGradient>
-            <linearGradient id="nG95" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/></linearGradient>
-            <linearGradient id="nG997" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.25"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.03"/></linearGradient>
+            <linearGradient id="nG68" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.55"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="nG95" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/></linearGradient>
+            <linearGradient id="nG997" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.3"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.05"/></linearGradient>
           </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Нормальное распределение и правило 68–95–99.7</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">Нормальное распределение и правило 68–95–99.7</text>
           <!-- Axis -->
-          <line x1="40" y1="195" x2="520" y2="195" stroke="#475569" stroke-width="1.5"/>
-          <!-- Tick marks for -3σ..+3σ, center at 280, spacing 60 -->
-          <g font-size="10" fill="#64748b" text-anchor="middle">
-            <text x="100" y="215">μ−3σ</text>
-            <text x="160" y="215">μ−2σ</text>
-            <text x="220" y="215">μ−σ</text>
-            <text x="280" y="215" font-weight="700" fill="#1e40af">μ</text>
-            <text x="340" y="215">μ+σ</text>
-            <text x="400" y="215">μ+2σ</text>
-            <text x="460" y="215">μ+3σ</text>
+          <line x1="60" y1="270" x2="700" y2="270" stroke="#475569" stroke-width="1.5"/>
+          <!-- Tick marks: center 380, halfwidth 270, ±3σ -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="110" y="290">μ−3σ</text>
+            <text x="200" y="290">μ−2σ</text>
+            <text x="290" y="290">μ−σ</text>
+            <text x="380" y="290" font-weight="700" fill="#1e40af">μ</text>
+            <text x="470" y="290">μ+σ</text>
+            <text x="560" y="290">μ+2σ</text>
+            <text x="650" y="290">μ+3σ</text>
           </g>
-          <!-- ±3σ area (99.7%) -->
-          <path d="M100,195 Q160,193 220,170 Q250,140 280,50 Q310,140 340,170 Q400,193 460,195 L460,195 L100,195 Z" fill="url(#nG997)"/>
-          <!-- ±2σ area (95%) -->
-          <path d="M160,195 Q195,190 220,170 Q250,140 280,50 Q310,140 340,170 Q365,190 400,195 L400,195 L160,195 Z" fill="url(#nG95)"/>
-          <!-- ±1σ area (68%) -->
-          <path d="M220,195 Q240,180 250,155 Q265,110 280,50 Q295,110 310,155 Q320,180 340,195 L340,195 L220,195 Z" fill="url(#nG68)"/>
-          <!-- Bell curve outline -->
-          <path d="M50,195 Q100,194 160,190 Q200,185 220,170 Q250,140 280,50 Q310,140 340,170 Q360,185 400,190 Q460,194 510,195" fill="none" stroke="#1e40af" stroke-width="2.5"/>
+          <!-- Generated paths (filled in by init) -->
+          <path id="dist-997-area" d="" fill="url(#nG997)"/>
+          <path id="dist-95-area" d="" fill="url(#nG95)"/>
+          <path id="dist-68-area" d="" fill="url(#nG68)"/>
+          <path id="dist-bell-outline" d="" fill="none" stroke="#1e40af" stroke-width="2.5"/>
           <!-- Mean line -->
-          <line x1="280" y1="195" x2="280" y2="50" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="3,3"/>
-          <!-- Labels for percentages -->
-          <text x="280" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">68%</text>
-          <text x="200" y="150" text-anchor="end" font-size="11" fill="#1e40af">95%</text>
-          <line x1="205" y1="150" x2="220" y2="155" stroke="#1e40af" stroke-width="1"/>
-          <text x="360" y="150" text-anchor="start" font-size="11" fill="#1e40af">95%</text>
-          <line x1="355" y1="150" x2="340" y2="155" stroke="#1e40af" stroke-width="1"/>
-          <text x="140" y="175" text-anchor="end" font-size="10" fill="#475569">99.7%</text>
-          <line x1="145" y1="175" x2="160" y2="185" stroke="#475569" stroke-width="1"/>
+          <line x1="380" y1="270" x2="380" y2="60" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- Percentage labels -->
+          <text x="380" y="180" text-anchor="middle" font-size="18" font-weight="800" fill="#047857">68%</text>
+          <text x="240" y="225" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">95%</text>
+          <text x="520" y="225" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">95%</text>
+          <text x="150" y="255" text-anchor="middle" font-size="11" fill="#475569">99.7%</text>
+          <text x="610" y="255" text-anchor="middle" font-size="11" fill="#475569">99.7%</text>
         </svg>
         <div class="caption">Правило 68–95–99.7 на графике. В пределах одного сигма (зелёная зона) — 68% значений, в двух (синяя) — 95%, в трёх (серая) — 99.7%. За 3σ — менее 0.3% «экстремумов».</div>
+        <script>
+        (function() {
+          var svg = document.getElementById('dist-bell-outline');
+          if (!svg) return;
+          var U = App.Util;
+          var cx = 380, baselineY = 270, peakY = 60, halfWidth = 270;
+          U.setPath(document, 'dist-bell-outline', U.normalOutlinePath(cx, baselineY, peakY, halfWidth));
+          U.setPath(document, 'dist-997-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -3, 3));
+          U.setPath(document, 'dist-95-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -2, 2));
+          U.setPath(document, 'dist-68-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -1, 1));
+        })();
+        </script>
       </div>
 
       <p><b>Почему оно везде:</b> благодаря <span class="term" data-tip="Центральная предельная теорема. Утверждает, что среднее любых случайных величин (с конечной дисперсией) стремится к нормальному при большой выборке.">ЦПТ</span> — сумма большого числа независимых случайных факторов стремится к нормальному. Рост человека = сумма сотен генетических и средовых факторов → нормальное. Ошибка измерения = сумма многих мелких погрешностей → нормальное.</p>
@@ -119,27 +126,41 @@ App.registerTopic({
       <p><b>Где встречается:</b> рост, вес, IQ, ошибки измерений, шум в сигналах, остатки регрессии.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Влияние параметров μ и σ</text>
-          <line x1="30" y1="160" x2="540" y2="160" stroke="#475569" stroke-width="1.5"/>
-          <!-- narrow σ=0.5 centered at 200 -->
-          <path d="M30,160 Q140,159 180,150 Q195,140 200,40 Q205,140 220,150 Q260,159 540,160" fill="none" stroke="#10b981" stroke-width="2.5"/>
-          <text x="200" y="30" text-anchor="middle" font-size="10" fill="#059669">σ=0.5 (узкий)</text>
-          <!-- standard σ=1 centered at 300 -->
-          <path d="M30,160 Q170,157 230,140 Q270,110 300,70 Q330,110 370,140 Q430,157 540,160" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-          <text x="300" y="60" text-anchor="middle" font-size="10" fill="#1e40af">σ=1</text>
-          <!-- wide σ=2 centered at 380 -->
-          <path d="M30,160 Q200,156 290,140 Q340,115 380,100 Q420,115 470,140 Q520,156 540,160" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-          <text x="380" y="90" text-anchor="middle" font-size="10" fill="#92400e">σ=2 (широкий)</text>
-          <!-- means as ticks -->
-          <line x1="200" y1="158" x2="200" y2="166" stroke="#059669"/>
-          <line x1="300" y1="158" x2="300" y2="166" stroke="#1e40af"/>
-          <line x1="380" y1="158" x2="380" y2="166" stroke="#92400e"/>
-          <text x="200" y="180" text-anchor="middle" font-size="10" fill="#059669">μ=2</text>
-          <text x="300" y="180" text-anchor="middle" font-size="10" fill="#1e40af">μ=5</text>
-          <text x="380" y="180" text-anchor="middle" font-size="10" fill="#92400e">μ=8</text>
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">Влияние параметров μ и σ на форму нормального распределения</text>
+          <line x1="40" y1="220" x2="720" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <!-- 3 normal curves: narrow at cx=200, standard at cx=380, wide at cx=560 -->
+          <path id="dist-mu-narrow" d="" fill="none" stroke="#059669" stroke-width="2.8"/>
+          <path id="dist-mu-standard" d="" fill="none" stroke="#1e40af" stroke-width="2.8"/>
+          <path id="dist-mu-wide" d="" fill="none" stroke="#b45309" stroke-width="2.8"/>
+          <!-- Mean ticks -->
+          <line x1="200" y1="218" x2="200" y2="228" stroke="#059669" stroke-width="2"/>
+          <line x1="380" y1="218" x2="380" y2="228" stroke="#1e40af" stroke-width="2"/>
+          <line x1="560" y1="218" x2="560" y2="228" stroke="#b45309" stroke-width="2"/>
+          <text x="200" y="245" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">μ=2</text>
+          <text x="380" y="245" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">μ=5</text>
+          <text x="560" y="245" text-anchor="middle" font-size="12" font-weight="600" fill="#b45309">μ=8</text>
+          <!-- Legend: на разных уровнях, чтобы не накладывалось -->
+          <g font-size="12" font-weight="600">
+            <text x="120" y="65" text-anchor="middle" fill="#059669">σ=0.5 — узкий, острый</text>
+            <line x1="200" y1="80" x2="200" y2="90" stroke="#059669" stroke-width="1"/>
+            <text x="380" y="100" text-anchor="middle" fill="#1e40af">σ=1 — стандартный</text>
+            <text x="640" y="135" text-anchor="middle" fill="#b45309">σ=2 — широкий, пологий</text>
+          </g>
         </svg>
-        <div class="caption">μ сдвигает колокол влево/вправо. σ меняет его ширину: маленькая σ — узкий острый пик, большая σ — широкий пологий.</div>
+        <div class="caption">μ сдвигает колокол влево/вправо. σ меняет его ширину: маленькая σ — узкий и высокий пик, большая σ — широкий и пологий. Площадь под каждой кривой одинакова и равна 1.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // peakY ниже = выше пик. Высоты пропорциональны 1/σ
+          // Standard σ=1 → peakY = 130 (высота 90px)
+          // σ=0.5 → высота 180px → peakY = 40
+          // σ=2 → высота 45px → peakY = 175
+          U.setPath(document, 'dist-mu-narrow',   U.normalOutlinePath(200, 220, 40,  60));
+          U.setPath(document, 'dist-mu-standard', U.normalOutlinePath(380, 220, 130, 120));
+          U.setPath(document, 'dist-mu-wide',     U.normalOutlinePath(560, 220, 175, 240));
+        })();
+        </script>
       </div>
 
       <h4>📐 Равномерное (uniform) — $U(a, b)$</h4>
@@ -283,28 +304,45 @@ App.registerTopic({
       <p>Непрерывный «брат» Пуассона. Если события происходят по Пуассону с интенсивностью $\\lambda$, то <b>время между</b> соседними событиями распределено экспоненциально.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="expGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#059669" stop-opacity="0.4"/><stop offset="100%" stop-color="#059669" stop-opacity="0.05"/></linearGradient>
           </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Экспоненциальное Exp(λ) — PDF</text>
-          <line x1="50" y1="160" x2="540" y2="160" stroke="#475569" stroke-width="1.5"/>
-          <line x1="50" y1="40" x2="50" y2="160" stroke="#475569" stroke-width="1.5"/>
-          <!-- λ=1 curve: f(x) = e^-x; scale: x in 0..6, each unit = 80px; y = 120*e^-x -->
-          <path d="M50,40 Q110,70 170,88 Q230,102 290,115 Q350,128 410,140 Q470,150 540,157 L540,160 L50,160 Z" fill="url(#expGrad)" stroke="#059669" stroke-width="2.5"/>
-          <!-- Another curve: λ=0.5 (flatter) -->
-          <path d="M50,100 Q150,115 250,125 Q350,138 450,148 Q500,154 540,157" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="5,3"/>
-          <text x="150" y="85" fill="#059669" font-size="11" font-weight="600">λ = 1 (средний интервал = 1)</text>
-          <text x="280" y="135" fill="#0369a1" font-size="11" font-weight="600">λ = 0.5 (средний = 2)</text>
-          <!-- Axis ticks -->
-          <g font-size="10" fill="#64748b" text-anchor="middle">
-            <text x="50" y="178">0</text><text x="130" y="178">1</text><text x="210" y="178">2</text>
-            <text x="290" y="178">3</text><text x="370" y="178">4</text><text x="450" y="178">5</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#047857">Экспоненциальное Exp(λ) — PDF</text>
+          <line x1="60" y1="220" x2="720" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <line x1="60" y1="50" x2="60" y2="220" stroke="#475569" stroke-width="1.5"/>
+          <!-- Two curves generated by init -->
+          <path id="dist-exp-lam1-area" d="" fill="url(#expGrad)"/>
+          <path id="dist-exp-lam1" d="" fill="none" stroke="#059669" stroke-width="2.8"/>
+          <path id="dist-exp-lam05" d="" fill="none" stroke="#0284c7" stroke-width="2.8" stroke-dasharray="6,4"/>
+          <!-- Legend -->
+          <text x="250" y="80" fill="#059669" font-size="13" font-weight="600">λ = 1 (средний интервал = 1)</text>
+          <text x="430" y="160" fill="#0369a1" font-size="13" font-weight="600">λ = 0.5 (средний = 2)</text>
+          <!-- Axis ticks: 0..6, each unit = 110px starting at x=60 -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="60" y="240">0</text>
+            <text x="170" y="240">1</text>
+            <text x="280" y="240">2</text>
+            <text x="390" y="240">3</text>
+            <text x="500" y="240">4</text>
+            <text x="610" y="240">5</text>
+            <text x="720" y="240">6</text>
           </g>
-          <text x="495" y="178" font-size="10" fill="#64748b">время</text>
-          <text x="30" y="50" font-size="10" fill="#64748b">f(x)</text>
+          <text x="380" y="262" text-anchor="middle" font-size="12" fill="#64748b">время</text>
+          <text x="40" y="135" font-size="11" fill="#64748b" text-anchor="middle" transform="rotate(-90 40 135)">f(x)</text>
         </svg>
         <div class="caption">PDF экспоненциального — убывающая экспонента. Маленькие интервалы (близкие к 0) самые частые, большие — редкие. Среднее интервала = 1/λ.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var x0 = 60, baselineY = 220, length = 660;
+          // λ=1: peak height = 1, occupies full vertical space (170px) → peakY = 50
+          U.setPath(document, 'dist-exp-lam1-area', U.exponentialPath(x0, baselineY, 50, length, 1));
+          U.setPath(document, 'dist-exp-lam1', U.exponentialOutline(x0, baselineY, 50, length, 1));
+          // λ=0.5: peak height = 0.5 → peakY = 135 (half height)
+          U.setPath(document, 'dist-exp-lam05', U.exponentialOutline(x0, baselineY, 135, length, 0.5));
+        })();
+        </script>
       </div>
 
       <p><b>Пример:</b> если приходит в среднем 5 клиентов в час ($\\lambda = 5$), то время до следующего клиента распределено экспоненциально со средним $1/\\lambda = 12$ минут.</p>
@@ -827,7 +865,7 @@ T ~ Exp(λ = 4), в часах</div>
           else data = App.Util.expSample(n, p1);
 
           const isDiscrete = type === 'binomial' || type === 'poisson';
-          // Фиксированный range гистограммы по типу распределения
+          // Фиксированный range <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> по типу распределения
           const fixedRange = {
             normal: [-30, 60],
             uniform: [-25, 55],
@@ -984,9 +1022,9 @@ print("Нормальное" if p > 0.05 else "Не нормальное")</code
     extra: `
       <h3>Как проверить, что данные нормальны?</h3>
       <ul>
-        <li><b>Q-Q plot</b> — если точки на прямой, распределение близко к нормальному.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a></b> — если точки на прямой, распределение близко к нормальному.</li>
         <li><b>Тест Шапиро-Уилка</b> — формальный тест нормальности.</li>
-        <li><b>Гистограмма и оценка плотности (KDE)</b> — визуальная проверка.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> и оценка плотности (KDE)</b> — визуальная проверка.</li>
       </ul>
 
       <h3>Что делать с ненормальными данными</h3>

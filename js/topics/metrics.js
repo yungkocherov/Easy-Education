@@ -515,7 +515,7 @@ F1        = 2*0.625*1.0/(0.625+1.0) = <b>0.769</b></div>
           const rec = tp / (tp + fn) || 0;
           const f1 = 2 * prec * rec / (prec + rec) || 0;
 
-          // гистограммы вероятностей по классам
+          // <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> вероятностей по классам
           const bins = 20;
           const h0 = new Array(bins).fill(0), h1 = new Array(bins).fill(0);
           data.forEach(d => {

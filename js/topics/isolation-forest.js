@@ -130,7 +130,7 @@ App.registerTopic({
         <li>Топ 5% по score помечаются аномалиями.</li>
       </ul>
 
-      <p>Если не знаешь contamination — строй гистограмму scores и выбирай порог вручную.</p>
+      <p>Если не знаешь contamination — строй <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a> scores и выбирай порог вручную.</p>
 
       <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
@@ -432,8 +432,8 @@ App.registerTopic({
             <div class="calc">
               Стратегия 1: доменные знания<br>
               «Знаем, что ~5% транзакций — мошенничество» → contamination=0.05<br><br>
-              Стратегия 2: гистограмма score<br>
-              Строим гистограмму score: видим бимодальное распределение<br>
+              Стратегия 2: <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмма</a> score<br>
+              Строим <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a> score: видим бимодальное распределение<br>
               Пик около 0.5–0.6: нормальные | Хвост 0.75+: аномалии<br>
               Выбираем порог в «долине» между пиками<br><br>
               Стратегия 3: бизнес-ограничения<br>
@@ -455,10 +455,10 @@ App.registerTopic({
           </div>
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>contamination=0.05: только самые явные аномалии (score>0.88). contamination=0.20: 4x больше подозрительных. Лучшая практика: использовать score напрямую и строить гистограмму для диагностики.</p>
+            <p>contamination=0.05: только самые явные аномалии (score>0.88). contamination=0.20: 4x больше подозрительных. Лучшая практика: использовать score напрямую и строить <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a> для диагностики.</p>
           </div>
           <div class="lesson-box">
-            Если нет меток: Isolation Forest → score → выбор порога по гистограмме или k-distance plot. Если есть немного меток: можно подбирать contamination через precision@k (сколько из топ-k реально аномалии).
+            Если нет меток: Isolation Forest → score → выбор порога по <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмме</a> или k-distance plot. Если есть немного меток: можно подбирать contamination через precision@k (сколько из топ-k реально аномалии).
           </div>
         `,
       },
@@ -669,7 +669,7 @@ plt.title('Isolation Forest: карта аномальности')
 plt.legend()
 plt.show()
 
-# Гистограмма score: нормальные vs аномалии
+# <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> score: нормальные vs аномалии
 true_labels = np.array([1]*300 + [-1]*30)
 plt.hist(scores[true_labels==1], bins=30, alpha=0.6, label='Normal')
 plt.hist(scores[true_labels==-1], bins=10, alpha=0.6, label='Outlier')

@@ -764,7 +764,7 @@ profile = rfm.groupby('Сегмент').agg({
 }).rename(columns={'Сегмент': 'Размер'}).round(1)
 print(profile)
 
-# Scatter plot: Frequency vs Monetary
+# <a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">Scatter plot</a>: Frequency vs Monetary
 plt.scatter(rfm['Frequency'], rfm['Monetary'],
             c=rfm['Сегмент'], cmap='tab10', alpha=0.5)
 plt.xlabel('Frequency')

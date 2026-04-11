@@ -110,7 +110,7 @@ App.registerTopic({
           <circle cx="524" cy="148" r="3.5" fill="#ef4444" opacity="0.8"/>
           <text x="467" y="172" text-anchor="middle" font-size="10" fill="#ef4444">Сильная отрицательная</text>
         </svg>
-        <div class="caption">Три scatter plot-а: слева — точки тянутся вверх (r≈+0.9), по центру — облако без паттерна (r≈0), справа — точки тянутся вниз (r≈−0.8). Корреляция — это «насколько близко точки к прямой линии».</div>
+        <div class="caption">Три <a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">scatter plot</a>-а: слева — точки тянутся вверх (r≈+0.9), по центру — облако без паттерна (r≈0), справа — точки тянутся вниз (r≈−0.8). Корреляция — это «насколько близко точки к прямой линии».</div>
       </div>
 
       <h3>📐 Как читать значения</h3>
@@ -398,7 +398,7 @@ s_y = √(669.3/5) = √133.87 = <b>11.57</b></div>
               <!-- r annotation -->
               <text x="340" y="120" font-size="11" font-weight="700" fill="#ef4444">r = 0.996</text>
             </svg>
-            <div class="caption">Scatter plot роста и веса 6 человек. Точки почти идеально лежат на красной линии регрессии. Корреляция Пирсона r≈0.996 — почти идеальная положительная линейная связь.</div>
+            <div class="caption"><a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">Scatter plot</a> роста и веса 6 человек. Точки почти идеально лежат на красной линии регрессии. Корреляция Пирсона r≈0.996 — почти идеальная положительная линейная связь.</div>
           </div>
 
           <div class="lesson-box">Корреляция Пирсона считается в 5 шагов: средние → отклонения → ковариация → std → деление. Диапазон [-1, 1], знак показывает направление, модуль — силу.</div>
@@ -452,7 +452,7 @@ r = −275 / (√700 × √7617.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
 
           <div class="step" data-step="4">
             <h4>Единственный выход — визуализация</h4>
-            <p>Scatter plot мгновенно покажет перевёрнутую U. Отсюда правило: <b>всегда</b> смотри на график, прежде чем доверять числам корреляции.</p>
+            <p><a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">Scatter plot</a> мгновенно покажет перевёрнутую U. Отсюда правило: <b>всегда</b> смотри на график, прежде чем доверять числам корреляции.</p>
           </div>
 
           <div class="answer-box">
@@ -704,7 +704,7 @@ print(f"Кендалл: τ={r_kendall:.4f}, p={p_kendall:.4f}")
 corr_matrix = np.corrcoef(height, weight)
 print(f"\\nМатрица корреляций:\\n{corr_matrix.round(4)}")</code></pre>
 
-      <h3>📈 Scatter plot + линия тренда</h3>
+      <h3>📈 <a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">Scatter plot</a> + линия тренда</h3>
       <pre><code>import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats

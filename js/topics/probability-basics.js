@@ -112,34 +112,61 @@ App.registerTopic({
       </ul>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="pdfFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/></linearGradient>
-            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/></linearGradient>
+            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.6"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.15"/></linearGradient>
           </defs>
-          <text x="260" y="16" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">PDF и площадь = вероятность</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">PDF и площадь = вероятность</text>
           <!-- Axes -->
-          <line x1="50" y1="175" x2="490" y2="175" stroke="#94a3b8" stroke-width="1.5"/>
-          <line x1="50" y1="175" x2="50" y2="25" stroke="#94a3b8" stroke-width="1.5"/>
-          <!-- Bell curve -->
-          <path d="M50,175 C80,174 120,170 160,155 C190,140 210,110 230,70 C240,50 250,38 260,35 C270,38 280,50 290,70 C310,110 330,140 360,155 C400,170 440,174 470,175" fill="url(#pdfFill)" stroke="#3b82f6" stroke-width="2.5"/>
-          <!-- Shaded area [a,b] -->
-          <path d="M300,175 L300,95 C310,80 320,70 330,65 C340,70 350,80 360,95 C370,115 380,135 390,150 L390,175 Z" fill="url(#areaFill)" stroke="#10b981" stroke-width="2"/>
-          <!-- Labels -->
-          <text x="260" y="192" text-anchor="middle" font-size="11" fill="#64748b">x</text>
-          <text x="25" y="105" text-anchor="middle" font-size="11" fill="#64748b" transform="rotate(-90, 25, 105)">f(x)</text>
-          <text x="300" y="192" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">a</text>
-          <text x="390" y="192" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">b</text>
-          <line x1="300" y1="175" x2="300" y2="95" stroke="#10b981" stroke-width="1" stroke-dasharray="3"/>
-          <line x1="390" y1="175" x2="390" y2="150" stroke="#10b981" stroke-width="1" stroke-dasharray="3"/>
-          <!-- Annotation -->
-          <path d="M345,100 L420,60" stroke="#10b981" stroke-width="1"/>
-          <text x="425" y="55" font-size="11" fill="#065f46" font-weight="600">P(a ≤ X ≤ b)</text>
-          <text x="425" y="70" font-size="10" fill="#065f46">= площадь</text>
-          <!-- f(x) label -->
-          <text x="265" y="28" font-size="11" fill="#1e40af">f(x)</text>
+          <line x1="60" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <line x1="60" y1="260" x2="60" y2="50" stroke="#475569" stroke-width="1.5"/>
+          <!-- Bell curve area + outline -->
+          <path id="pb-pdf-area" d="" fill="url(#pdfFill)"/>
+          <path id="pb-pdf-outline" d="" fill="none" stroke="#3b82f6" stroke-width="2.8"/>
+          <!-- Shaded interval [a, b] (path generated separately) -->
+          <path id="pb-pdf-interval" d="" fill="url(#areaFill)" stroke="#059669" stroke-width="2.5"/>
+          <!-- Vertical drop lines for a and b -->
+          <line id="pb-pdf-line-a" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line id="pb-pdf-line-b" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- a, b labels on axis -->
+          <text id="pb-label-a" x="0" y="280" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">a</text>
+          <text id="pb-label-b" x="0" y="280" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">b</text>
+          <!-- f(x) label at top -->
+          <text x="380" y="60" text-anchor="middle" font-size="14" fill="#1e40af" font-weight="700">f(x)</text>
+          <!-- Legend with P(a≤X≤b) -->
+          <text x="540" y="105" font-size="13" font-weight="700" fill="#059669">P(a ≤ X ≤ b)</text>
+          <text x="540" y="125" font-size="12" fill="#047857">= зелёная площадь</text>
+          <line x1="540" y1="115" x2="490" y2="180" stroke="#059669" stroke-width="1.5"/>
+          <!-- Axis labels -->
+          <text x="380" y="305" text-anchor="middle" font-size="13" fill="#64748b">x</text>
+          <text x="35" y="155" text-anchor="middle" font-size="13" fill="#64748b" transform="rotate(-90 35 155)">f(x)</text>
         </svg>
-        <div class="caption">PDF: кривая показывает плотность. Вероятность P(a ≤ X ≤ b) = зелёная площадь под кривой. Вся площадь под кривой = 1.</div>
+        <div class="caption">PDF: кривая показывает плотность. Вероятность P(a ≤ X ≤ b) = зелёная площадь под кривой на этом интервале. Вся площадь под кривой = 1.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Bell centered at x=380, baseline 260, peak 70, halfWidth 280
+          var cx = 380, baselineY = 260, peakY = 70, halfWidth = 280;
+          U.setPath(document, 'pb-pdf-area', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -3, 3));
+          U.setPath(document, 'pb-pdf-outline', U.normalOutlinePath(cx, baselineY, peakY, halfWidth));
+          // Interval [a, b] = [+0.5σ, +2σ] (right of mean, like in screenshot)
+          U.setPath(document, 'pb-pdf-interval', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, 0.5, 2.0));
+          // a, b в пиксельных координатах
+          var aX = cx + (0.5 / 3) * halfWidth;  // ≈ 426.67
+          var bX = cx + (2.0 / 3) * halfWidth;  // ≈ 566.67
+          document.getElementById('pb-pdf-line-a').setAttribute('x1', aX);
+          document.getElementById('pb-pdf-line-a').setAttribute('y1', baselineY);
+          document.getElementById('pb-pdf-line-a').setAttribute('x2', aX);
+          document.getElementById('pb-pdf-line-a').setAttribute('y2', baselineY - Math.exp(-0.5 * 0.25) * (baselineY - peakY));
+          document.getElementById('pb-pdf-line-b').setAttribute('x1', bX);
+          document.getElementById('pb-pdf-line-b').setAttribute('y1', baselineY);
+          document.getElementById('pb-pdf-line-b').setAttribute('x2', bX);
+          document.getElementById('pb-pdf-line-b').setAttribute('y2', baselineY - Math.exp(-0.5 * 4) * (baselineY - peakY));
+          document.getElementById('pb-label-a').setAttribute('x', aX);
+          document.getElementById('pb-label-b').setAttribute('x', bX);
+        })();
+        </script>
       </div>
 
       <h3>📉 CDF — «какова вероятность быть ≤ x»</h3>
@@ -679,7 +706,7 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
             },
             options: {
               responsive: true, maintainAspectRatio: false,
-              plugins: { title: { display: true, text: 'Гистограмма граней' } },
+              plugins: { title: { display: true, text: '<a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> граней' } },
               scales: { y: { beginAtZero: true } },
             },
           });
