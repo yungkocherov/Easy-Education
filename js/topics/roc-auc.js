@@ -752,7 +752,7 @@ print(f'Average Precision: {ap:.4f}')</code></pre>
         <li><b>One-vs-One (OvO)</b>: для всех пар классов.</li>
       </ul>
 
-      <h3>Доверительный интервал</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">Доверительный интервал</a></h3>
       <p>DeLong's test — параметрический. Или bootstrap: многократно ресемплируй и считай AUC.</p>
     `,
 

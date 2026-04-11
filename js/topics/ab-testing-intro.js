@@ -35,7 +35,7 @@ App.registerTopic({
         <li><b>Метрика</b> — определяем одну первичную метрику (конверсия, ARPU, retention) и несколько вторичных. Только до начала теста!</li>
         <li><b>Размер выборки</b> — рассчитываем, сколько пользователей нужно для заданной мощности теста. Недостаточно данных → результат ненадёжен.</li>
         <li><b>Запуск</b> — рандомизируем, запускаем, не заглядываем в данные до конца (или используем sequential testing).</li>
-        <li><b>Анализ</b> — применяем выбранный статистический тест, считаем p-value и доверительный интервал.</li>
+        <li><b>Анализ</b> — применяем выбранный статистический тест, считаем p-value и <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительный интервал</a>.</li>
         <li><b>Решение</b> — «раскатываем» победителя или отвергаем изменение, документируем выводы.</li>
       </ol>
 
@@ -75,7 +75,7 @@ App.registerTopic({
           <!-- Step 5: Analyze -->
           <rect x="418" y="75" width="85" height="50" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
           <text x="460" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#991b1b">Анализ</text>
-          <text x="460" y="112" text-anchor="middle" font-size="9" fill="#991b1b">p-value, CI</text>
+          <text x="460" y="112" text-anchor="middle" font-size="9" fill="#991b1b">p-value, <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a></text>
           <!-- Arrow 5→6 -->
           <line x1="503" y1="100" x2="520" y2="100" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrAB)"/>
           <!-- Step 6: Decision -->
@@ -188,10 +188,130 @@ App.registerTopic({
         <p><span class="term" data-tip="Minimum Detectable Effect. Минимальное изменение метрики, которое ты хочешь надёжно обнаружить. Слишком маленький MDE требует огромных выборок. Слишком большой — пропустишь реальные эффекты.">MDE</span> — это бизнес-решение, а не статистическое. Спроси: «При каком минимальном улучшении нам стоит внедрять изменение?». Если ответ — 0.1 п.п., тебе нужны миллионы пользователей. Если 5 п.п. — несколько тысяч.</p>
       </div>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Размер выборки vs MDE (закон 1/Δ²)</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Baseline конверсия 10%, α = 0.05, power = 80%. n на группу</text>
+          <line x1="80" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="60" x2="80" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- Y axis log-ish -->
+          <g font-size="11" fill="#64748b" text-anchor="end">
+            <text x="75" y="264">0</text>
+            <text x="75" y="220">5k</text>
+            <text x="75" y="180">20k</text>
+            <text path="" y="140">50k</text>
+            <text x="75" y="140">50k</text>
+            <text x="75" y="100">150k</text>
+            <text x="75" y="64">600k</text>
+          </g>
+          <!-- X ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="140" y="280">0.3%</text>
+            <text x="240" y="280">0.5%</text>
+            <text x="340" y="280">1%</text>
+            <text x="440" y="280">2%</text>
+            <text x="540" y="280">3%</text>
+            <text x="640" y="280">5%</text>
+            <text x="720" y="280">MDE</text>
+          </g>
+          <!-- Curve: n ~ 1/MDE^2 -->
+          <!-- Values computed: MDE=0.3% → 620k, 0.5% → 200k, 1% → 50k, 2% → 12.5k, 3% → 5.5k, 5% → 2k -->
+          <path d="M140,68 C170,95 200,140 240,170 C280,195 320,218 400,234 C480,246 560,252 720,256" fill="none" stroke="#4338ca" stroke-width="3"/>
+          <!-- Dots with labels -->
+          <circle cx="140" cy="68" r="5" fill="#4338ca"/>
+          <text x="140" y="56" text-anchor="middle" font-size="11" fill="#4338ca" font-weight="700">620k</text>
+          <circle cx="240" cy="170" r="5" fill="#4338ca"/>
+          <text x="220" y="160" text-anchor="end" font-size="11" fill="#4338ca" font-weight="700">200k</text>
+          <circle cx="340" cy="218" r="5" fill="#4338ca"/>
+          <text x="370" y="214" text-anchor="start" font-size="11" fill="#4338ca" font-weight="700">50k</text>
+          <circle cx="440" cy="240" r="5" fill="#4338ca"/>
+          <text x="470" y="236" text-anchor="start" font-size="11" fill="#4338ca" font-weight="700">12k</text>
+          <circle cx="540" cy="250" r="4" fill="#4338ca"/>
+          <circle cx="640" cy="254" r="4" fill="#4338ca"/>
+          <text x="30" y="160" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-90 30 160)">Пользователей на группу</text>
+        </svg>
+        <div class="caption">Закон 1/Δ²: чтобы обнаружить в 2 раза меньший эффект, нужно в 4 раза больше данных. MDE 0.5% требует 200k на группу, MDE 2% — всего 12k. Это главная причина, почему микроскопические улучшения не стоят того.</div>
+      </div>
+
       <h3>⚠️ Частые ошибки в A/B тестах</h3>
 
       <h4>1. Peeking («подглядывание»)</h4>
       <p>Самая распространённая ошибка. Ты запустил тест и каждый день проверяешь данные. Как только p < 0.05 — останавливаешь. Проблема: при многократных проверках реальная ошибка I рода сильно превышает 5%.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Peeking: инфляция ошибки I рода</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Реальная вероятность ложноположительного результата при H₀ (α=0.05 на каждой проверке)</text>
+          <!-- Axes -->
+          <line x1="80" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="60" x2="80" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- Y ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="end">
+            <text x="75" y="264">0%</text>
+            <text x="75" y="220">10%</text>
+            <text x="75" y="180">20%</text>
+            <text x="75" y="140">30%</text>
+            <text x="75" y="100">40%</text>
+            <text x="75" y="64">50%</text>
+          </g>
+          <!-- X ticks: 1..20 checks -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="110" y="280">1</text>
+            <text x="210" y="280">5</text>
+            <text x="335" y="280">10</text>
+            <text x="465" y="280">15</text>
+            <text x="590" y="280">20</text>
+            <text x="720" y="280">25</text>
+          </g>
+          <!-- Nominal α = 5% line -->
+          <line x1="80" y1="240" x2="720" y2="240" stroke="#059669" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="715" y="235" text-anchor="end" font-size="11" fill="#059669" font-weight="600">заявленная α = 5%</text>
+          <!-- Realistic (capped) curve 1 - (1-0.05)^n, n=1..25 -->
+          <!-- y(n) = 260 - 400 * (1 - 0.95^n)   (scale 50% = 200 px) -->
+          <path d="
+            M110,252
+            L135,247
+            L160,242
+            L185,238
+            L210,233
+            L235,228
+            L260,223
+            L285,219
+            L310,215
+            L335,211
+            L360,207
+            L385,203
+            L410,199
+            L435,196
+            L460,192
+            L485,189
+            L510,185
+            L535,182
+            L560,179
+            L585,176
+            L610,174
+            L635,171
+            L660,168
+            L685,166
+            L710,163
+          " fill="none" stroke="#dc2626" stroke-width="3"/>
+          <!-- Dots on curve -->
+          <circle cx="110" cy="252" r="3" fill="#dc2626"/>
+          <circle cx="210" cy="233" r="3" fill="#dc2626"/>
+          <circle cx="335" cy="211" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+          <circle cx="460" cy="192" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+          <circle cx="585" cy="176" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+          <!-- Annotations on dots -->
+          <text x="335" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~14%</text>
+          <text x="460" y="181" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~22%</text>
+          <text x="585" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~29%</text>
+          <!-- Axis labels -->
+          <text x="380" y="305" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600">Число проверок теста (дней)</text>
+          <text x="30" y="160" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-90 30 160)">Реальная P(ложного срабатывания)</text>
+        </svg>
+        <div class="caption">При каждой «проверке» теста шанс случайно получить p &lt; 0.05 накапливается. На 10-й проверке реальная ошибка уже ~14%, на 20-й — ~29%. Решение: зафиксируй n заранее и не подглядывай.</div>
+      </div>
+
       <div class="callout warn">⚠️ Если проверять каждый день 20 дней, вероятность ложно-положительного результата при H₀ составит не 5%, а ~30–40%. Это не анализ — это рулетка.</div>
 
       <h4>2. Несколько первичных метрик</h4>

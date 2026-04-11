@@ -279,7 +279,7 @@ App.registerTopic({
 
       <p>Квантили широко используются:</p>
       <ul>
-        <li>В <b>доверительных интервалах</b>: $z_{0.975} = 1.96$ для 95% CI.</li>
+        <li>В <b><a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительных интервалах</a></b>: $z_{0.975} = 1.96$ для 95% <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a>.</li>
         <li>В <b>SLA мониторинге</b>: p50, p95, p99 задержек.</li>
         <li>В <b>проверке гипотез</b>: критические значения t, z, $\\chi^2$.</li>
       </ul>

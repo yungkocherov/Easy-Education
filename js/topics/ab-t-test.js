@@ -25,7 +25,7 @@ App.registerTopic({
 
       <div class="key-concept">
         <div class="kc-label">Зачем t, а не z?</div>
-        <p>z-тест предполагает, что дисперсия генеральной совокупности <b>известна</b>. На практике мы её оцениваем по выборке. Это создаёт дополнительную неопределённость — особенно при малом n. t-распределение Стьюдента «шире» нормального и учитывает эту неопределённость. При n → ∞ t → z. При n ≥ 30 разница незначительна.</p>
+        <p>z-тест предполагает, что дисперсия генеральной совокупности <b>известна</b>. На практике мы её оцениваем по выборке. Это создаёт дополнительную неопределённость — особенно при малом n. <a class="glossary-link" onclick="App.selectTopic('glossary-t-distribution')">t-распределение</a> Стьюдента «шире» нормального и учитывает эту неопределённость. При n → ∞ t → z. При n ≥ 30 разница незначительна.</p>
       </div>
 
       <h3>📐 Два варианта двухвыборочного t-теста</h3>
@@ -47,7 +47,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 580 210" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="tDistA" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
@@ -58,37 +58,99 @@ App.registerTopic({
               <stop offset="100%" stop-color="#10b981" stop-opacity="0.05"/>
             </linearGradient>
           </defs>
-          <text x="290" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Сравнение средних двух групп</text>
-          <!-- Axis -->
-          <line x1="30" y1="168" x2="550" y2="168" stroke="#94a3b8" stroke-width="1.5"/>
-          <!-- Group A: mean=280, sd=40 → bell at x=180 -->
-          <!-- Group B: mean=315, sd=55 → bell at x=295 -->
-          <!-- Scale: x = 30 + (val-180)*2.5; val from 180 to 380 = 200 points = 500px/200=2.5px -->
-          <!-- A bell center at 280 → x=30+(280-180)*2.5=280 -->
-          <!-- B bell center at 315 → x=30+(315-180)*2.5=368 -->
-          <!-- A with σ=40→ half-width ~3σ=120px -->
-          <path d="M100,168 C120,168 145,163 165,152 C180,142 192,127 200,110 C210,89 218,68 228,52 C235,40 240,33 245,28 C250,24 255,21 260,19 C265,17 268,16 272,16 C276,16 279,17 282,20 C287,24 291,30 296,38 C303,50 309,65 315,85 C320,100 325,117 330,133 C336,148 343,160 355,166 C370,169 400,168 430,168" fill="url(#tDistA)" stroke="#3b82f6" stroke-width="2"/>
-          <!-- B bell center at x=368, σ=55→half-width ~160px -->
-          <path d="M160,168 C185,168 205,165 225,156 C240,148 252,136 262,121 C270,108 275,94 280,80 C285,66 290,54 295,44 C300,35 305,28 310,24 C315,21 318,20 322,20 C326,20 330,21 335,25 C340,30 344,38 348,49 C354,63 358,78 362,94 C368,113 374,132 382,147 C390,158 402,165 420,168 C445,169 480,168 520,168" fill="url(#tDistB)" stroke="#10b981" stroke-width="2"/>
-          <!-- mean lines -->
-          <line x1="272" y1="16" x2="272" y2="173" stroke="#2563eb" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="272" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">x̄_A=280</text>
-          <line x1="322" y1="20" x2="322" y2="173" stroke="#059669" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="322" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">x̄_B=315</text>
-          <!-- difference arrow -->
-          <line x1="272" y1="100" x2="322" y2="100" stroke="#64748b" stroke-width="1.5"/>
-          <text x="297" y="94" text-anchor="middle" font-size="10" fill="#64748b">Δ=35</text>
-          <!-- legend -->
-          <rect x="40" y="30" width="12" height="12" fill="#3b82f6" opacity="0.6" rx="2"/>
-          <text x="57" y="41" font-size="10" fill="#2563eb">Группа A: μ=280, σ=40</text>
-          <rect x="40" y="50" width="12" height="12" fill="#10b981" opacity="0.6" rx="2"/>
-          <text x="57" y="61" font-size="10" fill="#059669">Группа B: μ=315, σ=55</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Сравнение средних двух групп</text>
+          <line x1="50" y1="240" x2="710" y2="240" stroke="#475569" stroke-width="1.5"/>
+          <!-- Group A bell: centered at cx=340, narrow -->
+          <path id="tt-group-a-area" d="" fill="url(#tDistA)"/>
+          <path id="tt-group-a" d="" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+          <!-- Group B bell: centered at cx=430, wider (bigger σ) -->
+          <path id="tt-group-b-area" d="" fill="url(#tDistB)"/>
+          <path id="tt-group-b" d="" fill="none" stroke="#059669" stroke-width="2.5"/>
+          <!-- Mean lines -->
+          <line x1="340" y1="70" x2="340" y2="248" stroke="#2563eb" stroke-width="2" stroke-dasharray="5,3"/>
+          <line x1="430" y1="90" x2="430" y2="248" stroke="#059669" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="340" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#2563eb">x̄_A = 280</text>
+          <text x="430" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">x̄_B = 315</text>
+          <!-- Delta arrow -->
+          <line x1="340" y1="160" x2="430" y2="160" stroke="#64748b" stroke-width="1.5"/>
+          <polygon points="340,157 333,160 340,163" fill="#64748b"/>
+          <polygon points="430,157 437,160 430,163" fill="#64748b"/>
+          <text x="385" y="153" text-anchor="middle" font-size="12" fill="#64748b" font-weight="700">Δ = 35</text>
+          <!-- Legend -->
+          <rect x="60" y="60" width="14" height="14" fill="#3b82f6" opacity="0.5" stroke="#2563eb"/>
+          <text x="82" y="72" font-size="12" fill="#2563eb">Группа A: μ=280, σ=40 (контроль)</text>
+          <rect x="60" y="85" width="14" height="14" fill="#10b981" opacity="0.5" stroke="#059669"/>
+          <text x="82" y="97" font-size="12" fill="#059669">Группа B: μ=315, σ=55 (вариант)</text>
           <!-- SE annotation -->
-          <text x="430" y="80" font-size="10" fill="#475569">Разность значима</text>
-          <text x="430" y="94" font-size="10" fill="#475569">если Δ >> SE</text>
-          <text x="430" y="108" font-size="10" font-weight="600" fill="#7c3aed">t = Δ / SE</text>
+          <text x="580" y="75" font-size="13" font-weight="700" fill="#7c3aed">t = Δ / SE</text>
+          <text x="580" y="92" font-size="11" fill="#475569">Чем больше Δ и</text>
+          <text x="580" y="108" font-size="11" fill="#475569">меньше SE → значимо</text>
         </svg>
         <div class="caption">Две группы с разными средними и разными дисперсиями. Чем меньше перекрытие кривых, тем сильнее сигнал. t-статистика нормирует Δ на SE — учитывает разброс и размер выборки.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Group A: center 340, peak 70 (высокий, узкий), halfWidth 150
+          U.setPath(document, 'tt-group-a-area', U.normalSegmentPath(340, 240, 70, 150, -3, 3));
+          U.setPath(document, 'tt-group-a', U.normalOutlinePath(340, 240, 70, 150));
+          // Group B: center 430, peak 90 (ниже, шире), halfWidth 200
+          U.setPath(document, 'tt-group-b-area', U.normalSegmentPath(430, 240, 90, 200, -3, 3));
+          U.setPath(document, 'tt-group-b', U.normalOutlinePath(430, 240, 90, 200));
+        })();
+        </script>
+      </div>
+
+      <h3>📊 Почему именно t-распределение, а не нормальное?</h3>
+      <p>Когда мы знаем истинное $\\sigma$ популяции — используется z-тест с нормальным распределением. Но на практике мы $\\sigma$ <b>не знаем</b> и оцениваем его из выборки как $s$. Это добавляет дополнительную неопределённость: наша оценка $s$ сама по себе шумная.</p>
+      <p>Для учёта этой неопределённости William Gosset (работая в пивоварне Guinness) в 1908 вывел <a class="glossary-link" onclick="App.selectTopic('glossary-t-distribution')">t-распределение</a>. Оно похоже на нормальное, но имеет <b>более тяжёлые хвосты</b> — экстремальные значения встречаются чуть чаще, что компенсирует неопределённость в $s$.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">t-распределение при разных df (сравнение с N(0,1))</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">При df → ∞ t-распределение совпадает с нормальным</text>
+          <line x1="60" y1="260" x2="700" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- Generated curves -->
+          <path id="tt-dist-n" d="" fill="none" stroke="#1e40af" stroke-width="3"/>
+          <path id="tt-dist-30" d="" fill="none" stroke="#059669" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <path id="tt-dist-5" d="" fill="none" stroke="#b45309" stroke-width="2.5"/>
+          <path id="tt-dist-2" d="" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+          <!-- Center line -->
+          <line x1="380" y1="65" x2="380" y2="265" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="380" y="280" text-anchor="middle" font-size="11" fill="#64748b">0</text>
+          <!-- Legend -->
+          <g font-size="12" font-weight="600">
+            <line x1="70" y1="75" x2="90" y2="75" stroke="#dc2626" stroke-width="2.5"/>
+            <text x="95" y="79" fill="#dc2626">t при df = 2 (очень тяжёлые хвосты)</text>
+            <line x1="70" y1="98" x2="90" y2="98" stroke="#b45309" stroke-width="2.5"/>
+            <text x="95" y="102" fill="#b45309">t при df = 5</text>
+            <line x1="70" y1="121" x2="90" y2="121" stroke="#059669" stroke-width="2.5" stroke-dasharray="6,3"/>
+            <text x="95" y="125" fill="#059669">t при df = 30 (почти нормальное)</text>
+            <line x1="70" y1="144" x2="90" y2="144" stroke="#1e40af" stroke-width="3"/>
+            <text x="95" y="148" fill="#1e40af">N(0, 1) — нормальное</text>
+          </g>
+          <!-- x axis labels -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="130" y="278">−4</text>
+            <text x="195" y="278">−3</text>
+            <text x="260" y="278">−2</text>
+            <text x="320" y="278">−1</text>
+            <text x="440" y="278">1</text>
+            <text x="500" y="278">2</text>
+            <text x="565" y="278">3</text>
+            <text x="630" y="278">4</text>
+          </g>
+        </svg>
+        <div class="caption">При df = 2 t-распределение сильно «тяжелее» нормального (больше экстремумов). При df = 30 уже почти неотличимо от нормального. Поэтому для n &gt; 30 часто используют z-тест — разница мизерная.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var cx = 380, baselineY = 260, peakY = 80, halfWidth = 250;
+          U.setPath(document, 'tt-dist-n', U.normalOutlinePath(cx, baselineY, peakY, halfWidth, 4));
+          U.setPath(document, 'tt-dist-30', U.tDistOutline(cx, baselineY, peakY, halfWidth, 30, 4));
+          U.setPath(document, 'tt-dist-5', U.tDistOutline(cx, baselineY, peakY, halfWidth, 5, 4));
+          U.setPath(document, 'tt-dist-2', U.tDistOutline(cx, baselineY, peakY, halfWidth, 2, 4));
+        })();
+        </script>
       </div>
 
       <h3>📊 Предположения t-теста</h3>
@@ -582,7 +644,7 @@ plt.show()</code></pre>
           <ul>
             <li>Работает при малых выборках (n &lt; 30) — в отличие от z-теста</li>
             <li>Робустен к умеренным отклонениям от нормальности (особенно Welch при n≥30)</li>
-            <li>Даёт CI для разности средних — понятен бизнесу</li>
+            <li>Даёт <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a> для разности средних — понятен бизнесу</li>
             <li>Cohen's d не зависит от n — честная мера эффекта</li>
             <li>Welch корректен при неравных дисперсиях</li>
           </ul>

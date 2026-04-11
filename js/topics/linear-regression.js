@@ -132,7 +132,7 @@ App.registerTopic({
       </ul>
 
       <h3>📐 Предположения линейной регрессии (LINE)</h3>
-      <p>Чтобы линейная регрессия давала корректные результаты (особенно доверительные интервалы и тесты), нужны 4 предположения:</p>
+      <p>Чтобы линейная регрессия давала корректные результаты (особенно <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительные интервалы</a> и тесты), нужны 4 предположения:</p>
 
       <ul>
         <li><b>L — Linearity</b>: связь между X и y должна быть линейной. Если на самом деле квадратичная — линейная модель будет систематически ошибаться.</li>
@@ -716,7 +716,7 @@ plt.show()</code></pre>
       <ul>
         <li><b>L</b>inearity — связь между X и y линейна.</li>
         <li><b>I</b>ndependence — ошибки независимы.</li>
-        <li><b>N</b>ormality — ошибки распределены нормально (важно для CI и p-value).</li>
+        <li><b>N</b>ormality — ошибки распределены нормально (важно для <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a> и p-value).</li>
         <li><b>E</b>qual variance — гомоскедастичность.</li>
       </ul>
 

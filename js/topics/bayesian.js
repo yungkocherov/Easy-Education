@@ -193,7 +193,7 @@ App.registerTopic({
             <tr><th></th><th>Frequentist</th><th>Bayesian</th></tr>
             <tr><td>Параметр θ</td><td>Фиксирован, но неизвестен</td><td>Случайная величина</td></tr>
             <tr><td>Данные</td><td>Случайные</td><td>Фиксированы</td></tr>
-            <tr><td>«Интервал»</td><td>Доверительный (CI)</td><td>Credible Interval</td></tr>
+            <tr><td>«Интервал»</td><td>Доверительный (<a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a>)</td><td>Credible Interval</td></tr>
             <tr><td>Prior</td><td>Нет</td><td>Обязателен</td></tr>
             <tr><td>Вывод</td><td>p-value</td><td>P(θ | data)</td></tr>
           </table>

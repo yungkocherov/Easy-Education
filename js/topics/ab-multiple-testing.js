@@ -32,51 +32,84 @@ App.registerTopic({
       <p>При 20 тестах вы ошибаетесь с вероятностью 64%! Это неприемлемо.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 210" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
-          <defs>
-            <marker id="mt_arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <path d="M0,0 L7,3.5 L0,7 Z" fill="#64748b"/>
-            </marker>
-          </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">Накопление ложных открытий с числом тестов m</text>
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Накопление ложных открытий с числом тестов m</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">P(хотя бы одна ложная) = 1 − (1 − α)ᵐ при α = 0.05</text>
           <!-- Axes -->
-          <line x1="50" y1="175" x2="530" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#mt_arr)"/>
-          <line x1="50" y1="175" x2="50" y2="25" stroke="#64748b" stroke-width="1.5" marker-end="url(#mt_arr)"/>
-          <!-- Y-axis labels -->
-          <text x="44" y="178" text-anchor="end" font-size="9" fill="#64748b">0%</text>
-          <text x="44" y="133" text-anchor="end" font-size="9" fill="#64748b">25%</text>
-          <text x="44" y="88"  text-anchor="end" font-size="9" fill="#64748b">50%</text>
-          <text x="44" y="43"  text-anchor="end" font-size="9" fill="#64748b">75%</text>
-          <text x="27" y="100" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,27,100)">P(≥1 ложная)</text>
-          <!-- X-axis labels -->
-          <text x="50"  y="188" text-anchor="middle" font-size="9" fill="#64748b">0</text>
-          <text x="136" y="188" text-anchor="middle" font-size="9" fill="#64748b">10</text>
-          <text x="222" y="188" text-anchor="middle" font-size="9" fill="#64748b">20</text>
-          <text x="308" y="188" text-anchor="middle" font-size="9" fill="#64748b">30</text>
-          <text x="394" y="188" text-anchor="middle" font-size="9" fill="#64748b">40</text>
-          <text x="480" y="188" text-anchor="middle" font-size="9" fill="#64748b">50</text>
-          <text x="285" y="200" text-anchor="middle" font-size="10" fill="#64748b">Число тестов m</text>
-          <!-- Grid line at 5% (y=175−0.05*(175-25)/1 = 175−7.5=167.5) scale: 0..100% → y=175..25, so 1%=1.5px -->
-          <line x1="50" y1="168" x2="530" y2="168" stroke="#64748b" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <text x="535" y="170" font-size="9" fill="#64748b">5%</text>
-          <!-- FWER curve: 1-(0.95)^m. Points: m=0,0%; m=10,40%; m=20,64%; m=30,79%; m=50,92% -->
-          <!-- y = 175 - P*150, P = 1-0.95^m -->
-          <!-- m: 0→x=50, 50→x=480. scale: 8.6px per m -->
-          <path d="M50,175 C70,157 86,142 108,130 C130,117 152,107 180,99 C210,90 250,81 290,74 C330,68 370,62 410,57 C445,54 470,51 480,50"
-                fill="none" stroke="#ef4444" stroke-width="2.5"/>
-          <!-- Without correction: horizontal at 5% (y=168) -->
-          <!-- With Bonferroni: m=50, α'=0.05/50=0.001, FWER stays ≤5% — shown as dashed green -->
-          <line x1="50" y1="168" x2="480" y2="168" stroke="#10b981" stroke-width="2" stroke-dasharray="7,4"/>
+          <line x1="80" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="60" x2="80" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- Y ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="end">
+            <text x="75" y="264">0%</text>
+            <text x="75" y="214">25%</text>
+            <text x="75" y="164">50%</text>
+            <text x="75" y="114">75%</text>
+            <text x="75" y="64">100%</text>
+          </g>
+          <!-- Grid lines -->
+          <line x1="80" y1="214" x2="720" y2="214" stroke="#e5e7eb" stroke-width="0.7"/>
+          <line x1="80" y1="164" x2="720" y2="164" stroke="#e5e7eb" stroke-width="0.7"/>
+          <line x1="80" y1="114" x2="720" y2="114" stroke="#e5e7eb" stroke-width="0.7"/>
+          <!-- X ticks (0..50) -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="80" y="280">0</text>
+            <text x="208" y="280">10</text>
+            <text x="336" y="280">20</text>
+            <text x="464" y="280">30</text>
+            <text x="592" y="280">40</text>
+            <text x="720" y="280">50</text>
+          </g>
+          <text x="380" y="302" text-anchor="middle" font-size="12" fill="#64748b">число тестов m</text>
+          <text x="40" y="160" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-90 40 160)">FWER</text>
+          <!-- Curve (computed below) -->
+          <path id="mt-fwer-curve" d="" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <!-- Horizontal line at 5% (target FWER with Bonferroni) -->
+          <line x1="80" y1="250" x2="720" y2="250" stroke="#059669" stroke-width="2.2" stroke-dasharray="6,4"/>
           <!-- Annotations -->
-          <text x="435" y="45" font-size="10" font-weight="700" fill="#ef4444">Без поправки</text>
-          <text x="300" y="160" font-size="10" font-weight="700" fill="#10b981">С поправкой Бонферрони</text>
-          <!-- Key points -->
-          <circle cx="222" cy="79" r="4" fill="#ef4444"/>
-          <text x="222" y="73" text-anchor="middle" font-size="9" fill="#ef4444">64%</text>
-          <circle cx="136" cy="115" r="4" fill="#ef4444"/>
-          <text x="136" y="109" text-anchor="middle" font-size="9" fill="#ef4444">40%</text>
+          <text x="640" y="85" text-anchor="end" font-size="13" font-weight="700" fill="#dc2626">Без поправки</text>
+          <text x="640" y="245" text-anchor="end" font-size="13" font-weight="700" fill="#059669">С поправкой Бонферрони (≤5%)</text>
+          <!-- Key points with labels -->
+          <circle id="mt-pt-5" cx="0" cy="0" r="5" fill="#dc2626"/>
+          <text id="mt-lbl-5" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">23%</text>
+          <circle id="mt-pt-10" cx="0" cy="0" r="5" fill="#dc2626"/>
+          <text id="mt-lbl-10" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">40%</text>
+          <circle id="mt-pt-20" cx="0" cy="0" r="5" fill="#dc2626"/>
+          <text id="mt-lbl-20" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">64%</text>
+          <circle id="mt-pt-50" cx="0" cy="0" r="5" fill="#dc2626"/>
+          <text id="mt-lbl-50" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">92%</text>
         </svg>
-        <div class="caption">Красная кривая: рост FWER (вероятность ≥1 ложного открытия) с числом тестов при α=0.05 без поправки. Зелёная линия: FWER при поправке Бонферрони — остаётся ≤5% при любом m.</div>
+        <div class="caption">Красная кривая: рост FWER (вероятность ≥1 ложного открытия) с числом тестов при α=0.05 без поправки. Уже при 10 тестах почти 40%, при 20 — 64%. Зелёная линия: FWER после поправки Бонферрони остаётся ≤5% при любом m.</div>
+        <script>
+        (function() {
+          // Build exact curve: y = 1 - 0.95^m for m = 0..50
+          var x0 = 80, x1 = 720, y0 = 260, y1 = 60;  // axes
+          var pts = [];
+          for (var m = 0; m <= 50; m += 0.5) {
+            var x = x0 + (m / 50) * (x1 - x0);
+            var p = 1 - Math.pow(0.95, m);
+            var y = y0 - p * (y0 - y1);
+            pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+          }
+          var d = 'M' + pts[0][0] + ',' + pts[0][1];
+          for (var i = 1; i < pts.length; i++) d += ' L' + pts[i][0] + ',' + pts[i][1];
+          document.getElementById('mt-fwer-curve').setAttribute('d', d);
+          // Place markers at m = 5, 10, 20, 50
+          function placeAt(m, idCircle, idLabel, text) {
+            var x = x0 + (m / 50) * (x1 - x0);
+            var p = 1 - Math.pow(0.95, m);
+            var y = y0 - p * (y0 - y1);
+            var c = document.getElementById(idCircle);
+            c.setAttribute('cx', x); c.setAttribute('cy', y);
+            var l = document.getElementById(idLabel);
+            l.setAttribute('x', x); l.setAttribute('y', y - 10);
+            l.textContent = text;
+          }
+          placeAt(5, 'mt-pt-5', 'mt-lbl-5', '23%');
+          placeAt(10, 'mt-pt-10', 'mt-lbl-10', '40%');
+          placeAt(20, 'mt-pt-20', 'mt-lbl-20', '64%');
+          placeAt(50, 'mt-pt-50', 'mt-lbl-50', '92%');
+        })();
+        </script>
       </div>
 
       <h3>📊 FWER — Family-Wise Error Rate</h3>
@@ -144,7 +177,7 @@ App.registerTopic({
           <ul>
             <li><b>Множественные метрики</b> — тестируем одновременно CTR, конверсию, выручку, время на сайте. Каждая метрика — отдельный тест. Нужны поправки.</li>
             <li><b>Множественные варианты</b> — A/B/C/D тест с 4 вариантами: 6 пар сравнений (C(4,2)). Нужны поправки или ANOVA-аналог.</li>
-            <li><b>Множественные сегменты</b> — анализ результата по устройствам, регионам, когортам. Каждый сегмент — отдельный тест.</li>
+            <li><b>Множественные сегменты</b> — анализ результата по устройствам, регионам, <a class="glossary-link" onclick="App.selectTopic('glossary-cohort-analysis')">когортам</a>. Каждый сегмент — отдельный тест.</li>
           </ul>
           <p>На практике многие компании (Booking.com, Netflix) явно применяют BH-коррекцию к своим A/B метрикам.</p>
         </div>
@@ -556,7 +589,7 @@ print(f"  (при α={alpha} и {n_metrics} метриках)")</code></pre>
         <tr><td><b>A/B/C/D тесты</b></td><td>Несколько вариантов vs контроль — каждая пара требует поправки</td></tr>
         <tr><td><b>Исследование фичей</b></td><td>Поиск «полезных» признаков среди сотен — легко найти ложные</td></tr>
         <tr><td><b>Геномика и биоинформатика</b></td><td>Тысячи генов × p=0.05 → FDR-контроль (Бенджамини-Хохберг)</td></tr>
-        <tr><td><b>Когортный анализ</b></td><td>Сравнение сегментов: мобильные, десктоп, iOS, Android — десятки сравнений</td></tr>
+        <tr><td><b><a class="glossary-link" onclick="App.selectTopic('glossary-cohort-analysis')">Когортный анализ</a></b></td><td>Сравнение сегментов: мобильные, десктоп, iOS, Android — десятки сравнений</td></tr>
         <tr><td><b>Data dredging (p-hacking)</b></td><td>Главная защита от случайных «открытий» при множественной проверке</td></tr>
       </table>
     `,

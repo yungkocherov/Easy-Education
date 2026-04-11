@@ -46,56 +46,72 @@ App.registerTopic({
       <p>Под $H_0$ статистика $z$ распределена примерно как $N(0, 1)$ — стандартное нормальное. Чем больше |z|, тем меньше p-value, тем сильнее доказательства против $H_0$.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 195" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <defs>
             <linearGradient id="zBellGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
-              <stop offset="100%" stop-color="#6366f1" stop-opacity="0.04"/>
+              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/>
             </linearGradient>
-            <linearGradient id="zTailR" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
+            <linearGradient id="zTailGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#dc2626" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#dc2626" stop-opacity="0.1"/>
             </linearGradient>
-            <linearGradient id="zTailL" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
-            </linearGradient>
-            <marker id="zArr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-              <path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/>
-            </marker>
           </defs>
-          <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">z-тест: стандартное нормальное N(0,1)</text>
-          <!-- Baseline -->
-          <line x1="30" y1="158" x2="530" y2="158" stroke="#94a3b8" stroke-width="1.5"/>
-          <!-- Left tail shading (z < -1.96) -->
-          <path d="M30,158 C40,158 60,155 75,145 C82,138 87,128 90,117 L90,158 Z" fill="url(#zTailL)" stroke="#ef4444" stroke-width="1.2"/>
-          <!-- Right tail shading (z > 1.96) -->
-          <path d="M470,117 C473,128 478,138 485,145 C500,155 520,158 530,158 L470,158 Z" fill="url(#zTailR)" stroke="#ef4444" stroke-width="1.2"/>
-          <!-- Full bell -->
-          <path d="M30,158 C50,158 70,155 85,145 C100,133 115,113 130,93 C145,72 160,52 175,39 C190,28 210,20 230,17 C250,15 270,15 280,15 C290,15 310,15 330,17 C350,20 370,28 385,39 C400,52 415,72 430,93 C445,113 460,133 475,145 C490,155 510,158 530,158" fill="url(#zBellGrad)" stroke="#6366f1" stroke-width="2.5"/>
-          <!-- z = 0 center -->
-          <line x1="280" y1="15" x2="280" y2="163" stroke="#475569" stroke-width="1.2" stroke-dasharray="4,3"/>
-          <text x="280" y="175" text-anchor="middle" font-size="11" fill="#475569">0</text>
-          <!-- Critical values at ±1.96 -->
-          <line x1="90" y1="117" x2="90" y2="163" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="5,3"/>
-          <text x="90" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">−1.96</text>
-          <line x1="470" y1="117" x2="470" y2="163" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="5,3"/>
-          <text x="470" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">+1.96</text>
-          <!-- Tail labels -->
-          <text x="58" y="140" text-anchor="middle" font-size="9" font-weight="600" fill="#ef4444">α/2</text>
-          <text x="58" y="153" text-anchor="middle" font-size="9" fill="#ef4444">2.5%</text>
-          <text x="502" y="140" text-anchor="middle" font-size="9" font-weight="600" fill="#ef4444">α/2</text>
-          <text x="502" y="153" text-anchor="middle" font-size="9" fill="#ef4444">2.5%</text>
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">z-тест: стандартное нормальное N(0,1)</text>
+          <line x1="60" y1="240" x2="700" y2="240" stroke="#475569" stroke-width="1.5"/>
+          <!-- Generated paths -->
+          <path id="zt-central" d="" fill="url(#zBellGrad)"/>
+          <path id="zt-left-tail" d="" fill="url(#zTailGrad)" stroke="#dc2626" stroke-width="1.8"/>
+          <path id="zt-right-tail" d="" fill="url(#zTailGrad)" stroke="#dc2626" stroke-width="1.8"/>
+          <path id="zt-outline" d="" fill="none" stroke="#4338ca" stroke-width="2.8"/>
+          <!-- z = 0 center line -->
+          <line x1="380" y1="70" x2="380" y2="248" stroke="#475569" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <text x="380" y="262" text-anchor="middle" font-size="12" fill="#475569" font-weight="700">0</text>
+          <!-- Critical lines ±1.96 -->
+          <line id="zt-line-left" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
+          <line id="zt-line-right" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
+          <text id="zt-label-left" x="0" y="262" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">−1.96</text>
+          <text id="zt-label-right" x="0" y="262" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">+1.96</text>
           <!-- Middle label -->
-          <text x="280" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="#4f46e5">95%</text>
-          <text x="280" y="96" text-anchor="middle" font-size="10" fill="#4f46e5">не отвергаем H₀</text>
-          <!-- Sample z marker -->
-          <line x1="390" y1="40" x2="390" y2="163" stroke="#f97316" stroke-width="2.5" stroke-dasharray="0"/>
-          <text x="390" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="#f97316">z=2.43</text>
-          <text x="420" y="55" font-size="9" fill="#f97316">наш z</text>
-          <text x="420" y="68" font-size="9" fill="#f97316">p=0.015</text>
+          <text x="380" y="130" text-anchor="middle" font-size="18" font-weight="800" fill="#4f46e5">95%</text>
+          <text x="380" y="152" text-anchor="middle" font-size="12" fill="#4f46e5">не отвергаем H₀</text>
+          <!-- Tail labels -->
+          <text x="110" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">α/2 = 2.5%</text>
+          <text x="650" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">α/2 = 2.5%</text>
+          <!-- Sample z = 2.43 marker -->
+          <line id="zt-sample" x1="0" y1="0" x2="0" y2="0" stroke="#f97316" stroke-width="3"/>
+          <text id="zt-sample-label" x="0" y="285" text-anchor="middle" font-size="12" font-weight="700" fill="#f97316">наш z = 2.43</text>
         </svg>
-        <div class="caption">z-распределение при H₀. Красные хвосты — область отвержения (каждая 2.5% при α=0.05). Оранжевая линия — пример z=2.43, который попадает в правый хвост: отвергаем H₀.</div>
+        <div class="caption">z-распределение при H₀. Красные хвосты — область отвержения (каждая 2.5% при α=0.05). Оранжевая линия — пример z=2.43, который попадает в правый хвост: отвергаем H₀, p ≈ 0.015.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var cx = 380, baselineY = 240, peakY = 70, halfWidth = 270;
+          U.setPath(document, 'zt-outline', U.normalOutlinePath(cx, baselineY, peakY, halfWidth));
+          U.setPath(document, 'zt-central', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -1.96, 1.96));
+          U.setPath(document, 'zt-left-tail', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, -3, -1.96));
+          U.setPath(document, 'zt-right-tail', U.normalSegmentPath(cx, baselineY, peakY, halfWidth, 1.96, 3));
+          // Critical lines
+          var leftX = cx - (1.96 / 3) * halfWidth;
+          var rightX = cx + (1.96 / 3) * halfWidth;
+          var critY = baselineY - Math.exp(-0.5 * 1.96 * 1.96) * (baselineY - peakY);
+          var lL = document.getElementById('zt-line-left');
+          lL.setAttribute('x1', leftX); lL.setAttribute('x2', leftX);
+          lL.setAttribute('y1', critY); lL.setAttribute('y2', baselineY + 8);
+          var lR = document.getElementById('zt-line-right');
+          lR.setAttribute('x1', rightX); lR.setAttribute('x2', rightX);
+          lR.setAttribute('y1', critY); lR.setAttribute('y2', baselineY + 8);
+          document.getElementById('zt-label-left').setAttribute('x', leftX);
+          document.getElementById('zt-label-right').setAttribute('x', rightX);
+          // Sample z = 2.43 marker
+          var sampleX = cx + (2.43 / 3) * halfWidth;
+          var sampleY = baselineY - Math.exp(-0.5 * 2.43 * 2.43) * (baselineY - peakY);
+          var ls = document.getElementById('zt-sample');
+          ls.setAttribute('x1', sampleX); ls.setAttribute('x2', sampleX);
+          ls.setAttribute('y1', sampleY); ls.setAttribute('y2', baselineY + 25);
+          document.getElementById('zt-sample-label').setAttribute('x', sampleX);
+        })();
+        </script>
       </div>
 
       <h3>🔁 Односторонний vs двусторонний тест</h3>
@@ -106,8 +122,8 @@ App.registerTopic({
       </ul>
       <div class="callout warn">⚠️ Переключать тест с двустороннего на односторонний после просмотра данных — грубая форма p-hacking. Выбирай тип теста ДО запуска.</div>
 
-      <h3>📏 Доверительный интервал для разности пропорций</h3>
-      <p>p-value говорит «значимо или нет». Доверительный интервал (CI) говорит «насколько»:</p>
+      <h3>📏 <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">Доверительный интервал</a> для разности пропорций</h3>
+      <p>p-value говорит «значимо или нет». Доверительный интервал (<a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a>) говорит «насколько»:</p>
       <div class="math-block">$$\\text{CI}_{95\\%} = (\\hat{p}_B - \\hat{p}_A) \\pm z_{0.025} \\cdot \\sqrt{\\frac{\\hat{p}_A(1-\\hat{p}_A)}{n_A} + \\frac{\\hat{p}_B(1-\\hat{p}_B)}{n_B}}$$</div>
       <p>Обрати внимание: здесь используем SE <b>без</b> объединённой пропорции (непулированный), так как мы оцениваем интервал для реальной разности, а не тестируем гипотезу равенства.</p>
 

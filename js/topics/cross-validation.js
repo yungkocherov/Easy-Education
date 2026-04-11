@@ -285,7 +285,7 @@ Fold 5: test = точки 17–20, train = 1–16
 
 Итоговая оценка: <b>0.90 ± 0.134</b>
 
-95% доверительный интервал: 0.90 ± 1.96 * 0.134/√5 ≈ 0.90 ± 0.117</div>
+95% <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительный интервал</a>: 0.90 ± 1.96 * 0.134/√5 ≈ 0.90 ± 0.117</div>
             <div class="why">CV даёт не только среднее (0.90), но и разброс (±0.134). Большой std означает, что модель нестабильна. В нашем случае std=0.134 достаточно высокий — из-за маленького датасета (20 точек).</div>
           </div>
 
@@ -614,7 +614,7 @@ k=3 vs k=5: одинаковый Mean и Std!
             <div class="stat-card"><div class="stat-label">Std</div><div class="stat-value">${(std * 100).toFixed(1)}%</div></div>
             <div class="stat-card"><div class="stat-label">Min</div><div class="stat-value">${(App.Util.min(scores) * 100).toFixed(1)}%</div></div>
             <div class="stat-card"><div class="stat-label">Max</div><div class="stat-value">${(App.Util.max(scores) * 100).toFixed(1)}%</div></div>
-            <div class="stat-card"><div class="stat-label">95% CI</div><div class="stat-value">±${(1.96 * std / Math.sqrt(k) * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">95% <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a></div><div class="stat-value">±${(1.96 * std / Math.sqrt(k) * 100).toFixed(1)}%</div></div>
           `;
         }
 

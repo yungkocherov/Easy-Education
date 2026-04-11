@@ -189,7 +189,7 @@ App.registerTopic({
         <li><b>Дисбаланс классов</b> — диктует выбор метрики.</li>
         <li><b>Гипотезы</b> — при сравнении моделей нужны тесты на разницу метрик.</li>
         <li><b>Любая ML-модель</b> — оценивается через метрики.</li>
-        <li><b>Cross-validation</b> — даёт среднюю метрику с доверительным интервалом.</li>
+        <li><b>Cross-validation</b> — даёт среднюю метрику с <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительным интервалом</a>.</li>
       </ul>
     `,
 

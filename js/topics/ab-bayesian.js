@@ -53,61 +53,156 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 215" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
-          <defs>
-            <linearGradient id="bab_gradA" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.45"/>
-              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
-            </linearGradient>
-            <linearGradient id="bab_gradB" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#10b981" stop-opacity="0.45"/>
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0.05"/>
-            </linearGradient>
-            <linearGradient id="bab_prior" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.05"/>
-            </linearGradient>
-            <marker id="bab_arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <path d="M0,0 L7,3.5 L0,7 Z" fill="#f59e0b"/>
-            </marker>
-          </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">Posterior-распределения конверсии A и B</text>
-          <!-- Axes -->
-          <line x1="40" y1="175" x2="530" y2="175" stroke="#64748b" stroke-width="1.5"/>
-          <line x1="40" y1="175" x2="40" y2="28" stroke="#64748b" stroke-width="1.5"/>
-          <text x="285" y="198" text-anchor="middle" font-size="10" fill="#64748b">θ (истинная конверсия)</text>
-          <!-- X-axis ticks -->
-          <text x="40"  y="188" text-anchor="middle" font-size="9" fill="#64748b">0</text>
-          <text x="138" y="188" text-anchor="middle" font-size="9" fill="#64748b">0.2</text>
-          <text x="236" y="188" text-anchor="middle" font-size="9" fill="#64748b">0.4</text>
-          <text x="334" y="188" text-anchor="middle" font-size="9" fill="#64748b">0.6</text>
-          <text x="432" y="188" text-anchor="middle" font-size="9" fill="#64748b">0.8</text>
-          <text x="530" y="188" text-anchor="middle" font-size="9" fill="#64748b">1.0</text>
-          <!-- Prior flat (Beta(1,1)) -->
-          <path d="M40,172 L530,172" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <!-- Posterior A: Beta(52,952) peak ~5.2% → θ≈0.052 → x=40+0.052*490≈65, wide curve -->
-          <!-- scale: x = 40 + θ*490  so θ=0.05→x=64.5, θ=0.1→x=89 -->
-          <!-- Beta(52,952) mean=52/1004≈0.0518, sd≈sqrt(52*952/1004^2/1005)≈0.007 -->
-          <!-- peak at x≈64.5, half-width ~3SD=0.021 → 10px, very narrow -->
-          <!-- Draw bell at x≈65, spread ≈ 25px visually  -->
-          <path d="M40,173 C45,173 52,172 58,168 C62,163 64,152 65,138 C66,120 67,100 67.5,80 C68,60 68,45 68.5,35 C69,28 69.5,26 70,26 C70.5,26 71,28 71.5,35 C72,42 72.5,57 73,76 C73.5,96 74,116 75,136 C76,152 78,163 82,168 C88,172 100,173 530,173" fill="url(#bab_gradA)" stroke="#3b82f6" stroke-width="2.2"/>
-          <!-- Posterior B: Beta(67,933) mean=67/1000=0.067 → x=40+0.067*490≈73, slightly right -->
-          <path d="M45,173 C52,173 60,172 67,168 C71,163 73.5,152 74.5,138 C75.5,122 76,105 76.5,88 C77,70 77.5,52 78,40 C78.3,32 78.7,29 79,27.5 C79.3,26.5 79.7,26 80,26 C80.3,26 80.7,26.5 81,27.5 C81.3,29 81.7,32 82,40 C82.5,52 83,70 83.5,88 C84,105 84.5,122 85.5,138 C86.5,152 88,163 92,168 C99,172 115,173 530,173" fill="url(#bab_gradB)" stroke="#10b981" stroke-width="2.2"/>
-          <!-- Overlap shading indicator -->
-          <text x="68" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#3b82f6">A</text>
-          <text x="80" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#10b981">B</text>
-          <!-- P(B>A) arrow annotation -->
-          <path d="M85,100 C120,80 160,75 185,78" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#bab_arr)"/>
-          <text x="165" y="68" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">P(B &gt; A) = ?</text>
+        <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Эволюция posterior по мере сбора данных</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Prior Beta(1,1) — равномерный. Истинная конверсия θ = 0.06 (6%)</text>
+          <line x1="60" y1="290" x2="720" y2="290" stroke="#475569" stroke-width="1.5"/>
+          <!-- X ticks: 0..0.2 (конверсии) -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="60" y="310">0%</text>
+            <text x="192" y="310">4%</text>
+            <text x="324" y="310">8%</text>
+            <text x="456" y="310">12%</text>
+            <text x="588" y="310">16%</text>
+            <text x="720" y="310">20%</text>
+          </g>
+          <text x="380" y="330" text-anchor="middle" font-size="12" fill="#64748b">θ (конверсия)</text>
+          <!-- Prior line (flat) -->
+          <line x1="60" y1="275" x2="720" y2="275" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+          <!-- 4 posteriors with growing n -->
+          <path id="bab-p10" d="" fill="none" stroke="#60a5fa" stroke-width="2.5"/>
+          <path id="bab-p100" d="" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+          <path id="bab-p500" d="" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>
+          <path id="bab-p2000" d="" fill="none" stroke="#1e3a8a" stroke-width="3"/>
+          <!-- True theta line -->
+          <line x1="258" y1="70" x2="258" y2="290" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="4,3"/>
+          <text x="258" y="64" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">θ = 0.06 (истина)</text>
           <!-- Legend -->
-          <line x1="200" y1="205" x2="225" y2="205" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <text x="232" y="208" font-size="9" fill="#64748b">Prior Beta(1,1)</text>
-          <rect x="310" y="200" width="14" height="9" fill="url(#bab_gradA)" stroke="#3b82f6" stroke-width="1"/>
-          <text x="328" y="208" font-size="9" fill="#1e293b">Posterior A</text>
-          <rect x="400" y="200" width="14" height="9" fill="url(#bab_gradB)" stroke="#10b981" stroke-width="1"/>
-          <text x="418" y="208" font-size="9" fill="#1e293b">Posterior B</text>
+          <g font-size="11" font-weight="600">
+            <line x1="460" y1="75" x2="485" y2="75" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+            <text x="492" y="79" fill="#64748b">Prior Beta(1,1)</text>
+            <line x1="460" y1="97" x2="485" y2="97" stroke="#60a5fa" stroke-width="2.5"/>
+            <text x="492" y="101" fill="#60a5fa">после 10 наблюдений (1 успех)</text>
+            <line x1="460" y1="119" x2="485" y2="119" stroke="#3b82f6" stroke-width="2.5"/>
+            <text x="492" y="123" fill="#3b82f6">после 100 (6 успехов)</text>
+            <line x1="460" y1="141" x2="485" y2="141" stroke="#1d4ed8" stroke-width="2.5"/>
+            <text x="492" y="145" fill="#1d4ed8">после 500 (30 успехов)</text>
+            <line x1="460" y1="163" x2="485" y2="163" stroke="#1e3a8a" stroke-width="3"/>
+            <text x="492" y="167" fill="#1e3a8a">после 2000 (120 успехов)</text>
+          </g>
         </svg>
-        <div class="caption">Два posterior-распределения конверсии. Равномерный prior Beta(1,1) после данных превращается в острые пики. P(B&gt;A) — доля «пространства» где зелёный хвост правее синего. Считается через Монте-Карло.</div>
+        <div class="caption">По мере роста числа наблюдений posterior становится всё острее и стягивается к истинной конверсии. Это и есть Байесовское обучение: каждое новое наблюдение сужает нашу неопределённость.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Our x-axis: 0..0.2 maps to 60..720 px (width 660)
+          // Use betaOutline(x0, x1, baselineY, peakY, α, β)
+          // We only draw within the 0..0.2 range. Since our betaOutline is for [0,1],
+          // we need to stretch [0, 0.2] onto the full canvas. We do this by drawing
+          // beta for params that peak near 0.06, over a narrow x-range.
+          // Trick: treat x=0..1 in the generator as our displayed x=0..0.2.
+          // Call betaOutline(x0=60, x1=720) but stretch alpha/beta for narrow peaks.
+          // Actually the generator maps u=0..1 to x0..x1 linearly. So if we want
+          // true conversion θ ∈ [0, 0.2] to be shown, we need to pass α, β for a beta
+          // whose support is [0, 0.2]. Easiest: rescale by treating θ∈[0,0.2] as u∈[0,1]
+          // and adjusting — but this changes the shape!
+          // Better approach: call betaOutline with the original α, β but with x0..x1
+          // representing the [0, 1] range and just draw the left 20%. So we extend
+          // x1 to 60 + (660/0.2) = 60 + 3300 = 3360, then clip visually — but clipping
+          // is complex. Instead, write a mini-helper that draws Beta over a custom
+          // θ-range.
+          function betaOnRange(thetaMin, thetaMax, xPxMin, xPxMax, baselineY, peakY, alpha, beta) {
+            var n = 200;
+            // find peak pdf over the whole [0,1] to normalise
+            var mode = (alpha - 1) / (alpha + beta - 2);
+            if (alpha < 1 || beta < 1) mode = 0.5;
+            mode = Math.max(0.001, Math.min(0.999, mode));
+            var peakPdf = Math.pow(mode, alpha - 1) * Math.pow(1 - mode, beta - 1);
+            var pts = [];
+            for (var i = 0; i <= n; i++) {
+              var t = thetaMin + (thetaMax - thetaMin) * (i / n);
+              var tt = Math.max(0.0001, Math.min(0.9999, t));
+              var pdf = Math.pow(tt, alpha - 1) * Math.pow(1 - tt, beta - 1);
+              var normPdf = Math.min(1, pdf / peakPdf);
+              var x = xPxMin + (xPxMax - xPxMin) * (i / n);
+              var y = baselineY - normPdf * (baselineY - peakY);
+              pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+            }
+            var d = 'M' + pts[0][0] + ',' + pts[0][1];
+            for (var j = 1; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+            return d;
+          }
+          var baselineY = 290, peakY = 80;
+          var x0 = 60, x1 = 720;
+          var tMin = 0, tMax = 0.2;
+          // Prior Beta(1,1) → after k successes, n trials: Beta(1+k, 1+n-k)
+          document.getElementById('bab-p10').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 1, 1 + 9));
+          document.getElementById('bab-p100').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 6, 1 + 94));
+          document.getElementById('bab-p500').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 30, 1 + 470));
+          document.getElementById('bab-p2000').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 120, 1 + 1880));
+        })();
+        </script>
+      </div>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Posterior A vs B: как считается P(B &gt; A)</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">A: 51/1000 = 5.1%. B: 67/1000 = 6.7%. P(B &gt; A) ≈ 96.8%</text>
+          <line x1="60" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- X ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="60" y="280">0%</text>
+            <text x="192" y="280">4%</text>
+            <text x="324" y="280">8%</text>
+            <text x="456" y="280">12%</text>
+            <text x="588" y="280">16%</text>
+            <text x="720" y="280">20%</text>
+          </g>
+          <!-- Posterior A and B -->
+          <path id="bab-post-a" d="" fill="#3b82f6" fill-opacity="0.25" stroke="#1d4ed8" stroke-width="2.5"/>
+          <path id="bab-post-b" d="" fill="#10b981" fill-opacity="0.25" stroke="#047857" stroke-width="2.5"/>
+          <!-- Labels -->
+          <text x="180" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">A</text>
+          <text x="230" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">B</text>
+          <!-- Big P(B>A) annotation -->
+          <text x="520" y="95" font-size="18" font-weight="800" fill="#d97706">P(B &gt; A) = 96.8%</text>
+          <text x="520" y="115" font-size="11" fill="#92400e">(Monte Carlo из 100k семплов)</text>
+        </svg>
+        <div class="caption">Два posterior-распределения конверсии. После 1000 наблюдений в каждой группе оба пика острые. P(B&gt;A) — это вероятность, что B реально лучше. Считается Monte Carlo: семплируем θ из каждого posterior, смотрим долю пар где θ_B &gt; θ_A.</div>
+        <script>
+        (function() {
+          function betaOnRange(thetaMin, thetaMax, xPxMin, xPxMax, baselineY, peakY, alpha, beta, closed) {
+            var n = 200;
+            var mode = (alpha - 1) / (alpha + beta - 2);
+            if (alpha < 1 || beta < 1) mode = 0.5;
+            mode = Math.max(0.001, Math.min(0.999, mode));
+            var peakPdf = Math.pow(mode, alpha - 1) * Math.pow(1 - mode, beta - 1);
+            var pts = [];
+            for (var i = 0; i <= n; i++) {
+              var t = thetaMin + (thetaMax - thetaMin) * (i / n);
+              var tt = Math.max(0.0001, Math.min(0.9999, t));
+              var pdf = Math.pow(tt, alpha - 1) * Math.pow(1 - tt, beta - 1);
+              var normPdf = Math.min(1, pdf / peakPdf);
+              var x = xPxMin + (xPxMax - xPxMin) * (i / n);
+              var y = baselineY - normPdf * (baselineY - peakY);
+              pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+            }
+            var d;
+            if (closed) {
+              d = 'M' + pts[0][0] + ',' + baselineY;
+              for (var k = 0; k < pts.length; k++) d += ' L' + pts[k][0] + ',' + pts[k][1];
+              d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+            } else {
+              d = 'M' + pts[0][0] + ',' + pts[0][1];
+              for (var j = 1; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+            }
+            return d;
+          }
+          // A: Beta(1+51, 1+949), B: Beta(1+67, 1+933)
+          document.getElementById('bab-post-a').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, 52, 950, true));
+          document.getElementById('bab-post-b').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, 68, 934, true));
+        })();
+        </script>
       </div>
 
       <h3>🎲 P(B > A) через Монте-Карло</h3>
@@ -148,9 +243,9 @@ App.registerTopic({
       </div>
 
       <div class="deep-dive">
-        <summary>Подробнее: Credible Interval vs Доверительный интервал</summary>
+        <summary>Подробнее: Credible Interval vs <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">Доверительный интервал</a></summary>
         <div class="deep-dive-body">
-          <p>Байесовский <b>Credible Interval</b> (CI) и частотный <b>Confidence Interval</b> — похожие по виду, но принципиально разные концепции:</p>
+          <p>Байесовский <b>Credible Interval</b> (<a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a>) и частотный <b>Confidence Interval</b> — похожие по виду, но принципиально разные концепции:</p>
           <table>
             <tr><th></th><th>Confidence Interval (частотный)</th><th>Credible Interval (байесовский)</th></tr>
             <tr><td>Определение</td><td>При многократном повторении 95% таких интервалов накроют истинный θ</td><td>С вероятностью 95% θ находится в этом интервале</td></tr>

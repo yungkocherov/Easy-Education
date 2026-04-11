@@ -103,7 +103,7 @@ App.registerTopic({
       <p>RDD использует <b>пороговое правило</b> назначения воздействия. Если лечение назначается при $X > c$ (порог), то объекты чуть выше и чуть ниже порога практически идентичны — за исключением факта получения воздействия. Эффект = скачок функции регрессии в точке $c$.</p>
 
       <div class="key-concept">
-        <div class="kc-label">DAG: причинный граф</div>
+        <div class="kc-label"><a class="glossary-link" onclick="App.selectTopic('glossary-dag')">DAG</a>: причинный граф</div>
         <p><span class="term" data-tip="DAG (Directed Acyclic Graph): ориентированный граф без циклов, где рёбра — причинные связи. Позволяет формально идентифицировать конфаундеры, медиаторы и коллайдеры.">DAG</span> (направленный ациклический граф) — язык для записи причинных связей. Стрелка A → B означает «A причинно влияет на B». DAG помогает решить главный вопрос: <b>что контролировать, а что нет.</b></p>
       </div>
 
@@ -563,7 +563,7 @@ print(model.summary())
 # Коэффициент treat:post — DiD оценка эффекта
 
 did_estimate = model.params['treat:post']
-ci = model.conf_int().loc['treat:post']
+<a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">ci</a> = model.conf_int().loc['treat:post']
 print(f'\\nDiD оценка: {did_estimate:.2f} (95% CI: [{ci[0]:.2f}, {ci[1]:.2f}])')
 print(f'Истинный эффект: {true_effect}')</code></pre>
 

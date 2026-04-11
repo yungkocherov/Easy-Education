@@ -80,6 +80,54 @@ App.registerTopic({
       <p>Для классического A/B теста (2 группы, 2 исхода): df = 1. Для A/B/C (3 группы, 2 исхода): df = 2. Для A/B с 3 исходами: df = 2.</p>
       <p>При $H_0$ статистика $\\chi^2$ распределена примерно как $\\chi^2(df)$ — хи-квадрат распределение с df степенями свободы.</p>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Хи-квадрат распределение для разных df</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">При большом df становится похоже на нормальное</text>
+          <line x1="60" y1="260" x2="720" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <line x1="60" y1="60" x2="60" y2="260" stroke="#475569" stroke-width="1.5"/>
+          <!-- 4 curves -->
+          <path id="chi-df1" d="" fill="none" stroke="#dc2626" stroke-width="2.8"/>
+          <path id="chi-df2" d="" fill="none" stroke="#b45309" stroke-width="2.8"/>
+          <path id="chi-df5" d="" fill="none" stroke="#059669" stroke-width="2.8"/>
+          <path id="chi-df10" d="" fill="none" stroke="#1e40af" stroke-width="2.8"/>
+          <!-- Legend -->
+          <g font-size="12" font-weight="600">
+            <line x1="460" y1="80" x2="480" y2="80" stroke="#dc2626" stroke-width="2.8"/>
+            <text x="485" y="84" fill="#dc2626">df = 1 (L-образная)</text>
+            <line x1="460" y1="102" x2="480" y2="102" stroke="#b45309" stroke-width="2.8"/>
+            <text x="485" y="106" fill="#b45309">df = 2 (убывающая)</text>
+            <line x1="460" y1="124" x2="480" y2="124" stroke="#059669" stroke-width="2.8"/>
+            <text x="485" y="128" fill="#059669">df = 5 (скос вправо)</text>
+            <line x1="460" y1="146" x2="480" y2="146" stroke="#1e40af" stroke-width="2.8"/>
+            <text x="485" y="150" fill="#1e40af">df = 10 (почти симм.)</text>
+          </g>
+          <!-- X ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="60" y="280">0</text>
+            <text x="170" y="280">5</text>
+            <text x="280" y="280">10</text>
+            <text x="390" y="280">15</text>
+            <text x="500" y="280">20</text>
+            <text x="610" y="280">25</text>
+            <text x="720" y="280">30</text>
+          </g>
+          <text x="380" y="302" text-anchor="middle" font-size="12" fill="#64748b">χ² значение</text>
+        </svg>
+        <div class="caption">Хи-квадрат распределение всегда &gt; 0, скошено вправо. При маленьких df (1-2) — убывающая или L-образная. При df ≥ 10 уже почти симметричное. Критическое значение при α=0.05: df=1 → 3.84, df=2 → 5.99, df=5 → 11.07, df=10 → 18.31.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          var x0 = 60, x1 = 720, baselineY = 260, peakY = 70;
+          // df=1 — надо ограничить amplitude (она огромна у 0)
+          U.setPath(document, 'chi-df1', U.chiSquareOutline(x0, x1, baselineY, peakY, 1, 30));
+          U.setPath(document, 'chi-df2', U.chiSquareOutline(x0, x1, baselineY, peakY, 2, 30));
+          U.setPath(document, 'chi-df5', U.chiSquareOutline(x0, x1, baselineY, peakY, 5, 30));
+          U.setPath(document, 'chi-df10', U.chiSquareOutline(x0, x1, baselineY, peakY, 10, 30));
+        })();
+        </script>
+      </div>
+
       <div class="key-concept">
         <div class="kc-label">Условие применимости</div>
         <p>Все <b>ожидаемые</b> (не наблюдаемые!) частоты должны быть ≥ 5. Если хоть одна ожидаемая частота &lt; 5 — нормальное приближение ненадёжно. Решение: объединить малые категории, собрать больше данных, или использовать <b>точный тест Фишера</b>.</p>

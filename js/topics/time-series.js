@@ -744,7 +744,7 @@ forecast_df = model.predict(future)
 
 # Визуализация
 fig1 = model.plot(forecast_df)
-fig1.suptitle('Prophet: прогноз с доверительным интервалом')
+fig1.suptitle('Prophet: прогноз с <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">доверительным интервалом</a>')
 plt.show()
 
 fig2 = model.plot_components(forecast_df)

@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'product-analytics',
   category: 'ab',
   title: 'Продуктовая аналитика',
-  summary: 'Воронки, retention, LTV, North Star метрика, когортный анализ.',
+  summary: '<a class="glossary-link" onclick="App.selectTopic('glossary-funnel')">Воронки</a>, retention, LTV, North Star метрика, <a class="glossary-link" onclick="App.selectTopic('glossary-cohort-analysis')">когортный анализ</a>.',
 
   tabs: {
     theory: `
@@ -43,7 +43,7 @@ App.registerTopic({
               <stop offset="100%" stop-color="#fbbf24"/>
             </linearGradient>
           </defs>
-          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">AARRR Funnel</text>
+          <text x="280" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">AARRR <a class="glossary-link" onclick="App.selectTopic('glossary-funnel')">Funnel</a></text>
 
           <!-- Trapezoids forming a funnel -->
           <!-- Acquisition: widest -->
@@ -100,9 +100,64 @@ App.registerTopic({
       </ul>
 
       <h4>Retention и кривые выживаемости</h4>
-      <p>Retention Rate на N-й день/неделю/месяц: какая доля пользователей из когорты вернулась через N периодов.</p>
+      <p>Retention Rate на N-й день/неделю/месяц: какая доля пользователей из <a class="glossary-link" onclick="App.selectTopic('glossary-cohort-analysis')">когорты</a> вернулась через N периодов.</p>
       <div class="math-block">$$\\text{Retention}_N = \\frac{\\text{вернулись на } N\\text{-й день}}{\\text{стартовали в день 0}}$$</div>
       <p><b>Retention curve</b> — график retention по времени. Кривая обычно резко падает в первые дни, потом стабилизируется. Форма важнее абсолютных цифр.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Retention Curve: три типичные формы</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Что происходит с когортой со временем (день 0 = 100%)</text>
+          <line x1="80" y1="280" x2="720" y2="280" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="60" x2="80" y2="280" stroke="#475569" stroke-width="1.5"/>
+          <g font-size="11" fill="#64748b" text-anchor="end">
+            <text x="75" y="284">0%</text>
+            <text x="75" y="240">20%</text>
+            <text x="75" y="196">40%</text>
+            <text x="75" y="152">60%</text>
+            <text x="75" y="108">80%</text>
+            <text x="75" y="64">100%</text>
+          </g>
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="80" y="300">D0</text>
+            <text x="180" y="300">D1</text>
+            <text x="280" y="300">D3</text>
+            <text x="380" y="300">D7</text>
+            <text x="505" y="300">D14</text>
+            <text x="720" y="300">D30</text>
+          </g>
+          <text x="380" y="322" text-anchor="middle" font-size="12" fill="#64748b">дни с момента первого визита</text>
+          <path d="M80,64 L180,180 L280,230 L380,255 L505,268 L720,275" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <path d="M80,64 L180,130 L280,155 L380,170 L505,175 L720,178" fill="none" stroke="#059669" stroke-width="3"/>
+          <path d="M80,64 L180,155 L280,185 L380,205 L505,218 L720,230" fill="none" stroke="#d97706" stroke-width="3"/>
+          <g>
+            <circle cx="180" cy="130" r="4" fill="#059669"/>
+            <circle cx="280" cy="155" r="4" fill="#059669"/>
+            <circle cx="380" cy="170" r="4" fill="#059669"/>
+            <circle cx="505" cy="175" r="4" fill="#059669"/>
+            <circle cx="720" cy="178" r="4" fill="#059669"/>
+            <circle cx="180" cy="155" r="4" fill="#d97706"/>
+            <circle cx="280" cy="185" r="4" fill="#d97706"/>
+            <circle cx="380" cy="205" r="4" fill="#d97706"/>
+            <circle cx="505" cy="218" r="4" fill="#d97706"/>
+            <circle cx="720" cy="230" r="4" fill="#d97706"/>
+            <circle cx="180" cy="180" r="4" fill="#dc2626"/>
+            <circle cx="280" cy="230" r="4" fill="#dc2626"/>
+            <circle cx="380" cy="255" r="4" fill="#dc2626"/>
+            <circle cx="505" cy="268" r="4" fill="#dc2626"/>
+            <circle cx="720" cy="275" r="4" fill="#dc2626"/>
+          </g>
+          <g font-size="12" font-weight="600">
+            <line x1="440" y1="75" x2="460" y2="75" stroke="#059669" stroke-width="3"/>
+            <text x="465" y="79" fill="#059669">Здоровый продукт (стабилизация ~50%)</text>
+            <line x1="440" y1="100" x2="460" y2="100" stroke="#d97706" stroke-width="3"/>
+            <text x="465" y="104" fill="#d97706">Средний (медленное угасание)</text>
+            <line x1="440" y1="125" x2="460" y2="125" stroke="#dc2626" stroke-width="3"/>
+            <text x="465" y="129" fill="#dc2626">Leaky bucket (утечка до 0)</text>
+          </g>
+        </svg>
+        <div class="caption">3 типичные формы кривой retention. <b>Зелёная</b> — признак Product-Market Fit: резкое падение в первые дни, потом стабилизация. <b>Жёлтая</b> — «медленная смерть». <b>Красная</b> — дырявое ведро, пользователи уходят почти сразу.</div>
+      </div>
 
       <h4>Churn Rate</h4>
       <p>Churn — обратная сторона retention: доля пользователей, покинувших продукт за период.</p>

@@ -397,6 +397,92 @@ const App = (function () {
       const el = container.querySelector(`#${id}`);
       if (el) el.setAttribute('d', d);
     },
+
+    // Student's t PDF (unnormalised for plotting).
+    // f(t; ν) = (1 + t²/ν)^(−(ν+1)/2)
+    // Возвращает открытую полилинию
+    tDistOutline(cx, baselineY, peakY, halfWidth, df = 5, sigmaUnits = 4, n = 150) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = -sigmaUnits + (2 * sigmaUnits * i) / n;
+        const x = cx + (t / sigmaUnits) * halfWidth;
+        const pdf = Math.pow(1 + (t * t) / df, -(df + 1) / 2);
+        const y = baselineY - pdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
+
+    // Beta distribution PDF (unnormalised, scaled so peak at mode = 1)
+    // Используется для байесовских постериоров: Beta(α, β)
+    // x0..x1 — пиксельный диапазон для [0, 1]
+    betaOutline(x0, x1, baselineY, peakY, alpha, beta, n = 200) {
+      // Find the mode to normalise peak height
+      let mode = (alpha - 1) / (alpha + beta - 2);
+      if (alpha < 1 || beta < 1) mode = 0.5;
+      mode = Math.max(0.001, Math.min(0.999, mode));
+      const peakPdf = Math.pow(mode, alpha - 1) * Math.pow(1 - mode, beta - 1);
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const u = i / n;  // parameter in [0, 1]
+        // Skip pathological endpoints
+        const uu = Math.max(0.0001, Math.min(0.9999, u));
+        const pdf = Math.pow(uu, alpha - 1) * Math.pow(1 - uu, beta - 1);
+        const normPdf = Math.min(1, pdf / peakPdf);
+        const x = x0 + (x1 - x0) * u;
+        const y = baselineY - normPdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
+
+    betaAreaPath(x0, x1, baselineY, peakY, alpha, beta, n = 200) {
+      let mode = (alpha - 1) / (alpha + beta - 2);
+      if (alpha < 1 || beta < 1) mode = 0.5;
+      mode = Math.max(0.001, Math.min(0.999, mode));
+      const peakPdf = Math.pow(mode, alpha - 1) * Math.pow(1 - mode, beta - 1);
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const u = i / n;
+        const uu = Math.max(0.0001, Math.min(0.9999, u));
+        const pdf = Math.pow(uu, alpha - 1) * Math.pow(1 - uu, beta - 1);
+        const normPdf = Math.min(1, pdf / peakPdf);
+        const x = x0 + (x1 - x0) * u;
+        const y = baselineY - normPdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${baselineY}`;
+      for (const [x, y] of pts) d += ` L${x},${y}`;
+      d += ` L${pts[pts.length - 1][0]},${baselineY} Z`;
+      return d;
+    },
+
+    // Chi-square PDF (unnormalised, peak at mode = 1)
+    // f(x; k) = x^(k/2 - 1) * exp(-x/2)
+    // xMax — максимум по оси x (в единицах распределения)
+    chiSquareOutline(x0, x1, baselineY, peakY, k, xMax = 15, n = 200) {
+      // Mode is at (k-2) for k >= 2, else 0
+      const mode = Math.max(0.01, k - 2);
+      const peakPdf = Math.pow(mode, k / 2 - 1) * Math.exp(-mode / 2);
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const xData = (xMax * i) / n;
+        const x = x0 + ((x1 - x0) * i) / n;
+        // Avoid x^0 issues; at xData=0 and k=2, f=0.5
+        const xx = Math.max(0.001, xData);
+        const pdf = Math.pow(xx, k / 2 - 1) * Math.exp(-xx / 2);
+        const normPdf = Math.min(1.05, pdf / peakPdf);
+        const y = baselineY - Math.max(0, normPdf) * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
     // Нормальное CDF (приближение)
     normalCDF(x, mu = 0, sigma = 1) {
       const z = (x - mu) / (sigma * Math.sqrt(2));
