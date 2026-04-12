@@ -392,6 +392,52 @@ const App = (function () {
       return d;
     },
 
+    // Log-normal PDF — гладкая правосторонне скошенная кривая.
+    // x0 — пиксель, соответствующий x=0 (начало оси)
+    // x1 — правый край
+    // mu, sigma — параметры log-normal (не средние!)
+    // Мода = exp(mu - sigma^2), пик нормализуется до peakY.
+    logNormalOutline(x0, x1, baselineY, peakY, mu, sigma, xMax, n = 200) {
+      const mode = Math.exp(mu - sigma * sigma);
+      const peakPdf = (1 / (mode * sigma * Math.sqrt(2 * Math.PI))) *
+                       Math.exp(-Math.pow(Math.log(mode) - mu, 2) / (2 * sigma * sigma));
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const xData = (xMax * i) / n;
+        const x = x0 + ((x1 - x0) * i) / n;
+        if (xData <= 0.001) { pts.push([Math.round(x), baselineY]); continue; }
+        const pdf = (1 / (xData * sigma * Math.sqrt(2 * Math.PI))) *
+                     Math.exp(-Math.pow(Math.log(xData) - mu, 2) / (2 * sigma * sigma));
+        const normPdf = Math.min(1, pdf / peakPdf);
+        const y = baselineY - normPdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+      return d;
+    },
+
+    logNormalArea(x0, x1, baselineY, peakY, mu, sigma, xMax, n = 200) {
+      const mode = Math.exp(mu - sigma * sigma);
+      const peakPdf = (1 / (mode * sigma * Math.sqrt(2 * Math.PI))) *
+                       Math.exp(-Math.pow(Math.log(mode) - mu, 2) / (2 * sigma * sigma));
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const xData = (xMax * i) / n;
+        const x = x0 + ((x1 - x0) * i) / n;
+        if (xData <= 0.001) { pts.push([Math.round(x), baselineY]); continue; }
+        const pdf = (1 / (xData * sigma * Math.sqrt(2 * Math.PI))) *
+                     Math.exp(-Math.pow(Math.log(xData) - mu, 2) / (2 * sigma * sigma));
+        const normPdf = Math.min(1, pdf / peakPdf);
+        const y = baselineY - normPdf * (baselineY - peakY);
+        pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+      }
+      let d = `M${pts[0][0]},${baselineY}`;
+      for (const [x, y] of pts) d += ` L${x},${y}`;
+      d += ` L${pts[pts.length - 1][0]},${baselineY} Z`;
+      return d;
+    },
+
     // Утилита: вставить path в SVG с указанным id (внутри container)
     setPath(container, id, d) {
       const el = container.querySelector(`#${id}`);

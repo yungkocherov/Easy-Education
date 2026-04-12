@@ -180,8 +180,15 @@ App.registerTopic({
       </table>
 
       <p>Формула для <b>z-теста пропорций</b> (двусторонний, одинаковые группы):</p>
-      <div class="math-block">$$n = \\frac{(z_{\\alpha/2} + z_{\\beta})^2 \\cdot (p_1(1-p_1) + p_2(1-p_2))}{(p_2 - p_1)^2}$$</div>
-      <p>где $z_{0.025} = 1.96$ и $z_{0.2} = 0.84$ при стандартных α=0.05, β=0.20.</p>
+      <div class="math-block">$$n = \\frac{(z_{\\alpha/2} + z_{\\beta})^2 \\cdot 2\\bar{p}(1-\\bar{p})}{\\Delta^2}$$</div>
+      <p>где:</p>
+      <ul>
+        <li>$\\bar{p} = \\frac{p_1 + p_2}{2}$ — средняя конверсия обеих групп (≈ baseline конверсия)</li>
+        <li>$\\Delta = p_2 - p_1$ — <b>MDE</b>, минимальный эффект, который хотим обнаружить</li>
+        <li>$z_{\\alpha/2} = 1.96$ при α = 0.05 (двусторонний)</li>
+        <li>$z_{\\beta} = 0.84$ при power = 80% (β = 0.20)</li>
+      </ul>
+      <p>Упрощение: $n \\approx \\frac{16 \\cdot \\bar{p}(1-\\bar{p})}{\\Delta^2}$ при стандартных α=0.05 и power=80%.</p>
 
       <div class="key-concept">
         <div class="kc-label">MDE — минимальный детектируемый эффект</div>
@@ -266,50 +273,51 @@ App.registerTopic({
           <!-- Nominal α = 5% line -->
           <line x1="80" y1="240" x2="720" y2="240" stroke="#059669" stroke-width="1.5" stroke-dasharray="5,3"/>
           <text x="715" y="235" text-anchor="end" font-size="11" fill="#059669" font-weight="600">заявленная α = 5%</text>
-          <!-- Realistic (capped) curve 1 - (1-0.05)^n, n=1..25 -->
-          <!-- y(n) = 260 - 400 * (1 - 0.95^n)   (scale 50% = 200 px) -->
-          <path d="
-            M110,252
-            L135,247
-            L160,242
-            L185,238
-            L210,233
-            L235,228
-            L260,223
-            L285,219
-            L310,215
-            L335,211
-            L360,207
-            L385,203
-            L410,199
-            L435,196
-            L460,192
-            L485,189
-            L510,185
-            L535,182
-            L560,179
-            L585,176
-            L610,174
-            L635,171
-            L660,168
-            L685,166
-            L710,163
-          " fill="none" stroke="#dc2626" stroke-width="3"/>
-          <!-- Dots on curve -->
-          <circle cx="110" cy="252" r="3" fill="#dc2626"/>
-          <circle cx="210" cy="233" r="3" fill="#dc2626"/>
-          <circle cx="335" cy="211" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
-          <circle cx="460" cy="192" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
-          <circle cx="585" cy="176" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
-          <!-- Annotations on dots -->
-          <text x="335" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~14%</text>
-          <text x="460" y="181" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~22%</text>
-          <text x="585" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">~29%</text>
+          <!-- Generated curve (computed by script below) -->
+          <path id="peek-curve" d="" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <!-- Key point markers (positioned by script) -->
+          <circle id="peek-pt1" cx="0" cy="0" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+          <text id="peek-lbl1" x="0" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">5%</text>
+          <circle id="peek-pt10" cx="0" cy="0" r="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+          <text id="peek-lbl10" x="0" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">40%</text>
+          <circle id="peek-pt20" cx="0" cy="0" r="5" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+          <text id="peek-lbl20" x="0" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">64%</text>
           <!-- Axis labels -->
           <text x="380" y="305" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600">Число проверок теста (дней)</text>
           <text x="30" y="160" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-90 30 160)">Реальная P(ложного срабатывания)</text>
         </svg>
-        <div class="caption">При каждой «проверке» теста шанс случайно получить p &lt; 0.05 накапливается. На 10-й проверке реальная ошибка уже ~14%, на 20-й — ~29%. Решение: зафиксируй n заранее и не подглядывай.</div>
+        <div class="caption">При каждой «проверке» теста шанс случайно получить p &lt; 0.05 накапливается. При 1 проверке — ровно 5% (как заявлено). При 10 — уже 40%. При 20 — 64%. Решение: зафиксируй n заранее и не подглядывай.</div>
+        <script>
+        (function() {
+          // P(≥1 false positive) = 1 - (1-α)^n, α = 0.05
+          // x: n=1..25 → pixel 110..710
+          // y: P=0..50% → pixel 260..60
+          var x0 = 80, x1 = 720, y0 = 260, y1 = 60;
+          function nToX(n) { return x0 + ((n - 0) / 25) * (x1 - x0); }
+          function pToY(p) { return y0 - (p / 0.5) * (y0 - y1); }
+          var pts = [];
+          for (var n = 1; n <= 25; n++) {
+            var p = 1 - Math.pow(0.95, n);
+            pts.push([nToX(n).toFixed(1), pToY(p).toFixed(1)]);
+          }
+          var d = 'M' + pts[0][0] + ',' + pts[0][1];
+          for (var i = 1; i < pts.length; i++) d += ' L' + pts[i][0] + ',' + pts[i][1];
+          document.getElementById('peek-curve').setAttribute('d', d);
+          // Place markers: n=1 (5%), n=10 (40%), n=20 (64%)
+          function place(n, circleId, labelId, text) {
+            var p = 1 - Math.pow(0.95, n);
+            var x = nToX(n), y = pToY(p);
+            var c = document.getElementById(circleId);
+            c.setAttribute('cx', x); c.setAttribute('cy', y);
+            var l = document.getElementById(labelId);
+            l.setAttribute('x', x); l.setAttribute('y', y - 12);
+            l.textContent = text;
+          }
+          place(1, 'peek-pt1', 'peek-lbl1', '5%');
+          place(10, 'peek-pt10', 'peek-lbl10', '40%');
+          place(20, 'peek-pt20', 'peek-lbl20', '64%');
+        })();
+        </script>
       </div>
 
       <div class="callout warn">⚠️ Если проверять каждый день 20 дней, вероятность ложно-положительного результата при H₀ составит не 5%, а ~30–40%. Это не анализ — это рулетка.</div>

@@ -188,69 +188,35 @@ App.registerTopic({
           var U = App.Util;
           // Симметричное: обычная нормальная, центр 455, halfWidth 110
           U.setPath(document, 'ds-skew-sym', U.normalOutlinePath(455, 240, 60, 110));
-          // Левый скос — это «нормальная», смещённая так, что хвост слева.
-          // Мы рисуем кривую с пиком справа от центра панели.
-          // Пик у x=200 (мода), длинный хвост идёт влево.
-          // Используем экспоненциальную с инверсией для левого хвоста.
-          var leftSkew = buildLeftSkewPath(155, 240, 60, 200);
-          document.getElementById('ds-skew-left').setAttribute('d', leftSkew);
-          var rightSkew = buildRightSkewPath(755, 240, 60, 705);
-          document.getElementById('ds-skew-right').setAttribute('d', rightSkew);
 
-          function buildRightSkewPath(centerPanelX, baselineY, peakY, modeX) {
-            // Лог-нормально-подобная форма: быстрый рост от 0 до моды, медленный спад
-            // x от modeX-60 до modeX+170
-            var pts = [];
-            var x0 = modeX - 60;
-            var x1 = modeX + 175;
-            var n = 150;
+          // Правый скос: log-normal (гладкая, без угла на пике)
+          // mu=1.0, sigma=0.5 → mode≈2.22, median≈2.72, mean≈3.14
+          U.setPath(document, 'ds-skew-right', U.logNormalArea(640, 880, 240, 60, 1.0, 0.5, 12));
+
+          // Левый скос: зеркальный log-normal — рисуем log-normal справа налево
+          (function() {
+            var mu = 1.0, sigma = 0.5, xMax = 12;
+            var mode = Math.exp(mu - sigma * sigma);
+            var peakPdf = (1 / (mode * sigma * Math.sqrt(2 * Math.PI))) *
+                           Math.exp(-Math.pow(Math.log(mode) - mu, 2) / (2 * sigma * sigma));
+            var x0px = 30, x1px = 270, baselineY = 240, peakY = 60;
+            var pts = [], n = 200;
             for (var i = 0; i <= n; i++) {
-              var x = x0 + (x1 - x0) * i / n;
-              var t = (x - modeX) / 50; // нормализованный
-              var pdf;
-              if (t < -1) {
-                pdf = 0;
-              } else if (t < 0) {
-                // Быстрый подъём слева от моды
-                pdf = Math.pow(1 + t, 4);
-              } else {
-                // Медленный экспоненциальный спад
-                pdf = Math.exp(-t * 1.0);
-              }
-              var y = baselineY - pdf * (baselineY - peakY);
+              var xData = (xMax * i) / n;
+              // Mirror: map high xData to LEFT pixel, low xData to RIGHT pixel
+              var x = x1px - ((x1px - x0px) * i) / n;
+              if (xData <= 0.001) { pts.push([Math.round(x), baselineY]); continue; }
+              var pdf = (1 / (xData * sigma * Math.sqrt(2 * Math.PI))) *
+                         Math.exp(-Math.pow(Math.log(xData) - mu, 2) / (2 * sigma * sigma));
+              var normPdf = Math.min(1, pdf / peakPdf);
+              var y = baselineY - normPdf * (baselineY - peakY);
               pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
             }
             var d = 'M' + pts[0][0] + ',' + baselineY;
             for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
             d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
-            return d;
-          }
-
-          function buildLeftSkewPath(centerPanelX, baselineY, peakY, modeX) {
-            // Зеркальный
-            var pts = [];
-            var x0 = modeX - 175;
-            var x1 = modeX + 60;
-            var n = 150;
-            for (var i = 0; i <= n; i++) {
-              var x = x0 + (x1 - x0) * i / n;
-              var t = (x - modeX) / 50;
-              var pdf;
-              if (t > 1) {
-                pdf = 0;
-              } else if (t > 0) {
-                pdf = Math.pow(1 - t, 4);
-              } else {
-                pdf = Math.exp(t * 1.0);
-              }
-              var y = baselineY - pdf * (baselineY - peakY);
-              pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
-            }
-            var d = 'M' + pts[0][0] + ',' + baselineY;
-            for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
-            d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
-            return d;
-          }
+            document.getElementById('ds-skew-left').setAttribute('d', d);
+          })();
         })();
         </script>
       </div>

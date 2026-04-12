@@ -77,31 +77,20 @@ App.registerTopic({
           U.setPath(document, 'dist-intro-normal-area', U.normalSegmentPath(200, 240, 60, 150, -3, 3));
           U.setPath(document, 'dist-intro-normal', U.normalOutlinePath(200, 240, 60, 150));
 
-          // Right-skewed: use custom path builder
-          var modeX = 560;  // mode position
-          var x0 = modeX - 80, x1 = modeX + 300;
-          var baselineY = 240, peakY = 60;
-          var n = 200;
-          var pts = [];
-          for (var i = 0; i <= n; i++) {
-            var x = x0 + (x1 - x0) * i / n;
-            var t = (x - modeX) / 60;
-            var pdf;
-            if (t < -1.2) pdf = 0;
-            else if (t < 0) pdf = Math.pow(1 + t / 1.2, 4);
-            else pdf = Math.exp(-t * 0.8);
-            var y = baselineY - pdf * (baselineY - peakY);
-            pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
-          }
-          var d = 'M' + pts[0][0] + ',' + baselineY;
-          for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
-          d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
-          document.getElementById('dist-intro-skew').setAttribute('d', d);
+          // Right-skewed: log-normal (smooth, no angular peak)
+          // mu=1.0, sigma=0.5 gives nice right-skew; xMax=12 covers the tail
+          var skewMu = 1.0, skewSigma = 0.5, skewXmax = 12;
+          document.getElementById('dist-intro-skew').setAttribute('d',
+            U.logNormalArea(460, 870, 240, 60, skewMu, skewSigma, skewXmax));
 
-          // Position mode, median, mean lines
-          var modePx = modeX;
-          var medianPx = modeX + 50;
-          var meanPx = modeX + 100;
+          // Compute mode, median, mean in data coords, then map to pixels
+          var skewMode = Math.exp(skewMu - skewSigma * skewSigma);   // ~2.22
+          var skewMedian = Math.exp(skewMu);                          // ~2.72
+          var skewMean = Math.exp(skewMu + skewSigma * skewSigma / 2); // ~3.14
+          function dataToX(val) { return 460 + (val / skewXmax) * (870 - 460); }
+          var modePx = dataToX(skewMode);
+          var medianPx = dataToX(skewMedian);
+          var meanPx = dataToX(skewMean);
           function setLine(id, x) {
             var el = document.getElementById(id);
             el.setAttribute('x1', x); el.setAttribute('x2', x);
