@@ -66,8 +66,9 @@ App.registerTopic({
           <text x="510" y="140" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">N</text>
           <!-- Expected formula -->
           <rect x="20" y="158" width="520" height="34" rx="6" fill="#fef9c3"/>
-          <text x="280" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#713f12">Ожидаемая частота:</text>
-          <text x="280" y="186" text-anchor="middle" font-size="11" fill="#713f12">E_{ij} = (Rᵢ × Cⱼ) / N     (строка_итого × столбец_итого / общий_итого)</text>
+          <text x="280" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#713f12">Ожидаемая частота:</text>
+          <text x="280" y="188" text-anchor="middle" font-size="12" fill="#713f12">Eᵢⱼ = (Rᵢ × Cⱼ) / N</text>
+          <text x="280" y="203" text-anchor="middle" font-size="10" fill="#92400e">(строка_итого × столбец_итого / общий_итого)</text>
         </svg>
         <div class="caption">Таблица r×c. R_i — итого строки i, C_j — итого столбца j, N — общий итог. Ожидаемые частоты показывают, как выглядели бы данные при полной независимости группы и исхода.</div>
       </div>

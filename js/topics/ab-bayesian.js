@@ -82,7 +82,7 @@ App.registerTopic({
             <line x1="460" y1="75" x2="485" y2="75" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
             <text x="492" y="79" fill="#64748b">Prior Beta(1,1)</text>
             <line x1="460" y1="97" x2="485" y2="97" stroke="#60a5fa" stroke-width="2.5"/>
-            <text x="492" y="101" fill="#60a5fa">после 10 наблюдений (1 успех)</text>
+            <text x="492" y="101" fill="#60a5fa">после 50 наблюдений (3 успеха)</text>
             <line x1="460" y1="119" x2="485" y2="119" stroke="#3b82f6" stroke-width="2.5"/>
             <text x="492" y="123" fill="#3b82f6">после 100 (6 успехов)</text>
             <line x1="460" y1="141" x2="485" y2="141" stroke="#1d4ed8" stroke-width="2.5"/>
@@ -136,7 +136,7 @@ App.registerTopic({
           var x0 = 60, x1 = 720;
           var tMin = 0, tMax = 0.2;
           // Prior Beta(1,1) → after k successes, n trials: Beta(1+k, 1+n-k)
-          document.getElementById('bab-p10').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 1, 1 + 9));
+          document.getElementById('bab-p10').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 3, 1 + 47));
           document.getElementById('bab-p100').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 6, 1 + 94));
           document.getElementById('bab-p500').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 30, 1 + 470));
           document.getElementById('bab-p2000').setAttribute('d', betaOnRange(tMin, tMax, x0, x1, baselineY, peakY, 1 + 120, 1 + 1880));

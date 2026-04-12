@@ -66,12 +66,12 @@ App.registerTopic({
           <path id="zt-outline" d="" fill="none" stroke="#4338ca" stroke-width="2.8"/>
           <!-- z = 0 center line -->
           <line x1="380" y1="70" x2="380" y2="248" stroke="#475569" stroke-width="1.2" stroke-dasharray="4,3"/>
-          <text x="380" y="262" text-anchor="middle" font-size="12" fill="#475569" font-weight="700">0</text>
+          <text x="380" y="256" text-anchor="middle" font-size="12" fill="#475569" font-weight="700">0</text>
           <!-- Critical lines ±1.96 -->
           <line id="zt-line-left" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
           <line id="zt-line-right" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,3"/>
-          <text id="zt-label-left" x="0" y="262" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">−1.96</text>
-          <text id="zt-label-right" x="0" y="262" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">+1.96</text>
+          <text id="zt-label-left" x="0" y="256" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">−1.96</text>
+          <text id="zt-label-right" x="0" y="256" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">+1.96</text>
           <!-- Middle label -->
           <text x="380" y="130" text-anchor="middle" font-size="18" font-weight="800" fill="#4f46e5">95%</text>
           <text x="380" y="152" text-anchor="middle" font-size="12" fill="#4f46e5">не отвергаем H₀</text>
@@ -80,7 +80,7 @@ App.registerTopic({
           <text x="650" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">α/2 = 2.5%</text>
           <!-- Sample z = 2.43 marker -->
           <line id="zt-sample" x1="0" y1="0" x2="0" y2="0" stroke="#f97316" stroke-width="3"/>
-          <text id="zt-sample-label" x="0" y="285" text-anchor="middle" font-size="12" font-weight="700" fill="#f97316">наш z = 2.43</text>
+          <text id="zt-sample-label" x="0" y="270" text-anchor="middle" font-size="12" font-weight="700" fill="#f97316">наш z = 2.43</text>
         </svg>
         <div class="caption">z-распределение при H₀. Красные хвосты — область отвержения (каждая 2.5% при α=0.05). Оранжевая линия — пример z=2.43, который попадает в правый хвост: отвергаем H₀, p ≈ 0.015.</div>
         <script>
@@ -97,10 +97,10 @@ App.registerTopic({
           var critY = baselineY - Math.exp(-0.5 * 1.96 * 1.96) * (baselineY - peakY);
           var lL = document.getElementById('zt-line-left');
           lL.setAttribute('x1', leftX); lL.setAttribute('x2', leftX);
-          lL.setAttribute('y1', critY); lL.setAttribute('y2', baselineY + 8);
+          lL.setAttribute('y1', critY); lL.setAttribute('y2', baselineY);
           var lR = document.getElementById('zt-line-right');
           lR.setAttribute('x1', rightX); lR.setAttribute('x2', rightX);
-          lR.setAttribute('y1', critY); lR.setAttribute('y2', baselineY + 8);
+          lR.setAttribute('y1', critY); lR.setAttribute('y2', baselineY);
           document.getElementById('zt-label-left').setAttribute('x', leftX);
           document.getElementById('zt-label-right').setAttribute('x', rightX);
           // Sample z = 2.43 marker
@@ -108,7 +108,7 @@ App.registerTopic({
           var sampleY = baselineY - Math.exp(-0.5 * 2.43 * 2.43) * (baselineY - peakY);
           var ls = document.getElementById('zt-sample');
           ls.setAttribute('x1', sampleX); ls.setAttribute('x2', sampleX);
-          ls.setAttribute('y1', sampleY); ls.setAttribute('y2', baselineY + 25);
+          ls.setAttribute('y1', sampleY); ls.setAttribute('y2', baselineY);
           document.getElementById('zt-sample-label').setAttribute('x', sampleX);
         })();
         </script>

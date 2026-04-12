@@ -144,11 +144,21 @@ App.registerTopic({
         <script>
         (function() {
           var U = App.Util;
-          var cx = 380, baselineY = 260, peakY = 80, halfWidth = 250;
-          U.setPath(document, 'tt-dist-n', U.normalOutlinePath(cx, baselineY, peakY, halfWidth, 4));
-          U.setPath(document, 'tt-dist-30', U.tDistOutline(cx, baselineY, peakY, halfWidth, 30, 4));
-          U.setPath(document, 'tt-dist-5', U.tDistOutline(cx, baselineY, peakY, halfWidth, 5, 4));
-          U.setPath(document, 'tt-dist-2', U.tDistOutline(cx, baselineY, peakY, halfWidth, 2, 4));
+          var cx = 380, baselineY = 260, halfWidth = 250;
+          // Normal PDF peak at t=0: 1/sqrt(2π) ≈ 0.399
+          // t-dist peak at t=0: Γ((ν+1)/2) / (√(νπ) · Γ(ν/2))
+          // Ratio t_peak / normal_peak determines relative height
+          var normalPeak = 1;  // reference
+          // Approximate peak ratios: df=2 → ~0.85, df=5 → ~0.94, df=30 → ~0.995
+          var peakN = 80;  // Normal peak y-coordinate (highest)
+          // Scale other peaks proportionally (lower = higher y value in SVG)
+          var peak2  = baselineY - 0.64 * (baselineY - peakN);  // df=2: much flatter → 145
+          var peak5  = baselineY - 0.87 * (baselineY - peakN);  // df=5: slightly flatter → 103
+          var peak30 = baselineY - 0.99 * (baselineY - peakN);  // df=30: almost same → 82
+          U.setPath(document, 'tt-dist-n',  U.normalOutlinePath(cx, baselineY, peakN, halfWidth, 4));
+          U.setPath(document, 'tt-dist-30', U.tDistOutline(cx, baselineY, peak30, halfWidth, 30, 4));
+          U.setPath(document, 'tt-dist-5',  U.tDistOutline(cx, baselineY, peak5, halfWidth, 5, 4));
+          U.setPath(document, 'tt-dist-2',  U.tDistOutline(cx, baselineY, peak2, halfWidth, 2, 4));
         })();
         </script>
       </div>

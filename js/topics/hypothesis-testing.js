@@ -96,10 +96,10 @@ App.registerTopic({
           var critY = baselineY - Math.exp(-0.5 * 4) * (baselineY - peakY);
           var l = document.getElementById('ht-line-left');
           l.setAttribute('x1', leftX); l.setAttribute('x2', leftX);
-          l.setAttribute('y1', critY); l.setAttribute('y2', baselineY + 8);
+          l.setAttribute('y1', critY); l.setAttribute('y2', baselineY);
           var r = document.getElementById('ht-line-right');
           r.setAttribute('x1', rightX); r.setAttribute('x2', rightX);
-          r.setAttribute('y1', critY); r.setAttribute('y2', baselineY + 8);
+          r.setAttribute('y1', critY); r.setAttribute('y2', baselineY);
           document.getElementById('ht-label-left').setAttribute('x', leftX);
           document.getElementById('ht-label-right').setAttribute('x', rightX);
         })();
@@ -187,7 +187,7 @@ App.registerTopic({
           var statY = baselineY - Math.exp(-0.5 * 1.7 * 1.7) * (baselineY - peakY);
           var l = document.getElementById('pv-stat-line');
           l.setAttribute('x1', statX); l.setAttribute('x2', statX);
-          l.setAttribute('y1', statY); l.setAttribute('y2', baselineY + 8);
+          l.setAttribute('y1', statY); l.setAttribute('y2', baselineY);
           document.getElementById('pv-stat-label').setAttribute('x', statX);
         })();
         </script>
