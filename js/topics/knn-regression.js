@@ -17,7 +17,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 210" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+        <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
           <text x="250" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">kNN регрессия: k=3, предсказываем цену квартиры</text>
           <!-- Axes -->
           <line x1="50" y1="30" x2="50" y2="170" stroke="#64748b" stroke-width="1.5"/>

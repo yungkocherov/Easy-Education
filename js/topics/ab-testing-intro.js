@@ -108,7 +108,7 @@ App.registerTopic({
       </table>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
           <defs>
             <marker id="arrFlow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
               <path d="M0,0 L7,3.5 L0,7 Z" fill="#64748b"/>
@@ -130,9 +130,9 @@ App.registerTopic({
           <text x="482" y="51" text-anchor="middle" font-size="10" font-weight="600" fill="#713f12">ANOVA /</text>
           <text x="482" y="65" text-anchor="middle" font-size="10" fill="#713f12">Хи-квадрат</text>
           <!-- Q2: What type? -->
-          <rect x="55" y="100" width="170" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <rect x="35" y="100" width="210" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
           <text x="140" y="116" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Тип метрики?</text>
-          <text x="140" y="130" text-anchor="middle" font-size="10" fill="#1e40af">бинарная / непрерывная / категориальная</text>
+          <text x="140" y="130" text-anchor="middle" font-size="9" fill="#1e40af">бинарная / непрерывная / категориальная</text>
           <line x1="140" y1="72" x2="140" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
           <!-- Binary branch -->
           <line x1="90" y1="138" x2="60" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>

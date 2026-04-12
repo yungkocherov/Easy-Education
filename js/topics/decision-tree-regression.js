@@ -17,7 +17,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 520 215" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+        <svg viewBox="0 0 520 235" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
           <text x="260" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево регрессии: разбиение пространства</text>
           <!-- Left panel: tree structure -->
           <rect x="10" y="25" width="230" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>

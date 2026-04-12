@@ -34,7 +34,7 @@ App.registerTopic({
       <p>Данные организуются в таблицу $r \\times c$, где $r$ — число вариантов (групп), $c$ — число категорий исходов:</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 560 215" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
           <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Структура таблицы сопряжённости</text>
           <!-- Table header -->
           <rect x="20" y="28" width="520" height="32" rx="4" fill="#dbeafe"/>

@@ -49,10 +49,10 @@ App.registerTopic({
           <text x="200" y="131" text-anchor="middle" font-size="10" font-weight="600" fill="#5b21b6">SVM</text>
           <text x="200" y="144" text-anchor="middle" font-size="9" fill="#5b21b6">Модель 3</text>
 
-          <!-- Lines to predictions -->
-          <line x1="250" y1="37" x2="310" y2="90" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <line x1="250" y1="85" x2="310" y2="90" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <line x1="250" y1="133" x2="310" y2="90" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- Lines from models to meta-features -->
+          <path d="M250,37 C280,37 280,78 310,78" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <path d="M250,85 L310,90" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <path d="M250,133 C280,133 280,105 310,105" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"/>
 
           <!-- Level 0 predictions (meta-features) -->
           <rect x="310" y="65" width="90" height="55" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
