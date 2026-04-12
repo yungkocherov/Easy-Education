@@ -77,7 +77,7 @@ App.registerTopic({
       <p>Минимум, Q1, медиана, Q3, максимум — даёт быстрое понимание всей формы распределения. Графически это отображается как <span class="term" data-tip="Графическое представление пятёрки чисел: ящик — от Q1 до Q3, линия внутри — медиана, усы — до крайних «нормальных» значений, точки — выбросы."><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">boxplot</a></span>.</p>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 560 190" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
           <!-- Horizontal axis -->
           <line x1="40" y1="130" x2="520" y2="130" stroke="#64748b" stroke-width="1.5"/>
           <!-- Whisker left: min to Q1 -->
@@ -737,7 +737,9 @@ Max = 120 (выброс!)</div>
           const iqr = q3 - q1;
 
           // <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> с фиксированным range
-          const histRange = [-20, Math.max(outVal + 20, 120)];
+          const dataMin = App.Util.min(data);
+          const dataMax = App.Util.max(data);
+          const histRange = [Math.floor(dataMin - 5), Math.ceil(dataMax + 5)];
           const hist = App.Util.histogram(data, 40, histRange);
           const ctx = container.querySelector('#dstat-chart').getContext('2d');
           if (chart) chart.destroy();
@@ -765,7 +767,7 @@ Max = 120 (выброс!)</div>
               },
               scales: {
                 x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 15 } },
-                y: { title: { display: true, text: 'Частота' }, min: 0, max: Math.round(n * 0.3), beginAtZero: true },
+                y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
               },
             },
           });

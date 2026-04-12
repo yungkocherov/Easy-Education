@@ -195,7 +195,7 @@ App.registerTopic({
           // σ=2 → высота 45px → peakY = 175
           U.setPath(document, 'dist-mu-narrow',   U.normalOutlinePath(200, 220, 40,  60));
           U.setPath(document, 'dist-mu-standard', U.normalOutlinePath(380, 220, 130, 120));
-          U.setPath(document, 'dist-mu-wide',     U.normalOutlinePath(560, 220, 175, 240));
+          U.setPath(document, 'dist-mu-wide',     U.normalOutlinePath(560, 220, 175, 195));
         })();
         </script>
       </div>
@@ -919,11 +919,11 @@ T ~ Exp(λ = 4), в часах</div>
           const isDiscrete = type === 'binomial' || type === 'poisson';
           // Фиксированный range <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> по типу распределения
           const fixedRange = {
-            normal: [-30, 60],
-            uniform: [-25, 55],
+            normal: [Math.floor(p1 - 4 * p2), Math.ceil(p1 + 4 * p2)],
+            uniform: [Math.floor(p1 - 1), Math.ceil(p2 + 1)],
             binomial: [0, Math.round(p1) + 1],
-            poisson: [0, 40],
-            exp: [0, 15],
+            poisson: [0, Math.max(Math.ceil(p1 + 4 * Math.sqrt(p1)), 10)],
+            exp: [0, Math.max(Math.ceil(5 / p1), 5)],
           }[type];
           const bins = isDiscrete ? Math.min(50, fixedRange[1] - fixedRange[0] + 1) : 50;
           const hist = App.Util.histogram(data, bins, fixedRange);
@@ -948,7 +948,7 @@ T ~ Exp(λ = 4), в часах</div>
               plugins: { legend: { display: false } },
               scales: {
                 x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 15 } },
-                y: { title: { display: true, text: 'Частота' }, min: 0, max: Math.round(n * 0.35), beginAtZero: true },
+                y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
               },
             },
           });

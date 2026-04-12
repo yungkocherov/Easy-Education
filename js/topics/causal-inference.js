@@ -494,7 +494,7 @@ App.registerTopic({
                 annotation: {},
               },
               scales: {
-                x: { type: 'linear', title: { display: true, text: 'Период' } },
+                x: { type: 'linear', title: { display: true, text: 'Период' }, ticks: { callback: function(value) { return value < 4 ? 'До ' + (value + 1) : 'После ' + (value - 3); } } },
                 y: { title: { display: true, text: 'Исход (Y)' } },
               },
             },

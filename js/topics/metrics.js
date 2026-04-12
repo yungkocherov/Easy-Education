@@ -538,7 +538,7 @@ F1        = 2*0.625*1.0/(0.625+1.0) = <b>0.769</b></div>
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' }, title: { display: true, text: 'Распределения предсказанных вероятностей' } },
-              scales: { x: { stacked: true, title: { display: true, text: 'p' } }, y: { stacked: true, min: 0, max: 100 } },
+              scales: { x: { stacked: true, title: { display: true, text: 'p' }, ticks: { maxTicksLimit: 10 } }, y: { stacked: true, beginAtZero: true } },
             },
           });
           App.registerChart(chart);

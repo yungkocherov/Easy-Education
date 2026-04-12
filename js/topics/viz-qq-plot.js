@@ -118,19 +118,19 @@ App.registerTopic({
             <line x1="390" y1="75" x2="390" y2="200" stroke="#94a3b8"/>
             <line x1="390" y1="200" x2="650" y2="75" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
             <!-- Points converge to diagonal in middle, pull toward x-axis at ends -->
-            <circle cx="400" cy="180" r="3" fill="#0284c7"/>
-            <circle cx="420" cy="170" r="3" fill="#0284c7"/>
-            <circle cx="440" cy="158" r="3" fill="#0284c7"/>
-            <circle cx="460" cy="150" r="3" fill="#0284c7"/>
-            <circle cx="480" cy="140" r="3" fill="#0284c7"/>
-            <circle cx="500" cy="133" r="3" fill="#0284c7"/>
-            <circle cx="520" cy="125" r="3" fill="#0284c7"/>
-            <circle cx="540" cy="120" r="3" fill="#0284c7"/>
-            <circle cx="560" cy="115" r="3" fill="#0284c7"/>
-            <circle cx="580" cy="108" r="3" fill="#0284c7"/>
-            <circle cx="600" cy="100" r="3" fill="#0284c7"/>
-            <circle cx="620" cy="98" r="3" fill="#0284c7"/>
-            <circle cx="640" cy="95" r="3" fill="#0284c7"/>
+            <circle cx="400" cy="192" r="3" fill="#0284c7"/>
+            <circle cx="420" cy="178" r="3" fill="#0284c7"/>
+            <circle cx="440" cy="164" r="3" fill="#0284c7"/>
+            <circle cx="460" cy="152" r="3" fill="#0284c7"/>
+            <circle cx="480" cy="142" r="3" fill="#0284c7"/>
+            <circle cx="500" cy="135" r="3" fill="#0284c7"/>
+            <circle cx="520" cy="128" r="3" fill="#0284c7"/>
+            <circle cx="540" cy="122" r="3" fill="#0284c7"/>
+            <circle cx="560" cy="116" r="3" fill="#0284c7"/>
+            <circle cx="580" cy="112" r="3" fill="#0284c7"/>
+            <circle cx="600" cy="108" r="3" fill="#0284c7"/>
+            <circle cx="620" cy="102" r="3" fill="#0284c7"/>
+            <circle cx="640" cy="88" r="3" fill="#0284c7"/>
             <text x="520" y="235" text-anchor="middle" font-size="10" fill="#475569">Крайние значения ближе к центру.</text>
             <text x="520" y="250" text-anchor="middle" font-size="10" fill="#475569">Меньше экстремумов, чем у нормального.</text>
             <text x="520" y="265" text-anchor="middle" font-size="9" fill="#64748b">(Равномерное, ограниченные данные)</text>
@@ -142,20 +142,20 @@ App.registerTopic({
             <line x1="50" y1="390" x2="310" y2="390" stroke="#94a3b8"/>
             <line x1="50" y1="305" x2="50" y2="390" stroke="#94a3b8"/>
             <line x1="50" y1="390" x2="310" y2="305" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
-            <!-- Curve above diagonal on right -->
+            <!-- Curve above diagonal on right (right skew: upper tail stretches up) -->
             <circle cx="60"  cy="388" r="3" fill="#0284c7"/>
-            <circle cx="80"  cy="380" r="3" fill="#0284c7"/>
-            <circle cx="100" cy="372" r="3" fill="#0284c7"/>
-            <circle cx="120" cy="362" r="3" fill="#0284c7"/>
-            <circle cx="140" cy="350" r="3" fill="#0284c7"/>
-            <circle cx="160" cy="340" r="3" fill="#0284c7"/>
-            <circle cx="180" cy="327" r="3" fill="#0284c7"/>
-            <circle cx="200" cy="317" r="3" fill="#0284c7"/>
-            <circle cx="220" cy="305" r="3" fill="#0284c7"/>
-            <circle cx="240" cy="290" r="3" fill="#0284c7"/>
-            <circle cx="260" cy="275" r="3" fill="#0284c7"/>
-            <circle cx="280" cy="260" r="3" fill="#0284c7"/>
-            <circle cx="300" cy="240" r="3" fill="#0284c7"/>
+            <circle cx="80"  cy="382" r="3" fill="#0284c7"/>
+            <circle cx="100" cy="375" r="3" fill="#0284c7"/>
+            <circle cx="120" cy="367" r="3" fill="#0284c7"/>
+            <circle cx="140" cy="358" r="3" fill="#0284c7"/>
+            <circle cx="160" cy="348" r="3" fill="#0284c7"/>
+            <circle cx="180" cy="340" r="3" fill="#0284c7"/>
+            <circle cx="200" cy="333" r="3" fill="#0284c7"/>
+            <circle cx="220" cy="325" r="3" fill="#0284c7"/>
+            <circle cx="240" cy="318" r="3" fill="#0284c7"/>
+            <circle cx="260" cy="312" r="3" fill="#0284c7"/>
+            <circle cx="280" cy="307" r="3" fill="#0284c7"/>
+            <circle cx="300" cy="303" r="3" fill="#0284c7"/>
           </g>
           <!-- LEFT SKEW -->
           <g>

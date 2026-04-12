@@ -473,7 +473,7 @@ p-value (двусторонний) ≈ <b>0.003</b></div>
               responsive: true, maintainAspectRatio: false,
               plugins: {
                 legend: { display: true },
-                title: { display: true, text: 'Перекрытые <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> A и B' },
+                title: { display: true, text: 'Перекрытые гистограммы A и B' },
               },
               scales: {
                 x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } },
@@ -508,62 +508,6 @@ p-value (двусторонний) ≈ <b>0.003</b></div>
         [cN, cMuA, cMuB, cDist].forEach((c) => c.input.addEventListener('change', run));
         [cN, cMuA, cMuB].forEach((c) => c.input.addEventListener('input', run));
         container.querySelector('#mw-run').onclick = run;
-        run();
-      },
-    },
-
-    simulation: {
-      html: `
-        <h3>Ранговый тест Манна-Уитни</h3>
-        <p>Сравни две группы с разными распределениями. Тест работает даже на скошенных данных.</p>
-        <div class="sim-container">
-          <div class="sim-controls" id="abmw-controls"></div>
-          <div class="sim-buttons"><button class="btn" id="abmw-run">🔄 Новый тест</button></div>
-          <div class="sim-output">
-            <div class="sim-chart-wrap"><canvas id="abmw-chart"></canvas></div>
-            <div class="sim-stats" id="abmw-stats"></div>
-          </div>
-        </div>
-      `,
-      init(container) {
-        const controls = container.querySelector('#abmw-controls');
-        const cN = App.makeControl('range', 'abmw-n', 'n на группу', { min: 10, max: 200, step: 5, value: 30 });
-        const cMA = App.makeControl('range', 'abmw-ma', 'Сдвиг A', { min: 0, max: 10, step: 0.5, value: 3 });
-        const cMB = App.makeControl('range', 'abmw-mb', 'Сдвиг B', { min: 0, max: 10, step: 0.5, value: 5 });
-        const cDist = App.makeControl('select', 'abmw-dist', 'Распределение', { options: [{ value: 'exp', label: 'Экспоненциальное (скошенное)' }, { value: 'normal', label: 'Нормальное' }, { value: 'uniform', label: 'Равномерное' }], value: 'exp' });
-        [cN, cMA, cMB, cDist].forEach(c => controls.appendChild(c.wrap));
-        let chart = null;
-        function run() {
-          const n = +cN.input.value, shA = +cMA.input.value, shB = +cMB.input.value, dist = cDist.input.value;
-          let A, B;
-          if (dist === 'exp') { A = App.Util.expSample(n, 1).map(v => v + shA); B = App.Util.expSample(n, 1).map(v => v + shB); }
-          else if (dist === 'normal') { A = App.Util.normalSample(n, shA, 2); B = App.Util.normalSample(n, shB, 2); }
-          else { A = App.Util.uniformSample(n, shA, shA + 4); B = App.Util.uniformSample(n, shB, shB + 4); }
-          // Mann-Whitney U
-          const all = A.map(v => ({ v, g: 0 })).concat(B.map(v => ({ v, g: 1 })));
-          all.sort((a, b) => a.v - b.v);
-          all.forEach((x, i) => x.rank = i + 1);
-          const RA = all.filter(x => x.g === 0).reduce((s, x) => s + x.rank, 0);
-          const U = RA - n * (n + 1) / 2;
-          const mu = n * n / 2;
-          const sigma = Math.sqrt(n * n * (2 * n + 1) / 12);
-          const z = sigma > 0 ? (U - mu) / sigma : 0;
-          const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
-          const sig = pVal < 0.05;
-          const hA = App.Util.histogram(A, 20, [0, 15]);
-          const hB = App.Util.histogram(B, 20, [0, 15]);
-          const ctx = container.querySelector('#abmw-chart').getContext('2d');
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'bar', data: { labels: hA.centers.map(c => c.toFixed(1)),
-              datasets: [{ label: 'A', data: hA.counts, backgroundColor: 'rgba(59,130,246,0.4)' }, { label: 'B', data: hB.counts, backgroundColor: 'rgba(245,158,11,0.4)' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: sig ? '✅ Группы различаются (U-тест)' : '❌ Различий не найдено' } }, scales: { y: { beginAtZero: true } } },
-          });
-          App.registerChart(chart);
-          container.querySelector('#abmw-stats').innerHTML = '<div class="stat-card"><div class="stat-label">U</div><div class="stat-value">' + U.toFixed(0) + '</div></div><div class="stat-card"><div class="stat-label">z</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div><div class="stat-card"><div class="stat-label">Медиана A</div><div class="stat-value">' + App.Util.median(A).toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">Медиана B</div><div class="stat-value">' + App.Util.median(B).toFixed(2) + '</div></div>';
-        }
-        [cN, cMA, cMB, cDist].forEach(c => c.input.addEventListener('input', run));
-        container.querySelector('#abmw-run').onclick = run;
         run();
       },
     },

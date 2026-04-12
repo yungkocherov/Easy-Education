@@ -706,7 +706,7 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
             },
             options: {
               responsive: true, maintainAspectRatio: false,
-              plugins: { title: { display: true, text: '<a class="glossary-link" onclick="App.selectTopic('viz-histogram')">Гистограмма</a> граней' } },
+              plugins: { title: { display: true, text: 'Гистограмма граней' } },
               scales: { y: { beginAtZero: true } },
             },
           });

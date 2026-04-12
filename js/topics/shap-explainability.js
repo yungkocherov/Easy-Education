@@ -385,7 +385,9 @@ App.registerTopic({
         }
 
         function computeImportanceAndAccuracy(X, y, removeN) {
-          const activeFeatures = featureNames.map((_, i) => i < featureNames.length - removeN ? i : null).filter(i => i !== null);
+          const sortedIndices = trueWeights.map((w, i) => ({ i, w: Math.abs(w) })).sort((a, b) => a.w - b.w).map(x => x.i);
+          const removedSet = new Set(sortedIndices.slice(0, removeN));
+          const activeFeatures = featureNames.map((_, i) => removedSet.has(i) ? null : i).filter(i => i !== null);
           // Simplified: importance proportional to true weights * random factor
           const rawImportance = trueWeights.map((w, i) => {
             if (!activeFeatures.includes(i)) return 0;
@@ -439,7 +441,7 @@ App.registerTopic({
                 legend: { display: false },
               },
               scales: {
-                x: { title: { display: true, text: 'Важность (%)' }, min: 0, max: 70 },
+                x: { title: { display: true, text: 'Важность (%)' }, min: 0, suggestedMax: 70 },
               },
             },
           });

@@ -467,7 +467,7 @@ p-value = 2×(1 − Φ(3.935)) ≈ <b>0.000083</b> ≪ 0.001</div>
           if (chart) chart.destroy();
           chart = new Chart(ctx, {
             type: 'bar', data: { labels: ['A', 'B'], datasets: [{ data: [crA * 100, crB * 100], backgroundColor: ['rgba(59,130,246,0.6)', sig ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.5)'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Разница значима (p < 0.05)' : '❌ Разница НЕ значима' } }, scales: { y: { min: 0, max: 15, title: { display: true, text: 'Конверсия %' } } } },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Разница значима (p < 0.05)' : '❌ Разница НЕ значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(crA, crB) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
           });
           App.registerChart(chart);
           container.querySelector('#abz-stats').innerHTML = '<div class="stat-card"><div class="stat-label">CR(A)</div><div class="stat-value">' + (crA*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">CR(B)</div><div class="stat-value">' + (crB*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">z-статистика</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>';

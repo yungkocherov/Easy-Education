@@ -85,7 +85,7 @@ App.registerTopic({
 
       <div class="illustration bordered">
         <svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
-          <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">6 типичных паттернов scatter plot</text>
+          <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">7 типичных паттернов scatter plot</text>
           <!-- 1. Positive linear -->
           <g>
             <rect x="20" y="40" width="210" height="130" fill="#f8fafc" stroke="#cbd5e1"/>

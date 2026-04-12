@@ -42,36 +42,38 @@ App.registerTopic({
           </g>
           <!-- X ticks -->
           <g font-size="10" fill="#64748b" text-anchor="middle">
-            <text x="100" y="268">150</text>
-            <text x="165" y="268">160</text>
-            <text x="230" y="268">170</text>
-            <text x="295" y="268">175</text>
-            <text x="360" y="268">180</text>
-            <text x="425" y="268">185</text>
-            <text x="490" y="268">190</text>
-            <text x="555" y="268">200</text>
+            <text x="75"  y="268">150</text>
+            <text x="133" y="268">155</text>
+            <text x="191" y="268">160</text>
+            <text x="249" y="268">165</text>
+            <text x="307" y="268">170</text>
+            <text x="365" y="268">175</text>
+            <text x="423" y="268">180</text>
+            <text x="481" y="268">185</text>
+            <text x="539" y="268">190</text>
+            <text x="597" y="268">195</text>
+            <text x="645" y="268">200</text>
           </g>
           <text x="360" y="288" text-anchor="middle" font-size="11" fill="#64748b">Рост, см</text>
           <text x="30" y="150" text-anchor="middle" font-size="11" fill="#64748b" transform="rotate(-90 30 150)">Частота</text>
           <!-- Bars: bell-shaped distribution -->
           <!-- Each bar 50px wide -->
           <g fill="#3b82f6" fill-opacity="0.65" stroke="#1e40af" stroke-width="1.2">
-            <rect x="75"  y="246" width="52" height="4"/>
-            <rect x="128" y="228" width="52" height="22"/>
-            <rect x="181" y="196" width="52" height="54"/>
-            <rect x="234" y="148" width="52" height="102"/>
-            <rect x="287" y="85"  width="52" height="165"/>
-            <rect x="340" y="56"  width="52" height="194"/>
-            <rect x="393" y="90"  width="52" height="160"/>
-            <rect x="446" y="150" width="52" height="100"/>
-            <rect x="499" y="200" width="52" height="50"/>
-            <rect x="552" y="230" width="52" height="20"/>
-            <rect x="605" y="246" width="40" height="4"/>
+            <rect x="75"  y="246" width="57" height="4"/>
+            <rect x="133" y="228" width="57" height="22"/>
+            <rect x="191" y="196" width="57" height="54"/>
+            <rect x="249" y="148" width="57" height="102"/>
+            <rect x="307" y="85"  width="57" height="165"/>
+            <rect x="365" y="56"  width="57" height="194"/>
+            <rect x="423" y="90"  width="57" height="160"/>
+            <rect x="481" y="150" width="57" height="100"/>
+            <rect x="539" y="200" width="57" height="50"/>
+            <rect x="597" y="246" width="48" height="4"/>
           </g>
           <!-- Annotations -->
-          <line x1="365" y1="56" x2="430" y2="30" stroke="#1e40af" stroke-width="1"/>
-          <text x="435" y="30" font-size="11" fill="#1e40af" font-weight="600">пик = мода</text>
-          <text x="435" y="44" font-size="9" fill="#64748b">наиболее частое значение</text>
+          <line x1="393" y1="56" x2="450" y2="30" stroke="#1e40af" stroke-width="1"/>
+          <text x="455" y="30" font-size="11" fill="#1e40af" font-weight="600">пик = мода</text>
+          <text x="455" y="44" font-size="9" fill="#64748b">наиболее частое значение</text>
         </svg>
         <div class="caption">Гистограмма роста. Каждый столбец — интервал роста шириной 5 см. Высота = число людей в этом интервале. Видно: пик ~178 см, почти симметрично, хвосты до 150 и 200.</div>
       </div>

@@ -134,8 +134,8 @@ App.registerTopic({
           <line id="bv-opt-line" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="2" stroke-dasharray="3,3"/>
           <text id="bv-opt-label" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Оптимум</text>
           <!-- Labels -->
-          <text x="100" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">← высокий bias (underfitting)</text>
-          <text x="700" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">высокий variance (overfitting) →</text>
+          <text x="140" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">← высокий bias (underfitting)</text>
+          <text x="640" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">высокий variance (overfitting) →</text>
           <text x="130" y="95" text-anchor="start" font-size="10" fill="#b45309">(underfitting)</text>
           <text x="700" y="95" text-anchor="end" font-size="10" fill="#7c3aed">(overfitting)</text>
           <!-- Legend -->
@@ -726,7 +726,7 @@ Train error низкий → bias не катастрофический
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' }, title: { display: true, text: `Полином степени ${deg}` } },
-              scales: { x: { type: 'linear', min: -3.5, max: 3.5 }, y: { min: -3, max: 3 } },
+              scales: { x: { type: 'linear', min: -3.5, max: 3.5 }, y: { suggestedMin: -3, suggestedMax: 3 } },
             },
           });
           App.registerChart(fitChart);
@@ -754,7 +754,7 @@ Train error низкий → bias не катастрофический
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' }, title: { display: true, text: 'Bias-Variance кривая' } },
-              scales: { x: { title: { display: true, text: 'Степень полинома' } }, y: { type: 'logarithmic', title: { display: true, text: 'MSE' } } },
+              scales: { x: { title: { display: true, text: 'Степень полинома' } }, y: { type: 'logarithmic', title: { display: true, text: 'MSE' }, min: 0.001 } },
             },
           });
           App.registerChart(errChart);

@@ -592,6 +592,7 @@ Recall = 100%! Но Precision упала, и 3 ложные тревоги.</div
           const target = Math.floor(majority.length * targetRatio);
           const need = Math.max(0, target - minority.length);
           synthetic = [];
+          if (minority.length < 2) { draw(); return; }
           for (let i = 0; i < need; i++) {
             const base = minority[Math.floor(Math.random() * minority.length)];
             const dists = minority.filter(p => p !== base).map(p => ({ p, d: (p.x - base.x) ** 2 + (p.y - base.y) ** 2 }));

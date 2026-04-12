@@ -562,7 +562,7 @@ App.registerTopic({
               plugins: { legend: { position: 'top' } },
               scales: {
                 x: { type: 'linear', title: { display: true, text: 'X' }, min: -5, max: 5 },
-                y: { title: { display: true, text: 'Y' }, min: -20, max: 20 },
+                y: { title: { display: true, text: 'Y' }, suggestedMin: -20, suggestedMax: 20 },
               },
             },
           });

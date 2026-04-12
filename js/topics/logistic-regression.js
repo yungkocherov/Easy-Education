@@ -478,7 +478,7 @@ App.registerTopic({
 
         let chart = null;
         let X = [], y = [];
-        let w = [0, 0, 0]; // w0 (bias), w1, w2
+        let w = [0.01, 0.01, 0.01]; // w0 (bias), w1, w2
         let iterations = 0;
 
         function <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">sigmoid</a>(z) { return 1 / (1 + Math.exp(-z)); }
@@ -491,7 +491,7 @@ App.registerTopic({
             X.push([App.Util.randn(-sep, 1), App.Util.randn(-sep, 1)]); y.push(0);
             X.push([App.Util.randn(sep, 1), App.Util.randn(sep, 1)]); y.push(1);
           }
-          w = [0, 0, 0];
+          w = [0.01, 0.01, 0.01];
           iterations = 0;
           update();
         }

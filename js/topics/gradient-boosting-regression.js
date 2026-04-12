@@ -797,7 +797,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { title: { display: true, text: 'Предсказание бустинга' } },
-              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -2.5, max: 2.5 } },
+              scales: { x: { type: 'linear', min: 0, max: 6.5 }, y: { suggestedMin: -2.5, suggestedMax: 2.5 } },
             },
           });
           App.registerChart(predChart);

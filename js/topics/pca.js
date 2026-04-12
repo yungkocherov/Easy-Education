@@ -581,8 +581,8 @@ App.registerTopic({
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' } },
               scales: {
-                x: { type: 'linear', title: { display: true, text: 'X' }, min: -8, max: 8 },
-                y: { title: { display: true, text: 'Y' }, min: -8, max: 8 },
+                x: { type: 'linear', title: { display: true, text: 'X' }, suggestedMin: -8, suggestedMax: 8 },
+                y: { title: { display: true, text: 'Y' }, suggestedMin: -8, suggestedMax: 8 },
               },
             },
           });

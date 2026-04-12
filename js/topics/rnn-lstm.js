@@ -825,7 +825,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' } },
-              scales: { x: { type: 'linear', title: { display: true, text: 't' }, min: 0, max: 200 }, y: { title: { display: true, text: 'x(t)' }, min: -2.5, max: 2.5 } },
+              scales: { x: { type: 'linear', title: { display: true, text: 't' }, min: 0, max: 200 }, y: { title: { display: true, text: 'x(t)' }, suggestedMin: -2.5, suggestedMax: 2.5 } },
             },
           });
           App.registerChart(chart);

@@ -602,7 +602,7 @@ k=3 vs k=5: одинаковый Mean и Std!
           chart = new Chart(ctx, {
             type: 'bar',
             data: {
-              labels: scores.map((_, i) => `Fold ${i + 1}`),
+              labels: scores.map((_, i) => k > 12 ? `${i + 1}` : `Fold ${i + 1}`),
               datasets: [
                 { label: 'Accuracy', data: scores, backgroundColor: 'rgba(59,130,246,0.6)' },
               ],

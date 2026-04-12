@@ -17,7 +17,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+        <svg viewBox="0 0 520 210" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
           <text x="260" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Байесовское обновление убеждений</text>
           <!-- Axes -->
           <line x1="40" y1="170" x2="490" y2="170" stroke="#64748b" stroke-width="1.5"/>
@@ -695,7 +695,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { position: 'top' }, title: { display: true, text: `Истинное p = ${pTrue}` } },
-              scales: { x: { title: { display: true, text: 'p (вероятность «орёл»)' }, ticks: { maxTicksLimit: 10 }, min: 0, max: 1 }, y: { title: { display: true, text: 'плотность' }, min: 0, max: 12 } },
+              scales: { x: { title: { display: true, text: 'p (вероятность «орёл»)' }, ticks: { maxTicksLimit: 10 }, min: 0, max: 1 }, y: { title: { display: true, text: 'плотность' }, beginAtZero: true } },
             },
           });
           App.registerChart(chart);

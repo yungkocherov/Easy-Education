@@ -94,7 +94,7 @@ App.registerTopic({
             <line x1="80" y1="60" x2="80" y2="255" stroke="#475569"/>
             <!-- Bimodal violin (2 bulges) -->
             <g transform="translate(180,0)">
-              <path d="M0,240 C-10,238 -20,230 -15,215 C-5,200 -30,180 -40,155 C-50,130 -25,115 -5,100 C5,90 0,78 0,75 C0,78 -5,90 5,100 C25,115 50,130 40,155 C30,180 5,200 15,215 C20,230 10,238 0,240 Z" fill="#bbf7d0" fill-opacity="0.6" stroke="#059669" stroke-width="2"/>
+              <path d="M0,240 C-8,238 -15,232 -25,220 C-40,205 -50,195 -50,185 C-50,175 -40,165 -20,155 C-10,150 -8,145 -10,140 C-15,132 -40,120 -50,110 C-55,102 -50,90 -35,82 C-18,75 -5,72 0,70 C5,72 18,75 35,82 C50,90 55,102 50,110 C40,120 15,132 10,140 C8,145 10,150 20,155 C40,165 50,175 50,185 C50,195 40,205 25,220 C15,232 8,238 0,240 Z" fill="#bbf7d0" fill-opacity="0.6" stroke="#059669" stroke-width="2"/>
               <!-- Inner box plot, centered but showing overall stats -->
               <rect x="-8" y="115" width="16" height="100" fill="#059669" fill-opacity="0.6" stroke="#064e3b" stroke-width="1.5"/>
               <line x1="-8" y1="165" x2="8" y2="165" stroke="white" stroke-width="2.5"/>

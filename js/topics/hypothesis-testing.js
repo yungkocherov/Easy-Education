@@ -682,13 +682,13 @@ p-value < 0.001</div>
               labels: hist.centers.map((c) => App.Util.round(c, 2)),
               datasets: [{
                 data: hist.counts,
-                backgroundColor: hist.centers.map((c) => c < alpha ? 'rgba(220, 38, 38, 0.7)' : 'rgba(59, 130, 246, 0.6)'),
+                backgroundColor: hist.centers.map((c, i) => { const binW = 1 / 20; return (c + binW / 2) <= alpha ? 'rgba(220, 38, 38, 0.7)' : 'rgba(59, 130, 246, 0.6)'; }),
               }],
             },
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { legend: { display: false }, title: { display: true, text: 'Распределение p-значений (красное — отвергаем H₀)' } },
-              scales: { x: { title: { display: true, text: 'p-value' } }, y: { beginAtZero: true, min: 0, max: 200 } },
+              scales: { x: { title: { display: true, text: 'p-value' } }, y: { beginAtZero: true } },
             },
           });
           App.registerChart(chart);

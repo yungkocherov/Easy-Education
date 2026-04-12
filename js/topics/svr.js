@@ -417,7 +417,7 @@ App.registerTopic({
             options: {
               responsive: true, maintainAspectRatio: false,
               plugins: { title: { display: true, text: 'SVR: ε-труба' } },
-              scales: { x: { type: 'linear', min: 0, max: 6.3 }, y: { min: -3, max: 3 } },
+              scales: { x: { type: 'linear', min: 0, max: 6.5 }, y: { suggestedMin: -3, suggestedMax: 3 } },
             },
           });
           App.registerChart(chart);

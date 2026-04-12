@@ -869,7 +869,7 @@ App.registerTopic({
           lossChart = new Chart(lossCtx, {
             type: 'line',
             data: { labels: lossHistory.map((_, i) => i), datasets: [{ label: 'Loss', data: lossHistory, borderColor: '#16a34a', borderWidth: 2, pointRadius: 0, fill: false }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Cross-entropy loss' } }, scales: { y: { beginAtZero: true, min: 0, max: 1.5 } } },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Cross-entropy loss' } }, scales: { x: { title: { display: true, text: 'Эпоха' } }, y: { beginAtZero: true } } },
           });
           App.registerChart(lossChart);
 

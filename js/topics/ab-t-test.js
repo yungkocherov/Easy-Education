@@ -554,8 +554,11 @@ p-value:      0.005       &lt;&lt;0.001     0.007
           const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(t)));
           const d = (mB - mA) / Math.sqrt((vA + vB) / 2);
           const sig = pVal < 0.05;
-          const hA = App.Util.histogram(A, 20, [0, 120]);
-          const hB = App.Util.histogram(B, 20, [0, 120]);
+          const allVals = [...A, ...B];
+          const lo = Math.floor(Math.min(...allVals));
+          const hi = Math.ceil(Math.max(...allVals));
+          const hA = App.Util.histogram(A, 20, [lo, hi]);
+          const hB = App.Util.histogram(B, 20, [lo, hi]);
           const ctx = container.querySelector('#abt-chart').getContext('2d');
           if (chart) chart.destroy();
           chart = new Chart(ctx, {

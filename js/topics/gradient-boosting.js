@@ -23,7 +23,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+        <svg viewBox="0 0 540 212" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
           <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Gradient Boosting: последовательное исправление ошибок</text>
           <!-- Stage 1 box -->
           <rect x="20" y="30" width="130" height="90" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
@@ -560,8 +560,8 @@ App.registerTopic({
             },
             options: {
               responsive: true, maintainAspectRatio: false,
-              plugins: { legend: { position: 'top' } },
-              scales: { x: { type: 'linear', title: { display: true, text: 'x' }, min: 0, max: 10 }, y: { title: { display: true, text: 'y' }, min: -3, max: 6 } },
+              plugins: { legend: { position: 'top' }, title: { display: true, text: 'Gradient Boosting: предсказание' } },
+              scales: { x: { type: 'linear', title: { display: true, text: 'x' }, min: 0, max: 10 }, y: { title: { display: true, text: 'y' }, suggestedMin: -3, suggestedMax: 6 } },
             },
           });
           App.registerChart(chart);

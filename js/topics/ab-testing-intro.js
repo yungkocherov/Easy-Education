@@ -108,62 +108,63 @@ App.registerTopic({
       </table>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <svg viewBox="0 0 700 285" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
           <defs>
             <marker id="arrFlow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
               <path d="M0,0 L7,3.5 L0,7 Z" fill="#64748b"/>
             </marker>
           </defs>
-          <text x="280" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Блок-схема выбора теста</text>
+          <text x="350" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Блок-схема выбора теста</text>
           <!-- Q1: Two groups? -->
-          <rect x="195" y="34" width="170" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-          <text x="280" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Сколько групп?</text>
-          <text x="280" y="65" text-anchor="middle" font-size="10" fill="#1e40af">2 группы или &gt;2?</text>
+          <rect x="225" y="34" width="170" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="310" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Сколько групп?</text>
+          <text x="310" y="65" text-anchor="middle" font-size="10" fill="#1e40af">2 группы или &gt;2?</text>
           <!-- Arrow: 2 groups left -->
-          <line x1="195" y1="53" x2="140" y2="53" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="165" y="47" text-anchor="middle" font-size="9" fill="#475569">2</text>
+          <line x1="225" y1="53" x2="185" y2="53" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="205" y="47" text-anchor="middle" font-size="9" fill="#475569">2</text>
           <!-- Arrow: >2 groups right -->
-          <line x1="365" y1="53" x2="420" y2="53" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="390" y="47" text-anchor="middle" font-size="9" fill="#475569">&gt;2</text>
+          <line x1="395" y1="53" x2="470" y2="53" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="430" y="47" text-anchor="middle" font-size="9" fill="#475569">&gt;2</text>
           <!-- >2 groups box -->
-          <rect x="420" y="35" width="125" height="36" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
-          <text x="482" y="51" text-anchor="middle" font-size="10" font-weight="600" fill="#713f12">ANOVA /</text>
-          <text x="482" y="65" text-anchor="middle" font-size="10" fill="#713f12">Хи-квадрат</text>
+          <rect x="470" y="35" width="130" height="36" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+          <text x="535" y="51" text-anchor="middle" font-size="10" font-weight="600" fill="#713f12">ANOVA /</text>
+          <text x="535" y="65" text-anchor="middle" font-size="10" fill="#713f12">Хи-квадрат</text>
+          <!-- Vertical arrow to Q2 -->
+          <line x1="175" y1="72" x2="175" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
           <!-- Q2: What type? -->
-          <rect x="35" y="100" width="210" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-          <text x="140" y="116" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Тип метрики?</text>
-          <text x="140" y="130" text-anchor="middle" font-size="9" fill="#1e40af">бинарная / непрерывная / категориальная</text>
-          <line x1="140" y1="72" x2="140" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <rect x="65" y="100" width="220" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="175" y="116" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Тип метрики?</text>
+          <text x="175" y="130" text-anchor="middle" font-size="9" fill="#1e40af">бинарная / непрерывная / категориальная</text>
           <!-- Binary branch -->
-          <line x1="90" y1="138" x2="60" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="60" y="155" font-size="9" fill="#475569">бинар.</text>
-          <rect x="10" y="175" width="100" height="38" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
-          <text x="60" y="191" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">z-тест для</text>
-          <text x="60" y="205" text-anchor="middle" font-size="10" fill="#065f46">пропорций</text>
+          <line x1="110" y1="138" x2="65" y2="178" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="75" y="155" font-size="9" fill="#475569">бинар.</text>
+          <rect x="0" y="178" width="130" height="38" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+          <text x="65" y="194" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">z-тест для</text>
+          <text x="65" y="208" text-anchor="middle" font-size="10" fill="#065f46">пропорций</text>
           <!-- Continuous branch -->
-          <line x1="140" y1="138" x2="140" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="145" y="160" font-size="9" fill="#475569">непрер.</text>
+          <line x1="175" y1="138" x2="220" y2="178" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="205" y="162" font-size="9" fill="#475569">непрер.</text>
           <!-- Q3: Normal? -->
-          <rect x="80" y="175" width="120" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-          <text x="140" y="191" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Нормальность?</text>
-          <text x="140" y="205" text-anchor="middle" font-size="9" fill="#1e40af">n&gt;30 или норм.</text>
+          <rect x="150" y="178" width="140" height="38" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="220" y="194" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Нормальность?</text>
+          <text x="220" y="208" text-anchor="middle" font-size="9" fill="#1e40af">n&gt;30 или норм.</text>
           <!-- Yes → t-test -->
-          <line x1="200" y1="194" x2="240" y2="194" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="218" y="188" font-size="9" fill="#475569">да</text>
-          <rect x="240" y="175" width="80" height="38" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
-          <text x="280" y="191" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">t-тест</text>
-          <text x="280" y="205" text-anchor="middle" font-size="10" fill="#065f46">(Welch)</text>
+          <line x1="290" y1="197" x2="335" y2="197" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="310" y="190" font-size="9" fill="#475569">да</text>
+          <rect x="335" y="178" width="100" height="38" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+          <text x="385" y="194" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">t-тест</text>
+          <text x="385" y="208" text-anchor="middle" font-size="10" fill="#065f46">(Welch)</text>
           <!-- No → Mann-Whitney -->
-          <line x1="140" y1="213" x2="140" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="147" y="233" font-size="9" fill="#475569">нет</text>
-          <rect x="80" y="240" width="120" height="16" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-          <text x="140" y="252" text-anchor="middle" font-size="9" font-weight="600" fill="#92400e">Манн-Уитни U</text>
+          <line x1="220" y1="216" x2="220" y2="244" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="230" y="236" font-size="9" fill="#475569">нет</text>
+          <rect x="160" y="244" width="120" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+          <text x="220" y="262" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Манн-Уитни U</text>
           <!-- Categorical branch -->
-          <line x1="185" y1="138" x2="340" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
-          <text x="290" y="155" font-size="9" fill="#475569">категор.</text>
-          <rect x="310" y="175" width="110" height="38" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
-          <text x="365" y="191" text-anchor="middle" font-size="10" font-weight="600" fill="#831843">Хи-квадрат /</text>
-          <text x="365" y="205" text-anchor="middle" font-size="10" fill="#831843">Тест Фишера</text>
+          <line x1="235" y1="138" x2="540" y2="178" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrFlow)"/>
+          <text x="400" y="155" font-size="9" fill="#475569">категор.</text>
+          <rect x="470" y="178" width="140" height="38" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+          <text x="540" y="194" text-anchor="middle" font-size="10" font-weight="600" fill="#831843">Хи-квадрат /</text>
+          <text x="540" y="208" text-anchor="middle" font-size="10" fill="#831843">Тест Фишера</text>
         </svg>
         <div class="caption">Блок-схема: начни с числа групп, потом смотри на тип метрики. Для бинарных метрик — z-тест, для непрерывных — t-тест (если нормальность) или Манн-Уитни, для категориальных — хи-квадрат.</div>
       </div>
@@ -206,7 +207,6 @@ App.registerTopic({
             <text x="75" y="264">0</text>
             <text x="75" y="220">5k</text>
             <text x="75" y="180">20k</text>
-            <text path="" y="140">50k</text>
             <text x="75" y="140">50k</text>
             <text x="75" y="100">150k</text>
             <text x="75" y="64">600k</text>

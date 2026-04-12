@@ -547,7 +547,7 @@ p_Fisher = 0.00067+0.01293+0.08289+0.08289+0.01293+0.00067
           if (chart) chart.destroy();
           chart = new Chart(ctx, {
             type: 'bar', data: { labels: ['A', 'B', 'C'], datasets: [{ label: 'Конверсия %', data: crs.map(c=>c*100), backgroundColor: ['rgba(59,130,246,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Есть значимая разница' : '❌ Разница не значима' } }, scales: { y: { min: 0, max: 15 } } },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Есть значимая разница' : '❌ Разница не значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(...crs) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
           });
           App.registerChart(chart);
           container.querySelector('#abchi-stats').innerHTML = '<div class="stat-card"><div class="stat-label">χ²</div><div class="stat-value">' + chi2.toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">df</div><div class="stat-value">2</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">≈' + pVal.toFixed(3) + '</div></div>';

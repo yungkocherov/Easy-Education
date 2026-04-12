@@ -577,12 +577,12 @@ App.registerTopic({
             window._gdLossChart = new Chart(lossCtx, {
               type: 'line',
               data: { labels: [], datasets: [{ label: 'Loss', data: [], borderColor: '#16a34a', borderWidth: 2, pointRadius: 0, fill: false }] },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss' } }, scales: { y: { type: 'logarithmic', min: 0.001 } } },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Loss' } }, scales: { y: { type: 'logarithmic', min: 1e-6 } } },
             });
             App.registerChart(window._gdLossChart);
           }
           window._gdLossChart.data.labels = lossHistory.map((_, i) => i);
-          window._gdLossChart.data.datasets[0].data = lossHistory.map(v => Math.max(1e-9, v));
+          window._gdLossChart.data.datasets[0].data = lossHistory.map(v => Math.max(1e-6, v));
           window._gdLossChart.update('none');
 
           const last = trajectory[trajectory.length - 1];
