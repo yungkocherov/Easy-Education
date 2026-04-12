@@ -193,16 +193,16 @@ body {
 
 /* ========== Glossary inline links ========== */
 .glossary-link {
-  color: #7c3aed;
+  color: #dc2626;
   cursor: pointer;
-  border-bottom: 1px dashed #a78bfa;
+  border-bottom: 1.5px dashed #f87171;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 .glossary-link:hover {
-  color: #4c1d95;
+  color: #991b1b;
   border-bottom-style: solid;
-  background: #ede9fe;
+  background: #fef2f2;
 }
 
 /* ========== Prerequisites block ========== */
