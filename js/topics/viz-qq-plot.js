@@ -92,20 +92,20 @@ App.registerTopic({
             <line x1="50" y1="200" x2="310" y2="200" stroke="#94a3b8"/>
             <line x1="50" y1="75" x2="50" y2="200" stroke="#94a3b8"/>
             <line x1="50" y1="200" x2="310" y2="75" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
-            <!-- S-curve below diagonal then above -->
-            <circle cx="60"  cy="195" r="3" fill="#0284c7"/>
-            <circle cx="80"  cy="188" r="3" fill="#0284c7"/>
-            <circle cx="100" cy="183" r="3" fill="#0284c7"/>
-            <circle cx="120" cy="177" r="3" fill="#0284c7"/>
-            <circle cx="140" cy="165" r="3" fill="#0284c7"/>
-            <circle cx="160" cy="148" r="3" fill="#0284c7"/>
-            <circle cx="180" cy="132" r="3" fill="#0284c7"/>
-            <circle cx="200" cy="120" r="3" fill="#0284c7"/>
-            <circle cx="220" cy="112" r="3" fill="#0284c7"/>
-            <circle cx="240" cy="107" r="3" fill="#0284c7"/>
-            <circle cx="260" cy="102" r="3" fill="#0284c7"/>
-            <circle cx="280" cy="95" r="3" fill="#0284c7"/>
-            <circle cx="300" cy="85" r="3" fill="#0284c7"/>
+            <!-- Heavy-tails S-curve: left end far below diagonal, crosses in middle, right end far above -->
+            <circle cx="60"  cy="208" r="3" fill="#0284c7"/>
+            <circle cx="80"  cy="200" r="3" fill="#0284c7"/>
+            <circle cx="100" cy="188" r="3" fill="#0284c7"/>
+            <circle cx="120" cy="175" r="3" fill="#0284c7"/>
+            <circle cx="140" cy="162" r="3" fill="#0284c7"/>
+            <circle cx="160" cy="150" r="3" fill="#0284c7"/>
+            <circle cx="180" cy="137" r="3" fill="#0284c7"/>
+            <circle cx="200" cy="123" r="3" fill="#0284c7"/>
+            <circle cx="220" cy="108" r="3" fill="#0284c7"/>
+            <circle cx="240" cy="92"  r="3" fill="#0284c7"/>
+            <circle cx="260" cy="78"  r="3" fill="#0284c7"/>
+            <circle cx="280" cy="68"  r="3" fill="#0284c7"/>
+            <circle cx="300" cy="62"  r="3" fill="#0284c7"/>
             <text x="180" y="235" text-anchor="middle" font-size="10" fill="#475569">Нижние квантили ниже, верхние выше.</text>
             <text x="180" y="250" text-anchor="middle" font-size="10" fill="#475569">Больше экстремумов, чем у нормального.</text>
             <text x="180" y="265" text-anchor="middle" font-size="9" fill="#64748b">(Student-t, Cauchy, финансовые ряды)</text>
@@ -164,19 +164,20 @@ App.registerTopic({
             <line x1="390" y1="390" x2="650" y2="390" stroke="#94a3b8"/>
             <line x1="390" y1="305" x2="390" y2="390" stroke="#94a3b8"/>
             <line x1="390" y1="390" x2="650" y2="305" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
-            <circle cx="400" cy="370" r="3" fill="#0284c7"/>
-            <circle cx="420" cy="358" r="3" fill="#0284c7"/>
-            <circle cx="440" cy="345" r="3" fill="#0284c7"/>
-            <circle cx="460" cy="335" r="3" fill="#0284c7"/>
-            <circle cx="480" cy="332" r="3" fill="#0284c7"/>
-            <circle cx="500" cy="325" r="3" fill="#0284c7"/>
-            <circle cx="520" cy="320" r="3" fill="#0284c7"/>
-            <circle cx="540" cy="318" r="3" fill="#0284c7"/>
-            <circle cx="560" cy="315" r="3" fill="#0284c7"/>
-            <circle cx="580" cy="313" r="3" fill="#0284c7"/>
-            <circle cx="600" cy="312" r="3" fill="#0284c7"/>
-            <circle cx="620" cy="310" r="3" fill="#0284c7"/>
-            <circle cx="640" cy="308" r="3" fill="#0284c7"/>
+            <!-- Left skew: points curve BELOW diagonal (sample quantiles smaller than theoretical) -->
+            <circle cx="400" cy="398" r="3" fill="#0284c7"/>
+            <circle cx="420" cy="395" r="3" fill="#0284c7"/>
+            <circle cx="440" cy="388" r="3" fill="#0284c7"/>
+            <circle cx="460" cy="380" r="3" fill="#0284c7"/>
+            <circle cx="480" cy="370" r="3" fill="#0284c7"/>
+            <circle cx="500" cy="362" r="3" fill="#0284c7"/>
+            <circle cx="520" cy="352" r="3" fill="#0284c7"/>
+            <circle cx="540" cy="342" r="3" fill="#0284c7"/>
+            <circle cx="560" cy="337" r="3" fill="#0284c7"/>
+            <circle cx="580" cy="330" r="3" fill="#0284c7"/>
+            <circle cx="600" cy="325" r="3" fill="#0284c7"/>
+            <circle cx="620" cy="318" r="3" fill="#0284c7"/>
+            <circle cx="640" cy="312" r="3" fill="#0284c7"/>
           </g>
         </svg>
         <div class="caption">Как читать отклонения от диагонали: S-образная форма — тяжёлые хвосты, «зажатая» — лёгкие, кривизна вверх справа — правый скос, кривизна вниз слева — левый скос.</div>

@@ -405,11 +405,10 @@ App.registerTopic({
             <table>
               <tr><th>Rank</th><th>Score</th><th>contamination=0.05</th><th>contamination=0.10</th><th>contamination=0.20</th></tr>
               <tr><td>1</td><td>0.92</td><td>Аномалия</td><td>Аномалия</td><td>Аномалия</td></tr>
-              <tr><td>2</td><td>0.89</td><td>Аномалия</td><td>Аномалия</td><td>Аномалия</td></tr>
-              <tr><td>3</td><td>0.85</td><td>Аномалия</td><td>Аномалия</td><td>Аномалия</td></tr>
-              <tr><td>4</td><td>0.79</td><td>—</td><td>Аномалия</td><td>Аномалия</td></tr>
-              <tr><td>5</td><td>0.74</td><td>—</td><td>Аномалия</td><td>Аномалия</td></tr>
-              <tr><td>6–10</td><td>0.65–0.70</td><td>—</td><td>—</td><td>Аномалия</td></tr>
+              <tr><td>2</td><td>0.89</td><td>—</td><td>Аномалия</td><td>Аномалия</td></tr>
+              <tr><td>3</td><td>0.85</td><td>—</td><td>—</td><td>Аномалия</td></tr>
+              <tr><td>4</td><td>0.79</td><td>—</td><td>—</td><td>Аномалия</td></tr>
+              <tr><td>5–10</td><td>0.65–0.74</td><td>—</td><td>—</td><td>—</td></tr>
               <tr><td>11–20</td><td>0.55–0.64</td><td>—</td><td>—</td><td>—</td></tr>
             </table>
           </div>
@@ -455,7 +454,7 @@ App.registerTopic({
           </div>
           <div class="answer-box">
             <div class="answer-label">Ответ</div>
-            <p>contamination=0.05: только самые явные аномалии (score>0.88). contamination=0.20: 4x больше подозрительных. Лучшая практика: использовать score напрямую и строить <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a> для диагностики.</p>
+            <p>contamination=0.05: только самая явная аномалия (score ≥ 0.92, 1 точка из 20). contamination=0.20: 4 точки. Лучшая практика: использовать score напрямую и строить <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмму</a> для диагностики.</p>
           </div>
           <div class="lesson-box">
             Если нет меток: Isolation Forest → score → выбор порога по <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограмме</a> или k-distance plot. Если есть немного меток: можно подбирать contamination через precision@k (сколько из топ-k реально аномалии).
