@@ -62,11 +62,173 @@ App.registerTopic({
       <div class="math-block">$$R \\approx U \\cdot V^T$$</div>
       <p>где $U$ — матрица пользовательских латентных факторов (n_users × k), $V$ — матрица item'овских латентных факторов (n_items × k), а k — число скрытых факторов (обычно 10–200).</p>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Matrix Factorization: R ≈ U · Vᵀ</text>
+          <text x="380" y="40" text-anchor="middle" font-size="11" fill="#64748b">Разреженная матрица оценок → плотные латентные вектора</text>
+
+          <!-- R matrix (sparse) -->
+          <g>
+            <text x="170" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">R (users × items)</text>
+            <text x="170" y="86" text-anchor="middle" font-size="10" fill="#64748b">? — неизвестные оценки</text>
+            <!-- 4x5 grid -->
+            <g>
+              <text x="70" y="110" font-size="11" font-weight="600">Аня</text>
+              <text x="70" y="132" font-size="11" font-weight="600">Боря</text>
+              <text x="70" y="154" font-size="11" font-weight="600">Вера</text>
+              <text x="70" y="176" font-size="11" font-weight="600">Гена</text>
+            </g>
+            <g font-size="10" text-anchor="middle">
+              <text x="115" y="96">Ф1</text>
+              <text x="140" y="96">Ф2</text>
+              <text x="165" y="96">Ф3</text>
+              <text x="190" y="96">Ф4</text>
+              <text x="215" y="96">Ф5</text>
+            </g>
+            <!-- cells -->
+            <g>
+              <rect x="102" y="100" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="115" y="113" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">5</text>
+              <rect x="128" y="100" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="141" y="113" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="154" y="100" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="167" y="113" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">4</text>
+              <rect x="180" y="100" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="193" y="113" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="206" y="100" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="219" y="113" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">1</text>
+
+              <rect x="102" y="122" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="115" y="135" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="128" y="122" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="141" y="135" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">5</text>
+              <rect x="154" y="122" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="167" y="135" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">2</text>
+              <rect x="180" y="122" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="193" y="135" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">4</text>
+              <rect x="206" y="122" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="219" y="135" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+
+              <rect x="102" y="144" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="115" y="157" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">4</text>
+              <rect x="128" y="144" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="141" y="157" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="154" y="144" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="167" y="157" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="180" y="144" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="193" y="157" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">3</text>
+              <rect x="206" y="144" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="219" y="157" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">2</text>
+
+              <rect x="102" y="166" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="115" y="179" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="128" y="166" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="141" y="179" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">4</text>
+              <rect x="154" y="166" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="167" y="179" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">5</text>
+              <rect x="180" y="166" width="26" height="18" fill="#f3f4f6" stroke="#64748b"/>
+              <text x="193" y="179" text-anchor="middle" font-size="11" fill="#9ca3af">?</text>
+              <rect x="206" y="166" width="26" height="18" fill="#dbeafe" stroke="#64748b"/>
+              <text x="219" y="179" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">1</text>
+            </g>
+          </g>
+
+          <!-- ≈ sign -->
+          <text x="275" y="145" text-anchor="middle" font-size="22" font-weight="700" fill="#475569">≈</text>
+
+          <!-- U matrix -->
+          <g>
+            <text x="360" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">U (users × 2)</text>
+            <text x="360" y="86" text-anchor="middle" font-size="10" fill="#64748b">латентные вектора пользователей</text>
+            <g>
+              <text x="306" y="110" font-size="10" font-weight="600">Аня</text>
+              <rect x="328" y="100" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="343" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">1.2</text>
+              <rect x="358" y="100" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="373" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">-0.5</text>
+
+              <text x="306" y="132" font-size="10" font-weight="600">Боря</text>
+              <rect x="328" y="122" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="343" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">-0.8</text>
+              <rect x="358" y="122" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="373" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">1.1</text>
+
+              <text x="306" y="154" font-size="10" font-weight="600">Вера</text>
+              <rect x="328" y="144" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="343" y="157" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">0.9</text>
+              <rect x="358" y="144" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="373" y="157" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">0.3</text>
+
+              <text x="306" y="176" font-size="10" font-weight="600">Гена</text>
+              <rect x="328" y="166" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="343" y="179" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">-0.6</text>
+              <rect x="358" y="166" width="30" height="18" fill="#dcfce7" stroke="#059669"/>
+              <text x="373" y="179" text-anchor="middle" font-size="10" font-weight="700" fill="#065f46">1.3</text>
+            </g>
+          </g>
+
+          <!-- × sign -->
+          <text x="425" y="145" text-anchor="middle" font-size="22" font-weight="700" fill="#475569">×</text>
+
+          <!-- V^T matrix -->
+          <g>
+            <text x="570" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#b45309">Vᵀ (2 × items)</text>
+            <text x="570" y="86" text-anchor="middle" font-size="10" fill="#64748b">латентные вектора фильмов</text>
+            <g>
+              <g font-size="10" text-anchor="middle">
+                <text x="475" y="96">Ф1</text>
+                <text x="510" y="96">Ф2</text>
+                <text x="545" y="96">Ф3</text>
+                <text x="580" y="96">Ф4</text>
+                <text x="615" y="96">Ф5</text>
+              </g>
+              <rect x="460" y="100" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="475" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">2.1</text>
+              <rect x="495" y="100" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="510" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">-0.3</text>
+              <rect x="530" y="100" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="545" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">1.6</text>
+              <rect x="565" y="100" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="580" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">0.7</text>
+              <rect x="600" y="100" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="615" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">-0.4</text>
+
+              <rect x="460" y="122" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="475" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">-0.2</text>
+              <rect x="495" y="122" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="510" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">1.8</text>
+              <rect x="530" y="122" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="545" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">0.4</text>
+              <rect x="565" y="122" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="580" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">1.5</text>
+              <rect x="600" y="122" width="30" height="18" fill="#fef3c7" stroke="#b45309"/>
+              <text x="615" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">-0.7</text>
+            </g>
+          </g>
+
+          <!-- Interpretation of latent factors -->
+          <text x="380" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">Интерпретация латентных факторов (модель обнаруживает сама):</text>
+          <g font-size="11">
+            <text x="200" y="255" text-anchor="middle" fill="#059669" font-weight="600">Фактор 1: любитель экшна (−) / драмы (+)</text>
+            <text x="560" y="255" text-anchor="middle" fill="#b45309" font-weight="600">Фактор 1: фильм экшн (+) / драма (−)</text>
+            <text x="200" y="275" text-anchor="middle" fill="#059669" font-weight="600">Фактор 2: любитель комедий (+)</text>
+            <text x="560" y="275" text-anchor="middle" fill="#b45309" font-weight="600">Фактор 2: фильм комедийный (+)</text>
+          </g>
+
+          <!-- Arrow to prediction example -->
+          <text x="380" y="310" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">Предсказать оценку Ани на Ф2:</text>
+          <text x="380" y="328" text-anchor="middle" font-size="11" fill="#475569" font-family="monospace">r̂(Аня, Ф2) = 1.2 × (−0.3) + (−0.5) × 1.8 = −0.36 − 0.9 = −1.26</text>
+          <text x="380" y="346" text-anchor="middle" font-size="11" fill="#64748b">(Аня любит экшн и не любит комедии → не понравится Ф2, который комедия)</text>
+          <text x="380" y="364" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">Рекомендация: не показывать!</text>
+        </svg>
+        <div class="caption">Matrix Factorization: разреженная матрица оценок приближается произведением двух маленьких плотных матриц. Строки U — вектора пользователей, столбцы Vᵀ — вектора фильмов. Оценка r̂(u, i) = скалярное произведение их векторов. Модель сама открывает «смысл» каждого измерения.</div>
+      </div>
+
       <p><b>Что такое латентные факторы?</b> Это скрытые характеристики, которые модель обнаруживает сама. Например, для фильмов один фактор может отвечать за «серьёзность vs. комедийность», другой — за «визуальные эффекты vs. диалоги». Модель не знает этих названий, но обнаруживает паттерны в данных.</p>
 
       <h4>SVD (Singular Value Decomposition)</h4>
       <div class="math-block">$$R = U \\Sigma V^T$$</div>
-      <p>$\\Sigma$ — диагональная матрица с сингулярными значениями (от большего к меньшему). Оставляя k наибольших значений, получаем <b>приближение ранга k</b> — лучшее в смысле MSE (теорема Экарта-Янга).</p>
+      <p>$\\Sigma$ — диагональная матрица с сингулярными значениями (от большего к меньшему). Оставляя k наибольших значений, получаем <b>приближение ранга k</b> — лучшее в смысле <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> (теорема Экарта-Янга).</p>
 
       <h4>ALS (Alternating Least Squares)</h4>
       <p>SVD напрямую плохо работает с пропусками. ALS решает задачу итеративно:</p>
@@ -75,9 +237,9 @@ App.registerTopic({
         <li>Фиксируем U, оптимизируем V.</li>
         <li>Повторяем, пока не сойдётся.</li>
       </ol>
-      <p>Функция потерь:</p>
+      <p><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Функция потерь</a>:</p>
       <div class="math-block">$$\\min_{U, V} \\sum_{(u,i) \\in \\text{observed}} (r_{ui} - \\vec{u}_u \\cdot \\vec{v}_i)^2 + \\lambda(\\|\\vec{u}_u\\|^2 + \\|\\vec{v}_i\\|^2)$$</div>
-      <p>Регуляризация $\\lambda$ предотвращает переобучение.</p>
+      <p>Регуляризация $\\lambda$ предотвращает <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a>.</p>
 
       <h3>❄️ Проблема холодного старта</h3>
       <p><span class="term" data-tip="Cold Start Problem. Ситуация, когда система не может делать рекомендации для нового пользователя или нового item'а из-за отсутствия данных.">Холодный старт</span> — фундаментальная проблема рекомендательных систем:</p>
@@ -104,7 +266,7 @@ App.registerTopic({
       <h3>🧠 Современные подходы</h3>
       <ul>
         <li><b>Neural Collaborative Filtering (NCF)</b> — вместо скалярного произведения $\\vec{u} \\cdot \\vec{v}$ используется нейросеть, которая моделирует нелинейные взаимодействия.</li>
-        <li><b>Two-Tower Model</b> — две «башни» (нейросети): одна кодирует пользователя, другая — item. На выходе — скалярное произведение эмбеддингов. Подходит для масштабных систем (YouTube, Google).</li>
+        <li><b>Two-Tower Model</b> — две «башни» (нейросети): одна кодирует пользователя, другая — item. На выходе — скалярное произведение <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">эмбеддингов</a>. Подходит для масштабных систем (YouTube, Google).</li>
         <li><b>Transformer-based</b> — модели типа SASRec, BERT4Rec рассматривают историю взаимодействий как последовательность и предсказывают следующий item, как языковые модели предсказывают слово.</li>
         <li><b>Graph Neural Networks</b> — пользователи и items — узлы графа, взаимодействия — рёбра. GNN агрегируют информацию от соседей (LightGCN, PinSage).</li>
       </ul>
@@ -114,7 +276,7 @@ App.registerTopic({
         <div class="deep-dive-body">
           <p>Для оценки рекомендательных систем используют специальные метрики:</p>
           <ul>
-            <li><b>RMSE / MAE</b> — для предсказания рейтингов (регрессия).</li>
+            <li><b>RMSE / <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a></b> — для предсказания рейтингов (регрессия).</li>
             <li><b>Precision@K / Recall@K</b> — какая доля из K рекомендаций релевантна / какая доля релевантных items попала в top-K.</li>
             <li><b>NDCG (Normalized Discounted Cumulative Gain)</b> — учитывает позицию: релевантный item выше — лучше.</li>
             <li><b>MAP (Mean Average Precision)</b> — среднее AP по всем пользователям.</li>
@@ -136,7 +298,7 @@ App.registerTopic({
       <ul>
         <li><b>kNN</b> — user-user и item-item CF — это по сути kNN по пользователям/объектам.</li>
         <li><b>PCA / SVD</b> — матричная факторизация тесно связана с PCA: оба ищут латентные структуры.</li>
-        <li><b>NLP</b> — TF-IDF, word embeddings используются в content-based подходах.</li>
+        <li><b>NLP</b> — TF-IDF, word <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">embeddings</a> используются в content-based подходах.</li>
         <li><b>Нейронные сети</b> — NCF, two-tower, transformer-based модели для рекомендаций.</li>
         <li><b>Метрики</b> — Precision, Recall, NDCG для оценки качества.</li>
       </ul>

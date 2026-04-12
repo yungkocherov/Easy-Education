@@ -27,7 +27,7 @@ App.registerTopic({
       <div class="illustration bordered">
         <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
           <!-- Title -->
-          <text x="250" y="20" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">Confusion Matrix</text>
+          <text x="250" y="20" text-anchor="middle" font-size="13" font-weight="600" fill="#334155"><a class="glossary-link" onclick="App.selectTopic('glossary-confusion-matrix')">Confusion Matrix</a></text>
           <!-- Column headers -->
           <text x="230" y="48" text-anchor="middle" font-size="10" fill="#64748b">Предсказано: Позитив</text>
           <text x="390" y="48" text-anchor="middle" font-size="10" fill="#64748b">Предсказано: Негатив</text>
@@ -51,7 +51,7 @@ App.registerTopic({
           <text x="398" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#065f46">TN</text>
           <text x="398" y="160" text-anchor="middle" font-size="10" fill="#065f46">True Negative ✓</text>
         </svg>
-        <div class="caption">Матрица ошибок (Confusion Matrix): TP и TN — верные предсказания (зелёные), FP и FN — ошибки (красные). Все метрики классификации строятся из этих 4 чисел.</div>
+        <div class="caption"><a class="glossary-link" onclick="App.selectTopic('glossary-confusion-matrix')">Матрица ошибок</a> (Confusion Matrix): TP и TN — верные предсказания (зелёные), FP и FN — ошибки (красные). Все метрики классификации строятся из этих 4 чисел.</div>
       </div>
 
       <h3>🎯 Зачем нужны метрики</h3>
@@ -146,8 +146,8 @@ App.registerTopic({
       <h3>📉 Метрики для регрессии (коротко)</h3>
       <p>Для задачи регрессии применяются другие метрики:</p>
       <ul>
-        <li><b>MAE</b> (Mean Absolute Error) — средняя модуль ошибки. Устойчива к выбросам.</li>
-        <li><b>MSE</b> (Mean Squared Error) — средний квадрат ошибки. Наказывает большие ошибки сильнее.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a></b> (Mean Absolute Error) — средняя модуль ошибки. Устойчива к выбросам.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a></b> (Mean Squared Error) — средний квадрат ошибки. Наказывает большие ошибки сильнее.</li>
         <li><b>RMSE</b> — корень из MSE, в единицах таргета.</li>
         <li><b>R²</b> — доля объяснённой дисперсии.</li>
         <li><b>MAPE</b> — в процентах от истинного значения.</li>

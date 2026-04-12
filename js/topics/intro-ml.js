@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'intro-ml',
   category: 'ml-basics',
   title: 'Что такое Machine Learning',
-  summary: 'Типы задач, что значит «обучить модель», train/test, overfitting — фундамент для всего остального.',
+  summary: 'Типы задач, что значит «обучить модель», train/test, <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">overfitting</a> — фундамент для всего остального.',
 
   tabs: {
     theory: `
@@ -143,11 +143,11 @@ App.registerTopic({
 
       <p>Train — для обучения. Test — для <b>честной</b> оценки. Мы <b>никогда</b> не используем test при обучении.</p>
 
-      <h3>⚠️ Переобучение и недообучение</h3>
+      <h3>⚠️ <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Переобучение</a> и <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">недообучение</a></h3>
       <p>Два главных врага ML-модели:</p>
 
       <table>
-        <tr><th></th><th>Недообучение (Underfitting)</th><th>Переобучение (Overfitting)</th></tr>
+        <tr><th></th><th>Недообучение (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Underfitting</a>)</th><th>Переобучение (Overfitting)</th></tr>
         <tr>
           <td><b>Что происходит</b></td>
           <td>Модель слишком простая, не уловила закономерности</td>
@@ -199,7 +199,7 @@ App.registerTopic({
       <p>ML-алгоритмов много, но для старта достаточно знать основные:</p>
       <table>
         <tr><th>Задача</th><th>Алгоритмы</th><th>Когда использовать</th></tr>
-        <tr><td><b>Регрессия</b></td><td>Линейная регрессия, KNN, Деревья, Random Forest, Gradient Boosting</td><td>Предсказываем число (цена, количество, длительность)</td></tr>
+        <tr><td><b>Регрессия</b></td><td>Линейная регрессия, KNN, Деревья, Random Forest, <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting</td><td>Предсказываем число (цена, количество, длительность)</td></tr>
         <tr><td><b>Классификация</b></td><td>Логистическая регрессия, KNN, Деревья, RF, GB, SVM, Naive Bayes</td><td>Предсказываем класс (да/нет, тип, категория)</td></tr>
         <tr><td><b>Кластеризация</b></td><td>K-Means, DBSCAN, иерархическая</td><td>Ищем группы в данных без меток</td></tr>
         <tr><td><b>Снижение размерности</b></td><td>PCA, t-SNE, UMAP</td><td>Визуализируем или сжимаем данные</td></tr>
@@ -208,7 +208,7 @@ App.registerTopic({
       <h3>📏 Как оценить модель</h3>
       <p>Для разных задач — разные метрики:</p>
       <ul>
-        <li><b>Регрессия:</b> MSE (средний квадрат ошибки), MAE (средний модуль ошибки), R² (доля объяснённой дисперсии).</li>
+        <li><b>Регрессия:</b> <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> (средний квадрат ошибки), <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a> (средний модуль ошибки), R² (доля объяснённой дисперсии).</li>
         <li><b>Классификация:</b> Accuracy (доля правильных), Precision, Recall, F1-score, ROC-AUC.</li>
       </ul>
       <p>Подробно разбираем метрики в отдельных темах: «Метрики классификации» и «ROC и AUC».</p>

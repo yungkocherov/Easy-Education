@@ -472,7 +472,7 @@ Mean = 0.76, Std = 0.107
 
 k=1 — это overfit: один ближайший сосед запоминает каждый пример.
 Модель чувствительна к тому, какие примеры попали в train/test.</div>
-            <div class="why">Высокий Std при CV — признак нестабильной модели (высокая variance). k=1 в kNN — классический пример переобучения: модель идеально запоминает train, но плохо обобщает.</div>
+            <div class="why">Высокий Std при CV — признак нестабильной модели (высокая variance). k=1 в kNN — классический пример <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a>: модель идеально запоминает train, но плохо обобщает.</div>
           </div>
 
           <div class="step" data-step="3">

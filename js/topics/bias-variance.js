@@ -78,7 +78,7 @@ App.registerTopic({
         <li>Train error и validation error близки друг к другу.</li>
         <li>Модель систематически ошибается в определённых зонах.</li>
       </ul>
-      <p>Это называется <span class="term" data-tip="Underfitting. Недообучение. Модель слишком проста, чтобы уловить закономерности в данных. Симптомы: высокая ошибка на обучении и тесте.">недообучением (underfitting)</span>.</p>
+      <p>Это называется <span class="term" data-tip="Underfitting. Недообучение. Модель слишком проста, чтобы уловить закономерности в данных. Симптомы: высокая ошибка на обучении и тесте."><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">недообучением</a> (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">underfitting</a>)</span>.</p>
 
       <h4>2. Variance (дисперсия) — «модель слишком чувствительная»</h4>
       <p>Насколько сильно предсказания модели <b>меняются</b> при разных обучающих выборках. Высокая variance означает: возьми другую случайную выборку того же размера — получишь совсем другую модель.</p>
@@ -89,7 +89,7 @@ App.registerTopic({
         <li>Большой разрыв между train и validation.</li>
         <li>При разных фолдах CV — большой разброс качества.</li>
       </ul>
-      <p>Это называется <span class="term" data-tip="Overfitting. Переобучение. Модель запоминает особенности обучающей выборки, включая шум, и плохо работает на новых данных.">переобучением (overfitting)</span>.</p>
+      <p>Это называется <span class="term" data-tip="Overfitting. Переобучение. Модель запоминает особенности обучающей выборки, включая шум, и плохо работает на новых данных."><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучением</a> (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">overfitting</a>)</span>.</p>
 
       <h4>3. Noise (шум) — «данные сами по себе неточны»</h4>
       <p>Неустранимая часть ошибки, присущая данным. Реальные измерения всегда содержат случайность: даже совершенная модель не предскажет цены на бирже идеально — там есть истинная случайность.</p>
@@ -109,6 +109,99 @@ App.registerTopic({
       </ul>
 
       <p>А ошибка на <b>train</b> монотонно падает с ростом сложности — она обманчива и не показывает реального качества.</p>
+
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">U-образная кривая: ошибка vs сложность модели</text>
+          <line x1="80" y1="280" x2="720" y2="280" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="60" x2="80" y2="280" stroke="#475569" stroke-width="1.5"/>
+          <!-- X ticks -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="80" y="300">низкая</text>
+            <text x="720" y="300">высокая</text>
+          </g>
+          <text x="400" y="325" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">Сложность модели</text>
+          <text x="40" y="170" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b" transform="rotate(-90 40 170)">Ошибка</text>
+          <!-- Train error: monotonically decreasing (exponential decay) -->
+          <path id="bv-train" d="" fill="none" stroke="#1e40af" stroke-width="3"/>
+          <!-- Test error: U-shape (quadratic-ish) -->
+          <path id="bv-test" d="" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <!-- Bias component: decreasing -->
+          <path id="bv-bias" d="" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="5,3"/>
+          <!-- Variance component: increasing -->
+          <path id="bv-variance" d="" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3"/>
+          <!-- Optimal point marker -->
+          <line id="bv-opt-line" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="2" stroke-dasharray="3,3"/>
+          <text id="bv-opt-label" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Оптимум</text>
+          <!-- Labels -->
+          <text x="130" y="75" text-anchor="start" font-size="11" font-weight="700" fill="#b45309">↑ высокий bias</text>
+          <text x="700" y="75" text-anchor="end" font-size="11" font-weight="700" fill="#7c3aed">высокий variance ↑</text>
+          <text x="130" y="95" text-anchor="start" font-size="10" fill="#b45309">(underfitting)</text>
+          <text x="700" y="95" text-anchor="end" font-size="10" fill="#7c3aed">(overfitting)</text>
+          <!-- Legend -->
+          <g font-size="11" font-weight="600">
+            <line x1="520" y1="120" x2="545" y2="120" stroke="#1e40af" stroke-width="3"/>
+            <text x="550" y="124" fill="#1e40af">Train error</text>
+            <line x1="520" y1="140" x2="545" y2="140" stroke="#dc2626" stroke-width="3"/>
+            <text x="550" y="144" fill="#dc2626">Test error</text>
+            <line x1="520" y1="160" x2="545" y2="160" stroke="#b45309" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="550" y="164" fill="#b45309">Bias²</text>
+            <line x1="520" y1="180" x2="545" y2="180" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="550" y="184" fill="#7c3aed">Variance</text>
+          </g>
+        </svg>
+        <div class="caption">Классическая U-образная кривая. Train ошибка (синяя) монотонно падает с ростом сложности — обманчиво. Test ошибка (красная) сначала падает (уменьшается bias), потом растёт (растёт variance). Минимум test ошибки = оптимальная сложность модели.</div>
+        <script>
+        (function() {
+          var x0 = 80, x1 = 720, y0 = 280, y1 = 60;
+          var n = 100;
+          // X = complexity [0, 10]
+          function toX(c) { return x0 + (c / 10) * (x1 - x0); }
+          function toY(v) { return y0 - v * (y0 - y1); }
+          // Bias^2: exponential decay, starts high (0.9) ends low (0.05)
+          function bias2(c) { return 0.05 + 0.85 * Math.exp(-c / 2.5); }
+          // Variance: exponential growth, starts low (0.05) grows
+          function variance(c) { return 0.05 + 0.02 * Math.exp(c / 2.2); }
+          // Irreducible error
+          var noise = 0.1;
+          // Train error = bias^2 − some underfitting correction (train sees the data)
+          // For visualisation: train is strictly decreasing
+          function trainErr(c) { return Math.max(0.01, 0.95 * Math.exp(-c / 1.6)); }
+          function testErr(c) { return Math.min(0.95, bias2(c) + variance(c) + noise); }
+
+          function buildPath(fn) {
+            var pts = [];
+            for (var i = 0; i <= n; i++) {
+              var c = (10 * i) / n;
+              pts.push([toX(c).toFixed(1), toY(Math.min(0.95, fn(c))).toFixed(1)]);
+            }
+            var d = 'M' + pts[0][0] + ',' + pts[0][1];
+            for (var j = 1; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+            return d;
+          }
+
+          document.getElementById('bv-train').setAttribute('d', buildPath(trainErr));
+          document.getElementById('bv-test').setAttribute('d', buildPath(testErr));
+          document.getElementById('bv-bias').setAttribute('d', buildPath(bias2));
+          document.getElementById('bv-variance').setAttribute('d', buildPath(variance));
+
+          // Find optimum (min of test error)
+          var bestC = 0, bestErr = Infinity;
+          for (var i = 0; i <= n; i++) {
+            var c = (10 * i) / n;
+            var e = testErr(c);
+            if (e < bestErr) { bestErr = e; bestC = c; }
+          }
+          var optX = toX(bestC), optY = toY(bestErr);
+          var optLine = document.getElementById('bv-opt-line');
+          optLine.setAttribute('x1', optX); optLine.setAttribute('x2', optX);
+          optLine.setAttribute('y1', optY - 5); optLine.setAttribute('y2', 280);
+          var optLabel = document.getElementById('bv-opt-label');
+          optLabel.setAttribute('x', optX);
+          optLabel.setAttribute('y', optY - 15);
+        })();
+        </script>
+      </div>
 
       <h3>🔍 Как диагностировать проблему</h3>
       <p>Всегда сравнивай train и validation ошибки:</p>
@@ -160,10 +253,10 @@ App.registerTopic({
       <div class="deep-dive">
         <summary>Подробнее: формальное разложение</summary>
         <div class="deep-dive-body">
-          <p>Для регрессии с квадратичной функцией потерь, при истинной функции $f$ и шуме $\\epsilon$:</p>
+          <p>Для регрессии с квадратичной <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функцией потерь</a>, при истинной функции $f$ и шуме $\\epsilon$:</p>
           <div class="math-block">$$E\\left[(y - \\hat{f}(x))^2\\right] = \\underbrace{(E[\\hat{f}(x)] - f(x))^2}_{\\text{Bias}^2} + \\underbrace{E\\left[(\\hat{f}(x) - E[\\hat{f}(x)])^2\\right]}_{\\text{Variance}} + \\underbrace{\\sigma^2}_{\\text{Noise}}$$</div>
           <p>Здесь ожидание берётся по всем возможным обучающим выборкам.</p>
-          <p>Важное допущение: разложение существует для MSE. Для других функций потерь (log-loss, hinge loss) аналогичные разложения тоже есть, но выглядят иначе.</p>
+          <p>Важное допущение: разложение существует для <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>. Для других функций потерь (log-loss, hinge loss) аналогичные разложения тоже есть, но выглядят иначе.</p>
         </div>
       </div>
 

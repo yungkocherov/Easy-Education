@@ -91,13 +91,13 @@ App.registerTopic({
 
       <p><b>Роль C:</b></p>
       <ul>
-        <li><b>Большой C (например, 100):</b> модель пытается строго разделить всех. Узкий margin, много support vectors, риск переобучения.</li>
-        <li><b>Маленький C (например, 0.01):</b> допускает много нарушений. Широкий margin, более простая модель, риск недообучения.</li>
+        <li><b>Большой C (например, 100):</b> модель пытается строго разделить всех. Узкий margin, много support vectors, риск <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a>.</li>
+        <li><b>Маленький C (например, 0.01):</b> допускает много нарушений. Широкий margin, более простая модель, риск <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">недообучения</a>.</li>
       </ul>
 
       <p>C — главный гиперпараметр SVM, похожий на обратный коэффициент регуляризации.</p>
 
-      <h3>✨ Ядерный трюк — секрет SVM</h3>
+      <h3>✨ <a class="glossary-link" onclick="App.selectTopic('glossary-kernel-trick')">Ядерный трюк</a> — секрет SVM</h3>
       <p>Классическая SVM рисует <b>прямую линию</b> (линейную границу). Как работать с нелинейными данными (например, круги или спирали)?</p>
 
       <p>Ответ: <span class="term" data-tip="Kernel Trick. Техника неявного отображения данных в более высокую размерность через функцию ядра K(x, x'), без реального вычисления преобразования.">ядерный трюк</span>. Идея гениальная:</p>
@@ -136,7 +136,7 @@ App.registerTopic({
         <li><b>Маленький γ:</b> широкое влияние, гладкая граница, недообучение.</li>
       </ul>
 
-      <h4>Sigmoid</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Sigmoid</a></h4>
       <div class="math-block">$$K(x, x') = \\tanh(\\gamma \\cdot x^T x' + r)$$</div>
       <p>Похоже на нейросеть. Используется редко.</p>
 
@@ -640,7 +640,7 @@ App.registerTopic({
           </div>
 
           <div class="step" data-step="3">
-            <h4>Шаг 3: Kernel trick — неявное поднятие в высшее измерение</h4>
+            <h4>Шаг 3: <a class="glossary-link" onclick="App.selectTopic('glossary-kernel-trick')">Kernel trick</a> — неявное поднятие в высшее измерение</h4>
             <div class="calc">
               Вместо RBF можно ЯВНО добавить признак r² = x₁² + x₂²:<br><br>
               A(1,0): r² = 1² + 0² = <b>1</b> → новое пространство: (1, 0, 1)<br>
@@ -664,9 +664,9 @@ App.registerTopic({
             <h4>Шаг 4: Влияние γ на границу</h4>
             <div class="calc">
               γ = 0.01 (маленький): K(A,D) = exp(−0.01·4) = exp(−0.04) ≈ 0.96<br>
-              Все точки «похожи» → слишком гладкая граница → underfitting<br><br>
+              Все точки «похожи» → слишком гладкая граница → <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">underfitting</a><br><br>
               γ = 10 (большой): K(A,D) = exp(−10·4) = exp(−40) ≈ 0.000<br>
-              Только ближайшие точки «видят» друг друга → слишком сложная граница → overfitting<br><br>
+              Только ближайшие точки «видят» друг друга → слишком сложная граница → <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">overfitting</a><br><br>
               γ = 0.5 (оптимум): K адекватно отличает ближних от дальних
             </div>
             <div class="example-data-table">

@@ -166,7 +166,7 @@ App.registerTopic({
       <ul>
         <li><b>Работает «из коробки»</b> — почти не требует настройки.</li>
         <li><b>Сложно сделать хуже</b> — даже плохая настройка даёт приличный результат.</li>
-        <li><b>Устойчив к переобучению</b> — с ростом числа деревьев ошибка не растёт.</li>
+        <li><b>Устойчив к <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучению</a></b> — с ростом числа деревьев ошибка не растёт.</li>
         <li><b>Хорошо работает с табличными данными</b> — часто побеждает нейросети.</li>
         <li><b>Параллелится</b> — каждое дерево независимо от других.</li>
       </ul>
@@ -213,7 +213,7 @@ App.registerTopic({
       </div>
 
       <div class="deep-dive">
-        <summary>Подробнее: RF vs Gradient Boosting</summary>
+        <summary>Подробнее: RF vs <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting</summary>
         <div class="deep-dive-body">
           <p>Два главных ансамбля деревьев имеют ключевое различие:</p>
           <ul>
@@ -301,7 +301,7 @@ App.registerTopic({
             <p>При каждом разбиении случайно выбираем 1 признак из 2. Для корня выпало: <b>Вес</b>.</p>
             <div class="calc">
               Данные в корне: {1,3,3,4,5,6} → 3 яблока, 3 апельсина<br>
-              Gini корня = 1 − (3/6)² − (3/6)² = 1 − 0.25 − 0.25 = <b>0.5</b><br><br>
+              <a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Gini</a> корня = 1 − (3/6)² − (3/6)² = 1 − 0.25 − 0.25 = <b>0.5</b><br><br>
               Пробуем пороги для Вес (сортируем значения: 130,130,150,190,200,210):<br>
               Пороги между соседними уникальными: 140, 160, 185, 195, 205<br><br>
               <b>Порог Вес &lt; 140:</b><br>

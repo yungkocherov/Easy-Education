@@ -125,7 +125,7 @@ App.registerTopic({
             <li><b>Фиктивный игрок (Dummy):</b> если признак не изменяет предсказание ни в одной коалиции — его значение Шепли = 0.</li>
             <li><b>Аддитивность:</b> если объяснить сумму двух моделей — это то же самое, что сложить объяснения каждой.</li>
           </ul>
-          <p>Эти аксиомы делают SHAP единственным «справедливым» способом атрибуции вклада. Это отличает SHAP от ad-hoc методов вроде градиентов или attention-весов.</p>
+          <p>Эти аксиомы делают SHAP единственным «справедливым» способом атрибуции вклада. Это отличает SHAP от ad-hoc методов вроде <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиентов</a> или <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">attention</a>-весов.</p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ App.registerTopic({
 
       <h3>🔗 Как это связано с другими темами</h3>
       <ul>
-        <li><b>Random Forest / Gradient Boosting:</b> встроенный feature_importances_ — быстро, но смещён (Gini importance предпочитает высококардинальные признаки). SHAP честнее.</li>
+        <li><b>Random Forest / <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting:</b> встроенный feature_importances_ — быстро, но смещён (<a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Gini</a> importance предпочитает высококардинальные признаки). SHAP честнее.</li>
         <li><b>Линейная регрессия:</b> коэффициенты линейной модели — это «почти SHAP» (при стандартизации). SHAP обобщает это на нелинейные модели.</li>
         <li><b>A/B тест:</b> объяснимость помогает понять, что именно изменилось в поведении модели после обновления — как инструмент отладки.</li>
         <li><b>Product Analytics:</b> SHAP помогает объяснить предиктивные модели оттока, LTV, конверсии стейкхолдерам.</li>
@@ -234,7 +234,7 @@ App.registerTopic({
               Берём признак «Число звонков в поддержку»:<br>
               • Копируем тестовый датасет X_test<br>
               • В X_test_shuffled перемешиваем только этот столбец случайно<br>
-              • Вычисляем accuracy на X_test_shuffled (без переобучения!)<br>
+              • Вычисляем accuracy на X_test_shuffled (без <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a>!)<br>
               • Accuracy = 71% → важность = 88% − 71% = 17%<br><br>
               Повторяем для каждого признака по очереди
             </div>
@@ -370,7 +370,7 @@ App.registerTopic({
         const featureNames = ['Признак A', 'Признак B', 'Признак C', 'Признак D', 'Признак E (шум)'];
         const trueWeights = [3.0, 2.0, 1.5, 0.8, 0.0];
 
-        function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+        function <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">sigmoid</a>(x) { return 1 / (1 + Math.exp(-x)); }
 
         function generateData(noise) {
           const X = [], y = [];

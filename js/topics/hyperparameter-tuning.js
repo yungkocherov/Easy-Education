@@ -12,7 +12,7 @@ App.registerTopic({
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты готовишь блюдо. Ингредиенты — это данные, рецепт — это алгоритм (Random Forest, XGBoost и т.д.), а вот <b>температура духовки</b> и <b>время запекания</b> — это гиперпараметры.</p>
-        <p>Алгоритм сам «учится» готовить блюдо (подбирает параметры модели), но температуру и время ты задаёшь <b>до начала</b> готовки. Если поставишь 100°C на 10 минут — блюдо сырое (underfitting). Если 300°C на 2 часа — сгорит (overfitting).</p>
+        <p>Алгоритм сам «учится» готовить блюдо (подбирает параметры модели), но температуру и время ты задаёшь <b>до начала</b> готовки. Если поставишь 100°C на 10 минут — блюдо сырое (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">underfitting</a>). Если 300°C на 2 часа — сгорит (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">overfitting</a>).</p>
         <p>Подбор гиперпараметров — это поиск той самой «идеальной температуры и времени», при которых блюдо получается лучше всего. Можно перебрать все комбинации (Grid Search), тыкать наугад (Random Search) или умно пробовать, учась на предыдущих попытках (Bayesian Optimization).</p>
       </div>
 
@@ -39,7 +39,7 @@ App.registerTopic({
         <tr><td rowspan="3"><b>Random Forest</b></td><td>n_estimators</td><td>Кол-во деревьев</td><td>100–1000</td></tr>
         <tr><td>max_depth</td><td>Макс. глубина деревьев</td><td>5–30 или None</td></tr>
         <tr><td>min_samples_split</td><td>Мин. объектов для разбиения</td><td>2–20</td></tr>
-        <tr><td rowspan="3"><b>Gradient Boosting</b></td><td>learning_rate</td><td>Скорость обучения</td><td>0.001–0.3</td></tr>
+        <tr><td rowspan="3"><b><a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting</b></td><td>learning_rate</td><td>Скорость обучения</td><td>0.001–0.3</td></tr>
         <tr><td>n_estimators</td><td>Кол-во деревьев</td><td>100–3000</td></tr>
         <tr><td>max_depth</td><td>Глубина деревьев</td><td>3–10</td></tr>
         <tr><td rowspan="3"><b>SVM</b></td><td>C</td><td>Штраф за ошибки</td><td>0.01–100 (log-scale)</td></tr>
@@ -169,7 +169,7 @@ App.registerTopic({
         <li><b>Log-scale для lr, C, gamma</b> — эти параметры действуют мультипликативно. Разница между 0.001 и 0.01 важнее, чем между 0.01 и 0.1. Поэтому семплируй в лог-шкале: <code>loguniform(1e-4, 1e-1)</code>.</li>
         <li><b>Фиксируй random_state</b> — для воспроизводимости всегда задавай seed в модели и CV-сплиттере.</li>
         <li><b>Начинай с Random Search</b> — быстро находит хороший регион. Потом уточняй Grid Search или Optuna.</li>
-        <li><b>Мониторь overfitting</b> — если train score >> val score, параметры ведут к переобучению.</li>
+        <li><b>Мониторь overfitting</b> — если train score >> val score, параметры ведут к <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучению</a>.</li>
         <li><b>Pipeline!</b> — всегда оборачивай препроцессинг + модель в Pipeline, чтобы не было data leakage.</li>
       </ul>
 
@@ -222,7 +222,7 @@ App.registerTopic({
           <div class="step" data-step="3">
             <h4>Анализируем закономерности</h4>
             <div class="calc">По max_depth:
-  depth=5:  среднее accuracy ≈ 0.837 (недообучение — деревья слишком мелкие)
+  depth=5:  среднее accuracy ≈ 0.837 (<a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">недообучение</a> — деревья слишком мелкие)
   depth=10: среднее accuracy ≈ 0.871 (оптимум — достаточно гибкости)
   depth=15: среднее accuracy ≈ 0.864 (чуть хуже — начало переобучения)
 

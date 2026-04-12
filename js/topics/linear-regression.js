@@ -114,10 +114,10 @@ App.registerTopic({
 
       <h3>📊 Оценка качества модели</h3>
 
-      <h4>MSE (Mean Squared Error) и RMSE</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> (Mean Squared Error) и RMSE</h4>
       <p>Среднеквадратичная ошибка: $\\text{MSE} = \\frac{1}{n}\\sum (y_i - \\hat{y}_i)^2$. RMSE = √MSE, в единицах таргета.</p>
 
-      <h4>MAE (Mean Absolute Error)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a> (Mean Absolute Error)</h4>
       <p>$\\text{MAE} = \\frac{1}{n}\\sum |y_i - \\hat{y}_i|$. Устойчивее к выбросам, в единицах таргета.</p>
 
       <h4>R² — коэффициент детерминации</h4>
@@ -165,7 +165,7 @@ App.registerTopic({
         <tr><th>Ситуация</th><th>Линейная регрессия</th><th>Альтернатива</th></tr>
         <tr><td>Мало данных (< 1000), нужна интерпретация</td><td><b>✅ Лучший выбор</b></td><td>—</td></tr>
         <tr><td>Нелинейные зависимости</td><td>Полиномиальные признаки</td><td>Деревья, Random Forest, GB</td></tr>
-        <tr><td>Много признаков, переобучение</td><td>Ridge / Lasso</td><td>Elastic Net</td></tr>
+        <tr><td>Много признаков, <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a></td><td>Ridge / Lasso</td><td>Elastic Net</td></tr>
         <tr><td>Выбросы в данных</td><td>Huber регрессия</td><td>Деревья (устойчивы)</td></tr>
         <tr><td>Большие данные + максимальная точность</td><td>Как бейзлайн</td><td>XGBoost, LightGBM, CatBoost</td></tr>
       </table>

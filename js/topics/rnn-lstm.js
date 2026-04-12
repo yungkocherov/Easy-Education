@@ -109,9 +109,9 @@ App.registerTopic({
       <p>Все эти «слои» используют одни и те же веса. При обучении применяется <span class="term" data-tip="BPTT. Backpropagation Through Time. Алгоритм обратного распространения для RNN: разворачиваем сеть во времени и применяем обычный backprop.">backpropagation through time (BPTT)</span>.</p>
 
       <h3>⚠️ Проблема vanishing gradients</h3>
-      <p>Главная болезнь vanilla RNN. При BPTT через много шагов градиент умножается на $W_{hh}$ снова и снова. Если собственные значения меньше 1 — градиент <b>затухает</b> экспоненциально.</p>
+      <p>Главная болезнь vanilla RNN. При BPTT через много шагов <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a> умножается на $W_{hh}$ снова и снова. Если собственные значения меньше 1 — градиент <b>затухает</b> экспоненциально.</p>
       <p>Последствие: сеть <b>не может помнить далёкое прошлое</b>. Связи длиной больше 10-20 шагов почти не обучаются.</p>
-      <p>Альтернатива — <b>exploding gradients</b>: если собственные значения > 1, градиенты взрываются. Решается gradient clipping.</p>
+      <p>Альтернатива — <b>exploding gradients</b>: если собственные значения > 1, градиенты взрываются. Решается <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">gradient</a> clipping.</p>
 
       <h3>🏗️ LSTM — революция в памяти</h3>
       <p><span class="term" data-tip="Long Short-Term Memory. Специальная архитектура RNN с механизмом 'гейтов', решающая проблему vanishing gradients. Может помнить контекст на сотни шагов.">LSTM</span> (1997) решает проблему vanishing gradients через <b>cell state</b> — отдельный «канал памяти» с аддитивными обновлениями.</p>
@@ -120,7 +120,7 @@ App.registerTopic({
 
       <h4>Forget gate (что забыть)</h4>
       <div class="math-block">$$f_t = \\sigma(W_f [h_{t-1}, x_t] + b_f)$$</div>
-      <p>Решает, какие элементы старой памяти нужно «забыть». Сигмоида выдаёт значения от 0 до 1 для каждого элемента cell state.</p>
+      <p>Решает, какие элементы старой памяти нужно «забыть». <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Сигмоида</a> выдаёт значения от 0 до 1 для каждого элемента cell state.</p>
 
       <h4>Input gate (что записать)</h4>
       <div class="math-block">$$i_t = \\sigma(W_i [h_{t-1}, x_t] + b_i)$$</div>
@@ -187,7 +187,7 @@ App.registerTopic({
       </ul>
 
       <div class="deep-dive">
-        <summary>Подробнее: seq2seq и attention</summary>
+        <summary>Подробнее: seq2seq и <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">attention</a></summary>
         <div class="deep-dive-body">
           <p><b>Seq2seq</b> — архитектура для задач типа перевода:</p>
           <ul>
@@ -254,7 +254,7 @@ App.registerTopic({
               Нормализация (min=18, max=25): x_norm = (x - 18) / (25 - 18) = (x - 18) / 7<br>
               18 → 0.00, 22 → 0.571, 25 → 1.00, 23 → 0.714, 20 → 0.286
             </div>
-            <div class="why">LSTM обрабатывает последовательность по одному элементу. Оконный подход превращает временной ряд в пары (вход, цель). Нормализация в [0, 1] критична — без неё sigmoid/tanh будут насыщаться.</div>
+            <div class="why">LSTM обрабатывает последовательность по одному элементу. Оконный подход превращает временной ряд в пары (вход, цель). Нормализация в [0, 1] критична — без неё <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">sigmoid</a>/tanh будут насыщаться.</div>
           </div>
 
           <div class="step" data-step="2">
@@ -449,7 +449,7 @@ App.registerTopic({
               Истинное значение: $y = 23°C$<br>
               Ошибка: $|23 - 20.09| = 2.91°C$
             </div>
-            <div class="why">Предсказание 20.09°C при цели 23°C — ошибка 2.91°C. Это с случайными весами без обучения! После gradient descent по MSE loss веса подстроятся, и LSTM научится улавливать паттерн «рост → пик → спад». Ошибка уменьшится в десятки раз.</div>
+            <div class="why">Предсказание 20.09°C при цели 23°C — ошибка 2.91°C. Это с случайными весами без обучения! После gradient descent по <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> loss веса подстроятся, и LSTM научится улавливать паттерн «рост → пик → спад». Ошибка уменьшится в десятки раз.</div>
           </div>
 
           <div class="step" data-step="7">
@@ -560,7 +560,7 @@ App.registerTopic({
               N=50: RNN ≈ 0%, LSTM = 7.7%<br>
               N=100: RNN ≈ 0%, LSTM = 0.6% (тоже проблемы!)
             </div>
-            <div class="why">LSTM драматически лучше RNN, но тоже затухает на очень длинных последовательностях (100+ шагов). Для таких задач нужны Transformer (внимание на любое расстояние за 1 шаг) или SSM (Mamba).</div>
+            <div class="why">LSTM драматически лучше RNN, но тоже затухает на очень длинных последовательностях (100+ шагов). Для таких задач нужны Transformer (<a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a> на любое расстояние за 1 шаг) или SSM (Mamba).</div>
           </div>
 
           <div class="answer-box">

@@ -102,7 +102,7 @@ App.registerTopic({
 
       <div class="key-concept">
         <div class="kc-label">Ключевое отличие регрессии от классификации</div>
-        <p>В классификации лист предсказывает <b>моду</b> (самый частый класс). В регрессии лист предсказывает <b>среднее</b> значения целевой переменной. Критерий разбиения тоже меняется: не Gini / Entropy, а <b>MSE</b> (среднеквадратичная ошибка).</p>
+        <p>В классификации лист предсказывает <b>моду</b> (самый частый класс). В регрессии лист предсказывает <b>среднее</b> значения целевой переменной. Критерий разбиения тоже меняется: не <a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Gini</a> / Entropy, а <b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a></b> (среднеквадратичная ошибка).</p>
       </div>
 
       <h3>🔪 Критерий разбиения: MSE</h3>
@@ -128,7 +128,7 @@ App.registerTopic({
         <li><b>min_impurity_decrease</b> — разбиваем только если снижение MSE больше порога.</li>
       </ul>
 
-      <h3>🌿 MAE вместо MSE</h3>
+      <h3>🌿 <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a> вместо MSE</h3>
       <p>Можно использовать MAE как критерий разбиения (<code>criterion='absolute_error'</code>). В этом случае лист предсказывает <b>медиану</b> вместо среднего — более устойчиво к выбросам.</p>
 
       <div class="deep-dive">
@@ -145,7 +145,7 @@ App.registerTopic({
         <div class="deep-dive-body">
           <p>Дерево делит входное пространство на конечное число прямоугольников. В каждом прямоугольнике — константа. За пределами наблюдаемых значений признаков дерево может только вернуть значение крайнего листа — оно понятия не имеет, что «за границей».</p>
           <p>Это принципиально отличает дерево от линейной регрессии, которая спокойно экстраполирует (хотя и линейно). Для задач, где нужна экстраполяция, деревья не подходят.</p>
-          <p>Random Forest и Gradient Boosting страдают от той же проблемы — они тоже ансамбли деревьев.</p>
+          <p>Random Forest и <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting страдают от той же проблемы — они тоже ансамбли деревьев.</p>
         </div>
       </div>
 
@@ -232,7 +232,7 @@ App.registerTopic({
             <p>Оптимальное первое разбиение: площадь ≤ 68.5 м² (MSE_split = 3.89 vs 14.97 изначально — снижение на 74%). Для 78 м² предсказание: <b>11.25 млн руб.</b></p>
           </div>
           <div class="lesson-box">
-            Алгоритм жадный: каждое разбиение локально оптимально, но глобальный оптимум не гарантирован. Для 8 точек и глубины 2 — очень высокий риск переобучения. На практике используют min_samples_leaf ≥ 5-20.
+            Алгоритм жадный: каждое разбиение локально оптимально, но глобальный оптимум не гарантирован. Для 8 точек и глубины 2 — очень высокий риск <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a>. На практике используют min_samples_leaf ≥ 5-20.
           </div>
         `,
       },
@@ -291,7 +291,7 @@ App.registerTopic({
             <p>MSE-критерий: лист предсказывает <b>среднее</b>, чувствителен к выбросам. MAE-критерий: лист предсказывает <b>медиану</b>, устойчив. При наличии выбросов в таргете используйте <code>criterion='absolute_error'</code>.</p>
           </div>
           <div class="lesson-box">
-            В sklearn DecisionTreeRegressor: <code>criterion='squared_error'</code> (MSE, по умолчанию) или <code>criterion='absolute_error'</code> (MAE). Для данных с выбросами в y — предпочтите MAE или Huber-loss в Gradient Boosting.
+            В sklearn DecisionTreeRegressor: <code>criterion='squared_error'</code> (MSE, по умолчанию) или <code>criterion='absolute_error'</code> (MAE). Для данных с выбросами в y — предпочтите MAE или <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Huber-loss</a> в Gradient Boosting.
           </div>
         `,
       },
@@ -550,7 +550,7 @@ for ax, criterion in zip(axes, ['squared_error', 'absolute_error']):
 
 plt.tight_layout()
 plt.show()
-# Обратите внимание: за x=10 линия "застывает" — это экстраполяция</code></pre>
+# Обратите <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>: за x=10 линия "застывает" — это экстраполяция</code></pre>
     `,
 
     applications: `

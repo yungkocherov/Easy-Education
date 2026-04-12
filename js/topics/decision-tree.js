@@ -89,7 +89,7 @@ else:
       <h3>🧮 Измерение чистоты: impurity</h3>
       <p>Нам нужна формальная мера того, насколько «однородны» данные в узле. Есть три стандартных варианта:</p>
 
-      <h4>Gini impurity (для классификации)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Gini</a> impurity (для классификации)</h4>
       <div class="math-block">$$\\text{Gini} = 1 - \\sum_{c=1}^{C} p_c^2$$</div>
       <p>Где $p_c$ — доля класса $c$ в узле.</p>
       <ul>
@@ -98,22 +98,22 @@ else:
         <li>Три равных класса → Gini ≈ 0.67.</li>
       </ul>
 
-      <h4>Entropy (энтропия)</h4>
+      <h4>Entropy (<a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">энтропия</a>)</h4>
       <div class="math-block">$$H = -\\sum_{c=1}^{C} p_c \\log_2 p_c$$</div>
       <p>Мера неопределённости из теории информации. Даёт похожие результаты, но чуть сильнее штрафует смесь.</p>
 
-      <h4>MSE (для регрессии)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> (для регрессии)</h4>
       <p>Дисперсия целевой в узле. Чем разнороднее значения y в группе — тем выше MSE.</p>
 
       <h3>🎯 Как выбирается лучшее разбиение</h3>
-      <p>В каждом узле алгоритм перебирает <b>все</b> признаки и <b>все</b> возможные пороги, выбирая разбиение с максимальным <span class="term" data-tip="Information Gain. Разность impurity до и после разбиения. Чем больше IG, тем лучше разбиение разделяет классы.">Information Gain</span>:</p>
+      <p>В каждом узле алгоритм перебирает <b>все</b> признаки и <b>все</b> возможные пороги, выбирая разбиение с максимальным <span class="term" data-tip="Information Gain. Разность impurity до и после разбиения. Чем больше IG, тем лучше разбиение разделяет классы."><a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Information Gain</a></span>:</p>
 
       <div class="math-block">$$IG = \\text{Impurity}_{\\text{до}} - \\sum_{\\text{дети}} \\frac{|S_{\\text{ребёнок}}|}{|S|} \\cdot \\text{Impurity}_{\\text{ребёнок}}$$</div>
 
       <p>Проще: «насколько разбиение уменьшило беспорядок». Чем больше — тем лучше.</p>
 
       <h3>🛑 Когда остановиться</h3>
-      <p>Если не ограничивать рост, дерево построит один лист на каждый обучающий пример. <b>Train accuracy = 100%, test accuracy — ужас</b>. Классическое переобучение.</p>
+      <p>Если не ограничивать рост, дерево построит один лист на каждый обучающий пример. <b>Train accuracy = 100%, test accuracy — ужас</b>. Классическое <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a>.</p>
 
       <p>Главные критерии остановки — <span class="term" data-tip="Pre-pruning. Остановка роста дерева по критериям (max_depth, min_samples). Альтернатива пост-прунингу — обрезке готового дерева.">pre-pruning</span>:</p>
       <ul>
@@ -148,7 +148,7 @@ else:
 
       <p>Пример: переместили одну точку на 1%, первый split изменился — дерево перестроилось полностью.</p>
 
-      <p>Именно поэтому одиночные деревья редко используются в проде. Вместо этого — ансамбли (Random Forest, Gradient Boosting), которые снижают variance.</p>
+      <p>Именно поэтому одиночные деревья редко используются в проде. Вместо этого — ансамбли (Random Forest, <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting), которые снижают variance.</p>
 
       <h3>⚖️ Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
@@ -208,7 +208,7 @@ else:
           <p>Разные реализации обрабатывают категориальные признаки по-разному:</p>
           <ul>
             <li><b>CART:</b> разбивает категории на два подмножества (перебор).</li>
-            <li><b>sklearn:</b> требует явного кодирования (One-Hot или Label).</li>
+            <li><b>sklearn:</b> требует явного кодирования (<a class="glossary-link" onclick="App.selectTopic('glossary-one-hot')">One-Hot</a> или Label).</li>
             <li><b>LightGBM:</b> нативная поддержка, оптимальное разбиение по среднему таргету.</li>
             <li><b>CatBoost:</b> специальная обработка через target encoding.</li>
           </ul>
@@ -585,7 +585,7 @@ else:
           </div>
 
           <div class="step" data-step="2">
-            <h4>Шаг 2. depth=1 (Decision Stump) — underfitting</h4>
+            <h4>Шаг 2. depth=1 (Decision Stump) — <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">underfitting</a></h4>
             <div class="calc">
               Одна линия-split: например, $x_1 > 0.3$<br>
               Это грубое приближение истинной границы $x_1 + x_2 > 0$.<br><br>

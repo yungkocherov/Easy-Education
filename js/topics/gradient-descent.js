@@ -1,11 +1,11 @@
 /* ==========================================================================
-   Gradient Descent (основа обучения)
+   <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Descent (основа обучения)
    ========================================================================== */
 App.registerTopic({
   id: 'gradient-descent',
   category: 'dl',
   title: 'Градиентный спуск',
-  summary: 'Как модели учатся: шагаем против градиента функции потерь.',
+  summary: 'Как модели учатся: шагаем против <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиента</a> <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>.',
 
   tabs: {
     theory: `
@@ -415,7 +415,7 @@ App.registerTopic({
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
-            <p>Есть 4 точки данных: $(1, 2),\\,(2, 4),\\,(3, 5),\\,(4, 8)$. Обучаем модель $\\hat{y} = w \\cdot x$ (без bias). Loss = MSE. Сравниваем Batch GD и SGD при $\\eta = 0{,}05$, $w_0 = 0$.</p>
+            <p>Есть 4 точки данных: $(1, 2),\\,(2, 4),\\,(3, 5),\\,(4, 8)$. Обучаем модель $\\hat{y} = w \\cdot x$ (без bias). Loss = <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>. Сравниваем Batch GD и SGD при $\\eta = 0{,}05$, $w_0 = 0$.</p>
           </div>
 
           <div class="example-data-table">

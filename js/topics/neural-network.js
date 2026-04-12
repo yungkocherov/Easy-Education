@@ -78,7 +78,7 @@ App.registerTopic({
         <li>$a^{(l-1)}$ — вход слоя (выход предыдущего).</li>
         <li>$W^{(l)}$ — матрица весов слоя.</li>
         <li>$b^{(l)}$ — вектор bias.</li>
-        <li>$\\sigma$ — нелинейная функция активации.</li>
+        <li>$\\sigma$ — нелинейная <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">функция активации</a>.</li>
         <li>$a^{(l)}$ — выход слоя.</li>
       </ul>
 
@@ -87,19 +87,19 @@ App.registerTopic({
       <h3>⚡ Функции активации</h3>
       <p><span class="term" data-tip="Activation function. Нелинейная функция, применяемая к выходу нейрона. Без неё сеть была бы эквивалентна одному линейному слою.">Активация</span> — критически важный элемент. Без неё несколько линейных слоёв эквивалентны одному.</p>
 
-      <h4>Sigmoid</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Sigmoid</a></h4>
       <div class="math-block">$$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$</div>
-      <p>Выход в (0, 1). Классика 80-х. Сегодня используется только в выходном слое для бинарной классификации. Проблема: «умирает» на краях (градиент ≈ 0).</p>
+      <p>Выход в (0, 1). Классика 80-х. Сегодня используется только в выходном слое для бинарной классификации. Проблема: «умирает» на краях (<a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a> ≈ 0).</p>
 
       <h4>Tanh</h4>
       <div class="math-block">$$\\tanh(z) \\in (-1, 1)$$</div>
       <p>Центрирована около 0. Лучше sigmoid, но тоже насыщается.</p>
 
-      <h4>ReLU (Rectified Linear Unit)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-activations')">ReLU</a> (Rectified Linear Unit)</h4>
       <div class="math-block">$$\\text{ReLU}(z) = \\max(0, z)$$</div>
       <p><b>Стандарт в современных сетях</b>. Простая, быстрая, не насыщается для положительных. Проблема «dying ReLU» — нейроны с отрицательными входами застревают.</p>
 
-      <h4>Leaky ReLU, ELU, GELU, Swish</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-activations')">Leaky ReLU</a>, ELU, <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">GELU</a>, <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">Swish</a></h4>
       <p>Варианты ReLU, которые не «умирают». GELU и Swish используются в современных трансформерах.</p>
 
       <h3>🎓 Backpropagation — как сеть учится</h3>
@@ -135,9 +135,9 @@ App.registerTopic({
       <p>При обратном распространении градиент многократно умножается. Если $\\sigma' < 1$, градиент <b>затухает</b> — первые слои не учатся. Решается ReLU, batch normalization, residual connections.</p>
 
       <h4>Exploding gradients</h4>
-      <p>Противоположная проблема: градиенты <b>взрываются</b>. Loss → NaN. Решается gradient clipping и правильной инициализацией.</p>
+      <p>Противоположная проблема: градиенты <b>взрываются</b>. Loss → NaN. Решается <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">gradient</a> clipping и правильной инициализацией.</p>
 
-      <h4>Переобучение</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Переобучение</a></h4>
       <p>Глубокие сети имеют миллионы параметров. Легко запоминают обучающие данные. Решается:</p>
       <ul>
         <li><b>Dropout</b> — случайно отключаем нейроны при обучении.</li>
@@ -188,7 +188,7 @@ App.registerTopic({
             <li><b>MLP</b> — полносвязные слои, для tabular данных.</li>
             <li><b>CNN</b> — свёрточные, для изображений.</li>
             <li><b>RNN/LSTM/GRU</b> — для последовательностей.</li>
-            <li><b>Transformer</b> — attention, для NLP и других последовательностей.</li>
+            <li><b>Transformer</b> — <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">attention</a>, для NLP и других последовательностей.</li>
             <li><b>GNN</b> — графовые нейросети.</li>
             <li><b>Autoencoder</b> — сжатие и восстановление.</li>
             <li><b>GAN</b> — генеративные, соревнующиеся сети.</li>
@@ -321,7 +321,7 @@ App.registerTopic({
             <div class="calc">
               $a_2 = \\text{ReLU}(z_2) = \\text{ReLU}(0{,}8) = \\max(0,\\; 0{,}8) = \\mathbf{0{,}8}$
             </div>
-            <div class="why">Тоже положительное: $0{,}8 > 0$, ReLU пропускает. Обратите внимание: нейрон h₂ «видит» $x_2$ сильнее ($w_{22}=0{,}8$), а $x_1$ — с отрицательным весом.</div>
+            <div class="why">Тоже положительное: $0{,}8 > 0$, ReLU пропускает. Обратите <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>: нейрон h₂ «видит» $x_2$ сильнее ($w_{22}=0{,}8$), а $x_1$ — с отрицательным весом.</div>
           </div>
 
           <div class="step" data-step="4">
@@ -613,7 +613,7 @@ App.registerTopic({
               16 нейронов = 16 линейных разрезов пространства.<br>
               Кусочно-линейная граница с 16 сегментами выглядит почти как кривая.<br>
               Теорема (Universal Approximation): с достаточным числом нейронов один скрытый слой может аппроксимировать любую непрерывную функцию.<br><br>
-              <b>Но:</b> 65 параметров при 20 точках данных → risk overfitting!<br>
+              <b>Но:</b> 65 параметров при 20 точках данных → risk <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">overfitting</a>!<br>
               Train accuracy: 100%. Test accuracy: может быть 80-90%.
             </div>
             <div class="why">Больше нейронов = более гибкая граница. Но гибкость без данных = переобучение. Правило: следите за val loss, используйте dropout и early stopping.</div>
@@ -624,7 +624,7 @@ App.registerTopic({
             <div class="example-data-table">
               <table>
                 <tr><th>Нейронов</th><th>Train Acc</th><th>Test Acc</th><th>Bias</th><th>Variance</th><th>Диагноз</th></tr>
-                <tr><td>1</td><td>50%</td><td>50%</td><td>Высокий</td><td>Низкий</td><td>Underfitting</td></tr>
+                <tr><td>1</td><td>50%</td><td>50%</td><td>Высокий</td><td>Низкий</td><td><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Underfitting</a></td></tr>
                 <tr><td>4</td><td>98%</td><td>95%</td><td>Низкий</td><td>Низкий</td><td>Оптимум</td></tr>
                 <tr><td>16</td><td>100%</td><td>88%</td><td>Нулевой</td><td>Высокий</td><td>Overfitting</td></tr>
               </table>
@@ -1012,7 +1012,7 @@ plt.legend(); plt.show()
         <li><b>Image recognition</b> — CNN (свёрточные сети).</li>
         <li><b>NLP</b> — RNN, LSTM, Transformer.</li>
         <li><b>Speech</b> — распознавание и синтез.</li>
-        <li><b>Recommender systems</b> — neural collaborative filtering, embeddings.</li>
+        <li><b>Recommender systems</b> — neural collaborative filtering, <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">embeddings</a>.</li>
         <li><b>Reinforcement Learning</b> — DQN, PPO.</li>
         <li><b>Generative AI</b> — GAN, VAE, Diffusion.</li>
       </ul>
@@ -1060,7 +1060,7 @@ plt.legend(); plt.show()
         <tr><td>Vanishing gradients</td><td>Первые слои не учатся</td><td>ReLU, ResNet, BatchNorm</td></tr>
         <tr><td>Exploding gradients</td><td>Loss → NaN</td><td>Gradient clipping</td></tr>
         <tr><td>Переобучение</td><td>Train ↓ Val ↑</td><td>Dropout, больше данных</td></tr>
-        <tr><td>Недообучение</td><td>Train и Val высокие</td><td>Больше слоёв/нейронов</td></tr>
+        <tr><td><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Недообучение</a></td><td>Train и Val высокие</td><td>Больше слоёв/нейронов</td></tr>
         <tr><td>Плохой LR</td><td>Loss не падает или скачет</td><td>LR scheduler, warmup</td></tr>
       </table>
 

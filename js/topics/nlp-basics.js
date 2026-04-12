@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'nlp-basics',
   category: 'dl',
   title: 'NLP: от текста к числам',
-  summary: 'Bag-of-Words, TF-IDF, Word2Vec, embeddings — как превратить текст в признаки.',
+  summary: 'Bag-of-Words, TF-IDF, Word2Vec, <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">embeddings</a> — как превратить текст в признаки.',
 
   tabs: {
     theory: `
@@ -150,7 +150,7 @@ App.registerTopic({
 
       <p><b>CBOW</b> усредняет векторы контекстных слов и предсказывает центральное — быстрый, хорош на частых словах. <b>Skip-gram</b> берёт центральное слово и предсказывает каждое контекстное по отдельности — медленнее, но лучше для редких слов и маленьких корпусов.</p>
 
-      <h3>🌐 Современные эмбеддинги: BERT и GPT</h3>
+      <h3>🌐 Современные <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">эмбеддинги</a>: BERT и GPT</h3>
       <p>Word2Vec даёт одинаковый вектор слову «банк» в предложениях «банк реки» и «банк выдал кредит». <b>Контекстуальные эмбеддинги</b> (BERT, GPT) это исправляют: вектор слова зависит от всего предложения.</p>
 
       <table>

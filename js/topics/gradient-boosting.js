@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Gradient Boosting
+   <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting
    ========================================================================== */
 App.registerTopic({
   id: 'gradient-boosting',
@@ -85,10 +85,10 @@ App.registerTopic({
       </div>
 
       <h3>🔍 Почему «градиентный»?</h3>
-      <p>На самом деле каждое новое дерево учится не на самих остатках, а на <b>отрицательном градиенте</b> функции потерь:</p>
+      <p>На самом деле каждое новое дерево учится не на самих остатках, а на <b>отрицательном <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиенте</a></b> <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>:</p>
       <div class="math-block">$$r_i^{(m)} = -\\left[\\frac{\\partial L(y_i, F(x_i))}{\\partial F(x_i)}\\right]_{F=F_{m-1}}$$</div>
 
-      <p>Для MSE градиент = $y - F$, то есть обычный остаток. Но для других функций потерь (log-loss, Huber) градиент другой — и именно на нём учится новое дерево.</p>
+      <p>Для <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> градиент = $y - F$, то есть обычный остаток. Но для других функций потерь (log-loss, Huber) градиент другой — и именно на нём учится новое дерево.</p>
       <p>Это и есть <b>gradient boosting</b>: мы делаем шаг в сторону уменьшения loss, «спускаясь по градиенту» в пространстве функций.</p>
 
       <h3>⚙️ Learning rate η — главный параметр</h3>
@@ -103,7 +103,7 @@ App.registerTopic({
 
       <p><b>Правило:</b> меньше η → нужно больше деревьев M. Чаще всего η ∈ [0.01, 0.1].</p>
 
-      <h3>🛡️ Как бороться с переобучением</h3>
+      <h3>🛡️ Как бороться с <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучением</a></h3>
       <p>Boosting склонен к переобучению. Инструменты борьбы:</p>
       <ul>
         <li><b>Learning rate</b> — главная ручка. Маленький η + много деревьев.</li>

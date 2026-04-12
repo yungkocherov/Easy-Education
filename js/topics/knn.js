@@ -94,7 +94,7 @@ App.registerTopic({
       <ul>
         <li><b>k = 1</b>: каждый пример определяет свою окрестность. <b>Высокая variance</b> — модель шумная, чувствительна к выбросам. <span class="term" data-tip="Overfitting. Переобучение — модель слишком чувствительна к обучающим данным.">Переобучается</span>.</li>
         <li><b>k = 5-20</b>: обычно хорошо работает. Сглаживает шум, но улавливает локальные паттерны.</li>
-        <li><b>k = n</b>: все точки голосуют одинаково → модель всегда предсказывает мажоритарный класс. <b>Высокий bias</b>, недообучение.</li>
+        <li><b>k = n</b>: все точки голосуют одинаково → модель всегда предсказывает мажоритарный класс. <b>Высокий bias</b>, <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">недообучение</a>.</li>
       </ul>
 
       <p><b>Правила выбора k:</b></p>
@@ -194,7 +194,7 @@ App.registerTopic({
         <li><b>PCA</b> — часто применяется перед kNN для снижения размерности.</li>
         <li><b>Isolation Forest</b> — альтернатива для anomaly detection.</li>
         <li><b>SMOTE</b> — использует kNN для генерации синтетических примеров.</li>
-        <li><b>Embedding-based поиск</b> — современные системы поиска используют kNN над обучаемыми векторами.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">Embedding</a>-based поиск</b> — современные системы поиска используют kNN над обучаемыми векторами.</li>
         <li><b>Рекомендательные системы</b> — collaborative filtering часто основан на kNN.</li>
       </ul>
     `,
@@ -371,7 +371,7 @@ App.registerTopic({
         `,
       },
       {
-        title: 'k=1 vs k=7: переобучение и сглаживание',
+        title: 'k=1 vs k=7: <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a> и сглаживание',
         content: `
           <div class="example-problem">
             <div class="problem-label">Задача</div>
@@ -419,7 +419,7 @@ App.registerTopic({
               k=1: train 100%, val 71% — переобучение<br>
               k=3: train 91%, val 84% — баланс<br>
               k=5: train 87%, val 86% — чуть лучше<br>
-              k=7: train 83%, val 81% — небольшой underfitting<br>
+              k=7: train 83%, val 81% — небольшой <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">underfitting</a><br>
               Оптимум: <b>k=5</b> по cross-validation
             </div>
             <div class="why">Правило: k нечётное (нет ничьей), k ≈ √n как стартовая точка, финально выбирать через CV.</div>

@@ -149,7 +149,7 @@ App.registerTopic({
         <div class="deep-dive-body">
           <p>AUC связан с несколькими другими мерами:</p>
           <ul>
-            <li><b>Gini coefficient</b>: $\\text{Gini} = 2 \\cdot \\text{AUC} - 1$. Используется в финансах.</li>
+            <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-entropy')">Gini</a> coefficient</b>: $\\text{Gini} = 2 \\cdot \\text{AUC} - 1$. Используется в финансах.</li>
             <li><b>Mann-Whitney U</b>: AUC численно равен нормализованной U-статистике.</li>
             <li><b>Concordance index (C-index)</b>: то же, что AUC, но часто используется в survival analysis.</li>
           </ul>
@@ -172,7 +172,7 @@ App.registerTopic({
 
       <h3>🔗 Как это связано с другими темами</h3>
       <ul>
-        <li><b>Метрики классификации</b> — TPR/FPR выводятся из confusion matrix.</li>
+        <li><b>Метрики классификации</b> — TPR/FPR выводятся из <a class="glossary-link" onclick="App.selectTopic('glossary-confusion-matrix')">confusion matrix</a>.</li>
         <li><b>Дисбаланс классов</b> — диктует выбор между ROC и PR.</li>
         <li><b>Логистическая регрессия</b> — выдаёт вероятности, которые ROC анализирует.</li>
         <li><b>Бизнес-метрики</b> — порог на ROC выбирается по бизнес-целям.</li>
@@ -658,7 +658,7 @@ print(f'ROC-AUC (sklearn): {roc_auc_score(y_test, y_proba):.4f}')</code></pre>
 models = {
     'Logistic Regression': LogisticRegression(),
     'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-    'Gradient Boosting': GradientBoostingClassifier(random_state=42),
+    '<a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting': GradientBoostingClassifier(random_state=42),
 }
 
 plt.figure(figsize=(8, 6))

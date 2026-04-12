@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'transformer',
   category: 'dl',
   title: 'Transformer',
-  summary: 'Attention is all you need — архитектура современных LLM.',
+  summary: '<a class="glossary-link" onclick="App.selectTopic('glossary-attention')">Attention</a> is all you need — архитектура современных LLM.',
 
   tabs: {
     theory: `
@@ -18,7 +18,7 @@ App.registerTopic({
       </div>
       <div class="intuition">
         <div class="intuition-title">Аналогия</div>
-        <p>Представь класс студентов, пишущих эссе. Каждый читает предложение «она взяла книгу и начала её читать». Вопрос: что означает «её»? «Книгу», конечно. Чтобы это понять, нужно <b>обратить внимание</b> на слово «книгу», несмотря на расстояние в предложении.</p>
+        <p>Представь класс студентов, пишущих эссе. Каждый читает предложение «она взяла книгу и начала её читать». Вопрос: что означает «её»? «Книгу», конечно. Чтобы это понять, нужно <b>обратить <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a></b> на слово «книгу», несмотря на расстояние в предложении.</p>
         <p>Раньше (RNN) модели читали текст слово за словом, и к концу предложения уже забывали начало. Transformer сделал революционный ход: каждое слово <b>смотрит напрямую на все остальные слова</b> и выбирает, на какие обратить больше внимания. Это и называется <b>attention</b>.</p>
         <p>Результат: огромные языковые модели (GPT, Claude, Gemini), которые понимают контекст, пишут тексты, переводят, отвечают на вопросы. Transformer — архитектура современной эпохи ИИ.</p>
       </div>
@@ -85,17 +85,17 @@ App.registerTopic({
         <li><span class="term" data-tip="Value vector. 'Значение' — что этот токен передаёт, если на него обращают внимание.">Value (V)</span> — «какую информацию я несу?» Содержимое, которое передаётся.</li>
       </ul>
 
-      <p>Все три вектора получаются из исходного эмбеддинга токена через обучаемые матрицы: $Q = x W^Q$, $K = x W^K$, $V = x W^V$.</p>
+      <p>Все три вектора получаются из исходного <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">эмбеддинга</a> токена через обучаемые матрицы: $Q = x W^Q$, $K = x W^K$, $V = x W^V$.</p>
 
       <p><b>Алгоритм self-attention за 4 шага:</b></p>
       <ol>
         <li><b>Совместимость:</b> для каждой пары (token_i, token_j) считаем скалярное произведение $\\text{score}_{ij} = Q_i \\cdot K_j$. Чем ближе «запрос» и «ключ», тем выше скор.</li>
         <li><b>Масштабирование:</b> делим на $\\sqrt{d_k}$, где $d_k$ — размерность вектора Key.</li>
-        <li><b>Softmax:</b> превращаем скоры в веса (сумма = 1).</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Softmax</a>:</b> превращаем скоры в веса (сумма = 1).</li>
         <li><b>Агрегация:</b> выход для токена i = взвешенная сумма V всех токенов.</li>
       </ol>
 
-      <div class="math-block">$$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V$$</div>
+      <div class="math-block">$$\\text{Attention}(Q, K, V) = \\text{<a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">softmax</a>}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V$$</div>
 
       <div class="key-concept">
         <div class="kc-label">Зачем делить на √d_k?</div>
@@ -264,7 +264,7 @@ App.registerTopic({
           </div>
 
           <div class="step" data-step="1">
-            <h4>Шаг 1: Token Embeddings</h4>
+            <h4>Шаг 1: Token <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">Embeddings</a></h4>
             <p>Каждый токен представляется 4-мерным вектором (обучаемый lookup table):</p>
             <div class="calc">
               $e_{\\text{Кот}} = (0.5,\\; -0.2,\\; 0.8,\\; 0.1)$<br>
@@ -356,7 +356,7 @@ App.registerTopic({
             <div class="calc">
               $\\tilde{S} = S / \\sqrt{3} = \\begin{pmatrix} 0.921/1.732 & 0.768/1.732 \\\\ 0.686/1.732 & 0.249/1.732 \\end{pmatrix} = \\begin{pmatrix} 0.532 & 0.443 \\\\ 0.396 & 0.144 \\end{pmatrix}$
             </div>
-            <div class="why">Деление на $\\sqrt{d_k}$ предотвращает «замерзание» softmax. Без масштабирования при большом $d_k$ (например, 64 в BERT) скалярные произведения могут быть $\\sim \\sqrt{64} = 8$, и softmax выдаст почти one-hot вектор (один вес ≈ 1, все ≈ 0). Градиенты через такой softmax ≈ 0.</div>
+            <div class="why">Деление на $\\sqrt{d_k}$ предотвращает «замерзание» softmax. Без масштабирования при большом $d_k$ (например, 64 в BERT) скалярные произведения могут быть $\\sim \\sqrt{64} = 8$, и softmax выдаст почти <a class="glossary-link" onclick="App.selectTopic('glossary-one-hot')">one-hot</a> вектор (один вес ≈ 1, все ≈ 0). <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Градиенты</a> через такой softmax ≈ 0.</div>
           </div>
 
           <div class="step" data-step="6">
@@ -479,7 +479,7 @@ App.registerTopic({
             <h4>Шаг 10: Feed-Forward Network (FFN)</h4>
             <p>FFN применяется к каждой позиции НЕЗАВИСИМО:</p>
             <div class="calc">
-              FFN(x) = $\\text{ReLU}(x \\cdot W_1 + b_1) \\cdot W_2 + b_2$<br><br>
+              FFN(x) = $\\text{<a class="glossary-link" onclick="App.selectTopic('glossary-activations')">ReLU</a>}(x \\cdot W_1 + b_1) \\cdot W_2 + b_2$<br><br>
 
               Обычно $d_{ff} = 4d$, но возьмём $d_{ff} = 3$ для простоты:<br>
               $W_1$ размер $4 \\times 3$, $W_2$ размер $3 \\times 4$<br><br>

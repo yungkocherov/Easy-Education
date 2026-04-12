@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'boosting-comparison',
   category: 'ml-cls',
   title: 'XGBoost, LightGBM, CatBoost',
-  summary: 'Три главные библиотеки Gradient Boosting: чем отличаются, когда какую выбрать.',
+  summary: 'Три главные библиотеки <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting: чем отличаются, когда какую выбрать.',
 
   tabs: {
     theory: `
@@ -30,7 +30,7 @@ App.registerTopic({
       <h3>⚡ XGBoost (eXtreme Gradient Boosting, 2014)</h3>
       <p>Чен Тяньци создал XGBoost для соревнований по ML — и он быстро стал стандартом. Ключевые идеи:</p>
       <ul>
-        <li><b>Аппроксимация 2-го порядка:</b> использует и градиент, и гессиан (вторую производную) для более точных сплитов.</li>
+        <li><b>Аппроксимация 2-го порядка:</b> использует и <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a>, и гессиан (вторую производную) для более точных сплитов.</li>
         <li><b>Регуляризация в loss:</b> $L = \\sum l(y_i, \\hat{y}_i) + \\sum [\\gamma T + \\frac{1}{2}\\lambda \\|w\\|^2]$, где $T$ — число листьев, $w$ — значения в листьях.</li>
         <li><b>Рост дерева: level-wise</b> — сначала все узлы текущего уровня, потом следующий.</li>
         <li><b>Weighted quantile sketch</b> — для ускорения поиска сплитов на больших данных.</li>
@@ -54,13 +54,93 @@ App.registerTopic({
         <p><b>Leaf-wise</b> (LightGBM): дерево выбирает самый «полезный» лист и делит его. Быстрее добирается до хорошего loss, но может переобучиться → нужно ограничивать num_leaves.</p>
       </div>
 
+      <div class="illustration bordered">
+        <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+          <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Level-wise (XGBoost) vs Leaf-wise (LightGBM)</text>
+
+          <!-- Level-wise tree -->
+          <g>
+            <text x="190" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Level-wise: симметричный рост</text>
+            <text x="190" y="72" text-anchor="middle" font-size="10" fill="#64748b">Все узлы одного уровня сначала</text>
+            <!-- Root -->
+            <circle cx="190" cy="100" r="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+            <text x="190" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">x1</text>
+            <!-- Level 1 -->
+            <circle cx="130" cy="160" r="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+            <text x="130" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">x2</text>
+            <circle cx="250" cy="160" r="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+            <text x="250" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">x3</text>
+            <line x1="178" y1="115" x2="142" y2="146" stroke="#475569" stroke-width="1.5"/>
+            <line x1="202" y1="115" x2="238" y2="146" stroke="#475569" stroke-width="1.5"/>
+            <!-- Level 2 (leaves) -->
+            <rect x="80" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="95" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L1</text>
+            <rect x="115" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="130" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L2</text>
+            <rect x="150" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="165" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L3</text>
+            <rect x="200" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="215" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L4</text>
+            <rect x="235" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="250" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L5</text>
+            <rect x="270" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="285" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L6</text>
+            <line x1="122" y1="175" x2="95" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="128" y1="175" x2="130" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="138" y1="175" x2="165" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="242" y1="175" x2="215" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="250" y1="175" x2="250" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="258" y1="175" x2="285" y2="212" stroke="#475569" stroke-width="1"/>
+
+            <text x="190" y="265" text-anchor="middle" font-size="11" fill="#475569">Ограничение: max_depth</text>
+            <text x="190" y="283" text-anchor="middle" font-size="11" fill="#059669">✓ Сбалансированное</text>
+            <text x="190" y="298" text-anchor="middle" font-size="11" fill="#059669">✓ Меньше <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a></text>
+            <text x="190" y="313" text-anchor="middle" font-size="11" fill="#dc2626">✗ Медленнее достигает loss</text>
+          </g>
+
+          <!-- Leaf-wise tree -->
+          <g>
+            <text x="570" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="#b45309">Leaf-wise: асимметричный рост</text>
+            <text x="570" y="72" text-anchor="middle" font-size="10" fill="#64748b">Делим самый «полезный» лист</text>
+            <!-- Root -->
+            <circle cx="570" cy="100" r="18" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+            <text x="570" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">x1</text>
+            <!-- Left goes deeper (wanted to split the "best" leaf) -->
+            <circle cx="500" cy="160" r="18" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+            <text x="500" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">x2</text>
+            <!-- Right stays as leaf -->
+            <rect x="620" y="148" width="30" height="22" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+            <text x="635" y="163" text-anchor="middle" font-size="10" fill="#92400e">L1</text>
+            <line x1="556" y1="115" x2="512" y2="146" stroke="#475569" stroke-width="1.5"/>
+            <line x1="584" y1="115" x2="624" y2="148" stroke="#475569" stroke-width="1.5"/>
+            <!-- Level 2: x2 splits further -->
+            <circle cx="450" cy="220" r="18" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+            <text x="450" y="225" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">x3</text>
+            <rect x="530" y="208" width="30" height="22" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+            <text x="545" y="223" text-anchor="middle" font-size="10" fill="#92400e">L2</text>
+            <line x1="488" y1="175" x2="462" y2="206" stroke="#475569" stroke-width="1"/>
+            <line x1="512" y1="175" x2="534" y2="208" stroke="#475569" stroke-width="1"/>
+            <!-- Level 3: x3 splits further -->
+            <rect x="405" y="270" width="30" height="22" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+            <text x="420" y="285" text-anchor="middle" font-size="10" fill="#92400e">L3</text>
+            <rect x="465" y="270" width="30" height="22" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+            <text x="480" y="285" text-anchor="middle" font-size="10" fill="#92400e">L4</text>
+            <line x1="442" y1="238" x2="420" y2="268" stroke="#475569" stroke-width="1"/>
+            <line x1="458" y1="238" x2="480" y2="268" stroke="#475569" stroke-width="1"/>
+
+            <text x="570" y="313" text-anchor="middle" font-size="11" fill="#059669">✓ Быстрее снижает loss</text>
+          </g>
+        </svg>
+        <div class="caption">Слева — level-wise растёт симметрично, все ветки одной глубины. Справа — leaf-wise идёт «в глубину» туда, где наибольший выигрыш по loss. Асимметричное дерево быстрее снижает ошибку, но легче переобучается.</div>
+      </div>
+
       <h3>🐱 CatBoost (Categorical Boosting, 2017)</h3>
       <p>Яндекс создал CatBoost специально для данных с <b>категориальными признаками</b> (город, тип товара, операционная система):</p>
       <ul>
         <li><b>Ordered Target Encoding</b> — кодирует категории средним таргета, но с хитростью: для каждого объекта использует только предыдущие объекты (предотвращает target leakage).</li>
         <li><b>Ordered Boosting</b> — при вычислении остатков для каждого объекта использует модель, обученную без него. Борется с prediction shift.</li>
         <li><b>Symmetric Trees</b> — все узлы на одном уровне используют <b>один и тот же сплит</b>. Это ограничивает гибкость, но ускоряет предсказание и снижает переобучение.</li>
-        <li><b>Не нужен one-hot encoding</b> — принимает категории «как есть», без ручной подготовки.</li>
+        <li><b>Не нужен <a class="glossary-link" onclick="App.selectTopic('glossary-one-hot')">one-hot</a> encoding</b> — принимает категории «как есть», без ручной подготовки.</li>
       </ul>
 
       <h3>📊 Сравнительная таблица</h3>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Gradient Boosting для регрессии
+   <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting для регрессии
    ========================================================================== */
 App.registerTopic({
   id: 'gradient-boosting-reg',
@@ -13,7 +13,7 @@ App.registerTopic({
         <div class="intuition-title">Аналогия</div>
         <p>Представь, что ты скульптор, и работаешь с глиной. Ты лепишь грубую форму — скажем, голову. Потом смотришь: нос слишком большой, левое ухо не закончено, подбородок слишком острый. Ты <b>исправляешь</b> самые грубые недостатки, лепишь поправки. Снова смотришь — осталась мелкая бахрома, небольшая асимметрия. Исправляешь их. И так итерация за итерацией, пока скульптура не станет точной.</p>
         <p>Gradient Boosting для регрессии работает точно так же. Начинаем с грубого предсказания (среднее y). Смотрим, где ошиблись — это <b>остатки</b> (residuals). Обучаем дерево предсказывать эти остатки. Добавляем к модели. Снова смотрим на остатки — они уменьшились. Строим ещё одно дерево. Повторяем сотни раз.</p>
-        <p>Это <b>самое естественное применение бустинга</b>: в регрессии остатки — просто числа, и дерево может учиться на них напрямую. При классификации градиент чуть сложнее, но идея та же.</p>
+        <p>Это <b>самое естественное применение бустинга</b>: в регрессии остатки — просто числа, и дерево может учиться на них напрямую. При классификации <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a> чуть сложнее, но идея та же.</p>
       </div>
 
       <div class="illustration bordered">
@@ -59,7 +59,7 @@ App.registerTopic({
           <line x1="270" y1="132" x2="270" y2="142" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
           <line x1="469" y1="132" x2="340" y2="142" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
           <!-- Convergence chart -->
-          <text x="270" y="200" text-anchor="middle" font-size="9" fill="#64748b">MSE: ████████ → ████ → ██ → █ — уменьшается с каждой итерацией</text>
+          <text x="270" y="200" text-anchor="middle" font-size="9" fill="#64748b"><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>: ████████ → ████ → ██ → █ — уменьшается с каждой итерацией</text>
           <defs>
             <marker id="gbr_arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
               <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
@@ -86,11 +86,11 @@ App.registerTopic({
 
       <div class="key-concept">
         <div class="kc-label">Почему «Градиентный» Boosting</div>
-        <p>Для MSE: $L = \\frac{1}{2}(y - F)^2$. Отрицательный градиент: $-\\frac{\\partial L}{\\partial F} = y - F = r$. То есть для MSE остатки = отрицательный градиент функции потерь. Мы делаем <b>градиентный спуск в пространстве функций</b>, а не в пространстве параметров. Для других функций потерь (MAE, Huber) псевдо-остатки отличаются — отсюда и название.</p>
+        <p>Для MSE: $L = \\frac{1}{2}(y - F)^2$. Отрицательный градиент: $-\\frac{\\partial L}{\\partial F} = y - F = r$. То есть для MSE остатки = отрицательный градиент <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>. Мы делаем <b>градиентный спуск в пространстве функций</b>, а не в пространстве параметров. Для других функций потерь (<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a>, Huber) псевдо-остатки отличаются — отсюда и название.</p>
       </div>
 
       <h3>📉 Learning rate η — скорость обучения</h3>
-      <p>Без η каждое новое дерево полностью «закрывало» бы остатки — быстро, но переобучение. С η мы <b>замедляем</b> исправление:</p>
+      <p>Без η каждое новое дерево полностью «закрывало» бы остатки — быстро, но <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a>. С η мы <b>замедляем</b> исправление:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
       <ul>
         <li><b>η = 1.0:</b> полный шаг. После одного дерева остатки = 0 (если дерево идеально). Риск переобучения огромный.</li>
@@ -108,7 +108,7 @@ App.registerTopic({
         <li><b>max_features &lt; 1.0:</b> случайные признаки, как в Random Forest. Типично 0.8 или 'sqrt'.</li>
       </ul>
 
-      <h3>🎯 Huber Loss — устойчивость к выбросам</h3>
+      <h3>🎯 <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Huber Loss</a> — устойчивость к выбросам</h3>
       <p>MSE квадратично штрафует выбросы. Для зашумлённых данных лучше работает <span class="term" data-tip="Huber Loss. Гибрид MSE и MAE: квадратичный при малых ошибках (|r| ≤ δ) и линейный при больших. Устойчив к выбросам, но дифференцируем.">функция потерь Хьюбера</span>:</p>
       <div class="math-block">$$L_\\delta(r) = \\begin{cases} \\frac{1}{2}r^2, & |r| \\leq \\delta \\\\ \\delta(|r| - \\delta/2), & |r| > \\delta \\end{cases}$$</div>
       <p>Псевдо-остатки для Huber Loss:</p>

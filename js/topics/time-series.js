@@ -255,7 +255,7 @@ App.registerTopic({
         <li><b>Линейная регрессия</b> — тренд = линейная регрессия по времени. Basis for ARIMA.</li>
         <li><b>Статистика (распределения, тесты)</b> — ADF тест, критерий нормальности остатков.</li>
         <li><b>Нейронные сети</b> — LSTM и Transformer для сложных многомерных рядов.</li>
-        <li><b>Gradient Boosting</b> — мощный подход с ручным созданием лаговых признаков.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting</b> — мощный подход с ручным созданием лаговых признаков.</li>
       </ul>
     `,
 
@@ -685,7 +685,7 @@ print(arima_fit.summary())
 
 # Прогноз
 forecast = arima_fit.forecast(steps=6)
-mae  = mean_absolute_error(test, forecast)
+<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">mae</a>  = mean_absolute_error(test, forecast)
 rmse = np.sqrt(mean_squared_error(test, forecast))
 print(f"\\nARIMA(1,1,1): MAE={mae:.2f}, RMSE={rmse:.2f}")
 

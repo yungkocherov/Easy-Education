@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'logistic-regression',
   category: 'ml-cls',
   title: 'Логистическая регрессия',
-  summary: 'Классификация через сигмоиду: предсказываем вероятность класса.',
+  summary: 'Классификация через <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">сигмоиду</a>: предсказываем вероятность класса.',
 
   tabs: {
     theory: `
@@ -72,7 +72,7 @@ App.registerTopic({
         <li>Симметрична относительно (0, 0.5).</li>
       </ul>
 
-      <p>Красивое свойство производной: $\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$. Это упрощает вычисления градиентов.</p>
+      <p>Красивое свойство производной: $\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$. Это упрощает вычисления <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиентов</a>.</p>
 
       <h3>🧮 Модель логистической регрессии</h3>
       <p>Берём линейную комбинацию признаков и пропускаем через сигмоиду:</p>
@@ -95,8 +95,8 @@ App.registerTopic({
         <li><b>Высокий порог (0.7)</b>: меньше ложных тревог, но больше пропусков.</li>
       </ul>
 
-      <h3>📉 Функция потерь: log-loss</h3>
-      <p>Для линейной регрессии мы использовали MSE. Для классификации — нет, потому что она плохо работает с вероятностями. Используем <span class="term" data-tip="Cross-entropy loss / Log-loss. Функция потерь для классификации. Сильно наказывает уверенные неправильные предсказания (p → 0 для верного класса).">cross-entropy loss</span> (log-loss):</p>
+      <h3>📉 <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Функция потерь</a>: log-loss</h3>
+      <p>Для линейной регрессии мы использовали <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>. Для классификации — нет, потому что она плохо работает с вероятностями. Используем <span class="term" data-tip="Cross-entropy loss / Log-loss. Функция потерь для классификации. Сильно наказывает уверенные неправильные предсказания (p → 0 для верного класса).">cross-entropy loss</span> (log-loss):</p>
       <div class="math-block">$$L = -\\frac{1}{n} \\sum_{i=1}^{n} [y_i \\log(\\hat{p}_i) + (1-y_i) \\log(1 - \\hat{p}_i)]$$</div>
 
       <p><b>Интуиция:</b> для каждого примера штраф = $-\\log(\\text{вероятность правильного класса})$.</p>
@@ -141,8 +141,8 @@ App.registerTopic({
 
       <p><b>Интерпретация:</b> если $w_i = 0.7$, то при увеличении признака на 1, шансы умножаются на $e^{0.7} \\approx 2.0$. То есть шансы удваиваются.</p>
 
-      <h3>📊 Многоклассовая классификация (Softmax)</h3>
-      <p>Для более чем 2 классов используют <span class="term" data-tip="Softmax function. Обобщение сигмоиды на несколько классов. Превращает вектор чисел в распределение вероятностей (сумма = 1).">softmax</span> — обобщение сигмоиды:</p>
+      <h3>📊 Многоклассовая классификация (<a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Softmax</a>)</h3>
+      <p>Для более чем 2 классов используют <span class="term" data-tip="Softmax function. Обобщение сигмоиды на несколько классов. Превращает вектор чисел в распределение вероятностей (сумма = 1)."><a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">softmax</a></span> — обобщение сигмоиды:</p>
       <div class="math-block">$$P(y = k \\mid x) = \\frac{e^{z_k}}{\\sum_{j=1}^{K} e^{z_j}}$$</div>
 
       <p>Для каждого класса свой набор весов и своя линейная комбинация $z_k = w_k^T x + b_k$. Softmax превращает все $z_k$ в распределение вероятностей (сумма = 1). Модель предсказывает класс с наибольшей вероятностью.</p>
@@ -151,7 +151,7 @@ App.registerTopic({
         <li>$e^{2.0} = 7.39$, $e^{1.0} = 2.72$, $e^{0.5} = 1.65$ → сумма = 11.76</li>
         <li>$P = [0.63, 0.23, 0.14]$ → класс 1 (63%)</li>
       </ul>
-      <p>Функция потерь для многоклассовой задачи — <b>categorical cross-entropy</b>: $L = -\\sum_k y_k \\log P(y=k)$, где $y_k$ — one-hot вектор (1 для правильного класса, 0 для остальных). В sklearn: <code>LogisticRegression(multi_class='multinomial')</code>.</p>
+      <p>Функция потерь для многоклассовой задачи — <b>categorical cross-entropy</b>: $L = -\\sum_k y_k \\log P(y=k)$, где $y_k$ — <a class="glossary-link" onclick="App.selectTopic('glossary-one-hot')">one-hot</a> вектор (1 для правильного класса, 0 для остальных). В sklearn: <code>LogisticRegression(multi_class='multinomial')</code>.</p>
 
       <h3>⚠️ Частые заблуждения</h3>
       <ul>
@@ -481,7 +481,7 @@ App.registerTopic({
         let w = [0, 0, 0]; // w0 (bias), w1, w2
         let iterations = 0;
 
-        function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+        function <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">sigmoid</a>(z) { return 1 / (1 + Math.exp(-z)); }
 
         function regenerate() {
           const sep = +cSep.input.value;
@@ -663,7 +663,7 @@ print(proba.round(3))
 
 ConfusionMatrixDisplay.from_estimator(model_multi, X_te, y_te,
                                        display_labels=iris.target_names)
-plt.title('Матрица ошибок: Iris (3 класса)')
+plt.title('<a class="glossary-link" onclick="App.selectTopic('glossary-confusion-matrix')">Матрица ошибок</a>: Iris (3 класса)')
 plt.show()</code></pre>
     `,
 
@@ -689,7 +689,7 @@ plt.show()</code></pre>
             <li>Быстрое обучение и предсказание</li>
             <li>Легко добавлять регуляризацию (L1/L2)</li>
             <li>Устойчива к небольшим наборам данных</li>
-            <li>Выпуклая loss function → гарантированный глобальный минимум</li>
+            <li>Выпуклая <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">loss function</a> → гарантированный глобальный минимум</li>
           </ul>
         </div>
         <div class="cons">

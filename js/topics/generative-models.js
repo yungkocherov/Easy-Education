@@ -63,7 +63,7 @@ App.registerTopic({
           <text x="340" y="92" text-anchor="middle" font-size="10" fill="#64748b">dim=784</text>
 
           <text x="440" y="55" font-size="10" fill="#64748b">Loss = ||x - x̂||²</text>
-          <text x="440" y="72" font-size="10" fill="#64748b">(MSE)</text>
+          <text x="440" y="72" font-size="10" fill="#64748b">(<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>)</text>
         </svg>
         <div class="caption">Автоэнкодер: вход 784-мерный (28×28 пикселей) сжимается в 2-мерный латентный вектор z, затем восстанавливается. Loss = ошибка реконструкции.</div>
       </div>
@@ -99,7 +99,7 @@ App.registerTopic({
         <p><b>Зачем KL-дивергенция?</b> Она «притягивает» распределение $q(z|x)$ к стандартному нормальному $\\mathcal{N}(0, 1)$. Без неё Encoder мог бы выучить огромные $\\mu$ и крошечные $\\sigma$, фактически превращая VAE в обычный автоэнкодер. KL-регуляризация обеспечивает <b>гладкость</b>: близкие точки в $z$ дают похожие изображения.</p>
       </div>
 
-      <div class="why">Reparameterization trick — гениальная хитрость. Мы не можем дифференцировать через случайную операцию «сэмплировать из $\\mathcal{N}(\\mu, \\sigma^2)$». Но мы МОЖЕМ дифференцировать через детерминированную формулу $z = \\mu + \\sigma \\cdot \\varepsilon$, потому что $\\varepsilon$ — константа (сэмплирована заранее), а $\\mu$ и $\\sigma$ — обучаемые. Градиент проходит!</div>
+      <div class="why">Reparameterization trick — гениальная хитрость. Мы не можем дифференцировать через случайную операцию «сэмплировать из $\\mathcal{N}(\\mu, \\sigma^2)$». Но мы МОЖЕМ дифференцировать через детерминированную формулу $z = \\mu + \\sigma \\cdot \\varepsilon$, потому что $\\varepsilon$ — константа (сэмплирована заранее), а $\\mu$ и $\\sigma$ — обучаемые. <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Градиент</a> проходит!</div>
 
       <p>Термин <b>ELBO</b> (Evidence Lower Bound) — это $-\\mathcal{L}_{VAE}$ (мы максимизируем нижнюю границу логарифма правдоподобия данных $\\log p(x)$).</p>
 
@@ -318,7 +318,7 @@ App.registerTopic({
             <div class="problem-label">Задача</div>
             <p>Показать, как работает GAN на простейшем примере. Реальные данные — числа из распределения $\\mathcal{N}(5, 1)$ (среднее 5, стандартное отклонение 1). Генератор получает шум $z \\sim \\mathcal{N}(0, 1)$ и пытается генерировать числа, похожие на реальные. Дискриминатор пытается отличить реальные от фейковых.</p>
             <p>Генератор: $G(z) = a \\cdot z + b$ (линейное преобразование, начальные $a=1, b=0$).</p>
-            <p>Дискриминатор: $D(x) = \\sigma(w \\cdot x + c)$ (линейный + сигмоида, начальные $w=0.1, c=0$).</p>
+            <p>Дискриминатор: $D(x) = \\sigma(w \\cdot x + c)$ (линейный + <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">сигмоида</a>, начальные $w=0.1, c=0$).</p>
           </div>
 
           <div class="step" data-step="1">
@@ -556,7 +556,7 @@ class Generator(nn.Module):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(1, 16),
-            nn.ReLU(),
+            nn.<a class="glossary-link" onclick="App.selectTopic('glossary-activations')">ReLU</a>(),
             nn.Linear(16, 1)
         )
     def forward(self, z):
@@ -570,7 +570,7 @@ class Discriminator(nn.Module):
             nn.Linear(1, 16),
             nn.ReLU(),
             nn.Linear(16, 1),
-            nn.Sigmoid()
+            nn.<a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Sigmoid</a>()
         )
     def forward(self, x):
         return self.net(x)

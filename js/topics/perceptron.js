@@ -57,7 +57,7 @@ App.registerTopic({
             </marker>
           </defs>
         </svg>
-        <div class="caption">Один нейрон (перцептрон): входы x₁, x₂ умножаются на веса w₁, w₂, суммируются (Σ) с bias b, проходят через функцию активации → предсказание ŷ.</div>
+        <div class="caption">Один нейрон (перцептрон): входы x₁, x₂ умножаются на веса w₁, w₂, суммируются (Σ) с bias b, проходят через <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">функцию активации</a> → предсказание ŷ.</div>
       </div>
 
       <h3>📜 Историческое значение</h3>
@@ -76,7 +76,7 @@ App.registerTopic({
 
       <div class="math-block">$$\\hat{y} = \\text{sign}(w_0 + w_1 x_1 + w_2 x_2 + \\ldots + w_p x_p)$$</div>
 
-      <p>Функция <b>sign</b> — это пороговая функция активации. Современные нейроны используют другие (sigmoid, ReLU), но идея та же.</p>
+      <p>Функция <b>sign</b> — это пороговая функция активации. Современные нейроны используют другие (<a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">sigmoid</a>, <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">ReLU</a>), но идея та же.</p>
 
       <div class="key-concept">
         <div class="kc-label">Геометрическая интуиция</div>
@@ -184,11 +184,11 @@ App.registerTopic({
             <li><b>1986</b> — MLP + Backpropagation (Rumelhart et al.).</li>
             <li><b>1998</b> — LeNet-5 (свёрточные сети, LeCun).</li>
             <li><b>2012</b> — AlexNet (deep learning революция).</li>
-            <li><b>2014</b> — Seq2seq, Attention.</li>
+            <li><b>2014</b> — Seq2seq, <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">Attention</a>.</li>
             <li><b>2017</b> — Transformer ("Attention is All You Need").</li>
             <li><b>2022+</b> — GPT-4, Claude, LLMs.</li>
           </ol>
-          <p>Всё это развитие идеи перцептрона: нейрон → слои → глубокие сети → внимание.</p>
+          <p>Всё это развитие идеи перцептрона: нейрон → слои → глубокие сети → <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>.</p>
         </div>
       </div>
 

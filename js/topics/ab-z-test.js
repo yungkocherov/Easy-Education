@@ -125,7 +125,7 @@ App.registerTopic({
       <h3>📏 <a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">Доверительный интервал</a> для разности пропорций</h3>
       <p>p-value говорит «значимо или нет». Доверительный интервал (<a class="glossary-link" onclick="App.selectTopic('glossary-confidence-interval')">CI</a>) говорит «насколько»:</p>
       <div class="math-block">$$\\text{CI}_{95\\%} = (\\hat{p}_B - \\hat{p}_A) \\pm z_{0.025} \\cdot \\sqrt{\\frac{\\hat{p}_A(1-\\hat{p}_A)}{n_A} + \\frac{\\hat{p}_B(1-\\hat{p}_B)}{n_B}}$$</div>
-      <p>Обрати внимание: здесь используем SE <b>без</b> объединённой пропорции (непулированный), так как мы оцениваем интервал для реальной разности, а не тестируем гипотезу равенства.</p>
+      <p>Обрати <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>: здесь используем SE <b>без</b> объединённой пропорции (непулированный), так как мы оцениваем интервал для реальной разности, а не тестируем гипотезу равенства.</p>
 
       <div class="key-concept">
         <div class="kc-label">Статистическая vs практическая значимость</div>

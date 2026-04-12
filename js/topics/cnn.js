@@ -109,7 +109,7 @@ App.registerTopic({
       <ul>
         <li>Огромный размер модели.</li>
         <li>Долгое обучение.</li>
-        <li>Сильное переобучение (слишком много свободы).</li>
+        <li>Сильное <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a> (слишком много свободы).</li>
         <li><b>Игнорирует локальную структуру</b> изображения.</li>
       </ul>
 
@@ -174,10 +174,10 @@ App.registerTopic({
 
       <h3>🏗️ Типичная архитектура CNN</h3>
       <pre>Input (224×224×3)  ← исходное изображение
-  → Conv 3×3, 64 filters → ReLU → MaxPool 2×2   (112×112×64)
+  → Conv 3×3, 64 filters → <a class="glossary-link" onclick="App.selectTopic('glossary-activations')">ReLU</a> → MaxPool 2×2   (112×112×64)
   → Conv 3×3, 128 filters → ReLU → MaxPool 2×2  (56×56×128)
   → Conv 3×3, 256 filters → ReLU → MaxPool 2×2  (28×28×256)
-  → Flatten → FC → Softmax</pre>
+  → Flatten → FC → <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">Softmax</a></pre>
 
       <p>Идея: <b>глубина растёт</b> (больше фильтров), <b>размер уменьшается</b> (pooling). Получаем компактное, но информативное представление.</p>
 
@@ -223,7 +223,7 @@ App.registerTopic({
             <li><b>GoogLeNet</b> (2014) — inception-модули.</li>
             <li><b>ResNet</b> (2015) — skip connections, очень глубокие (100+ слоёв).</li>
             <li><b>EfficientNet</b> (2019) — оптимальный баланс размеров.</li>
-            <li><b>ViT</b> (2020) — attention вместо свёрток.</li>
+            <li><b>ViT</b> (2020) — <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">attention</a> вместо свёрток.</li>
           </ul>
         </div>
       </div>
@@ -233,7 +233,7 @@ App.registerTopic({
         <div class="deep-dive-body">
           <p>В глубоких CNN возникает проблема vanishing gradients. Решение — <span class="term" data-tip="Residual Connection. Skip-связь, добавляющая вход блока к его выходу: y = F(x) + x. Позволяет обучать очень глубокие сети.">residual connections</span>:</p>
           <div class="math-block">$$y = F(x) + x$$</div>
-          <p>Вход блока добавляется к выходу. Это «короткий путь» для градиентов — они легко доходят до ранних слоёв.</p>
+          <p>Вход блока добавляется к выходу. Это «короткий путь» для <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиентов</a> — они легко доходят до ранних слоёв.</p>
           <p>ResNet использует это и успешно обучает сети в 100+ слоёв.</p>
         </div>
       </div>
@@ -994,7 +994,7 @@ class SimpleCNN(nn.Module):
         x = self.dropout(x)
         x = x.view(x.size(0), -1)                 # разворачиваем в вектор
         x = F.relu(self.fc1(x))
-        return self.fc2(x)                         # логиты (без softmax)
+        return self.fc2(x)                         # логиты (без <a class="glossary-link" onclick="App.selectTopic('glossary-sigmoid-softmax')">softmax</a>)
 
 model = SimpleCNN()
 print(model)
