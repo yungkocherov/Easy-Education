@@ -148,9 +148,9 @@ App.registerTopic({
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a></b> (Mean Absolute Error) — средняя модуль ошибки. Устойчива к выбросам.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a></b> (Mean Squared Error) — средний квадрат ошибки. Наказывает большие ошибки сильнее.</li>
-        <li><b>RMSE</b> — корень из MSE, в единицах таргета.</li>
-        <li><b>R²</b> — доля объяснённой дисперсии.</li>
-        <li><b>MAPE</b> — в процентах от истинного значения.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-regression-metrics')">RMSE</a></b> — корень из MSE, в единицах таргета.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-regression-metrics')">R²</a></b> — доля объяснённой дисперсии.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-regression-metrics')">MAPE</a></b> — в процентах от истинного значения.</li>
       </ul>
 
       <h3>⚠️ Частые заблуждения</h3>
