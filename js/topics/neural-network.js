@@ -321,7 +321,7 @@ App.registerTopic({
             <div class="calc">
               $a_2 = \\text{ReLU}(z_2) = \\text{ReLU}(0{,}8) = \\max(0,\\; 0{,}8) = \\mathbf{0{,}8}$
             </div>
-            <div class="why">Тоже положительное: $0{,}8 > 0$, ReLU пропускает. Обратите <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>: нейрон h₂ «видит» $x_2$ сильнее ($w_{22}=0{,}8$), а $x_1$ — с отрицательным весом.</div>
+            <div class="why">Тоже положительное: $0{,}8 > 0$, ReLU пропускает. Обратите внимание: нейрон h₂ «видит» $x_2$ сильнее ($w_{22}=0{,}8$), а $x_1$ — с отрицательным весом.</div>
           </div>
 
           <div class="step" data-step="4">

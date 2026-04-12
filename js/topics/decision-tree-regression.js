@@ -550,7 +550,7 @@ for ax, criterion in zip(axes, ['squared_error', 'absolute_error']):
 
 plt.tight_layout()
 plt.show()
-# Обратите <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>: за x=10 линия "застывает" — это экстраполяция</code></pre>
+# Обратите внимание: за x=10 линия "застывает" — это экстраполяция</code></pre>
     `,
 
     applications: `

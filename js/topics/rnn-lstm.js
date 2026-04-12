@@ -560,7 +560,7 @@ App.registerTopic({
               N=50: RNN ≈ 0%, LSTM = 7.7%<br>
               N=100: RNN ≈ 0%, LSTM = 0.6% (тоже проблемы!)
             </div>
-            <div class="why">LSTM драматически лучше RNN, но тоже затухает на очень длинных последовательностях (100+ шагов). Для таких задач нужны Transformer (<a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a> на любое расстояние за 1 шаг) или SSM (Mamba).</div>
+            <div class="why">LSTM драматически лучше RNN, но тоже затухает на очень длинных последовательностях (100+ шагов). Для таких задач нужны Transformer (внимание на любое расстояние за 1 шаг) или SSM (Mamba).</div>
           </div>
 
           <div class="answer-box">

@@ -188,7 +188,7 @@ App.registerTopic({
             <li><b>2017</b> — Transformer ("Attention is All You Need").</li>
             <li><b>2022+</b> — GPT-4, Claude, LLMs.</li>
           </ol>
-          <p>Всё это развитие идеи перцептрона: нейрон → слои → глубокие сети → <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">внимание</a>.</p>
+          <p>Всё это развитие идеи перцептрона: нейрон → слои → глубокие сети → внимание.</p>
         </div>
       </div>
 

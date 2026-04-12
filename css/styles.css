@@ -507,7 +507,7 @@ canvas.sim-canvas {
 
 /* ========== Term with tooltip ========== */
 .term {
-  border-bottom: 1px dotted #3b82f6;
+  border-bottom: none;
   cursor: help;
   position: relative;
   color: #1e40af;
