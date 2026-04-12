@@ -570,9 +570,9 @@ canvas.sim-canvas {
 
 /* ========== Illustration ========== */
 .illustration { margin: 18px 0 22px; text-align: center; }
-.illustration svg { max-width: 100%; height: auto; display: inline-block; }
+.illustration svg { max-width: 100% !important; width: 100%; height: auto; display: inline-block; }
 .illustration .caption { font-size: 13px; color: #64748b; margin-top: 8px; font-style: italic; }
-.illustration.bordered svg { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; }
+.illustration.bordered svg { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; background: white; }
 
 /* ========== Step-by-step examples ========== */
 .example-problem { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px 18px; border-radius: 4px; margin: 16px 0; }

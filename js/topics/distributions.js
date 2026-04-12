@@ -42,31 +42,79 @@ App.registerTopic({
       <h3>📊 Ключевые распределения</h3>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="max-width:900px;">
           <defs>
             <linearGradient id="bellGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/></linearGradient>
             <linearGradient id="skewGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.4"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0.05"/></linearGradient>
           </defs>
-          <!-- Normal -->
-          <text x="150" y="18" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">Нормальное (μ=0, σ=1)</text>
-          <path d="M30,190 C30,190 70,188 90,180 C110,170 130,140 150,80 C160,50 170,30 180,30 C190,30 200,50 210,80 C230,140 250,170 270,180 C290,188 310,190 330,190" fill="url(#bellGrad)" stroke="#3b82f6" stroke-width="2.5"/>
-          <line x1="180" y1="30" x2="180" y2="195" stroke="#1e40af" stroke-width="1" stroke-dasharray="4"/>
-          <text x="180" y="207" text-anchor="middle" font-size="11" fill="#1e40af">μ</text>
-          <line x1="30" y1="190" x2="330" y2="190" stroke="#94a3b8" stroke-width="1"/>
-          <!-- Arrows for σ -->
-          <line x1="120" y1="130" x2="240" y2="130" stroke="#64748b" stroke-width="1"/>
-          <text x="180" y="145" text-anchor="middle" font-size="10" fill="#64748b">68% (μ±σ)</text>
-          <!-- Right-skewed -->
-          <text x="460" y="18" text-anchor="middle" font-size="13" font-weight="600" fill="#92400e">Правый скос (доходы, время)</text>
-          <path d="M340,190 C340,190 360,186 380,160 C400,120 410,60 420,40 C425,32 430,35 440,50 C460,90 480,130 500,155 C520,170 540,180 560,185 C570,188 580,189 590,190" fill="url(#skewGrad)" stroke="#f59e0b" stroke-width="2.5"/>
-          <line x1="340" y1="190" x2="590" y2="190" stroke="#94a3b8" stroke-width="1"/>
-          <line x1="420" y1="40" x2="420" y2="195" stroke="#92400e" stroke-width="1" stroke-dasharray="4"/>
-          <text x="420" y="207" text-anchor="middle" font-size="10" fill="#92400e">мода</text>
-          <line x1="440" y1="195" x2="440" y2="200" stroke="#64748b"/><text x="440" y="210" text-anchor="middle" font-size="9" fill="#64748b">медиана</text>
-          <line x1="475" y1="195" x2="475" y2="200" stroke="#64748b"/><text x="475" y="210" text-anchor="middle" font-size="9" fill="#64748b">среднее</text>
-          <path d="M545,175 L560,168" stroke="#92400e" stroke-width="1"/><text x="572" y="165" font-size="9" fill="#92400e">длинный хвост</text>
+          <!-- Normal (generated) -->
+          <text x="200" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Нормальное (μ=0, σ=1)</text>
+          <line x1="30" y1="240" x2="370" y2="240" stroke="#94a3b8" stroke-width="1.5"/>
+          <path id="dist-intro-normal-area" d="" fill="url(#bellGrad)"/>
+          <path id="dist-intro-normal" d="" fill="none" stroke="#1e40af" stroke-width="2.8"/>
+          <line x1="200" y1="60" x2="200" y2="245" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="4"/>
+          <text x="200" y="260" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="700">μ</text>
+          <line x1="137" y1="160" x2="263" y2="160" stroke="#64748b" stroke-width="1.5"/>
+          <text x="200" y="178" text-anchor="middle" font-size="11" fill="#64748b">68% (μ±σ)</text>
+
+          <!-- Right-skewed (generated) -->
+          <text x="640" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">Правый скос (доходы, время)</text>
+          <line x1="450" y1="240" x2="870" y2="240" stroke="#94a3b8" stroke-width="1.5"/>
+          <path id="dist-intro-skew" d="" fill="url(#skewGrad)" stroke="#b45309" stroke-width="2.8"/>
+          <!-- Mode, median, mean lines — well-separated -->
+          <line id="dist-skew-mode" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="2" stroke-dasharray="4,2"/>
+          <line id="dist-skew-median" x1="0" y1="0" x2="0" y2="0" stroke="#0284c7" stroke-width="2" stroke-dasharray="4,2"/>
+          <line id="dist-skew-mean" x1="0" y1="0" x2="0" y2="0" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,2"/>
+          <text id="dist-skew-mode-label" x="0" y="260" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">мода</text>
+          <text id="dist-skew-median-label" x="0" y="278" text-anchor="middle" font-size="12" font-weight="700" fill="#0284c7">медиана</text>
+          <text id="dist-skew-mean-label" x="0" y="296" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">среднее</text>
         </svg>
-        <div class="caption">Слева: нормальное распределение — симметричный колокол. Справа: правый скос — среднее сдвинуто вправо от медианы.</div>
+        <div class="caption">Слева: нормальное распределение — симметричный колокол, μ точно в центре. Справа: правый скос — мода (пик) левее медианы, медиана левее среднего. Длинный хвост «тянет» среднее вправо.</div>
+        <script>
+        (function() {
+          var U = App.Util;
+          // Normal: center 200, baseline 240, peak 60, halfWidth 150
+          U.setPath(document, 'dist-intro-normal-area', U.normalSegmentPath(200, 240, 60, 150, -3, 3));
+          U.setPath(document, 'dist-intro-normal', U.normalOutlinePath(200, 240, 60, 150));
+
+          // Right-skewed: use custom path builder
+          var modeX = 560;  // mode position
+          var x0 = modeX - 80, x1 = modeX + 300;
+          var baselineY = 240, peakY = 60;
+          var n = 200;
+          var pts = [];
+          for (var i = 0; i <= n; i++) {
+            var x = x0 + (x1 - x0) * i / n;
+            var t = (x - modeX) / 60;
+            var pdf;
+            if (t < -1.2) pdf = 0;
+            else if (t < 0) pdf = Math.pow(1 + t / 1.2, 4);
+            else pdf = Math.exp(-t * 0.8);
+            var y = baselineY - pdf * (baselineY - peakY);
+            pts.push([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
+          }
+          var d = 'M' + pts[0][0] + ',' + baselineY;
+          for (var j = 0; j < pts.length; j++) d += ' L' + pts[j][0] + ',' + pts[j][1];
+          d += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+          document.getElementById('dist-intro-skew').setAttribute('d', d);
+
+          // Position mode, median, mean lines
+          var modePx = modeX;
+          var medianPx = modeX + 50;
+          var meanPx = modeX + 100;
+          function setLine(id, x) {
+            var el = document.getElementById(id);
+            el.setAttribute('x1', x); el.setAttribute('x2', x);
+            el.setAttribute('y1', 55); el.setAttribute('y2', 245);
+          }
+          setLine('dist-skew-mode', modePx);
+          setLine('dist-skew-median', medianPx);
+          setLine('dist-skew-mean', meanPx);
+          document.getElementById('dist-skew-mode-label').setAttribute('x', modePx);
+          document.getElementById('dist-skew-median-label').setAttribute('x', medianPx);
+          document.getElementById('dist-skew-mean-label').setAttribute('x', meanPx);
+        })();
+        </script>
       </div>
 
       <h4>📊 Нормальное (Gaussian) — $N(\\mu, \\sigma^2)$</h4>

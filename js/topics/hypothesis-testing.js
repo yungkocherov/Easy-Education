@@ -231,19 +231,33 @@ App.registerTopic({
         <script>
         (function() {
           var U = App.Util;
-          var baselineY = 250, peakY = 80, halfWidth = 130;
-          var cxH0 = 250, cxH1 = 510;
+          var baselineY = 250, peakY = 80, halfWidth = 160;
+          var cxH0 = 220, cxH1 = 500;
+          // sigma in pixels = halfWidth / 3 ≈ 53.3
+          var sigPx = halfWidth / 3;
+          // Distance between centres in sigma units
+          var deltaSig = (cxH1 - cxH0) / sigPx;  // ≈ 5.25 sigma
+          // Critical point at +1.65σ from H0
+          var critSig = 1.65;
+          var critX = cxH0 + critSig * sigPx;
+          // For H1, the critical point is at (critX - cxH1) / sigPx sigma
+          var critSigH1 = (critX - cxH1) / sigPx;  // negative (left tail of H1)
           U.setPath(document, 'err-h0-outline', U.normalOutlinePath(cxH0, baselineY, peakY, halfWidth));
           U.setPath(document, 'err-h0-area', U.normalSegmentPath(cxH0, baselineY, peakY, halfWidth, -3, 3));
           U.setPath(document, 'err-h1-outline', U.normalOutlinePath(cxH1, baselineY, peakY, halfWidth));
           U.setPath(document, 'err-h1-area', U.normalSegmentPath(cxH1, baselineY, peakY, halfWidth, -3, 3));
-          // Critical value at +1.5σ from H0 (which is also -1.5σ from H1 because они на 3σ apart)
-          var critX = cxH0 + (1.5 / 3) * halfWidth;
-          U.setPath(document, 'err-alpha', U.normalSegmentPath(cxH0, baselineY, peakY, halfWidth, 1.5, 3));
-          U.setPath(document, 'err-beta', U.normalSegmentPath(cxH1, baselineY, peakY, halfWidth, -3, -1.5));
+          // Alpha = right tail of H0 beyond critSig
+          U.setPath(document, 'err-alpha', U.normalSegmentPath(cxH0, baselineY, peakY, halfWidth, critSig, 3));
+          // Beta = left portion of H1 up to critX (i.e. from -3 to critSigH1 in H1's frame)
+          U.setPath(document, 'err-beta', U.normalSegmentPath(cxH1, baselineY, peakY, halfWidth, -3, critSigH1));
           var critLine = document.getElementById('err-crit');
           critLine.setAttribute('x1', critX); critLine.setAttribute('x2', critX);
           critLine.setAttribute('y1', 60); critLine.setAttribute('y2', 258);
+          // Position labels — alpha right of crit, beta left of crit, well-separated
+          document.getElementById('err-alpha-label').setAttribute('x', critX + 40);
+          document.getElementById('err-alpha-sub').setAttribute('x', critX + 40);
+          document.getElementById('err-beta-label').setAttribute('x', critX - 50);
+          document.getElementById('err-beta-sub').setAttribute('x', critX - 50);
           document.getElementById('err-crit-label').setAttribute('x', critX);
           document.getElementById('err-h0-title').setAttribute('x', cxH0);
           document.getElementById('err-h1-title').setAttribute('x', cxH1);

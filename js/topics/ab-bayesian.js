@@ -161,9 +161,9 @@ App.registerTopic({
           <!-- Posterior A and B -->
           <path id="bab-post-a" d="" fill="#3b82f6" fill-opacity="0.25" stroke="#1d4ed8" stroke-width="2.5"/>
           <path id="bab-post-b" d="" fill="#10b981" fill-opacity="0.25" stroke="#047857" stroke-width="2.5"/>
-          <!-- Labels -->
-          <text x="180" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">A</text>
-          <text x="230" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">B</text>
+          <!-- Labels (positioned by init) -->
+          <text id="bab-label-a" x="0" y="0" text-anchor="middle" font-size="16" font-weight="800" fill="#1d4ed8">A</text>
+          <text id="bab-label-b" x="0" y="0" text-anchor="middle" font-size="16" font-weight="800" fill="#047857">B</text>
           <!-- Big P(B>A) annotation -->
           <text x="520" y="95" font-size="18" font-weight="800" fill="#d97706">P(B &gt; A) = 96.8%</text>
           <text x="520" y="115" font-size="11" fill="#92400e">(Monte Carlo из 100k семплов)</text>
@@ -198,9 +198,19 @@ App.registerTopic({
             }
             return d;
           }
-          // A: Beta(1+51, 1+949), B: Beta(1+67, 1+933)
-          document.getElementById('bab-post-a').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, 52, 950, true));
-          document.getElementById('bab-post-b').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, 68, 934, true));
+          // A: Beta(52, 950), B: Beta(68, 934)
+          var alphaA = 52, betaA = 950, alphaB = 68, betaB = 934;
+          document.getElementById('bab-post-a').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, alphaA, betaA, true));
+          document.getElementById('bab-post-b').setAttribute('d', betaOnRange(0, 0.2, 60, 720, 260, 70, alphaB, betaB, true));
+          // Position A/B labels at their mode peaks
+          var modeA = (alphaA - 1) / (alphaA + betaA - 2);
+          var modeB = (alphaB - 1) / (alphaB + betaB - 2);
+          var peakXa = 60 + (modeA / 0.2) * 660;
+          var peakXb = 60 + (modeB / 0.2) * 660;
+          document.getElementById('bab-label-a').setAttribute('x', peakXa);
+          document.getElementById('bab-label-a').setAttribute('y', 55);
+          document.getElementById('bab-label-b').setAttribute('x', peakXb);
+          document.getElementById('bab-label-b').setAttribute('y', 55);
         })();
         </script>
       </div>
