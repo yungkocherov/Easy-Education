@@ -17,37 +17,62 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 210" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+        <svg viewBox="0 0 760 440" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <!-- Axes -->
-          <line x1="70" y1="20" x2="70" y2="175" stroke="#64748b" stroke-width="1.5"/>
-          <line x1="70" y1="175" x2="440" y2="175" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="80" y1="40" x2="80" y2="340" stroke="#475569" stroke-width="1.5"/>
+          <line x1="80" y1="340" x2="680" y2="340" stroke="#475569" stroke-width="1.5"/>
           <!-- Axis labels -->
-          <text x="250" y="198" text-anchor="middle" font-size="11" fill="#64748b">FPR (False Positive Rate)</text>
-          <text x="18" y="100" text-anchor="middle" font-size="11" fill="#64748b" transform="rotate(-90,18,100)">TPR (Recall)</text>
+          <text x="380" y="385" text-anchor="middle" font-size="13" fill="#64748b" font-weight="600">FPR (False Positive Rate)</text>
+          <text x="30" y="190" text-anchor="middle" font-size="13" fill="#64748b" font-weight="600" transform="rotate(-90,30,190)">TPR (Recall)</text>
           <!-- Axis ticks -->
-          <text x="67" y="178" text-anchor="end" font-size="9" fill="#64748b">0</text>
-          <text x="67" y="24" text-anchor="end" font-size="9" fill="#64748b">1</text>
-          <text x="437" y="188" text-anchor="middle" font-size="9" fill="#64748b">1</text>
-          <!-- Diagonal dashed line (random) -->
-          <line x1="70" y1="175" x2="437" y2="20" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <text x="340" y="120" font-size="9" fill="#94a3b8">случайная модель</text>
-          <!-- AUC shaded area -->
-          <path d="M70,175 C100,140 130,80 180,55 C230,30 300,22 437,20 L437,175 Z" fill="#818cf8" fill-opacity="0.18"/>
-          <!-- ROC curve (model) -->
-          <path d="M70,175 C100,140 130,80 180,55 C230,30 300,22 437,20" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+          <g font-size="11" fill="#64748b" text-anchor="end">
+            <text x="75" y="344">0</text>
+            <text x="75" y="284">0.2</text>
+            <text x="75" y="224">0.4</text>
+            <text x="75" y="164">0.6</text>
+            <text x="75" y="104">0.8</text>
+            <text x="75" y="44">1</text>
+          </g>
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="80" y="360">0</text>
+            <text x="200" y="360">0.2</text>
+            <text x="320" y="360">0.4</text>
+            <text x="440" y="360">0.6</text>
+            <text x="560" y="360">0.8</text>
+            <text x="680" y="360">1</text>
+          </g>
+          <!-- Grid -->
+          <g stroke="#e5e7eb" stroke-width="0.5">
+            <line x1="80" y1="284" x2="680" y2="284"/>
+            <line x1="80" y1="224" x2="680" y2="224"/>
+            <line x1="80" y1="164" x2="680" y2="164"/>
+            <line x1="80" y1="104" x2="680" y2="104"/>
+            <line x1="200" y1="40" x2="200" y2="340"/>
+            <line x1="320" y1="40" x2="320" y2="340"/>
+            <line x1="440" y1="40" x2="440" y2="340"/>
+            <line x1="560" y1="40" x2="560" y2="340"/>
+          </g>
+          <!-- Diagonal (random model AUC=0.5) -->
+          <line x1="80" y1="340" x2="680" y2="40" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8,5"/>
+          <!-- AUC shaded area (step-wise) -->
+          <path d="M80,340 L80,220 L140,220 L140,160 L200,160 L200,120 L260,120 L260,95 L320,95 L320,75 L400,75 L400,60 L500,60 L500,50 L600,50 L600,42 L680,42 L680,340 Z" fill="#4338ca" fill-opacity="0.12"/>
+          <!-- ROC curve (step-wise — realistic) -->
+          <path d="M80,340 L80,220 L140,220 L140,160 L200,160 L200,120 L260,120 L260,95 L320,95 L320,75 L400,75 L400,60 L500,60 L500,50 L600,50 L600,42 L680,42" fill="none" stroke="#4338ca" stroke-width="3"/>
           <!-- AUC label -->
-          <text x="310" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#6366f1">AUC</text>
-          <text x="310" y="156" text-anchor="middle" font-size="10" fill="#6366f1">(площадь)</text>
-          <!-- Corner point label -->
-          <circle cx="70" cy="20" r="4" fill="#10b981"/>
-          <text x="82" y="17" font-size="9" fill="#10b981">идеал (0,1)</text>
+          <text x="400" y="250" text-anchor="middle" font-size="20" font-weight="800" fill="#4338ca">AUC = 0.91</text>
+          <text x="400" y="275" text-anchor="middle" font-size="12" fill="#6366f1">(площадь под кривой)</text>
+          <!-- Ideal point (0,1) -->
+          <circle cx="80" cy="40" r="6" fill="none" stroke="#059669" stroke-width="2.5"/>
+          <text x="95" y="35" font-size="12" fill="#059669" font-weight="700">идеал (0, 1)</text>
           <!-- Legend -->
-          <line x1="75" y1="200" x2="100" y2="200" stroke="#6366f1" stroke-width="2.5"/>
-          <text x="104" y="203" font-size="9" fill="#334155">модель</text>
-          <line x1="165" y1="200" x2="190" y2="200" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <text x="194" y="203" font-size="9" fill="#334155">случайная</text>
+          <g font-size="12" font-weight="600">
+            <line x1="80" y1="410" x2="110" y2="410" stroke="#4338ca" stroke-width="3"/>
+            <text x="118" y="414" fill="#4338ca">модель (AUC=0.91)</text>
+            <line x1="320" y1="410" x2="350" y2="410" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8,5"/>
+            <text x="358" y="414" fill="#94a3b8">случайная (AUC=0.5)</text>
+          </g>
         </svg>
-        <div class="caption">ROC-кривая: ось X — FPR (цена ошибки), ось Y — TPR (польза). Чем выше и левее кривая, тем лучше. AUC — закрашенная площадь под кривой.</div>
+        <div class="caption">ROC-кривая: ось X — FPR (сколько здоровых напугали), ось Y — TPR (сколько больных поймали). Ступенчатая форма — реалистичная (каждая ступень = один порог). Чем выше и левее кривая, тем лучше. Площадь под кривой = AUC.</div>
       </div>
 
       <h3>🎯 Зачем нужна ROC-кривая</h3>

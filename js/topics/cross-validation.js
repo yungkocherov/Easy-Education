@@ -23,51 +23,60 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
-          <text x="260" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">5-Fold Cross-Validation</text>
-          <!-- Fold 1: test=fold1, train=2-5 -->
-          <text x="42" y="45" text-anchor="end" font-size="10" fill="#64748b">Fold 1</text>
-          <rect x="50" y="32" width="82" height="22" rx="4" fill="#f59e0b"/>
-          <text x="91" y="47" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">test</text>
-          <rect x="136" y="32" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="222" y="32" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="308" y="32" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="394" y="32" width="82" height="22" rx="4" fill="#6366f1"/>
-          <text x="348" y="47" text-anchor="middle" font-size="9" fill="#c7d2fe">train</text>
+        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <text x="390" y="25" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">5-Fold Cross-Validation</text>
+          <!-- Column headers -->
+          <g font-size="11" fill="#64748b" text-anchor="middle">
+            <text x="158" y="52">Часть 1</text>
+            <text x="268" y="52">Часть 2</text>
+            <text x="378" y="52">Часть 3</text>
+            <text x="488" y="52">Часть 4</text>
+            <text x="598" y="52">Часть 5</text>
+          </g>
+          <!-- Fold 1 -->
+          <text x="55" y="82" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 1</text>
+          <rect x="68" y="65" width="180" height="28" rx="5" fill="#f59e0b"/>
+          <text x="158" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
+          <rect x="252" y="65" width="140" height="28" rx="5" fill="#6366f1"/>
+          <text x="322" y="84" text-anchor="middle" font-size="10" fill="#c7d2fe">train</text>
+          <rect x="396" y="65" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="540" y="65" width="120" height="28" rx="5" fill="#6366f1"/>
           <!-- Fold 2 -->
-          <text x="42" y="80" text-anchor="end" font-size="10" fill="#64748b">Fold 2</text>
-          <rect x="50" y="67" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="136" y="67" width="82" height="22" rx="4" fill="#f59e0b"/>
-          <text x="177" y="82" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">test</text>
-          <rect x="222" y="67" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="308" y="67" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="394" y="67" width="82" height="22" rx="4" fill="#6366f1"/>
+          <text x="55" y="127" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 2</text>
+          <rect x="68" y="110" width="180" height="28" rx="5" fill="#6366f1"/>
+          <text x="158" y="129" text-anchor="middle" font-size="10" fill="#c7d2fe">train</text>
+          <rect x="252" y="110" width="140" height="28" rx="5" fill="#f59e0b"/>
+          <text x="322" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
+          <rect x="396" y="110" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="540" y="110" width="120" height="28" rx="5" fill="#6366f1"/>
           <!-- Fold 3 -->
-          <text x="42" y="115" text-anchor="end" font-size="10" fill="#64748b">Fold 3</text>
-          <rect x="50" y="102" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="136" y="102" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="222" y="102" width="82" height="22" rx="4" fill="#f59e0b"/>
-          <text x="263" y="117" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">test</text>
-          <rect x="308" y="102" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="394" y="102" width="82" height="22" rx="4" fill="#6366f1"/>
+          <text x="55" y="172" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 3</text>
+          <rect x="68" y="155" width="180" height="28" rx="5" fill="#6366f1"/>
+          <rect x="252" y="155" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="396" y="155" width="140" height="28" rx="5" fill="#f59e0b"/>
+          <text x="466" y="174" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
+          <rect x="540" y="155" width="120" height="28" rx="5" fill="#6366f1"/>
           <!-- Fold 4 -->
-          <text x="42" y="150" text-anchor="end" font-size="10" fill="#64748b">Fold 4</text>
-          <rect x="50" y="137" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="136" y="137" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="222" y="137" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="308" y="137" width="82" height="22" rx="4" fill="#f59e0b"/>
-          <text x="349" y="152" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">test</text>
-          <rect x="394" y="137" width="82" height="22" rx="4" fill="#6366f1"/>
+          <text x="55" y="217" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 4</text>
+          <rect x="68" y="200" width="180" height="28" rx="5" fill="#6366f1"/>
+          <rect x="252" y="200" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="396" y="200" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="540" y="200" width="120" height="28" rx="5" fill="#f59e0b"/>
+          <text x="600" y="219" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
           <!-- Fold 5 -->
-          <text x="42" y="185" text-anchor="end" font-size="10" fill="#64748b">Fold 5</text>
-          <rect x="50" y="172" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="136" y="172" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="222" y="172" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="308" y="172" width="82" height="22" rx="4" fill="#6366f1"/>
-          <rect x="394" y="172" width="82" height="22" rx="4" fill="#f59e0b"/>
-          <text x="435" y="187" text-anchor="middle" font-size="9" font-weight="600" fill="#fff">test</text>
+          <text x="55" y="262" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 5</text>
+          <rect x="68" y="245" width="180" height="28" rx="5" fill="#f59e0b"/>
+          <text x="158" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
+          <rect x="252" y="245" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="396" y="245" width="140" height="28" rx="5" fill="#6366f1"/>
+          <rect x="540" y="245" width="120" height="28" rx="5" fill="#6366f1"/>
+          <!-- Legend -->
+          <rect x="200" y="292" width="18" height="14" rx="3" fill="#f59e0b"/>
+          <text x="224" y="304" font-size="12" fill="#475569" font-weight="600">= тест (оценка)</text>
+          <rect x="400" y="292" width="18" height="14" rx="3" fill="#6366f1"/>
+          <text x="424" y="304" font-size="12" fill="#475569" font-weight="600">= обучение</text>
         </svg>
-        <div class="caption">5-Fold CV: датасет делится на 5 частей. В каждом раунде одна часть (оранжевая) — тест, остальные (синие) — обучение. Итого 5 оценок → усредняем.</div>
+        <div class="caption">5-Fold CV: датасет делится на 5 частей. В каждом раунде одна часть (оранжевая) — тест, остальные (синие) — обучение. Итого 5 оценок → усредняем. Каждая точка данных участвует ровно один раз в тесте.</div>
       </div>
 
       <h3>🔍 Проблема: как честно оценить модель</h3>

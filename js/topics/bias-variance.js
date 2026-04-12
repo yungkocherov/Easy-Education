@@ -23,7 +23,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" style="max-width:640px;">
+        <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" style="max-width:640px;">
           <circle cx="100" cy="100" r="70" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
           <circle cx="100" cy="100" r="45" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
           <circle cx="100" cy="100" r="20" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
@@ -134,20 +134,20 @@ App.registerTopic({
           <line id="bv-opt-line" x1="0" y1="0" x2="0" y2="0" stroke="#059669" stroke-width="2" stroke-dasharray="3,3"/>
           <text id="bv-opt-label" x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Оптимум</text>
           <!-- Labels -->
-          <text x="130" y="75" text-anchor="start" font-size="11" font-weight="700" fill="#b45309">↑ высокий bias</text>
-          <text x="700" y="75" text-anchor="end" font-size="11" font-weight="700" fill="#7c3aed">высокий variance ↑</text>
+          <text x="100" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">← высокий bias (underfitting)</text>
+          <text x="700" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">высокий variance (overfitting) →</text>
           <text x="130" y="95" text-anchor="start" font-size="10" fill="#b45309">(underfitting)</text>
           <text x="700" y="95" text-anchor="end" font-size="10" fill="#7c3aed">(overfitting)</text>
           <!-- Legend -->
           <g font-size="11" font-weight="600">
-            <line x1="520" y1="120" x2="545" y2="120" stroke="#1e40af" stroke-width="3"/>
-            <text x="550" y="124" fill="#1e40af">Train error</text>
-            <line x1="520" y1="140" x2="545" y2="140" stroke="#dc2626" stroke-width="3"/>
-            <text x="550" y="144" fill="#dc2626">Test error</text>
-            <line x1="520" y1="160" x2="545" y2="160" stroke="#b45309" stroke-width="2" stroke-dasharray="5,3"/>
-            <text x="550" y="164" fill="#b45309">Bias²</text>
-            <line x1="520" y1="180" x2="545" y2="180" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3"/>
-            <text x="550" y="184" fill="#7c3aed">Variance</text>
+            <line x1="570" y1="225" x2="595" y2="225" stroke="#1e40af" stroke-width="3"/>
+            <text x="600" y="229" fill="#1e40af">Train error</text>
+            <line x1="570" y1="245" x2="595" y2="245" stroke="#dc2626" stroke-width="3"/>
+            <text x="600" y="249" fill="#dc2626">Test error</text>
+            <line x1="570" y1="265" x2="595" y2="265" stroke="#b45309" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="600" y="269" fill="#b45309">Bias²</text>
+            <line x1="570" y1="285" x2="595" y2="285" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="600" y="289" fill="#7c3aed">Variance</text>
           </g>
         </svg>
         <div class="caption">Классическая U-образная кривая. Train ошибка (синяя) монотонно падает с ростом сложности — обманчиво. Test ошибка (красная) сначала падает (уменьшается bias), потом растёт (растёт variance). Минимум test ошибки = оптимальная сложность модели.</div>
