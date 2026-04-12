@@ -235,46 +235,52 @@ p̂_B = 290 / 5000 = 0.0580  (5.80%)
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 480 170" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+            <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
               <defs>
-                <linearGradient id="zEx1Bell" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#6366f1" stop-opacity="0.25"/>
-                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0.04"/>
+                <linearGradient id="zEx1Center" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0.08"/>
                 </linearGradient>
                 <linearGradient id="zEx1Tail" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#ef4444" stop-opacity="0.5"/>
-                  <stop offset="100%" stop-color="#ef4444" stop-opacity="0.07"/>
+                  <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
                 </linearGradient>
               </defs>
-              <text x="240" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">z = 1.770, p = 0.077 — НЕ значимо</text>
+              <text x="240" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">z = 1.770, p = 0.077 — НЕ значимо</text>
               <line x1="30" y1="140" x2="450" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Bell -->
-              <path d="M30,140 C50,140 70,137 90,128 C110,117 130,100 150,81 C165,65 175,52 185,41 C195,30 210,20 230,16 C250,13 270,13 240,13 C210,13 230,16 250,13 C270,13 270,14 280,14 C290,14 310,16 330,22 C350,30 365,44 380,61 C395,79 410,100 425,117 C435,128 445,137 455,140" fill="url(#zEx1Bell)" stroke="#6366f1" stroke-width="2"/>
-              <!-- redrawn for clarity -->
-              <path d="M30,140 C55,140 80,136 100,122 C115,112 130,95 145,76 C158,59 168,45 178,35 C190,24 205,16 220,14 C235,12 250,12 260,12 C270,12 285,14 295,18 C310,24 325,36 338,50 C350,63 362,80 375,97 C388,114 405,128 420,135 C435,139 448,140 460,140" fill="url(#zEx1Bell)" stroke="#6366f1" stroke-width="2"/>
-              <!-- Right tail -->
-              <path d="M398,75 C404,87 412,103 422,116 C432,128 444,137 455,140 L398,140 Z" fill="url(#zEx1Tail)"/>
-              <!-- Left tail (mirror) -->
-              <path d="M62,75 C56,87 48,103 38,116 C30,127 25,138 22,140 L62,140 Z" fill="url(#zEx1Tail)"/>
-              <!-- Critical value lines -->
-              <line x1="98" y1="122" x2="98" y2="145" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
-              <text x="98" y="156" text-anchor="middle" font-size="9" fill="#ef4444">−1.96</text>
-              <line x1="362" y1="76" x2="362" y2="145" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
-              <text x="362" y="156" text-anchor="middle" font-size="9" fill="#ef4444">+1.96</text>
-              <!-- Center -->
-              <line x1="230" y1="12" x2="230" y2="145" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
-              <text x="230" y="156" text-anchor="middle" font-size="9" fill="#64748b">0</text>
-              <!-- Our z = 1.770 -->
-              <line x1="330" y1="22" x2="330" y2="145" stroke="#f97316" stroke-width="2.5"/>
-              <text x="330" y="163" text-anchor="middle" font-size="10" font-weight="700" fill="#f97316">z=1.770</text>
-              <!-- annotations -->
-              <text x="255" y="60" text-anchor="middle" font-size="10" fill="#4f46e5">не отвергаем H₀</text>
-              <text x="255" y="74" text-anchor="middle" font-size="10" fill="#4f46e5">95% доверительная область</text>
-              <path d="M330,50 L362,65" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
-              <text x="393" y="58" font-size="9" fill="#64748b">Нужно</text>
-              <text x="393" y="70" font-size="9" fill="#64748b">больше n</text>
+              <!-- Curves set via JS -->
+              <path id="zEx1AreaTailLeft"  d="" fill="url(#zEx1Tail)"/>
+              <path id="zEx1AreaTailRight" d="" fill="url(#zEx1Tail)"/>
+              <path id="zEx1AreaCenter"    d="" fill="url(#zEx1Center)"/>
+              <path id="zEx1Curve"         d="" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- Critical value lines: z=±1.96 in σ units → x = 240 + (±1.96/3)*180 = 240±117.6 -->
+              <line x1="122" y1="60" x2="122" y2="140" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <text x="122" y="157" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700">−1.96</text>
+              <line x1="358" y1="60" x2="358" y2="140" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <text x="358" y="157" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700">+1.96</text>
+              <!-- Center line -->
+              <line x1="240" y1="40" x2="240" y2="140" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="240" y="157" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">0</text>
+              <!-- Observed z = 1.770 → x = 240 + (1.770/3)*180 = 346.2 -->
+              <line x1="346" y1="65" x2="346" y2="140" stroke="#f97316" stroke-width="2.5"/>
+              <text x="346" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#f97316">z=1.770</text>
+              <!-- annotation box, positioned above curve on left-center, not overlapping right side -->
+              <text x="180" y="58" text-anchor="middle" font-size="11" fill="#4f46e5" font-weight="700">не отвергаем H₀</text>
+              <text x="180" y="74" text-anchor="middle" font-size="10" fill="#4f46e5">95% доверительная область</text>
+              <!-- "Нужно больше n" annotation below z=1.770 -->
+              <text x="400" y="188" text-anchor="middle" font-size="10" fill="#b45309" font-weight="600">Нужно больше n</text>
             </svg>
             <div class="caption">z = 1.770 не достигает критического значения 1.96. Разность 0.8 п.п. при n=5000 — ещё не значима. Для детектирования 0.8 п.п. с мощностью 80% нужно ~12 900 на группу.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // cx=240, baselineY=140, peakY=40, halfWidth=180 (for 3σ)
+              U.setPath(document, 'zEx1Curve',         U.normalOutlinePath(240, 140, 40, 180));
+              U.setPath(document, 'zEx1AreaCenter',    U.normalSegmentPath(240, 140, 40, 180, -1.96, 1.96));
+              U.setPath(document, 'zEx1AreaTailLeft',  U.normalSegmentPath(240, 140, 40, 180, -3, -1.96));
+              U.setPath(document, 'zEx1AreaTailRight', U.normalSegmentPath(240, 140, 40, 180, 1.96, 3));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">Разность 0.8 п.п. (5% → 5.8%) выглядит как рост, но статистически не доказана. Тест показывает: возможно, это случайность. Нужно либо больше данных, либо пересмотреть MDE — может, 0.8 п.п. недостаточно, чтобы оправдать изменение дизайна?</div>

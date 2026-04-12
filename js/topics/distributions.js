@@ -503,54 +503,59 @@ App.registerTopic({
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+            <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
               <defs>
                 <linearGradient id="band1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.55"/>
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
                   <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1"/>
                 </linearGradient>
                 <linearGradient id="band2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.45"/>
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
                   <stop offset="100%" stop-color="#10b981" stop-opacity="0.08"/>
                 </linearGradient>
                 <linearGradient id="band3" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
                   <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.06"/>
                 </linearGradient>
               </defs>
-              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Правило трёх сигм N(176, 7²)</text>
+              <text x="240" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Правило трёх сигм N(176, 7²)</text>
               <!-- axis -->
               <line x1="30" y1="130" x2="450" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- μ=176 → x=240, σ=7 → 60px; ±3σ covers x=60..420 -->
-              <!-- 99.7% band: −3σ→180−3*60=x=−0=60 to +3σ→420 -->
-              <path d="M60,130 L60,128 C80,120 100,105 120,87 C140,68 160,50 180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 C320,50 340,68 360,87 C380,105 400,120 420,128 L420,130 Z" fill="url(#band3)"/>
-              <!-- 95% band: −2σ→120 to +2σ→360 -->
-              <path d="M120,130 L120,87 C140,68 160,50 180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 C320,50 340,68 360,87 L360,130 Z" fill="url(#band2)"/>
-              <!-- 68% band: −1σ→180 to +1σ→300 -->
-              <path d="M180,130 L180,37 C200,26 220,20 240,19 C260,20 280,26 300,37 L300,130 Z" fill="url(#band1)"/>
+              <!-- bands rendered back-to-front via JS: 3σ, 2σ, 1σ -->
+              <path id="d3sigmaBand3" d="" fill="url(#band3)"/>
+              <path id="d3sigmaBand2" d="" fill="url(#band2)"/>
+              <path id="d3sigmaBand1" d="" fill="url(#band1)"/>
               <!-- bell outline -->
-              <path d="M30,130 C50,130 65,128 80,122 C100,113 120,95 140,75 C160,54 175,38 185,30 C200,21 220,17 240,16 C260,17 280,21 295,30 C305,38 320,54 340,75 C360,95 380,113 400,122 C415,128 430,130 450,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-              <!-- sigma lines -->
-              <line x1="180" y1="37" x2="180" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
-              <line x1="300" y1="37" x2="300" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
-              <line x1="120" y1="87" x2="120" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
-              <line x1="360" y1="87" x2="360" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
-              <line x1="60"  y1="128" x2="60"  y2="130" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
-              <line x1="420" y1="128" x2="420" y2="130" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
-              <!-- labels -->
-              <text x="240" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=176</text>
-              <text x="180" y="145" text-anchor="middle" font-size="9" fill="#3b82f6">−1σ</text>
-              <text x="300" y="145" text-anchor="middle" font-size="9" fill="#3b82f6">+1σ</text>
-              <text x="120" y="145" text-anchor="middle" font-size="9" fill="#10b981">−2σ</text>
-              <text x="360" y="145" text-anchor="middle" font-size="9" fill="#10b981">+2σ</text>
-              <text x="60"  y="145" text-anchor="middle" font-size="9" fill="#f59e0b">−3σ</text>
-              <text x="420" y="145" text-anchor="middle" font-size="9" fill="#f59e0b">+3σ</text>
-              <!-- band labels -->
-              <text x="240" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">68%</text>
-              <text x="155" y="110" text-anchor="middle" font-size="10" fill="#059669">95%</text>
-              <text x="85"  y="125" text-anchor="middle" font-size="10" fill="#b45309">99.7%</text>
+              <path id="d3sigmaCurve" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- sigma lines (pixel: μ=240, 1σ=60px) -->
+              <line x1="180" y1="45" x2="180" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="300" y1="45" x2="300" y2="130" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="120" y1="97" x2="120" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <line x1="360" y1="97" x2="360" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+              <!-- axis labels -->
+              <text x="240" y="148" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600">μ=176</text>
+              <text x="180" y="148" text-anchor="middle" font-size="10" fill="#3b82f6" font-weight="600">−1σ</text>
+              <text x="300" y="148" text-anchor="middle" font-size="10" fill="#3b82f6" font-weight="600">+1σ</text>
+              <text x="120" y="148" text-anchor="middle" font-size="10" fill="#059669" font-weight="600">−2σ</text>
+              <text x="360" y="148" text-anchor="middle" font-size="10" fill="#059669" font-weight="600">+2σ</text>
+              <text x="60"  y="148" text-anchor="middle" font-size="10" fill="#b45309" font-weight="600">−3σ</text>
+              <text x="420" y="148" text-anchor="middle" font-size="10" fill="#b45309" font-weight="600">+3σ</text>
+              <!-- band labels (positioned near middle of each band, visible) -->
+              <text x="240" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">68%</text>
+              <text x="150" y="122" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">95%</text>
+              <text x="80"  y="126" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">99.7%</text>
             </svg>
             <div class="caption">Три «полосы» нормального распределения N(176, 7²). Синяя зона (±1σ, 169–183 см) — 68% мужчин. Зелёная (±2σ) — 95%. Янтарная (±3σ) — 99.7%.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // cx=240, baselineY=130, peakY=20, halfWidth=180 (180px for 3σ → 60px per σ)
+              U.setPath(document, 'd3sigmaCurve', U.normalOutlinePath(240, 130, 20, 180));
+              U.setPath(document, 'd3sigmaBand3', U.normalSegmentPath(240, 130, 20, 180, -3, 3));
+              U.setPath(document, 'd3sigmaBand2', U.normalSegmentPath(240, 130, 20, 180, -2, 2));
+              U.setPath(document, 'd3sigmaBand1', U.normalSegmentPath(240, 130, 20, 180, -1, 1));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">Правило 68-95-99.7 позволяет быстро оценивать вероятности без калькулятора. Работает только для нормального распределения.</div>
@@ -803,43 +808,77 @@ T ~ Exp(λ = 4), в часах</div>
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+            <svg viewBox="0 0 460 180" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
               <defs>
-                <linearGradient id="tailFill" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="expTailFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#ef4444" stop-opacity="0.5"/>
                   <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
                 </linearGradient>
               </defs>
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Exp(λ=4): P(T &gt; 20 мин) ≈ 26%</text>
+              <text x="230" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Exp(λ=4/час): P(T &gt; 20 мин) ≈ 26%</text>
               <!-- axes -->
-              <line x1="40" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <line x1="40" y1="130" x2="40" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Exp PDF: f(t) = λ·e^(-λt), in minutes λ=1/15 per min -->
-              <!-- map t(min) 0..60 to x=40..430, so scale=(430-40)/60=6.5px/min -->
-              <!-- f(0)=1/15≈0.0667, peak at x=40, y scaled: f(0)*scale_y + 130 = 20 → scale_y=(110)/0.0667=1649 -->
-              <!-- curve: decreasing from (40,20) to (430,~130) -->
-              <!-- shaded tail area from t=20min → x=40+20*6.5=170 to end -->
-              <path d="M170,130 L170,64 C185,72 205,84 230,96 C260,110 300,120 350,126 C380,128 410,129 430,130 Z" fill="url(#tailFill)"/>
-              <!-- main curve -->
-              <path d="M40,20 C50,28 60,38 75,50 C95,66 120,82 150,96 C180,108 210,117 240,122 C280,127 330,129 430,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-              <!-- vertical line at t=20 min → x=170 -->
-              <line x1="170" y1="64" x2="170" y2="130" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
-              <text x="170" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">20 мин</text>
-              <!-- mean line at t=15 min → x=40+15*6.5=137.5 -->
-              <line x1="137" y1="76" x2="137" y2="130" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,2"/>
-              <text x="137" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=15</text>
+              <line x1="40" y1="135" x2="430" y2="135" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="40" y1="135" x2="40" y2="35" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Exp PDF: λ=1/15 per min. Pixel scale: 6.5 px/min over [0, 60] min -->
+              <!-- Full area under curve (light fill) and tail area (red) and outline set via JS -->
+              <path id="expAreaFull" d="" fill="#3b82f6" fill-opacity="0.08"/>
+              <path id="expTailArea" d="" fill="url(#expTailFill)"/>
+              <path id="expCurve" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- vertical line at t=20 min → x=170, curve y will be computed in script -->
+              <line id="expT20Line" x1="170" y1="0" x2="170" y2="135" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+              <!-- mean line at t=15 min → x=137.5 -->
+              <line id="expMeanLine" x1="137" y1="0" x2="137" y2="135" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,2"/>
               <!-- tail annotation -->
-              <text x="310" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">26%</text>
-              <text x="310" y="122" text-anchor="middle" font-size="9" fill="#dc2626">P(T&gt;20мин)</text>
-              <!-- y axis -->
-              <text x="34" y="23" text-anchor="end" font-size="9" fill="#64748b">f(0)</text>
-              <text x="34" y="133" text-anchor="end" font-size="9" fill="#64748b">0</text>
+              <text x="305" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">26%</text>
+              <text x="305" y="116" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">P(T &gt; 20 мин)</text>
+              <!-- y axis labels -->
+              <text x="34" y="38" text-anchor="end" font-size="10" fill="#64748b">f(0)</text>
+              <text x="34" y="138" text-anchor="end" font-size="10" fill="#64748b">0</text>
               <!-- x axis labels -->
-              <text x="40"  y="145" text-anchor="middle" font-size="9" fill="#64748b">0</text>
-              <text x="235" y="145" text-anchor="middle" font-size="9" fill="#64748b">30</text>
-              <text x="430" y="145" text-anchor="middle" font-size="9" fill="#64748b">60 мин</text>
+              <text x="40"  y="152" text-anchor="middle" font-size="10" fill="#64748b">0</text>
+              <text x="137" y="152" text-anchor="middle" font-size="10" fill="#64748b" font-weight="600">μ=15</text>
+              <text x="170" y="152" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700">20 мин</text>
+              <text x="235" y="152" text-anchor="middle" font-size="10" fill="#64748b">30</text>
+              <text x="430" y="152" text-anchor="middle" font-size="10" fill="#64748b">60 мин</text>
             </svg>
             <div class="caption">PDF экспоненциального распределения (λ=4/час = 1 автобус/15 мин). Красная зона — вероятность ждать дольше 20 минут: P(T&gt;20) ≈ 26%. Кривая резко убывает, большинство ожиданий коротких.</div>
+            <script>
+            (function() {
+              var baselineY = 135, peakY = 35, x0 = 40, xEnd = 430;
+              // Build curve over t in [0, 60] minutes, λ = 1/15 per minute
+              var pts = [];
+              for (var i = 0; i <= 120; i++) {
+                var tMin = (60 * i) / 120;
+                var px = x0 + (tMin / 60) * (xEnd - x0);
+                var pdf = Math.exp(-tMin / 15); // normalized so f(0)=1
+                var py = baselineY - pdf * (baselineY - peakY);
+                pts.push([Math.round(px * 10) / 10, Math.round(py * 10) / 10]);
+              }
+              // Outline
+              var outline = 'M' + pts[0][0] + ',' + pts[0][1];
+              for (var j = 1; j < pts.length; j++) outline += ' L' + pts[j][0] + ',' + pts[j][1];
+              // Full area
+              var areaFull = 'M' + pts[0][0] + ',' + baselineY;
+              for (var k = 0; k < pts.length; k++) areaFull += ' L' + pts[k][0] + ',' + pts[k][1];
+              areaFull += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+              // Tail area from t=20 min onward
+              var tailStart = Math.round(120 * 20 / 60); // index for t=20
+              var tail = 'M' + pts[tailStart][0] + ',' + baselineY;
+              for (var m = tailStart; m < pts.length; m++) tail += ' L' + pts[m][0] + ',' + pts[m][1];
+              tail += ' L' + pts[pts.length - 1][0] + ',' + baselineY + ' Z';
+              App.Util.setPath(document, 'expCurve', outline);
+              App.Util.setPath(document, 'expAreaFull', areaFull);
+              App.Util.setPath(document, 'expTailArea', tail);
+              // Position t=20 and mean lines to stop at the curve, not above it
+              var y20 = pts[tailStart][1];
+              var meanIdx = Math.round(120 * 15 / 60); // t=15
+              var yMean = pts[meanIdx][1];
+              var line20 = document.getElementById('expT20Line');
+              if (line20) line20.setAttribute('y1', y20);
+              var lineMean = document.getElementById('expMeanLine');
+              if (lineMean) lineMean.setAttribute('y1', yMean);
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">Экспоненциальное — «партнёр» Пуассона. Если число событий ~ Poisson(λ), то время между событиями ~ Exp(λ). Среднее время = 1/λ.</div>

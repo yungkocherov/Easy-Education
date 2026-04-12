@@ -369,29 +369,38 @@ n ≥ 7.84² = 61.5
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 480 165" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
-              <text x="240" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">SE = σ/√n: чем больше n — тем уже колокол</text>
+            <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">SE = σ/√n: чем больше n — тем уже колокол</text>
               <!-- axis -->
-              <line x1="30" y1="130" x2="450" y2="130" stroke="#94a3b8" stroke-width="1.2"/>
-              <!-- center at x=240 for all curves -->
-              <!-- n=4: SE=0.855 → wide, scale 120px/unit, half-width = 0.855*120=102px -->
-              <path d="M90,130 C110,130 130,126 155,115 C170,108 185,94 200,78 C210,65 220,55 230,50 C235,47 238,46 240,45 C242,46 245,47 250,50 C260,55 270,65 280,78 C295,94 310,108 325,115 C350,126 370,130 390,130" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.8"/>
-              <!-- n=36: SE=0.285 → medium, half-width=0.285*120=34px -->
-              <path d="M180,130 C190,130 200,128 210,122 C218,117 224,109 230,98 C234,90 237,83 240,79 C243,83 246,90 250,98 C256,109 262,117 270,122 C280,128 290,130 300,130" fill="none" stroke="#10b981" stroke-width="2" opacity="0.85"/>
-              <!-- n=100: SE=0.171 → narrow, half-width=0.171*120=20px -->
-              <path d="M210,130 C216,130 221,128 226,122 C230,116 234,106 237,97 C239,90 240,85 240,82 C240,85 241,90 243,97 C246,106 250,116 254,122 C259,128 264,130 270,130" fill="none" stroke="#3b82f6" stroke-width="2.5" opacity="0.9"/>
+              <line x1="30" y1="140" x2="450" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- All three curves set via JS, same peak area shown by varying peakY to preserve ~constant area -->
+              <path id="cltSen4"   d="" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path id="cltSen36"  d="" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path id="cltSen100" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
               <!-- center line -->
-              <line x1="240" y1="42" x2="240" y2="130" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
-              <text x="240" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ=3.5</text>
+              <line x1="240" y1="30" x2="240" y2="140" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="240" y="157" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600">μ=3.5</text>
               <!-- legend -->
-              <rect x="40" y="42" width="18" height="3" fill="#f59e0b"/>
-              <text x="62" y="47" font-size="10" fill="#b45309">n=4,  SE=0.855 (широкий)</text>
-              <rect x="40" y="58" width="18" height="3" fill="#10b981"/>
-              <text x="62" y="63" font-size="10" fill="#047857">n=36, SE=0.285 (средний)</text>
-              <rect x="40" y="74" width="18" height="3" fill="#3b82f6"/>
-              <text x="62" y="79" font-size="10" fill="#1d4ed8">n=100, SE=0.171 (узкий)</text>
+              <rect x="42" y="42" width="20" height="3" fill="#f59e0b"/>
+              <text x="68" y="47" font-size="11" fill="#b45309" font-weight="600">n=4, SE=0.855 (широкий)</text>
+              <rect x="42" y="60" width="20" height="3" fill="#10b981"/>
+              <text x="68" y="65" font-size="11" fill="#047857" font-weight="600">n=36, SE=0.285 (средний)</text>
+              <rect x="42" y="78" width="20" height="3" fill="#3b82f6"/>
+              <text x="68" y="83" font-size="11" fill="#1d4ed8" font-weight="600">n=100, SE=0.171 (узкий)</text>
             </svg>
             <div class="caption">Три кривые показывают распределение выборочного среднего при n=4, 36, 100. Все центрированы на μ=3.5. При росте n кривая сужается по закону SE=σ/√n: чем больше выборка, тем точнее оценка среднего.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // cx=240, baselineY=140. Same area under each curve (so height × width const).
+              // n=4 → halfWidth=150, peakY=100 (wide/short)
+              // n=36 → halfWidth=50, peakY=55  (medium)
+              // n=100 → halfWidth=30, peakY=30 (narrow/tall)
+              U.setPath(document, 'cltSen4',   U.normalOutlinePath(240, 140, 100, 150));
+              U.setPath(document, 'cltSen36',  U.normalOutlinePath(240, 140, 55,  50));
+              U.setPath(document, 'cltSen100', U.normalOutlinePath(240, 140, 30,  30));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">SE = σ/√n — главная формула планирования исследований. Она показывает, сколько данных нужно для заданной точности. Удвоение точности стоит в 4 раза дороже.</div>
@@ -442,34 +451,60 @@ s = 300 руб (выборочное std)
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 145" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">95% доверительный интервал: 1117–1283 руб</text>
-              <!-- number line -->
-              <line x1="40" y1="75" x2="420" y2="75" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- range: 1000..1400, map to x=40..420, scale=380/400=0.95px per rub -->
-              <!-- 1117 → 40+(117)*0.95=151, 1200→40+200*0.95=230, 1283→40+283*0.95=309 -->
-              <!-- CI bracket -->
-              <line x1="151" y1="60" x2="309" y2="60" stroke="#3b82f6" stroke-width="3"/>
-              <line x1="151" y1="52" x2="151" y2="68" stroke="#3b82f6" stroke-width="2.5"/>
-              <line x1="309" y1="52" x2="309" y2="68" stroke="#3b82f6" stroke-width="2.5"/>
-              <!-- point estimate -->
-              <circle cx="230" cy="75" r="7" fill="#3b82f6"/>
-              <line x1="230" y1="68" x2="230" y2="82" stroke="#3b82f6" stroke-width="2"/>
-              <!-- labels -->
-              <text x="151" y="85" text-anchor="middle" font-size="10" fill="#3b82f6">1117</text>
-              <text x="230" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#3b82f6">x̄=1200</text>
-              <text x="309" y="85" text-anchor="middle" font-size="10" fill="#3b82f6">1283</text>
-              <!-- CI label -->
-              <text x="230" y="50" text-anchor="middle" font-size="10" fill="#1d4ed8">← 95% CI: ±83 руб →</text>
-              <!-- axis ticks -->
-              <text x="40"  y="90" text-anchor="middle" font-size="9" fill="#64748b">1000</text>
-              <text x="230" y="90" text-anchor="middle" font-size="9" fill="#64748b"></text>
-              <text x="420" y="90" text-anchor="middle" font-size="9" fill="#64748b">1400</text>
-              <!-- "true mean" zone label -->
-              <text x="230" y="115" text-anchor="middle" font-size="10" fill="#475569">«Истинное среднее всех клиентов — где-то здесь»</text>
-              <text x="230" y="130" text-anchor="middle" font-size="9" fill="#64748b">в 95 случаях из 100 CI накрывает истинный параметр</text>
+            <svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+              <defs>
+                <linearGradient id="ciFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.45"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
+                </linearGradient>
+              </defs>
+              <text x="230" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">95% доверительный интервал: 1117–1283 руб</text>
+
+              <!-- Sampling distribution of the mean ~ N(1200, 42.4²) -->
+              <!-- cx=230, baselineY=130, peakY=45, halfWidth=180 (±3 SE ≈ ±127 руб) -->
+              <path id="ciCurveArea" d="" fill="url(#ciFill)"/>
+              <path id="ciCurve"     d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+              <!-- axis -->
+              <line x1="30" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
+
+              <!-- CI vertical lines at 1117 (x=151) and 1283 (x=309) -->
+              <line x1="151" y1="65" x2="151" y2="130" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="4,3"/>
+              <line x1="309" y1="65" x2="309" y2="130" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="4,3"/>
+
+              <!-- point estimate vertical line -->
+              <line x1="230" y1="45" x2="230" y2="130" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <circle cx="230" cy="130" r="5" fill="#1e40af"/>
+
+              <!-- bracket showing CI width -->
+              <line x1="151" y1="152" x2="309" y2="152" stroke="#1e40af" stroke-width="2"/>
+              <line x1="151" y1="147" x2="151" y2="157" stroke="#1e40af" stroke-width="2"/>
+              <line x1="309" y1="147" x2="309" y2="157" stroke="#1e40af" stroke-width="2"/>
+              <text x="230" y="146" text-anchor="middle" font-size="11" fill="#1e40af" font-weight="700">95% CI: ±83 руб</text>
+
+              <!-- number labels -->
+              <text x="151" y="172" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="700">1117</text>
+              <text x="230" y="172" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="700">x̄=1200</text>
+              <text x="309" y="172" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="700">1283</text>
+
+              <!-- axis range ticks -->
+              <text x="40"  y="186" text-anchor="middle" font-size="10" fill="#64748b">1000</text>
+              <text x="420" y="186" text-anchor="middle" font-size="10" fill="#64748b">1400</text>
+
+              <!-- bottom annotation -->
+              <text x="230" y="205" text-anchor="middle" font-size="11" fill="#475569" font-style="italic">в 95 случаях из 100 CI накрывает истинное μ</text>
             </svg>
-            <div class="caption">95% доверительный интервал для среднего чека: точечная оценка x̄=1200 (синяя точка), горизонтальная скобка — от 1117 до 1283 руб. ЦПТ гарантирует, что такой интервал накрывает истинное μ в 95% случаев.</div>
+            <div class="caption">95% доверительный интервал для среднего чека: синяя колоколообразная кривая — распределение выборочного среднего ~ N(1200, 42.4²). Пунктирные линии — границы 95% CI [1117, 1283]. ЦПТ гарантирует, что такой интервал накрывает истинное μ в 95% случаев.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // Sampling distribution curve: cx=230, baselineY=130, peakY=45, halfWidth=180 (≈3 SE)
+              U.setPath(document, 'ciCurve',     U.normalOutlinePath(230, 130, 45, 180));
+              // Shade only the CI region: ±1.96 SE ≈ ±83 руб, mapped to ±79px within ±180px halfwidth
+              // 1.96 SE corresponds to 1.96/3 of halfwidth = 0.653 → -1.96 to +1.96 in sigma units
+              U.setPath(document, 'ciCurveArea', U.normalSegmentPath(230, 130, 45, 180, -1.96, 1.96));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">Доверительный интервал — прямое следствие ЦПТ. Формула: x̄ ± z × (s/√n). Чем больше выборка, тем уже интервал. Чем выше уверенность (99% вместо 95%), тем шире.</div>

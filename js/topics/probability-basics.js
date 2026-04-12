@@ -525,37 +525,41 @@ z₃ = (189 − 175) / 7 = +2.0</div>
             <p>P(168–182 см) ≈ <b>68.3%</b>. P(>189 см) ≈ <b>2.3%</b>. Всё через CDF стандартного нормального.</p>
           </div>
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+            <svg viewBox="0 0 460 175" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
               <defs>
-                <linearGradient id="shadeFill" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="pbN175Fill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#10b981" stop-opacity="0.55"/>
                   <stop offset="100%" stop-color="#10b981" stop-opacity="0.1"/>
                 </linearGradient>
               </defs>
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">N(175, 7²): P(168 ≤ X ≤ 182) ≈ 68%</text>
+              <text x="230" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">N(175, 7²): P(168 ≤ X ≤ 182) ≈ 68%</text>
               <!-- axis -->
               <line x1="30" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Bell curve: μ=175 centered at x=230, σ=7 → 1σ=40px, curve spans ±3σ=±120px -->
-              <!-- shaded region from x=168 to x=182 → x_svg = 230+(val-175)*40/7 -->
-              <!-- 168→230+(−7)*40/7=230−40=190, 182→230+(7)*40/7=230+40=270 -->
-              <path d="M190,130 L190,92 C200,78 210,64 220,55 C225,51 228,49 230,48 C232,49 235,51 240,55 C250,64 260,78 270,92 L270,130 Z" fill="url(#shadeFill)"/>
-              <!-- bell curve outline -->
-              <path d="M30,130 C60,130 90,128 110,120 C130,112 150,95 170,78 C180,67 185,57 190,52 C200,43 210,36 220,33 C225,31 228,30 230,29 C232,30 235,31 240,33 C250,36 260,43 270,52 C275,57 280,67 290,78 C310,95 330,112 350,120 C370,128 400,130 430,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-              <!-- vertical dashed lines at 168 and 182 -->
+              <!-- shaded area (from z=-1 to z=+1) and bell outline set via JS -->
+              <path id="pbN175Area" d="" fill="url(#pbN175Fill)"/>
+              <path id="pbN175Curve" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- vertical dashed lines at 168 (z=-1, x=190) and 182 (z=+1, x=270) -->
               <line x1="190" y1="52" x2="190" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
               <line x1="270" y1="52" x2="270" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
               <!-- μ line -->
-              <line x1="230" y1="29" x2="230" y2="130" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+              <line x1="230" y1="30" x2="230" y2="130" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
               <!-- labels -->
-              <text x="190" y="145" text-anchor="middle" font-size="10" fill="#10b981">168</text>
-              <text x="230" y="145" text-anchor="middle" font-size="11" fill="#64748b">μ=175</text>
-              <text x="270" y="145" text-anchor="middle" font-size="10" fill="#10b981">182</text>
+              <text x="190" y="148" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">168</text>
+              <text x="230" y="148" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600">μ=175</text>
+              <text x="270" y="148" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">182</text>
+              <!-- z scores below numbers -->
+              <text x="190" y="162" text-anchor="middle" font-size="9" fill="#10b981">z=−1</text>
+              <text x="270" y="162" text-anchor="middle" font-size="9" fill="#10b981">z=+1</text>
               <!-- annotation -->
-              <text x="230" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">68%</text>
-              <!-- z scores -->
-              <text x="190" y="20" text-anchor="middle" font-size="10" fill="#10b981">z=−1</text>
-              <text x="270" y="20" text-anchor="middle" font-size="10" fill="#10b981">z=+1</text>
+              <text x="230" y="95" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">68%</text>
             </svg>
+            <script>
+            (function() {
+              var U = App.Util;
+              U.setPath(document, 'pbN175Curve', U.normalOutlinePath(230, 130, 30, 120));
+              U.setPath(document, 'pbN175Area',  U.normalSegmentPath(230, 130, 30, 120, -1, 1));
+            })();
+            </script>
             <div class="caption">Нормальное распределение N(175, 7²): зелёная зона — P(168 ≤ X ≤ 182) = P(−1 ≤ Z ≤ +1) ≈ 68%. Примерно двое из трёх мужчин имеют рост в этом диапазоне.</div>
           </div>
 

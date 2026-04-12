@@ -391,45 +391,51 @@ s = √30.89 ≈ <b>5.56 г</b></div>
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+            <svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
               <defs>
-                <linearGradient id="tailLeft" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="htTailLeft" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#ef4444" stop-opacity="0.55"/>
                   <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
                 </linearGradient>
+                <marker id="arrHt" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
+                </marker>
               </defs>
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">t-тест: H₀: μ=1000, наблюдаем x̄=994</text>
+              <text x="230" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">t-тест: H₀ — μ=1000, наблюдаем x̄=994</text>
               <!-- axis -->
-              <line x1="30" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- bell centered at μ=1000 → x=240, σ/√n=1.758 → 1 SE ≈ 22px at scale -->
-              <!-- scale: axis covers ~990..1010 (±5SE=±8.8g), total=20g → 400px → 20px/g -->
-              <!-- x = 30 + (val-990)*20 -->
-              <!-- shaded left tail from x_left to x=170 (val=994 → x=30+(994-990)*20=110) -->
-              <!-- actually t=-3.41 → left tail only very far. show shaded region x<994 val -->
-              <!-- let's center bell at 1000 → x=30+(1000-990)*20=230 -->
-              <!-- shade left tail x<994 → x<110... too far left. Use visual approach: -->
-              <!-- bell at center x=270, σ=1.758 g, scale 30px/g, 994 → 270+(994-1000)*30=270-180=90 -->
-              <!-- that's still too wide. Let me use scale 15px/g: bell at x=255, 994→255-90=165 -->
-              <!-- shaded region: left tail below 994 -->
-              <path d="M30,130 L30,129 C50,128 70,124 90,114 C100,107 110,97 120,86 C130,72 140,56 150,45 C158,36 162,31 165,29 L165,130 Z" fill="url(#tailLeft)"/>
-              <!-- bell curve centered at x=255 -->
-              <path d="M30,130 C50,130 70,126 90,118 C110,108 130,92 150,73 C160,62 163,55 165,49 C170,40 180,30 195,24 C210,19 225,17 240,16 C255,15 270,17 285,22 C300,28 315,37 325,48 C330,54 335,62 340,72 C355,90 375,108 395,118 C415,126 435,130 455,130" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-              <!-- μ₀=1000 line at x=240 -->
-              <line x1="240" y1="16" x2="240" y2="130" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
-              <text x="240" y="145" text-anchor="middle" font-size="10" fill="#64748b">μ₀=1000</text>
-              <!-- x̄=994 line at x=165 -->
-              <line x1="165" y1="29" x2="165" y2="130" stroke="#ef4444" stroke-width="2.5"/>
-              <text x="165" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">x̄=994</text>
-              <!-- t-statistic annotation -->
-              <text x="100" y="110" text-anchor="middle" font-size="11" font-weight="700" fill="#ef4444">p≈0.4%</text>
-              <path d="M100,95 L140,78" stroke="#ef4444" stroke-width="1" marker-end="url(#arrH)"/>
-              <defs><marker id="arrH" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/></marker></defs>
-              <text x="340" y="55" font-size="10" fill="#64748b">t = −3.41</text>
-              <!-- critical value annotation -->
-              <line x1="192" y1="60" x2="192" y2="130" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
-              <text x="192" y="55" text-anchor="middle" font-size="9" fill="#b45309">t_кр=−1.83</text>
+              <line x1="30" y1="140" x2="430" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- Bell curve centered at μ₀=1000 → x=230, halfWidth=175 (±3.5 SE visible).
+                   1 SE unit in σ-coords = 1 (normalOutlinePath uses σ). We mark:
+                   • critical value t_cr = -1.83 (at σ units -1.83)
+                   • observed t = -3.41 (at σ units -3.41)
+                   Pixel mapping: x = 230 + (σ/3) * 175 → σ=1 at x=288.3, σ=-1.83 at x=123.2, σ=-3.41 at x=31.2 -->
+              <path id="htTailArea" d="" fill="url(#htTailLeft)"/>
+              <path id="htCurve"    d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- μ₀=1000 center line -->
+              <line x1="230" y1="30" x2="230" y2="140" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <text x="230" y="158" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600">μ₀=1000</text>
+              <!-- Critical value line at σ = -1.83 → x ≈ 123 -->
+              <line x1="123" y1="75" x2="123" y2="140" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>
+              <text x="123" y="158" text-anchor="middle" font-size="10" fill="#b45309" font-weight="700">t_кр=−1.83</text>
+              <!-- Observed x̄ line at σ = -3.41 → x ≈ 31 (at boundary, so draw at 34) -->
+              <line x1="34" y1="138" x2="34" y2="140" stroke="#ef4444" stroke-width="2.5"/>
+              <text x="50" y="175" text-anchor="middle" font-size="11" fill="#ef4444" font-weight="700">x̄=994</text>
+              <text x="50" y="187" text-anchor="middle" font-size="10" fill="#ef4444">(t=−3.41)</text>
+              <!-- p-value annotation with arrow pointing into red tail -->
+              <text x="175" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">p ≈ 0.4%</text>
+              <path d="M145,95 L100,120" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrHt)"/>
             </svg>
-            <div class="caption">Распределение t-статистики при H₀: μ=1000. Красная линия — наблюдаемое x̄=994 (t=−3.41), далеко левее критического значения −1.83 (янтарная). Красная зона — p-value ≈ 0.4%: отвергаем H₀.</div>
+            <div class="caption">Распределение t-статистики при H₀: μ=1000. Красная линия на левом краю — наблюдаемое x̄=994 (t=−3.41), далеко левее критического значения −1.83 (янтарная пунктирная). Красная зона — p-value ≈ 0.4%: отвергаем H₀.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // cx=230, baselineY=140, peakY=35, halfWidth=175 for 3σ; show out to ±3.5σ
+              U.setPath(document, 'htCurve',    U.normalOutlinePath(230, 140, 35, 175, 3.5));
+              // Shade the LEFT tail beyond t = -1.83 (rejection region α)
+              // Observed t = -3.41 sits deep inside this region (shown as red line)
+              U.setPath(document, 'htTailArea', U.normalSegmentPath(230, 140, 35, 175, -3.5, -1.83, 3.5));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">Одновыборочный t-тест сравнивает выборочное среднее с известным значением. Формула: t = (x̄ − μ₀)/(s/√n). Чем больше |t|, тем сильнее доказательства против H₀.</div>
@@ -498,47 +504,58 @@ p-value = 2 × P(Z > 2.04) = 2 × 0.0207 = <b>0.041</b>
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+            <svg viewBox="0 0 460 195" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
               <defs>
-                <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="htAbA" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
                   <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
                 </linearGradient>
-                <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="htAbB" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/>
                   <stop offset="100%" stop-color="#10b981" stop-opacity="0.08"/>
                 </linearGradient>
+                <marker id="htAbArr"  markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/></marker>
+                <marker id="htAbArrR" markerWidth="6" markerHeight="6" refX="2" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#64748b"/></marker>
               </defs>
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">A/B тест: распределения конверсий pA=5% vs pB=6.5%</text>
+              <text x="230" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">A/B тест: pA=5% vs pB=6.5% (n=2000 на группу)</text>
               <!-- axis -->
-              <line x1="30" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Distribution A centered at pA=0.05, SE_A=sqrt(0.05*0.95/2000)≈0.00487 -->
-              <!-- Distribution B centered at pB=0.065, SE_B=sqrt(0.065*0.935/2000)≈0.00550 -->
-              <!-- Map p axis: 0.02..0.10, range=0.08, scale=400/0.08=5000px per unit -->
-              <!-- pA=0.05→x=30+(0.05-0.02)*5000=180, SE_A=0.00487→30px, pB=0.065→255, SE_B=0.0055→34px -->
-              <!-- Curve A: bell at x=180, half-width ~3SE=90px -->
-              <path d="M90,130 C110,130 130,127 145,118 C155,110 163,98 168,82 C172,70 175,58 178,49 C179,44 180,42 180,40 C180,38 181,36 182,34 C183,31 184,29 186,27 C189,24 185,28 188,32 C190,35 191,40 192,47 C194,57 196,70 198,84 C202,100 208,114 215,121 C228,128 248,130 270,130" fill="url(#gA)" stroke="#3b82f6" stroke-width="2"/>
-              <!-- Curve B: bell at x=255, half-width ~3SE=100px -->
-              <path d="M150,130 C170,130 190,128 205,120 C215,113 222,101 228,86 C232,73 235,62 238,52 C240,44 241,40 243,36 C245,32 247,29 249,27 C251,25 253,24 255,24 C257,24 259,25 261,27 C263,29 265,33 267,38 C270,46 272,55 275,67 C279,82 283,97 290,110 C298,120 310,127 325,130 C350,130 380,130 400,130" fill="url(#gB)" stroke="#10b981" stroke-width="2"/>
-              <!-- center lines -->
-              <line x1="180" y1="35" x2="180" y2="130" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/>
-              <line x1="255" y1="24" x2="255" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
-              <!-- labels -->
-              <text x="180" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#3b82f6">pA=5%</text>
-              <text x="255" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#10b981">pB=6.5%</text>
-              <!-- gap annotation -->
-              <line x1="180" y1="60" x2="255" y2="60" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrGap)" marker-start="url(#arrGapR)"/>
-              <defs>
-                <marker id="arrGap"  markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#64748b"/></marker>
-                <marker id="arrGapR" markerWidth="5" markerHeight="5" refX="2" refY="2.5" orient="auto"><path d="M5,0 L0,2.5 L5,5 Z" fill="#64748b"/></marker>
-              </defs>
-              <text x="218" y="55" text-anchor="middle" font-size="9" fill="#64748b">Δ=1.5 п.п.</text>
-              <!-- z stat -->
-              <text x="340" y="90" font-size="10" fill="#475569">z = 2.04</text>
-              <text x="340" y="105" font-size="10" fill="#475569">p = 0.041 &lt; 0.05</text>
-              <text x="340" y="120" font-size="10" font-weight="600" fill="#059669">B значимо лучше!</text>
+              <line x1="30" y1="140" x2="430" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+              <!-- SE_A ≈ 0.00487, SE_B ≈ 0.00550. Centers at pA=5% (x=180), pB=6.5% (x=255).
+                   Scale: 5000 px/unit → 1 SE_A ≈ 24 px, so halfWidth (3σ) ≈ 73 px
+                   For B:                                         halfWidth ≈ 82 px
+                   Use halfWidth=80 and 90 (~slightly exaggerated) for clean visuals. -->
+              <path id="htAbAreaA"  d="" fill="url(#htAbA)"/>
+              <path id="htAbAreaB"  d="" fill="url(#htAbB)"/>
+              <path id="htAbCurveA" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path id="htAbCurveB" d="" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- center lines (set y1 in script to curve peak) -->
+              <line id="htAbCenterA" x1="180" y1="55" x2="180" y2="140" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line id="htAbCenterB" x1="255" y1="45" x2="255" y2="140" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <!-- labels below axis -->
+              <text x="180" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#3b82f6">pA=5%</text>
+              <text x="255" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">pB=6.5%</text>
+              <!-- Δ arrow between the two centers, placed in the tails region -->
+              <line x1="186" y1="120" x2="249" y2="120" stroke="#64748b" stroke-width="1.5" marker-end="url(#htAbArr)" marker-start="url(#htAbArrR)"/>
+              <text x="217" y="115" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Δ = 1.5 п.п.</text>
+              <!-- Stats panel (right side) -->
+              <text x="345" y="55" font-size="11" fill="#475569" font-weight="600">z = 2.04</text>
+              <text x="345" y="72" font-size="11" fill="#475569" font-weight="600">p = 0.041 &lt; 0.05</text>
+              <text x="345" y="92" font-size="12" fill="#059669" font-weight="700">✓ B значимо лучше</text>
+              <!-- bottom caption line -->
+              <text x="230" y="185" text-anchor="middle" font-size="10" fill="#64748b" font-style="italic">разница между кривыми достаточна → отвергаем H₀: pA = pB</text>
             </svg>
             <div class="caption">Два распределения выборочных пропорций: A (синяя, 5%) и B (зелёная, 6.5%). Разница 1.5 п.п. статистически значима (z=2.04, p=0.041): кривые достаточно разделены при n=2000.</div>
+            <script>
+            (function() {
+              var U = App.Util;
+              // Bell A: center x=180, baselineY=140, peakY=55, halfWidth=80 (3σ)
+              U.setPath(document, 'htAbCurveA', U.normalOutlinePath(180, 140, 55, 80));
+              U.setPath(document, 'htAbAreaA',  U.normalSegmentPath(180, 140, 55, 80, -3, 3));
+              // Bell B: center x=255, baselineY=140, peakY=45, halfWidth=90 (slightly wider due to higher p)
+              U.setPath(document, 'htAbCurveB', U.normalOutlinePath(255, 140, 45, 90));
+              U.setPath(document, 'htAbAreaB',  U.normalSegmentPath(255, 140, 45, 90, -3, 3));
+            })();
+            </script>
           </div>
 
           <div class="lesson-box">A/B тест — это z-тест для пропорций. Для маленьких эффектов (1-2 п.п.) нужны тысячи наблюдений. Всегда рассчитывай необходимый размер выборки заранее (power analysis).</div>

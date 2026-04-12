@@ -366,37 +366,51 @@ s_y = √(669.3/5) = √133.87 = <b>11.57</b></div>
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Scatter: рост (см) vs вес (кг), r=0.996</text>
+            <svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">Scatter: рост (см) vs вес (кг), r=0.996</text>
+              <!-- plot area: x 80..440, y 40..160 -->
               <!-- axes -->
-              <line x1="60" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <line x1="60" y1="130" x2="60" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Data: (158,52),(165,60),(170,65),(175,72),(180,78),(182,83) -->
-              <!-- x: 158..182 range=24, map to x=60..430, scale=370/24=15.4px/cm, x=60+(h-158)*15.4 -->
-              <!-- y: 52..83 range=31, map to y=130..20, scale=110/31=3.55px/kg, y=130-(w-52)*3.55 -->
-              <!-- (158,52)→(60,130) (165,60)→(168,101) (170,65)→(245,83) (175,72)→(322,65)... wait, need to re-scale -->
-              <!-- Let's map x 155..185=30 → 60..420=360px, scale=12px/cm; y 48..87=39 → 20..130=110px, scale=2.82/kg -->
-              <!-- x=60+(h-155)*12, y=130-(w-48)*2.82 -->
-              <!-- (158,52)→(96,118.7) (165,60)→(180,95.6) (170,65)→(240,81.5) (175,72)→(300,61.7) (180,78)→(360,44.8) (182,83)→(384,29.7) -->
-              <!-- dots -->
-              <circle cx="96"  cy="119" r="6" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="180" cy="96"  r="6" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="240" cy="82"  r="6" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="300" cy="62"  r="6" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="360" cy="45"  r="6" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="384" cy="30"  r="6" fill="#3b82f6" opacity="0.85"/>
-              <!-- fitted line (nearly through all points, from ~(60,140) to (420,17)) -->
-              <line x1="70" y1="135" x2="400" y2="24" stroke="#ef4444" stroke-width="2" opacity="0.75"/>
-              <!-- axis labels -->
-              <text x="60"  y="145" text-anchor="middle" font-size="9" fill="#64748b">155</text>
-              <text x="240" y="145" text-anchor="middle" font-size="9" fill="#64748b">170</text>
-              <text x="420" y="145" text-anchor="middle" font-size="9" fill="#64748b">185</text>
-              <text x="230" y="158" text-anchor="middle" font-size="10" fill="#64748b">Рост (см)</text>
-              <text x="48" y="130" text-anchor="end" font-size="9" fill="#64748b">52</text>
-              <text x="48" y="45"  text-anchor="end" font-size="9" fill="#64748b">83</text>
-              <text x="20" y="80" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,20,80)">Вес (кг)</text>
-              <!-- r annotation -->
-              <text x="340" y="120" font-size="11" font-weight="700" fill="#ef4444">r = 0.996</text>
+              <line x1="80" y1="160" x2="440" y2="160" stroke="#475569" stroke-width="1.5"/>
+              <line x1="80" y1="160" x2="80" y2="40" stroke="#475569" stroke-width="1.5"/>
+              <!-- gridlines -->
+              <line x1="80" y1="120" x2="440" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="80" y1="80"  x2="440" y2="80"  stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="170" y1="40" x2="170" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="260" y1="40" x2="260" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="350" y1="40" x2="350" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- Data points. Map: x (155..185)=30cm → 80..440=360px, scale=12/cm
+                                    y (50..85)=35kg → 160..40=120px, scale=3.43/kg
+                   Points (cm,kg) → (x,y):
+                   (158,52)→(80+36, 160-6.86)=(116, 153.1) — outside nicely on the left
+                   (165,60)→(80+120, 160-34.3)=(200, 125.7)
+                   (170,65)→(80+180, 160-51.4)=(260, 108.6)
+                   (175,72)→(80+240, 160-75.4)=(320, 84.6)
+                   (180,78)→(80+300, 160-96.0)=(380, 64.0)
+                   (182,83)→(80+324, 160-113.1)=(404, 46.9) -->
+              <!-- fitted line (OLS fit through points) from x=116 to x=404 -->
+              <line x1="116" y1="153" x2="404" y2="47" stroke="#ef4444" stroke-width="2.5" opacity="0.85"/>
+              <!-- data dots drawn on top of line -->
+              <circle cx="116" cy="153" r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="200" cy="126" r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="260" cy="109" r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="320" cy="85"  r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="380" cy="64"  r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="404" cy="47"  r="6" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <!-- x-axis tick labels (below axis) -->
+              <text x="80"  y="178" text-anchor="middle" font-size="10" fill="#64748b">155</text>
+              <text x="170" y="178" text-anchor="middle" font-size="10" fill="#64748b">162</text>
+              <text x="260" y="178" text-anchor="middle" font-size="10" fill="#64748b">170</text>
+              <text x="350" y="178" text-anchor="middle" font-size="10" fill="#64748b">178</text>
+              <text x="440" y="178" text-anchor="middle" font-size="10" fill="#64748b">185</text>
+              <text x="260" y="198" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Рост (см)</text>
+              <!-- y-axis tick labels (left of axis) -->
+              <text x="72" y="164" text-anchor="end" font-size="10" fill="#64748b">50</text>
+              <text x="72" y="124" text-anchor="end" font-size="10" fill="#64748b">62</text>
+              <text x="72" y="84"  text-anchor="end" font-size="10" fill="#64748b">74</text>
+              <text x="72" y="44"  text-anchor="end" font-size="10" fill="#64748b">85</text>
+              <text x="32" y="100" text-anchor="middle" font-size="11" fill="#475569" font-weight="600" transform="rotate(-90,32,100)">Вес (кг)</text>
+              <!-- r annotation, positioned in lower-right clear area -->
+              <text x="408" y="140" text-anchor="end" font-size="14" font-weight="700" fill="#ef4444">r = 0.996</text>
             </svg>
             <div class="caption"><a class="glossary-link" onclick="App.selectTopic('viz-scatter-plot')">Scatter plot</a> роста и веса 6 человек. Точки почти идеально лежат на красной линии регрессии. Корреляция Пирсона r≈0.996 — почти идеальная положительная линейная связь.</div>
           </div>
@@ -461,35 +475,42 @@ r = −275 / (√700 × √7635.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Нелинейная связь: r≈−0.12, но зависимость очевидна</text>
+            <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+              <text x="240" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">Нелинейная связь: r ≈ −0.12, но зависимость очевидна</text>
+              <text x="240" y="38" text-anchor="middle" font-size="10" fill="#059669" font-style="italic">реальная кривая — перевёрнутая U</text>
+              <!-- plot area: x 70..440, y 55..175 -->
               <!-- axes -->
-              <line x1="50" y1="130" x2="430" y2="130" stroke="#94a3b8" stroke-width="1.5"/>
-              <line x1="50" y1="130" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- Data: temp 15,20,25,30,35,40,45 → x=50+(t-15)*380/30=50+(t-15)*12.67 -->
-              <!-- sales 20,50,90,100,85,40,10 → y=130-(s/100)*110 -->
-              <!-- (15,20)→(50,108) (20,50)→(113,75) (25,90)→(177,31) (30,100)→(240,20) (35,85)→(304,37) (40,40)→(367,86) (45,10)→(430,119) -->
-              <circle cx="50"  cy="108" r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="113" cy="75"  r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="177" cy="31"  r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="240" cy="20"  r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="304" cy="37"  r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="367" cy="86"  r="7" fill="#3b82f6" opacity="0.85"/>
-              <circle cx="430" cy="119" r="7" fill="#3b82f6" opacity="0.85"/>
-              <!-- inverted-U curve (parabola) -->
-              <path d="M50,108 C80,85 110,55 145,34 C175,17 205,14 240,16 C270,18 300,28 335,54 C368,78 395,100 430,119" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,3"/>
+              <line x1="70" y1="175" x2="440" y2="175" stroke="#475569" stroke-width="1.5"/>
+              <line x1="70" y1="175" x2="70" y2="55" stroke="#475569" stroke-width="1.5"/>
+              <!-- gridlines -->
+              <line x1="70" y1="135" x2="440" y2="135" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="70" y1="95"  x2="440" y2="95"  stroke="#e2e8f0" stroke-width="1"/>
+              <!-- Data: temp 15,20,25,30,35,40,45 → sales 20,50,90,100,85,40,10
+                   x mapping: t 15..45 → 70..440 (370px/30 = 12.33/°C)
+                   y mapping: s 0..100 → 175..55 (120px/100 = 1.2/unit)
+                   points: (15,20)→(70,151) (20,50)→(132,115) (25,90)→(193,67)
+                           (30,100)→(255,55) (35,85)→(316,73) (40,40)→(378,127) (45,10)→(440,163) -->
+              <!-- inverted-U dashed curve (drawn before dots so dots sit on top) -->
+              <path d="M70,151 C100,128 130,100 165,78 C195,60 225,54 255,55 C285,56 315,66 345,90 C375,115 405,140 440,163" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="7,4" opacity="0.9"/>
+              <!-- data dots -->
+              <circle cx="70"  cy="151" r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="132" cy="115" r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="193" cy="67"  r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="255" cy="55"  r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="316" cy="73"  r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="378" cy="127" r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+              <circle cx="440" cy="163" r="7" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
               <!-- axis labels -->
-              <text x="50"  y="145" text-anchor="middle" font-size="9" fill="#64748b">15°</text>
-              <text x="240" y="145" text-anchor="middle" font-size="9" fill="#64748b">30°</text>
-              <text x="430" y="145" text-anchor="middle" font-size="9" fill="#64748b">45°C</text>
-              <text x="240" y="158" text-anchor="middle" font-size="10" fill="#64748b">Температура</text>
-              <text x="18" y="80" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,18,80)">Продажи</text>
-              <!-- r annotation -->
-              <text x="320" y="70" font-size="10" fill="#64748b">r Пирсона</text>
-              <text x="320" y="84" font-size="12" font-weight="700" fill="#ef4444">≈ −0.12</text>
-              <text x="320" y="98" font-size="9" fill="#ef4444">(≈ «нет связи»?)</text>
-              <!-- parabola label -->
-              <text x="240" y="10" text-anchor="middle" font-size="9" fill="#059669">реальная кривая — перевёрнутая U</text>
+              <text x="70"  y="192" text-anchor="middle" font-size="10" fill="#64748b">15°</text>
+              <text x="193" y="192" text-anchor="middle" font-size="10" fill="#64748b">25°</text>
+              <text x="316" y="192" text-anchor="middle" font-size="10" fill="#64748b">35°</text>
+              <text x="440" y="192" text-anchor="middle" font-size="10" fill="#64748b">45°C</text>
+              <text x="255" y="210" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Температура</text>
+              <text x="30" y="115" text-anchor="middle" font-size="11" fill="#475569" font-weight="600" transform="rotate(-90,30,115)">Продажи</text>
+              <!-- r annotation in upper-right, away from curve -->
+              <text x="420" y="70" text-anchor="end" font-size="10" fill="#64748b">r Пирсона</text>
+              <text x="420" y="88" text-anchor="end" font-size="14" font-weight="700" fill="#ef4444">≈ −0.12</text>
+              <text x="420" y="104" text-anchor="end" font-size="9" fill="#ef4444" font-style="italic">(≈ «нет связи»?)</text>
             </svg>
             <div class="caption">Несмотря на очевидную квадратичную зависимость (продажи растут до 30°C, потом падают), r Пирсона ≈ −0.12 — «почти ноль». Пирсон видит только линейный тренд; здесь его нет из-за симметрии кривой.</div>
           </div>
