@@ -341,9 +341,9 @@ App.registerTopic({
                   <line x1="300" y1="40" x2="300" y2="130"/><line x1="330" y1="40" x2="330" y2="130"/>
                 </g>
                 <g font-size="11" text-anchor="middle" font-weight="600">
-                  <text x="285" y="60" fill="#10b981">280</text><text x="315" y="60" fill="#10b981">280</text><text x="345" y="60" fill="#64748b">0</text>
-                  <text x="285" y="90" fill="#10b981">210</text><text x="315" y="90" fill="#10b981">140</text><text x="345" y="90" fill="#64748b">0</text>
-                  <text x="285" y="120" fill="#64748b">0</text><text x="315" y="120" fill="#64748b">0</text><text x="345" y="120" fill="#64748b">0</text>
+                  <text x="285" y="60" fill="#10b981">70</text><text x="315" y="60" fill="#10b981">280</text><text x="345" y="60" fill="#10b981">210</text>
+                  <text x="285" y="90" fill="#10b981">210</text><text x="315" y="90" fill="#10b981">280</text><text x="345" y="90" fill="#10b981">70</text>
+                  <text x="285" y="120" fill="#10b981">280</text><text x="315" y="120" fill="#10b981">280</text><text x="345" y="120" fill="#64748b">0</text>
                 </g>
                 <text x="50" y="150" font-size="8" fill="#64748b">тёмное | светлое</text>
                 <text x="315" y="150" text-anchor="middle" font-size="8" fill="#64748b">граница найдена!</text>

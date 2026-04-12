@@ -72,25 +72,19 @@ App.registerTopic({
             <text x="250" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">x3</text>
             <line x1="178" y1="115" x2="142" y2="146" stroke="#475569" stroke-width="1.5"/>
             <line x1="202" y1="115" x2="238" y2="146" stroke="#475569" stroke-width="1.5"/>
-            <!-- Level 2 (leaves) -->
-            <rect x="80" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="95" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L1</text>
-            <rect x="115" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="130" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L2</text>
-            <rect x="150" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="165" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L3</text>
-            <rect x="200" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="215" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L4</text>
-            <rect x="235" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="250" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L5</text>
-            <rect x="270" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
-            <text x="285" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L6</text>
-            <line x1="122" y1="175" x2="95" y2="212" stroke="#475569" stroke-width="1"/>
-            <line x1="128" y1="175" x2="130" y2="212" stroke="#475569" stroke-width="1"/>
-            <line x1="138" y1="175" x2="165" y2="212" stroke="#475569" stroke-width="1"/>
-            <line x1="242" y1="175" x2="215" y2="212" stroke="#475569" stroke-width="1"/>
-            <line x1="250" y1="175" x2="250" y2="212" stroke="#475569" stroke-width="1"/>
-            <line x1="258" y1="175" x2="285" y2="212" stroke="#475569" stroke-width="1"/>
+            <!-- Level 2 (leaves): binary tree → 4 leaves -->
+            <rect x="85" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="100" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L1</text>
+            <rect x="135" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="150" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L2</text>
+            <rect x="215" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="230" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L3</text>
+            <rect x="265" y="215" width="30" height="22" fill="#bfdbfe" stroke="#1e40af" stroke-width="1.5"/>
+            <text x="280" y="230" text-anchor="middle" font-size="10" fill="#1e40af">L4</text>
+            <line x1="122" y1="175" x2="100" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="138" y1="175" x2="150" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="242" y1="175" x2="230" y2="212" stroke="#475569" stroke-width="1"/>
+            <line x1="258" y1="175" x2="280" y2="212" stroke="#475569" stroke-width="1"/>
 
             <text x="190" y="265" text-anchor="middle" font-size="11" fill="#475569">Ограничение: max_depth</text>
             <text x="190" y="283" text-anchor="middle" font-size="11" fill="#059669">✓ Сбалансированное</text>

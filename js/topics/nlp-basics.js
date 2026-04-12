@@ -106,7 +106,7 @@ App.registerTopic({
 
       <h4>Формула TF-IDF:</h4>
       <div class="math-block">$$\\text{TF}(t, d) = \\frac{\\text{count}(t, d)}{\\text{total words in } d}$$</div>
-      <div class="math-block">$$\\text{IDF}(t) = \\log\\frac{N}{\\text{df}(t) + 1}$$</div>
+      <div class="math-block">$$\\text{IDF}(t) = \\log\\frac{N}{\\text{df}(t)}$$</div>
       <div class="math-block">$$\\text{TF-IDF}(t, d) = \\text{TF}(t, d) \\times \\text{IDF}(t)$$</div>
       <p>Слово, которое встречается в каждом документе (например, «и»), получает IDF ≈ 0 и высокий TF-IDF не наберёт. Редкое, но специфичное слово получает высокий IDF и «выделяется».</p>
 

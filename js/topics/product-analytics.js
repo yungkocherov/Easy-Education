@@ -75,7 +75,7 @@ App.registerTopic({
           <text x="15" y="96"  font-size="9" fill="#64748b" text-anchor="end">40%</text>
           <text x="15" y="142" font-size="9" fill="#64748b" text-anchor="end">50%</text>
           <text x="15" y="188" font-size="9" fill="#64748b" text-anchor="end">40%</text>
-          <text x="15" y="234" font-size="9" fill="#64748b" text-anchor="end">38%</text>
+          <text x="15" y="234" font-size="9" fill="#64748b" text-anchor="end">37.5%</text>
         </svg>
         <div class="caption">AARRR воронка. Цифры справа — пользователи на каждом этапе. Процент слева — конверсия между этапами. Самая узкая часть — главное «бутылочное горлышко».</div>
       </div>

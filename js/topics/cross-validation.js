@@ -65,11 +65,11 @@ App.registerTopic({
           <text x="600" y="219" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
           <!-- Fold 5 -->
           <text x="55" y="262" text-anchor="end" font-size="12" fill="#475569" font-weight="600">Fold 5</text>
-          <rect x="68" y="245" width="180" height="28" rx="5" fill="#f59e0b"/>
-          <text x="158" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
+          <rect x="68" y="245" width="180" height="28" rx="5" fill="#6366f1"/>
           <rect x="252" y="245" width="140" height="28" rx="5" fill="#6366f1"/>
           <rect x="396" y="245" width="140" height="28" rx="5" fill="#6366f1"/>
-          <rect x="540" y="245" width="120" height="28" rx="5" fill="#6366f1"/>
+          <rect x="540" y="245" width="120" height="28" rx="5" fill="#f59e0b"/>
+          <text x="600" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">test</text>
           <!-- Legend -->
           <rect x="200" y="292" width="18" height="14" rx="3" fill="#f59e0b"/>
           <text x="224" y="304" font-size="12" fill="#475569" font-weight="600">= тест (оценка)</text>
