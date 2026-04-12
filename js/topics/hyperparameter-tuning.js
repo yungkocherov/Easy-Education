@@ -68,25 +68,25 @@ App.registerTopic({
           <text x="65" y="165" text-anchor="end" font-size="10" fill="#475569">10</text>
           <text x="65" y="225" text-anchor="end" font-size="10" fill="#475569">15</text>
           <!-- Row 1 -->
-          <rect x="80" y="72" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="86" y="72" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="130" y="98" text-anchor="middle" font-size="11" fill="#4338ca">0.82</text>
-          <rect x="170" y="72" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="176" y="72" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="220" y="98" text-anchor="middle" font-size="11" fill="#4338ca">0.84</text>
-          <rect x="260" y="72" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="266" y="72" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="310" y="98" text-anchor="middle" font-size="11" fill="#4338ca">0.84</text>
           <!-- Row 2 -->
-          <rect x="80" y="132" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="86" y="132" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="130" y="158" text-anchor="middle" font-size="11" fill="#4338ca">0.86</text>
-          <rect x="170" y="132" width="100" height="45" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="2.5"/>
+          <rect x="176" y="132" width="88" height="45" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="2.5"/>
           <text x="220" y="158" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">0.91</text>
-          <rect x="260" y="132" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="266" y="132" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="310" y="158" text-anchor="middle" font-size="11" fill="#4338ca">0.90</text>
           <!-- Row 3 -->
-          <rect x="80" y="192" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="86" y="192" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="130" y="218" text-anchor="middle" font-size="11" fill="#4338ca">0.85</text>
-          <rect x="170" y="192" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="176" y="192" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="220" y="218" text-anchor="middle" font-size="11" fill="#4338ca">0.89</text>
-          <rect x="260" y="192" width="100" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+          <rect x="266" y="192" width="88" height="45" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
           <text x="310" y="218" text-anchor="middle" font-size="11" fill="#4338ca">0.88</text>
           <text x="210" y="268" text-anchor="middle" font-size="10" fill="#065f46">Лучшая комбинация: n_estimators=200, max_depth=10 → accuracy=0.91</text>
         </svg>

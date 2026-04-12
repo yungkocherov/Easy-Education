@@ -62,8 +62,8 @@ App.registerTopic({
           <text x="340" y="72" text-anchor="middle" font-size="11" fill="#065f46" font-weight="600">Выход x̂</text>
           <text x="340" y="92" text-anchor="middle" font-size="10" fill="#64748b">dim=784</text>
 
-          <text x="440" y="55" font-size="10" fill="#64748b">Loss = ||x - x̂||²</text>
-          <text x="440" y="72" font-size="10" fill="#64748b">(<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>)</text>
+          <text x="400" y="55" font-size="10" fill="#64748b">Loss = ||x - x̂||²</text>
+          <text x="400" y="72" font-size="10" fill="#64748b">(<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a>)</text>
         </svg>
         <div class="caption">Автоэнкодер: вход 784-мерный (28×28 пикселей) сжимается в 2-мерный латентный вектор z, затем восстанавливается. Loss = ошибка реконструкции.</div>
       </div>

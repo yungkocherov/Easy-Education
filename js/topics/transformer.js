@@ -39,10 +39,10 @@ App.registerTopic({
           <path d="M145,130 C145,60 325,60 325,130" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
           <text x="260" y="55" text-anchor="middle" font-size="9" fill="#065f46" font-weight="600">0.30</text>
           <!-- Label -->
-          <text x="420" y="70" font-size="11" fill="#334155">← Attention от «сидел»:</text>
-          <text x="420" y="88" font-size="10" fill="#64748b">на кого смотрит это слово?</text>
-          <text x="420" y="106" font-size="10" fill="#64748b">Больше всего — на «кот»</text>
-          <text x="420" y="124" font-size="10" fill="#64748b">и «коврике» (субъект + место).</text>
+          <text x="555" y="70" text-anchor="end" font-size="10" fill="#334155">← Attention от «сидел»:</text>
+          <text x="555" y="86" text-anchor="end" font-size="9" fill="#64748b">на кого смотрит это слово?</text>
+          <text x="555" y="102" text-anchor="end" font-size="9" fill="#64748b">Больше всего — на «кот»</text>
+          <text x="555" y="118" text-anchor="end" font-size="9" fill="#64748b">и «коврике» (субъект + место).</text>
         </svg>
         <div class="caption">Self-attention: каждое слово «смотрит» на все остальные с разными весами. «Сидел» обращает внимание на «кот» (кто?) и «коврике» (где?).</div>
       </div>

@@ -595,7 +595,7 @@ App.registerTopic({
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
+            <svg viewBox="0 0 400 135" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;">
               <text x="200" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">MDI Feature Importance</text>
               <!-- Bar background -->
               <rect x="90" y="30" width="270" height="30" rx="4" fill="#f1f5f9"/>
@@ -716,7 +716,7 @@ App.registerTopic({
           </div>
 
           <div class="illustration bordered">
-            <svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
+            <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;">
               <text x="240" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Variance леса vs число деревьев (ρ=0.3, σ²=0.1)</text>
               <!-- Y axis -->
               <line x1="55" y1="25" x2="55" y2="145" stroke="#94a3b8" stroke-width="1.5"/>
@@ -729,7 +729,7 @@ App.registerTopic({
               <text x="50" y="148" text-anchor="end" font-size="8" fill="#64748b">0.03</text>
               <!-- Horizontal dashed line at ρσ²=0.030 (asymptote) -->
               <line x1="55" y1="140" x2="445" y2="140" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
-              <text x="450" y="143" font-size="8" fill="#ef4444">ρσ²=0.03</text>
+              <text x="445" y="143" text-anchor="end" font-size="8" fill="#ef4444">ρσ²=0.03</text>
               <!-- Single tree bar T=1 -->
               <rect x="70" y="25" width="50" height="120" rx="3" fill="#f87171" opacity="0.85"/>
               <text x="95" y="21" text-anchor="middle" font-size="8" font-weight="600" fill="#dc2626">0.100</text>

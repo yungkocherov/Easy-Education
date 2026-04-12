@@ -254,19 +254,19 @@ App.registerTopic({
           critLine.setAttribute('x1', critX); critLine.setAttribute('x2', critX);
           critLine.setAttribute('y1', 60); critLine.setAttribute('y2', 258);
           // Position labels — alpha right of crit, beta left of crit, well-separated
-          document.getElementById('err-alpha-label').setAttribute('x', critX + 40);
-          document.getElementById('err-alpha-sub').setAttribute('x', critX + 40);
-          document.getElementById('err-beta-label').setAttribute('x', critX - 50);
-          document.getElementById('err-beta-sub').setAttribute('x', critX - 50);
+          document.getElementById('err-alpha-label').setAttribute('x', critX + 55);
+          document.getElementById('err-alpha-sub').setAttribute('x', critX + 55);
+          document.getElementById('err-beta-label').setAttribute('x', critX - 55);
+          document.getElementById('err-beta-sub').setAttribute('x', critX - 55);
           document.getElementById('err-crit-label').setAttribute('x', critX);
           document.getElementById('err-h0-title').setAttribute('x', cxH0);
           document.getElementById('err-h1-title').setAttribute('x', cxH1);
           // Position alpha label inside the right tail of H0 (slightly above baseline)
-          document.getElementById('err-alpha-label').setAttribute('x', critX + 30);
-          document.getElementById('err-alpha-sub').setAttribute('x', critX + 30);
+          document.getElementById('err-alpha-label').setAttribute('x', critX + 55);
+          document.getElementById('err-alpha-sub').setAttribute('x', critX + 55);
           // Beta label inside the left tail of H1
-          document.getElementById('err-beta-label').setAttribute('x', critX - 30);
-          document.getElementById('err-beta-sub').setAttribute('x', critX - 30);
+          document.getElementById('err-beta-label').setAttribute('x', critX - 55);
+          document.getElementById('err-beta-sub').setAttribute('x', critX - 55);
         })();
         </script>
       </div>

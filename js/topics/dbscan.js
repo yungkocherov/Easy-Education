@@ -22,7 +22,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+        <svg viewBox="0 0 500 215" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
           <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">DBSCAN: ядра, границы, шум</text>
           <!-- Background -->
           <rect x="25" y="25" width="450" height="160" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
@@ -54,14 +54,14 @@ App.registerTopic({
           <text x="330" y="165" text-anchor="middle" font-size="9" fill="#10b981" font-weight="600">Кластер 2</text>
           <text x="450" y="100" text-anchor="middle" font-size="9" fill="#94a3b8">шум</text>
           <!-- Legend -->
-          <circle cx="40" cy="195" r="8" fill="#6366f1"/>
-          <text x="54" y="199" font-size="9" fill="#334155">ядро</text>
-          <circle cx="105" cy="195" r="6" fill="#818cf8"/>
-          <text x="117" y="199" font-size="9" fill="#334155">граница</text>
-          <circle cx="185" cy="195" r="4" fill="#94a3b8"/>
-          <text x="195" y="199" font-size="9" fill="#334155">шум</text>
-          <circle cx="250" cy="195" r="15" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2"/>
-          <text x="280" y="199" font-size="9" fill="#334155">ε-радиус</text>
+          <circle cx="40" cy="198" r="8" fill="#6366f1"/>
+          <text x="54" y="202" font-size="9" fill="#334155">ядро</text>
+          <circle cx="105" cy="198" r="6" fill="#818cf8"/>
+          <text x="117" y="202" font-size="9" fill="#334155">граница</text>
+          <circle cx="185" cy="198" r="4" fill="#94a3b8"/>
+          <text x="195" y="202" font-size="9" fill="#334155">шум</text>
+          <circle cx="250" cy="198" r="12" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="272" y="202" font-size="9" fill="#334155">ε-радиус</text>
         </svg>
         <div class="caption">DBSCAN: большие точки — ядровые (много соседей в ε-радиусе), средние — граничные (сами не ядровые, но рядом с ядровыми), маленькие серые — шум.</div>
       </div>
@@ -288,7 +288,7 @@ App.registerTopic({
             <div class="why">Border точки принадлежат кластеру ближайшей Core точки. Noise точки не достижимы ни из одной Core точки.</div>
           </div>
           <div class="illustration bordered">
-            <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
+            <svg viewBox="0 0 460 178" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
               <text x="230" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">DBSCAN: 10 точек (eps=1.5, minPts=3)</text>
               <!-- Scale: x=(coord)*35+30; y=155-coord*22 -->
               <!-- Cluster 1: P1(1,1)→(65,133), P2(1.5,1.5)→(82,122), P3(2,1)→(100,133), P4(2,2.5)→(100,100) -->

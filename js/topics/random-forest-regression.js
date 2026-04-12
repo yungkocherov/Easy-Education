@@ -48,7 +48,7 @@ App.registerTopic({
           <line x1="265" y1="155" x2="265" y2="188" stroke="#64748b" stroke-width="1.5" marker-end="url(#rfr_arr)"/>
           <line x1="440" y1="155" x2="330" y2="190" stroke="#64748b" stroke-width="1.5" marker-end="url(#rfr_arr)"/>
           <!-- Result box -->
-          <rect x="165" y="188" width="200" height="24" rx="5" fill="#6366f1"/>
+          <rect x="145" y="188" width="240" height="24" rx="5" fill="#6366f1"/>
           <text x="265" y="204" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">ŷ = (8.2 + 7.6 + 8.6) / 3 = 8.13</text>
           <defs>
             <marker id="rfr_arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">

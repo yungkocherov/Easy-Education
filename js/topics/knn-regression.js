@@ -62,7 +62,7 @@ App.registerTopic({
           <line x1="190" y1="93" x2="217" y2="82" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
           <!-- Mean line -->
           <line x1="50" y1="105" x2="470" y2="105" stroke="#10b981" stroke-width="1" stroke-dasharray="3,5" opacity="0.5"/>
-          <text x="475" y="108" font-size="8" fill="#10b981">10.67М</text>
+          <text x="462" y="108" font-size="8" fill="#10b981">10.67М</text>
           <!-- Legend -->
           <circle cx="60" cy="202" r="5" fill="#6366f1"/>
           <text x="70" y="206" font-size="9" fill="#334155">обучающая точка</text>

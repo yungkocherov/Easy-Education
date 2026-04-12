@@ -263,7 +263,7 @@ App.registerTopic({
               <circle cx="124" cy="137" r="6" fill="#3b82f6" stroke="#fff" stroke-width="1.5"/>
               <text x="96" y="133" font-size="9" fill="#3b82f6">w₂=0.8</text>
               <circle cx="89" cy="140" r="5" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
-              <text x="60" y="152" font-size="9" fill="#10b981">w₃=0.32</text>
+              <text x="96" y="150" font-size="9" fill="#10b981">w₃=0.32</text>
               <!-- Arrows between points -->
               <line x1="420" y1="23" x2="216" y2="119" stroke="#10b981" stroke-width="1.8" marker-end="url(#gd-arr)"/>
               <line x1="204" y1="122" x2="130" y2="136" stroke="#10b981" stroke-width="1.8" marker-end="url(#gd-arr)"/>
@@ -337,10 +337,7 @@ App.registerTopic({
               <text x="452" y="158" font-size="10" fill="#64748b">w</text>
               <text x="232" y="10" font-size="10" fill="#64748b">L</text>
               <text x="227" y="163" font-size="9" fill="#10b981">0</text>
-              <!-- Parabola: w from -14 to 14 -->
-              <polyline fill="none" stroke="#64748b" stroke-width="1.8"
-                points="22,147 60,131 98,107 136,75 174,39 230,155 286,39 324,75 362,107 400,131 438,147"/>
-              <!-- Actually parabola L=w^2: for w=-13 to 13 step 1 -->
+              <!-- Parabola L=w^2: for w=-13 to 13 step 1 -->
               <!-- x=230+w*16, y=155-w^2*0.9 (for w=13: y=155-152=3; for w=0: y=155) -->
               <polyline fill="none" stroke="#64748b" stroke-width="1.8"
                 points="22,3 46,22 70,46 94,75 118,107 142,132 166,150 230,155 294,150 318,132 342,107 366,75 390,46 414,22 438,3"/>

@@ -173,8 +173,8 @@ App.registerTopic({
             <circle cx="575" cy="82" r="4" fill="#b45309" opacity="0.85"/>
             <circle cx="600" cy="88" r="4" fill="#b45309" opacity="0.85"/>
             <circle cx="625" cy="98" r="4" fill="#b45309" opacity="0.85"/>
-            <circle cx="645" cy="110" r="4" fill="#b45309" opacity="0.85"/>
-            <circle cx="660" cy="128" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="635" cy="108" r="4" fill="#b45309" opacity="0.85"/>
+            <circle cx="645" cy="125" r="4" fill="#b45309" opacity="0.85"/>
           </g>
           <!-- Frame C: outlier pulls line -->
           <g>

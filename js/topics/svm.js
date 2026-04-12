@@ -603,7 +603,7 @@ App.registerTopic({
                 <circle cx="75" cy="110" r="8" fill="#f59e0b"/><text x="75" y="114" text-anchor="middle" font-size="7" fill="#fff">F</text>
                 <!-- Ideal boundary -->
                 <circle cx="150" cy="110" r="50" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6,3"/>
-                <text x="215" y="70" font-size="8" fill="#10b981">идеальная граница r=2</text>
+                <text x="295" y="70" text-anchor="end" font-size="8" fill="#10b981">идеальная граница r=2</text>
               </svg>
             </div>
             <div class="why">Данные расположены двумя концентрическими кольцами. Никакая прямая не может разделить «внутри» от «снаружи». Нужно нелинейное преобразование.</div>

@@ -20,8 +20,8 @@ App.registerTopic({
         <svg viewBox="0 0 520 235" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
           <text x="260" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Дерево регрессии: разбиение пространства</text>
           <!-- Left panel: tree structure -->
-          <rect x="10" y="25" width="230" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-          <text x="125" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Структура дерева</text>
+          <rect x="10" y="25" width="250" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="135" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Структура дерева</text>
           <!-- Root node -->
           <rect x="60" y="50" width="130" height="28" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
           <text x="125" y="68" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Площадь ≤ 70 м²?</text>
@@ -54,8 +54,8 @@ App.registerTopic({
           <text x="230" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">18.1 млн</text>
           <text x="125" y="205" text-anchor="middle" font-size="9" fill="#64748b">Листья = среднее y в регионе</text>
           <!-- Right panel: scatter + steps -->
-          <rect x="260" y="25" width="250" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-          <text x="385" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Ступенчатая аппроксимация</text>
+          <rect x="265" y="25" width="245" height="185" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="387" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Ступенчатая аппроксимация</text>
           <!-- Axes -->
           <line x1="280" y1="50" x2="280" y2="190" stroke="#64748b" stroke-width="1.2"/>
           <line x1="280" y1="190" x2="500" y2="190" stroke="#64748b" stroke-width="1.2"/>
