@@ -7,7 +7,7 @@ const App = (function () {
   const topics = [];
   const categories = [
     { id: 'stats', name: 'Статистика' },
-    { id: 'ab', name: 'A/B тесты и аналитика' },
+    { id: 'ab', name: 'Эксперименты и аналитика' },
     { id: 'ml-basics', name: 'Основы ML' },
     { id: 'ml-reg', name: 'Регрессия' },
     { id: 'ml-cls', name: 'Классификация' },

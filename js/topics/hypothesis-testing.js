@@ -439,198 +439,8 @@ s = √30.89 ≈ <b>5.56 г</b></div>
           </div>
 
           <div class="lesson-box">Одновыборочный t-тест сравнивает выборочное среднее с известным значением. Формула: t = (x̄ − μ₀)/(s/√n). Чем больше |t|, тем сильнее доказательства против H₀.</div>
-        `
-      },
-      {
-        title: 'A/B тест конверсии',
-        content: `
-          <div class="example-problem">
-            <div class="problem-label">Задача</div>
-            <p>Протестировали две версии кнопки «Купить». Достаточно ли данных, чтобы сказать, что B лучше A?</p>
-          </div>
 
-          <div class="example-data-table">
-            <table>
-              <tr><th>Вариант</th><th>Показов</th><th>Кликов</th><th>Конверсия (CR)</th></tr>
-              <tr><td><b>A (старая)</b></td><td>2000</td><td>100</td><td>5.0%</td></tr>
-              <tr><td><b>B (новая)</b></td><td>2000</td><td>130</td><td>6.5%</td></tr>
-            </table>
-          </div>
-          <p>Разница 1.5 п.п. Но может быть случайной?</p>
-
-          <div class="step" data-step="1">
-            <h4>Формулируем гипотезы</h4>
-            <div class="calc">H₀: p_A = p_B  (разницы нет, одна случайность)
-H₁: p_A ≠ p_B  (есть разница)
-α = 0.05</div>
-          </div>
-
-          <div class="step" data-step="2">
-            <h4>Считаем объединённую долю</h4>
-            <div class="calc">p̂ = (100 + 130) / (2000 + 2000) = 230 / 4000 = <b>0.0575</b></div>
-            <div class="why">Под H₀ конверсия одинакова, поэтому мы объединяем данные обеих групп для более точной оценки.</div>
-          </div>
-
-          <div class="step" data-step="3">
-            <h4>Считаем стандартную ошибку разности</h4>
-            <div class="calc">SE = √( p̂(1−p̂)(1/n_A + 1/n_B) )
-   = √( 0.0575 × 0.9425 × (1/2000 + 1/2000) )
-   = √( 0.0542 × 0.001 )
-   = √0.0000542
-   = <b>0.00736</b></div>
-          </div>
-
-          <div class="step" data-step="4">
-            <h4>Считаем z-статистику</h4>
-            <div class="calc">z = (p_B − p_A) / SE
-  = (0.065 − 0.050) / 0.00736
-  = 0.015 / 0.00736
-  = <b>2.04</b></div>
-          </div>
-
-          <div class="step" data-step="5">
-            <h4>Находим p-value и решаем</h4>
-            <div class="calc">Для двустороннего теста:
-p-value = 2 × P(Z > 2.04) = 2 × 0.0207 = <b>0.041</b>
-
-0.041 < 0.05 → <b>отвергаем H₀!</b></div>
-            <p>Разница <b>статистически значима</b> на уровне 5%. Вариант B действительно лучше.</p>
-            <div class="why">Обрати внимание: при 1000 показов на группу (вместо 2000) разница не была бы значимой (z ≈ 1.44, p ≈ 0.15). Размер выборки критичен для обнаружения маленьких эффектов.</div>
-          </div>
-
-          <div class="answer-box">
-            <div class="answer-label">Ответ</div>
-            <p>z = <b>2.04</b>, p = <b>0.041</b> < 0.05. Разница значима. Конверсия B (6.5%) <b>достоверно выше</b> A (5.0%).</p>
-          </div>
-
-          <div class="illustration bordered">
-            <svg viewBox="0 0 460 195" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;">
-              <defs>
-                <linearGradient id="htAbA" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
-                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
-                </linearGradient>
-                <linearGradient id="htAbB" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/>
-                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.08"/>
-                </linearGradient>
-                <marker id="htAbArr"  markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/></marker>
-                <marker id="htAbArrR" markerWidth="6" markerHeight="6" refX="2" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#64748b"/></marker>
-              </defs>
-              <text x="230" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">A/B тест: pA=5% vs pB=6.5% (n=2000 на группу)</text>
-              <!-- axis -->
-              <line x1="30" y1="140" x2="430" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
-              <!-- SE_A ≈ 0.00487, SE_B ≈ 0.00550. Centers at pA=5% (x=180), pB=6.5% (x=255).
-                   Scale: 5000 px/unit → 1 SE_A ≈ 24 px, so halfWidth (3σ) ≈ 73 px
-                   For B:                                         halfWidth ≈ 82 px
-                   Use halfWidth=80 and 90 (~slightly exaggerated) for clean visuals. -->
-              <path id="htAbAreaA"  d="" fill="url(#htAbA)"/>
-              <path id="htAbAreaB"  d="" fill="url(#htAbB)"/>
-              <path id="htAbCurveA" d="" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-              <path id="htAbCurveB" d="" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-              <!-- center lines (set y1 in script to curve peak) -->
-              <line id="htAbCenterA" x1="180" y1="55" x2="180" y2="140" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/>
-              <line id="htAbCenterB" x1="255" y1="45" x2="255" y2="140" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
-              <!-- labels below axis -->
-              <text x="180" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#3b82f6">pA=5%</text>
-              <text x="255" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">pB=6.5%</text>
-              <!-- Δ arrow between the two centers, placed in the tails region -->
-              <line x1="186" y1="120" x2="249" y2="120" stroke="#64748b" stroke-width="1.5" marker-end="url(#htAbArr)" marker-start="url(#htAbArrR)"/>
-              <text x="217" y="115" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Δ = 1.5 п.п.</text>
-              <!-- Stats panel (right side) -->
-              <text x="345" y="55" font-size="11" fill="#475569" font-weight="600">z = 2.04</text>
-              <text x="345" y="72" font-size="11" fill="#475569" font-weight="600">p = 0.041 &lt; 0.05</text>
-              <text x="345" y="92" font-size="12" fill="#059669" font-weight="700">✓ B значимо лучше</text>
-              <!-- bottom caption line -->
-              <text x="230" y="185" text-anchor="middle" font-size="10" fill="#64748b" font-style="italic">разница между кривыми достаточна → отвергаем H₀: pA = pB</text>
-            </svg>
-            <div class="caption">Два распределения выборочных пропорций: A (синяя, 5%) и B (зелёная, 6.5%). Разница 1.5 п.п. статистически значима (z=2.04, p=0.041): кривые достаточно разделены при n=2000.</div>
-            <script>
-            (function() {
-              var U = App.Util;
-              // Bell A: center x=180, baselineY=140, peakY=55, halfWidth=80 (3σ)
-              U.setPath(document, 'htAbCurveA', U.normalOutlinePath(180, 140, 55, 80));
-              U.setPath(document, 'htAbAreaA',  U.normalSegmentPath(180, 140, 55, 80, -3, 3));
-              // Bell B: center x=255, baselineY=140, peakY=45, halfWidth=90 (slightly wider due to higher p)
-              U.setPath(document, 'htAbCurveB', U.normalOutlinePath(255, 140, 45, 90));
-              U.setPath(document, 'htAbAreaB',  U.normalSegmentPath(255, 140, 45, 90, -3, 3));
-            })();
-            </script>
-          </div>
-
-          <div class="lesson-box">A/B тест — это z-тест для пропорций. Для маленьких эффектов (1-2 п.п.) нужны тысячи наблюдений. Всегда рассчитывай необходимый размер выборки заранее (power analysis).</div>
-        `
-      },
-      {
-        title: 'χ²-тест независимости',
-        content: `
-          <div class="example-problem">
-            <div class="problem-label">Задача</div>
-            <p>Опросили 200 человек: связан ли пол с предпочтением утреннего напитка (чай или кофе)?</p>
-          </div>
-
-          <div class="example-data-table">
-            <table>
-              <tr><th></th><th>Чай</th><th>Кофе</th><th>Итого</th></tr>
-              <tr><td><b>Мужчины</b></td><td>30</td><td>70</td><td>100</td></tr>
-              <tr><td><b>Женщины</b></td><td>60</td><td>40</td><td>100</td></tr>
-              <tr><td><b>Итого</b></td><td>90</td><td>110</td><td>200</td></tr>
-            </table>
-          </div>
-
-          <div class="step" data-step="1">
-            <h4>Формулируем гипотезы</h4>
-            <div class="calc">H₀: пол и предпочтение напитка независимы
-H₁: есть зависимость
-α = 0.05</div>
-          </div>
-
-          <div class="step" data-step="2">
-            <h4>Считаем ожидаемые частоты (при H₀)</h4>
-            <p>Если H₀ верна (пол не влияет), ожидаемая частота каждой ячейки:</p>
-            <div class="calc">E = (итого строки × итого столбца) / общий итого</div>
-            <div class="example-data-table">
-              <table>
-                <tr><th></th><th>Чай (E)</th><th>Кофе (E)</th></tr>
-                <tr><td><b>М</b></td><td>100×90/200 = <b>45</b></td><td>100×110/200 = <b>55</b></td></tr>
-                <tr><td><b>Ж</b></td><td>100×90/200 = <b>45</b></td><td>100×110/200 = <b>55</b></td></tr>
-              </table>
-            </div>
-            <div class="why">При независимости пола и напитка оба пола должны пить чай и кофе в одинаковых пропорциях: 90/200 = 45% чай, 110/200 = 55% кофе.</div>
-          </div>
-
-          <div class="step" data-step="3">
-            <h4>Считаем χ²-статистику</h4>
-            <div class="calc">χ² = Σ (O − E)² / E
-
-= (30−45)²/45 + (70−55)²/55 + (60−45)²/45 + (40−55)²/55
-= 225/45 + 225/55 + 225/45 + 225/55
-= 5.00 + 4.09 + 5.00 + 4.09
-= <b>18.18</b></div>
-            <div class="why">Для каждой ячейки считаем: (наблюдённая − ожидаемая)² / ожидаемая. Чем больше разница между наблюдённым и ожидаемым — тем больше χ² и тем сильнее данные противоречат H₀.</div>
-          </div>
-
-          <div class="step" data-step="4">
-            <h4>Определяем p-value</h4>
-            <div class="calc">df = (строк − 1) × (столбцов − 1) = 1 × 1 = 1
-Критическое χ² при df=1, α=0.05: 3.84
-
-Наше χ² = 18.18 >> 3.84 → <b>отвергаем H₀</b>
-p-value < 0.001</div>
-          </div>
-
-          <div class="step" data-step="5">
-            <h4>Интерпретация</h4>
-            <p>Связь между полом и предпочтением напитка <b>высоко значима</b>. Мужчины чаще выбирают кофе (70% vs 40%), женщины — чай (60% vs 30%).</p>
-            <p>Но: χ²-тест говорит <b>есть ли связь</b>, а не <b>насколько она сильная</b> и <b>какая причинно-следственная</b>.</p>
-          </div>
-
-          <div class="answer-box">
-            <div class="answer-label">Ответ</div>
-            <p>χ² = <b>18.18</b>, df = 1, p < <b>0.001</b>. Связь между полом и предпочтением напитка статистически значима.</p>
-          </div>
-
-          <div class="lesson-box">χ²-тест проверяет независимость двух категориальных признаков. Формула: сумма (O−E)²/E по всем ячейкам. Важно: все ожидаемые частоты должны быть ≥ 5, иначе тест не работает (используй точный тест Фишера).</div>
+          <div class="callout tip">💡 <b>Где смотреть конкретные тесты</b> — примеры с полным выводом для сравнения двух групп (<a onclick="App.selectTopic('ab-t-test')">t-тест для средних</a>, <a onclick="App.selectTopic('ab-z-test')">z-тест для конверсий</a>, <a onclick="App.selectTopic('ab-chi-square')">χ² для категориальных</a>, <a onclick="App.selectTopic('ab-mann-whitney')">Манн-Уитни для ненормальных</a>) вынесены в категорию <b>«Эксперименты и аналитика»</b>. Здесь остаётся только одновыборочный случай как самый компактный шаблон для понимания механики p-value и критических значений.</div>
         `
       }
     ],
@@ -734,57 +544,37 @@ p-value < 0.001</div>
     },
 
     python: `
-      <h3>📊 t-тесты в scipy.stats</h3>
+      <h3>📊 Одновыборочный t-тест</h3>
       <pre><code>from scipy import stats
 import numpy as np
 
-# Одновыборочный t-тест: среднее = 500?
+# Проверяем: среднее отличается от 500?
 sample = np.array([510, 495, 520, 505, 530, 498, 515, 490, 525, 508])
 stat, p = stats.ttest_1samp(sample, popmean=500)
 print(f"One-sample t-test: t={stat:.3f}, p={p:.4f}")
-print("Отвергаем H₀" if p < 0.05 else "Не отвергаем H₀")
-
-# Двухвыборочный t-тест
-group_a = np.array([78, 82, 85, 79, 88, 91, 76, 84])
-group_b = np.array([85, 89, 92, 88, 95, 87, 90, 93])
-stat, p = stats.ttest_ind(group_a, group_b, equal_var=True)
-print(f"\\nTwo-sample t-test: t={stat:.3f}, p={p:.4f}")
-
-# Парный t-тест (до/после)
-before = np.array([120, 135, 128, 140, 132])
-after  = np.array([115, 125, 122, 130, 128])
-stat, p = stats.ttest_rel(before, after)
-print(f"\\nPaired t-test: t={stat:.3f}, p={p:.4f}")</code></pre>
-
-      <h3>📋 Хи-квадрат тест</h3>
-      <pre><code>from scipy.stats import chi2_contingency
-import numpy as np
-
-# Таблица сопряжённости: пол × предпочтение
-#            Чай   Кофе  Сок
-observed = np.array([
-    [30, 50, 20],   # Мужчины
-    [45, 35, 25]    # Женщины
-])
-
-chi2, p, dof, expected = chi2_contingency(observed)
-print(f"χ² = {chi2:.2f}, p = {p:.4f}, df = {dof}")
-print(f"\\nОжидаемые частоты:\\n{expected.round(1)}")</code></pre>
+print("Отвергаем H₀" if p < 0.05 else "Не отвергаем H₀")</code></pre>
+      <p>Двухвыборочный t-тест, χ² и Манн-Уитни с полным Python-выводом находятся в специализированных темах категории «Эксперименты и аналитика».</p>
 
       <h3>🔍 Выбор теста — шпаргалка</h3>
-      <pre><code># Нормальность → параметрический тест
+      <pre><code># Сначала — проверка нормальности
 from scipy import stats
 
 data = np.random.normal(0, 1, 100)
 _, p_shapiro = stats.shapiro(data)
 
 if p_shapiro > 0.05:
-    print("Данные нормальные → t-тест / ANOVA")
-    # stats.ttest_ind(a, b)
+    print("Данные нормальные → t-тест / ANOVA (параметрические)")
 else:
-    print("Данные НЕ нормальные → Манн-Уитни / Краскел-Уоллис")
-    # stats.mannwhitneyu(a, b)
-    # stats.kruskal(a, b, c)</code></pre>
+    print("НЕ нормальные → Манн-Уитни / Краскел-Уоллис (непараметрические)")
+
+# Схема выбора:
+# 2 группы, непрерывные, нормальные       → ttest_ind
+# 2 группы, непрерывные, не нормальные     → mannwhitneyu
+# 2+ групп, непрерывные, нормальные        → f_oneway (ANOVA)
+# 2+ групп, непрерывные, не нормальные     → kruskal
+# Парные измерения (до/после)              → ttest_rel / wilcoxon
+# Категориальные данные                    → chi2_contingency / fisher_exact
+# Две пропорции (бинарная метрика)         → proportions_ztest</code></pre>
     `,
 
     applications: `
