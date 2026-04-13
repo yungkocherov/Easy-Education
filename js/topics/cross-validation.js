@@ -176,7 +176,7 @@ Fold 3: train [1..140],  test [141..160]</pre>
 
       <h3>⚠️ Основные риски</h3>
 
-      <h4>Data leakage в препроцессинге</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-data-leakage')">Data leakage</a> в препроцессинге</h4>
       <p>Если делать StandardScaler/PCA/feature engineering <b>до</b> разбиения — утечка гарантирована. Правильный порядок: внутри каждого fold обучать препроцессор на train и применять к test.</p>
       <p>Решение: <span class="term" data-tip="sklearn Pipeline. Объединение препроцессинга и модели в один объект, который правильно применяет каждый шаг только к train внутри CV.">Pipeline</span> в sklearn.</p>
 

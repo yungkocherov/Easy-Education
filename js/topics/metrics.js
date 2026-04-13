@@ -694,7 +694,7 @@ print(df.round(3))</code></pre>
         <li><b>Lift / Gain charts</b>: насколько модель лучше случайного выбора.</li>
       </ul>
 
-      <h3>Калибровка</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-calibration')">Калибровка</a></h3>
       <p>Precision/Recall не измеряют качество вероятностей. Для этого — Brier score, calibration plot, log-loss.</p>
 
       <h3>Выбор метрики по проблеме</h3>

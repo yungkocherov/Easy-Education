@@ -164,7 +164,7 @@ App.registerTopic({
       </ul>
 
       <div class="deep-dive">
-        <summary>Подробнее: утечка таргета при Target Encoding</summary>
+        <summary>Подробнее: <a class="glossary-link" onclick="App.selectTopic('glossary-data-leakage')">утечка таргета</a> при Target Encoding</summary>
         <div class="deep-dive-body">
           <p>Target Encoding — мощный инструмент, но с ловушкой. Если вы считаете среднее таргета по категории на <em>всех</em> обучающих данных, а потом используете эти же данные для обучения модели — модель видит «намёки» о правильном ответе в признаках.</p>
           <p>Правило: кодировать нужно только на <em>других</em> данных:</p>

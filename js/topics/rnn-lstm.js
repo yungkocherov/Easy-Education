@@ -108,7 +108,7 @@ App.registerTopic({
 
       <p>Все эти «слои» используют одни и те же веса. При обучении применяется <span class="term" data-tip="BPTT. Backpropagation Through Time. Алгоритм обратного распространения для RNN: разворачиваем сеть во времени и применяем обычный backprop.">backpropagation through time (BPTT)</span>.</p>
 
-      <h3>⚠️ Проблема vanishing gradients</h3>
+      <h3>⚠️ Проблема <a class="glossary-link" onclick="App.selectTopic('glossary-vanishing-gradient')">vanishing gradients</a></h3>
       <p>Главная болезнь vanilla RNN. При BPTT через много шагов <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a> умножается на $W_{hh}$ снова и снова. Если собственные значения меньше 1 — градиент <b>затухает</b> экспоненциально.</p>
       <p>Последствие: сеть <b>не может помнить далёкое прошлое</b>. Связи длиной больше 10-20 шагов почти не обучаются.</p>
       <p>Альтернатива — <b>exploding gradients</b>: если собственные значения > 1, градиенты взрываются. Решается <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">gradient</a> clipping.</p>

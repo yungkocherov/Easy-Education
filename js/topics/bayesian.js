@@ -131,8 +131,8 @@ App.registerTopic({
 
       <h4>Три способа оценки параметров</h4>
       <ul>
-        <li><b>MLE (Maximum Likelihood):</b> $\\hat{\\theta} = \\arg\\max P(D \\mid \\theta)$. Игнорирует prior.</li>
-        <li><b>MAP (Maximum a Posteriori):</b> $\\hat{\\theta} = \\arg\\max P(\\theta \\mid D)$. Использует prior, даёт одну оценку.</li>
+        <li><a class="glossary-link" onclick="App.selectTopic('glossary-mle-map')"><b>MLE (Maximum Likelihood)</b></a>: $\\hat{\\theta} = \\arg\\max P(D \\mid \\theta)$. Игнорирует prior.</li>
+        <li><a class="glossary-link" onclick="App.selectTopic('glossary-mle-map')"><b>MAP (Maximum a Posteriori)</b></a>: $\\hat{\\theta} = \\arg\\max P(\\theta \\mid D)$. Использует prior, даёт одну оценку.</li>
         <li><b>Full Bayes:</b> работаем с распределением $P(\\theta \\mid D)$ целиком. Дороже, но даёт uncertainty.</li>
       </ul>
 
@@ -246,7 +246,7 @@ App.registerTopic({
           </div>
 
           <div class="step" data-step="2">
-            <h4>Шаг 2. Likelihood (правдоподобие теста)</h4>
+            <h4>Шаг 2. <a class="glossary-link" onclick="App.selectTopic('glossary-mle-map')">Likelihood (правдоподобие)</a> теста</h4>
             <div class="example-data-table">
               <table>
                 <tr><th>Параметр</th><th>Обозначение</th><th>Значение</th><th>Смысл</th></tr>

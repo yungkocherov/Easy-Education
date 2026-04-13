@@ -90,7 +90,7 @@ App.registerTopic({
         <li><b>Encoder</b> получает вход $x$ и выдаёт $\\mu(x)$ и $\\log\\sigma^2(x)$.</li>
         <li><b>Reparameterization trick:</b> $z = \\mu + \\sigma \\cdot \\varepsilon$, где $\\varepsilon \\sim \\mathcal{N}(0, 1)$. Это позволяет делать backpropagation через стохастический семплинг.</li>
         <li><b>Decoder</b> восстанавливает $\\hat{x}$ из $z$.</li>
-        <li><b>Loss = Reconstruction + KL-divergence:</b></li>
+        <li><b>Loss = Reconstruction + <a class="glossary-link" onclick="App.selectTopic('glossary-kl-divergence')">KL-divergence</a>:</b></li>
       </ol>
 
       <div class="math-block">$$\\mathcal{L}_{VAE} = \\underbrace{||x - \\hat{x}||^2}_{\\text{Reconstruction}} + \\underbrace{D_{KL}\\left(q(z|x)\\;||\\;p(z)\\right)}_{\\text{Регуляризация}}$$</div>

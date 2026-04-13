@@ -57,7 +57,7 @@ App.registerTopic({
 
       <p>Transformer (2017, "Attention is All You Need") решил все три проблемы:</p>
       <ul>
-        <li><b>Параллельная обработка</b> — все токены обрабатываются одновременно.</li>
+        <li><b>Параллельная обработка</b> — все <a class="glossary-link" onclick="App.selectTopic('glossary-tokenization')">токены</a> обрабатываются одновременно.</li>
         <li><b>Прямые связи</b> — каждый токен напрямую «видит» все остальные.</li>
         <li><b>Единица расстояния</b> — путь между любыми двумя токенами = 1 операция.</li>
       </ul>
@@ -135,9 +135,9 @@ App.registerTopic({
 
       <p>Один блок содержит:</p>
       <ol>
-        <li><b>Layer Normalization</b> — нормализация активаций.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-batchnorm')">Layer Normalization</a></b> — нормализация активаций.</li>
         <li><b>Multi-Head Attention</b> — главная операция.</li>
-        <li><b>Residual connection</b> — добавляем вход к выходу.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-residual')">Residual connection</a></b> — добавляем вход к выходу.</li>
         <li><b>Feed-Forward Network</b> — обычный MLP, применённый к каждому токену.</li>
         <li>Снова residual.</li>
       </ol>

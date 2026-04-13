@@ -170,7 +170,7 @@ App.registerTopic({
         <li><b>Фиксируй random_state</b> — для воспроизводимости всегда задавай seed в модели и CV-сплиттере.</li>
         <li><b>Начинай с Random Search</b> — быстро находит хороший регион. Потом уточняй Grid Search или Optuna.</li>
         <li><b>Мониторь overfitting</b> — если train score >> val score, параметры ведут к <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучению</a>.</li>
-        <li><b>Pipeline!</b> — всегда оборачивай препроцессинг + модель в Pipeline, чтобы не было data leakage.</li>
+        <li><b>Pipeline!</b> — всегда оборачивай препроцессинг + модель в Pipeline, чтобы не было <a class="glossary-link" onclick="App.selectTopic('glossary-data-leakage')">data leakage</a>.</li>
       </ul>
 
       <div class="key-concept">
@@ -401,7 +401,7 @@ lr = 1.0 (слишком много):
           </div>
 
           <div class="step" data-step="3">
-            <h4>Оптимальная стратегия: lr + early stopping</h4>
+            <h4>Оптимальная стратегия: lr + <a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">early stopping</a></h4>
             <div class="calc">Лучшая практика:
   1. Задай lr = 0.05–0.1 (умеренно маленький)
   2. Поставь n_estimators = 5000 (с запасом)

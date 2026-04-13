@@ -182,7 +182,7 @@ App.registerTopic({
       </div>
 
       <div class="deep-dive">
-        <summary>Подробнее: калибровка вероятностей</summary>
+        <summary>Подробнее: <a class="glossary-link" onclick="App.selectTopic('glossary-calibration')">калибровка вероятностей</a></summary>
         <div class="deep-dive-body">
           <p>AUC говорит о <b>ранжировании</b>, но не о <b>калибровке</b> вероятностей. Модель может выдавать score 0.9 для всех положительных и 0.1 для всех отрицательных — AUC = 1.0. Но сами по себе 0.9 и 0.1 — не «настоящие вероятности».</p>
           <p>Для оценки калибровки используют:</p>

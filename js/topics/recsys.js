@@ -32,7 +32,7 @@ App.registerTopic({
       </ul>
       <div class="math-block">$$\\text{sim}(A, B) = \\cos(\\theta) = \\frac{\\vec{A} \\cdot \\vec{B}}{\\|\\vec{A}\\| \\cdot \\|\\vec{B}\\|} = \\frac{\\sum_{i} A_i B_i}{\\sqrt{\\sum_{i} A_i^2} \\cdot \\sqrt{\\sum_{i} B_i^2}}$$</div>
       <ul>
-        <li><b>TF-IDF для текста</b> — если item имеет текстовое описание, превращаем слова в числовые признаки. TF (term frequency) показывает, как часто слово встречается в описании, IDF (inverse document frequency) снижает вес частых слов вроде «фильм» или «книга».</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-tfidf')">TF-IDF</a> для текста</b> — если item имеет текстовое описание, превращаем слова в числовые признаки. TF (term frequency) показывает, как часто слово встречается в описании, IDF (inverse document frequency) снижает вес частых слов вроде «фильм» или «книга».</li>
       </ul>
 
       <div class="key-concept">
@@ -57,7 +57,7 @@ App.registerTopic({
       <div class="math-block">$$\\hat{r}_{ui} = \\frac{\\sum_{j \\in N(i)} \\text{sim}(i, j) \\cdot r_{uj}}{\\sum_{j \\in N(i)} |\\text{sim}(i, j)|}$$</div>
       <p>Amazon использовал именно item-item CF для «Те, кто купил X, также купили Y».</p>
 
-      <h3>🔢 Матричная факторизация</h3>
+      <h3>🔢 <a class="glossary-link" onclick="App.selectTopic('glossary-matrix-factorization')">Матричная факторизация</a></h3>
       <p>Главная идея: матрица оценок R (users × items) — разреженная, большинство ячеек пусты. Мы хотим <b>заполнить пропуски</b>, разложив R на произведение двух маленьких матриц:</p>
       <div class="math-block">$$R \\approx U \\cdot V^T$$</div>
       <p>где $U$ — матрица пользовательских латентных факторов (n_users × k), $V$ — матрица item'овских латентных факторов (n_items × k), а k — число скрытых факторов (обычно 10–200).</p>
@@ -230,7 +230,7 @@ App.registerTopic({
       <div class="math-block">$$R = U \\Sigma V^T$$</div>
       <p>$\\Sigma$ — диагональная матрица с сингулярными значениями (от большего к меньшему). Оставляя k наибольших значений, получаем <b>приближение ранга k</b> — лучшее в смысле <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> (теорема Экарта-Янга).</p>
 
-      <h4>ALS (Alternating Least Squares)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-matrix-factorization')">ALS (Alternating Least Squares)</a></h4>
       <p>SVD напрямую плохо работает с пропусками. ALS решает задачу итеративно:</p>
       <ol>
         <li>Фиксируем V, оптимизируем U (обычный метод наименьших квадратов).</li>

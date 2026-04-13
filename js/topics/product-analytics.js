@@ -99,7 +99,7 @@ App.registerTopic({
         <li>Stickiness &lt; 10% — низкое вовлечение, нужно исследовать.</li>
       </ul>
 
-      <h4>Retention и кривые выживаемости</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-ab-metrics')">Retention</a> и кривые выживаемости</h4>
       <p>Retention Rate на N-й день/неделю/месяц: какая доля пользователей из <a class="glossary-link" onclick="App.selectTopic('glossary-cohort-analysis')">когорты</a> вернулась через N периодов.</p>
       <div class="math-block">$$\\text{Retention}_N = \\frac{\\text{вернулись на } N\\text{-й день}}{\\text{стартовали в день 0}}$$</div>
       <p><b>Retention curve</b> — график retention по времени. Кривая обычно резко падает в первые дни, потом стабилизируется. Форма важнее абсолютных цифр.</p>
@@ -159,7 +159,7 @@ App.registerTopic({
         <div class="caption">3 типичные формы кривой retention. <b>Зелёная</b> — признак Product-Market Fit: резкое падение в первые дни, потом стабилизация. <b>Жёлтая</b> — «медленная смерть». <b>Красная</b> — дырявое ведро, пользователи уходят почти сразу.</div>
       </div>
 
-      <h4>Churn Rate</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-ab-metrics')">Churn Rate</a></h4>
       <p>Churn — обратная сторона retention: доля пользователей, покинувших продукт за период.</p>
       <div class="math-block">$$\\text{Churn} = 1 - \\text{Retention}$$</div>
       <p>Высокий churn уничтожает рост: при 10% monthly churn через год остаётся лишь $0.9^{12} \\approx 28\\%$ пользователей.</p>
@@ -199,7 +199,7 @@ App.registerTopic({
       </ul>
       <p>Стандартное представление — <b>треугольная retention-таблица</b>: строки = когорты, столбцы = периоды жизни.</p>
 
-      <h3>⭐ North Star Metric</h3>
+      <h3>⭐ <a class="glossary-link" onclick="App.selectTopic('glossary-ab-metrics')">North Star Metric</a></h3>
       <p><span class="term" data-tip="North Star Metric. Одна метрика, которая лучше всего отражает ценность, которую продукт создаёт для пользователей. Объединяет всю команду вокруг одной цели.">North Star Metric (NSM)</span> — единственная метрика, которая отражает основную ценность продукта для пользователей.</p>
       <p>Примеры NSM:</p>
       <ul>

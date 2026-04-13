@@ -131,8 +131,8 @@ App.registerTopic({
 
       <h3>⚠️ Проблемы обучения глубоких сетей</h3>
 
-      <h4>Vanishing gradients</h4>
-      <p>При обратном распространении градиент многократно умножается. Если $\\sigma' < 1$, градиент <b>затухает</b> — первые слои не учатся. Решается ReLU, batch normalization, residual connections.</p>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-vanishing-gradient')">Vanishing gradients</a></h4>
+      <p>При обратном распространении градиент многократно умножается. Если $\\sigma' < 1$, градиент <b>затухает</b> — первые слои не учатся. Решается ReLU, <a class="glossary-link" onclick="App.selectTopic('glossary-batchnorm')">batch normalization</a>, <a class="glossary-link" onclick="App.selectTopic('glossary-residual')">residual connections</a>.</p>
 
       <h4>Exploding gradients</h4>
       <p>Противоположная проблема: градиенты <b>взрываются</b>. Loss → NaN. Решается <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">gradient</a> clipping и правильной инициализацией.</p>
@@ -140,9 +140,9 @@ App.registerTopic({
       <h4><a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">Переобучение</a></h4>
       <p>Глубокие сети имеют миллионы параметров. Легко запоминают обучающие данные. Решается:</p>
       <ul>
-        <li><b>Dropout</b> — случайно отключаем нейроны при обучении.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-dropout')">Dropout</a></b> — случайно отключаем нейроны при обучении.</li>
         <li><b>Weight decay (L2)</b> — штраф за большие веса.</li>
-        <li><b>Early stopping</b>.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">Early stopping</a></b>.</li>
         <li><b>Data augmentation</b>.</li>
         <li><b>Batch normalization</b>.</li>
       </ul>
@@ -201,8 +201,8 @@ App.registerTopic({
         <summary>Подробнее: современные архитектурные приёмы</summary>
         <div class="deep-dive-body">
           <ul>
-            <li><b>Residual connections (ResNet)</b> — $y = F(x) + x$, позволяют обучать очень глубокие сети.</li>
-            <li><b>Batch Normalization</b> — нормализует активации, ускоряет обучение, регуляризирует.</li>
+            <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-residual')">Residual connections (ResNet)</a></b> — $y = F(x) + x$, позволяют обучать очень глубокие сети.</li>
+            <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-batchnorm')">Batch Normalization</a></b> — нормализует активации, ускоряет обучение, регуляризирует.</li>
             <li><b>Layer Normalization</b> — аналог для RNN/Transformer.</li>
             <li><b>Attention</b> — механизм фокусировки на важных частях входа.</li>
             <li><b>Skip connections</b> — короткие пути от входа к выходу.</li>

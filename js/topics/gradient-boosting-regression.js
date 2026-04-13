@@ -89,7 +89,7 @@ App.registerTopic({
         <p>Для MSE: $L = \\frac{1}{2}(y - F)^2$. Отрицательный градиент: $-\\frac{\\partial L}{\\partial F} = y - F = r$. То есть для MSE остатки = отрицательный градиент <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>. Мы делаем <b>градиентный спуск в пространстве функций</b>, а не в пространстве параметров. Для других функций потерь (<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a>, Huber) псевдо-остатки отличаются — отсюда и название.</p>
       </div>
 
-      <h3>📉 Learning rate η — скорость обучения</h3>
+      <h3>📉 <a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — скорость обучения</h3>
       <p>Без η каждое новое дерево полностью «закрывало» бы остатки — быстро, но <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a>. С η мы <b>замедляем</b> исправление:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
       <ul>
@@ -102,7 +102,7 @@ App.registerTopic({
       <h3>🛡️ Борьба с переобучением</h3>
       <p>Gradient Boosting легко переобучается. Три главных инструмента:</p>
       <ul>
-        <li><b>Малый η + early stopping:</b> валидационная ошибка перестала падать → стоп.</li>
+        <li><b>Малый η + <a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">early stopping</a>:</b> валидационная ошибка перестала падать → стоп.</li>
         <li><b>max_depth=3–5:</b> неглубокие деревья («пни»). Глубокие деревья переобучаются быстро.</li>
         <li><b>subsample &lt; 1.0:</b> каждое дерево обучается на случайной подвыборке строк (Stochastic GB). Типично subsample=0.8.</li>
         <li><b>max_features &lt; 1.0:</b> случайные признаки, как в Random Forest. Типично 0.8 или 'sqrt'.</li>

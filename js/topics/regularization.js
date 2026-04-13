@@ -157,8 +157,8 @@ App.registerTopic({
         <li><b>Нейросети</b> — <span class="term" data-tip="Weight decay. То же, что L2-регуляризация, но в контексте нейросетей. Штрафует большие веса.">weight decay</span> = L2.</li>
         <li><b>Деревья</b> — min_samples_split, max_depth.</li>
         <li><b>Бустинг</b> — η (learning rate), регуляризация листьев в XGBoost.</li>
-        <li><b>Dropout в нейросетях</b> — стохастическая регуляризация.</li>
-        <li><b>Early stopping</b> — регуляризация через ограничение обучения.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-dropout')">Dropout</a> в нейросетях</b> — стохастическая регуляризация.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">Early stopping</a></b> — регуляризация через ограничение обучения.</li>
       </ul>
 
       <h3>⚠️ Частые заблуждения</h3>

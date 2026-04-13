@@ -22,7 +22,7 @@ App.registerTopic({
         <li>Нас интересует <b>всё распределение</b> по категориям, а не одна доля.</li>
         <li>Число групп ≥ 2 (двустороннее A/B, A/B/C, A/B/C/D).</li>
         <li>Число категорий исходов ≥ 2.</li>
-        <li>Все <b>ожидаемые</b> частоты ≥ 5 (иначе — тест Фишера).</li>
+        <li>Все <b>ожидаемые</b> частоты ≥ 5 (иначе — <a class="glossary-link" onclick="App.selectTopic('glossary-nonparametric-tests')">тест Фишера</a>).</li>
       </ul>
 
       <div class="key-concept">

@@ -218,10 +218,10 @@ App.registerTopic({
         <div class="deep-dive-body">
           <ul>
             <li><b>LeNet-5</b> (1998) — первая CNN для MNIST.</li>
-            <li><b>AlexNet</b> (2012) — революция в ImageNet, ReLU, dropout.</li>
+            <li><b>AlexNet</b> (2012) — революция в ImageNet, ReLU, <a class="glossary-link" onclick="App.selectTopic('glossary-dropout')">dropout</a>.</li>
             <li><b>VGG</b> (2014) — простая, только 3×3 свёртки.</li>
             <li><b>GoogLeNet</b> (2014) — inception-модули.</li>
-            <li><b>ResNet</b> (2015) — skip connections, очень глубокие (100+ слоёв).</li>
+            <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-residual')">ResNet</a></b> (2015) — skip connections, очень глубокие (100+ слоёв).</li>
             <li><b>EfficientNet</b> (2019) — оптимальный баланс размеров.</li>
             <li><b>ViT</b> (2020) — <a class="glossary-link" onclick="App.selectTopic('glossary-attention')">attention</a> вместо свёрток.</li>
           </ul>
@@ -1137,7 +1137,7 @@ for epoch in range(10):
       <h3>Residual connections</h3>
       <p>$y = F(x) + x$ — «short-cut» вокруг блока слоёв. Решает vanishing gradients, позволяет сети в 100+ слоёв.</p>
 
-      <h3>Batch Normalization</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-batchnorm')">Batch Normalization</a></h3>
       <p>Нормализует активации в батче. Ускоряет обучение, регуляризирует, позволяет большие learning rates.</p>
 
       <h3>Dilated / Atrous Convolution</h3>

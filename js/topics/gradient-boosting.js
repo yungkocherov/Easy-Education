@@ -91,7 +91,7 @@ App.registerTopic({
       <p>Для <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> градиент = $y - F$, то есть обычный остаток. Но для других функций потерь (log-loss, Huber) градиент другой — и именно на нём учится новое дерево.</p>
       <p>Это и есть <b>gradient boosting</b>: мы делаем шаг в сторону уменьшения loss, «спускаясь по градиенту» в пространстве функций.</p>
 
-      <h3>⚙️ Learning rate η — главный параметр</h3>
+      <h3>⚙️ <a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — главный параметр</h3>
       <p>Без коэффициента $\\eta$ (learning rate) каждое новое дерево полностью заменяло бы ошибки предыдущих — это быстро переобучается. Поэтому мы «замедляем» обучение:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
 
@@ -174,7 +174,7 @@ App.registerTopic({
 
       <h3>⚠️ Частые заблуждения</h3>
       <ul>
-        <li><b>«Чем больше M, тем лучше»</b> — нет, модель переобучится. Используй early stopping.</li>
+        <li><b>«Чем больше M, тем лучше»</b> — нет, модель переобучится. Используй <a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">early stopping</a>.</li>
         <li><b>«Boosting заменяет deep learning»</b> — на табличных данных да, на изображениях/тексте — нет.</li>
         <li><b>«Бустинг всегда побеждает RF»</b> — при плохой настройке часто проигрывает.</li>
         <li><b>«XGBoost лучший»</b> — зависит от данных. LightGBM часто быстрее и не хуже.</li>

@@ -98,7 +98,7 @@ App.registerTopic({
         <li>✗ Не влезает в память.</li>
       </ul>
 
-      <h4>Stochastic Gradient Descent (SGD)</h4>
+      <h4><a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Stochastic Gradient Descent (SGD)</a></h4>
       <p>Градиент считается по <b>одному</b> примеру:</p>
       <ul>
         <li>✓ Очень быстрый.</li>
