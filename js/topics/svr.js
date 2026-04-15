@@ -330,12 +330,14 @@ App.registerTopic({
 
     simulation: {
       html: `
-        <h3>Симуляция: SVR с ε-трубой</h3>
-        <p>Меняй ε и C. Наблюдай, какие точки попадают внутрь трубы, а какие — снаружи.</p>
+        <h3>Симуляция: настоящий SVR — ε и C управляют формой</h3>
+        <p>Труба здесь не декоративная: мы действительно минимизируем $\\tfrac{1}{2}\\|w\\|^2 + C \\sum_i \\max(0, |y_i - f(x_i)| - \\varepsilon)$ через субградиентный спуск. Поставь много шума — увеличь ε, и наклон перестанет трястись вслед за каждым выбросом. Поставь ε=0 при C→∞ — и SVR станет как OLS.</p>
+        <p><b>Что смотреть:</b> какие точки стали опорными (красные — ровно на границе трубы или за ней). Только они влияют на решение. Увеличь ε — опорных меньше, наклон стабильнее, но больше «размазывание». Уменьши C — ||w|| падает, модель становится плоской (сильная регуляризация).</p>
         <div class="sim-container">
           <div class="sim-controls" id="svr-controls"></div>
           <div class="sim-buttons">
             <button class="btn" id="svr-regen">🔄 Новые данные</button>
+            <button class="btn secondary" id="svr-out">💥 Добавить выброс</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap"><canvas id="svr-chart"></canvas></div>
@@ -345,61 +347,109 @@ App.registerTopic({
       `,
       init(container) {
         const controls = container.querySelector('#svr-controls');
-        const cEps = App.makeControl('range', 'svr-eps', 'ε (ширина трубы)', { min: 0.1, max: 3, step: 0.1, value: 0.5 });
-        const cC = App.makeControl('range', 'svr-c', 'C (регуляризация, log)', { min: -1, max: 2, step: 0.1, value: 0.5 });
-        [cEps, cC].forEach(c => controls.appendChild(c.wrap));
+        const cEps = App.makeControl('range', 'svr-eps', 'ε (ширина трубы)', { min: 0, max: 3, step: 0.05, value: 0.5 });
+        const cC = App.makeControl('range', 'svr-c', 'log₁₀ C', { min: -2, max: 3, step: 0.1, value: 1 });
+        const cNoise = App.makeControl('range', 'svr-noise', 'Шум σ', { min: 0, max: 2, step: 0.05, value: 0.6 });
+        const cN = App.makeControl('range', 'svr-n', 'Точек', { min: 20, max: 150, step: 5, value: 60 });
+        [cEps, cC, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
 
         let chart = null;
         let dataX = [], dataY = [];
-        const N = 80;
+        // true line parameters — regenerated with data
+        let trueW = 0.9, trueB = 0.2;
+        let extraOutliers = [];
 
         function generate() {
+          const n = +cN.input.value;
+          const sigma = +cNoise.input.value;
+          trueW = 0.6 + Math.random() * 0.6;
+          trueB = -1 + Math.random() * 2;
           dataX = []; dataY = [];
-          for (let i = 0; i < N; i++) {
-            const x = Math.random() * 2 * Math.PI;
+          extraOutliers = [];
+          for (let i = 0; i < n; i++) {
+            const x = Math.random() * 10 - 5;
             dataX.push(x);
-            dataY.push(Math.sin(x) + App.Util.randn(0, 0.6));
+            dataY.push(trueW * x + trueB + App.Util.randn(0, sigma));
           }
-          update();
+          fitAndDraw();
         }
 
-        function update() {
-          const eps = +cEps.input.value;
-          const logC = +cC.input.value;
-          const C = Math.pow(10, logC);
+        function addOutlier() {
+          // Strong outlier in a random place, far from the line
+          const x = Math.random() * 10 - 5;
+          const sign = Math.random() < 0.5 ? -1 : 1;
+          const y = trueW * x + trueB + sign * (5 + Math.random() * 3);
+          dataX.push(x);
+          dataY.push(y);
+          extraOutliers.push(dataX.length - 1);
+          fitAndDraw();
+        }
 
-          // Simple linear regression as base line
-          const mx = App.Util.mean(dataX), my = App.Util.mean(dataY);
+        // --- Primal linear SVR via subgradient descent ---
+        // Objective: (1/2)||w||^2 + C * Σ max(0, |y_i - (w*x_i + b)| - ε)
+        function fitSVR(xs, ys, eps, C) {
+          let w = 0, b = App.Util.mean(ys);
+          const n = xs.length;
+          const lr = 0.01 / (1 + C);           // small step, scaled
+          const steps = 1500;
+          for (let t = 0; t < steps; t++) {
+            // subgradient of regularization term
+            let gw = w;
+            let gb = 0;
+            for (let i = 0; i < n; i++) {
+              const r = ys[i] - (w * xs[i] + b);
+              if (r > eps) {         // below the line → want f larger
+                gw += -C * xs[i];
+                gb += -C;
+              } else if (r < -eps) { // above the line
+                gw += C * xs[i];
+                gb += C;
+              } // else: inside tube, no gradient contribution
+            }
+            w -= lr * gw / n;
+            b -= lr * gb / n;
+          }
+          return { w, b };
+        }
+
+        // OLS for comparison
+        function fitOLS(xs, ys) {
+          const mx = App.Util.mean(xs), my = App.Util.mean(ys);
           let num = 0, den = 0;
-          for (let i = 0; i < dataX.length; i++) {
-            num += (dataX[i] - mx) * (dataY[i] - my);
-            den += (dataX[i] - mx) ** 2;
+          for (let i = 0; i < xs.length; i++) {
+            num += (xs[i] - mx) * (ys[i] - my);
+            den += (xs[i] - mx) ** 2;
           }
           const w = num / (den || 1);
-          const b = my - w * mx;
+          return { w, b: my - w * mx };
+        }
 
-          const gridX = App.Util.linspace(0, 2 * Math.PI, 200);
-          const lineY = gridX.map(x => w * x + b);
-          const upperY = gridX.map(x => w * x + b + eps);
-          const lowerY = gridX.map(x => w * x + b - eps);
+        function fitAndDraw() {
+          const eps = +cEps.input.value;
+          const C = Math.pow(10, +cC.input.value);
 
-          let outside = 0;
+          const { w, b } = fitSVR(dataX, dataY, eps, C);
+          const ols = fitOLS(dataX, dataY);
+
+          // classify points: inside tube, on edge (support), outside (also support)
+          const TOL = 0.02 * Math.max(0.2, eps);
+          const inside = [], edge = [], outside = [];
+          let totalLoss = 0;
           for (let i = 0; i < dataX.length; i++) {
             const pred = w * dataX[i] + b;
-            if (Math.abs(dataY[i] - pred) > eps) outside++;
-          }
-
-          const insideData = [], outsideData = [];
-          for (let i = 0; i < dataX.length; i++) {
-            const pred = w * dataX[i] + b;
+            const r = Math.abs(dataY[i] - pred);
             const pt = { x: dataX[i], y: dataY[i] };
-            if (Math.abs(dataY[i] - pred) > eps) outsideData.push(pt);
-            else insideData.push(pt);
+            if (r > eps + TOL) { outside.push(pt); totalLoss += r - eps; }
+            else if (r > eps - TOL) edge.push(pt);
+            else inside.push(pt);
           }
 
-          const lineData = gridX.map((x, i) => ({ x, y: lineY[i] }));
-          const upperData = gridX.map((x, i) => ({ x, y: upperY[i] }));
-          const lowerData = gridX.map((x, i) => ({ x, y: lowerY[i] }));
+          const xs = [-5.5, 5.5];
+          const lineData = xs.map(x => ({ x, y: w * x + b }));
+          const upperData = xs.map(x => ({ x, y: w * x + b + eps }));
+          const lowerData = xs.map(x => ({ x, y: w * x + b - eps }));
+          const olsData = xs.map(x => ({ x, y: ols.w * x + ols.b }));
+          const trueLine = xs.map(x => ({ x, y: trueW * x + trueB }));
 
           const ctx = container.querySelector('#svr-chart').getContext('2d');
           if (chart) chart.destroy();
@@ -407,30 +457,42 @@ App.registerTopic({
             type: 'scatter',
             data: {
               datasets: [
-                { label: 'Внутри трубы', data: insideData, backgroundColor: 'rgba(59,130,246,0.5)', pointRadius: 5 },
-                { label: 'Вне трубы', data: outsideData, backgroundColor: 'rgba(239,68,68,0.7)', pointRadius: 6 },
-                { label: 'Регрессия', data: lineData, type: 'line', borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
-                { label: '+ε', data: upperData, type: 'line', borderColor: 'rgba(16,185,129,0.5)', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false, showLine: true },
-                { label: '-ε', data: lowerData, type: 'line', borderColor: 'rgba(16,185,129,0.5)', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false, showLine: true },
+                { label: 'Внутри трубы (не штрафуется)', data: inside, backgroundColor: 'rgba(59,130,246,0.55)', pointRadius: 4 },
+                { label: 'Опорные на краю', data: edge, backgroundColor: 'rgba(234,179,8,0.9)', borderColor: '#b45309', borderWidth: 1.5, pointRadius: 6 },
+                { label: 'Опорные снаружи (штраф)', data: outside, backgroundColor: 'rgba(239,68,68,0.85)', borderColor: '#991b1b', borderWidth: 1.5, pointRadius: 6 },
+                { type: 'line', label: 'SVR f(x)', data: lineData, borderColor: '#6366f1', borderWidth: 3, pointRadius: 0, fill: false },
+                { type: 'line', label: '+ε', data: upperData, borderColor: 'rgba(99,102,241,0.55)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
+                { type: 'line', label: '−ε', data: lowerData, borderColor: 'rgba(99,102,241,0.55)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
+                { type: 'line', label: 'OLS (для сравнения)', data: olsData, borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, borderDash: [3,3], pointRadius: 0, fill: false },
+                { type: 'line', label: 'Истинная линия', data: trueLine, borderColor: 'rgba(100,116,139,0.7)', borderWidth: 1.25, borderDash: [2,3], pointRadius: 0, fill: false },
               ],
             },
             options: {
               responsive: true, maintainAspectRatio: false,
-              plugins: { title: { display: true, text: 'SVR: ε-труба' } },
-              scales: { x: { type: 'linear', min: 0, max: 6.5 }, y: { suggestedMin: -3, suggestedMax: 3 } },
+              plugins: { title: { display: true, text: 'SVR: ε-труба реально управляет подгонкой' }, legend: { position: 'top' } },
+              scales: { x: { type: 'linear', min: -5.5, max: 5.5, title: { display: true, text: 'x' } }, y: { suggestedMin: -10, suggestedMax: 10, title: { display: true, text: 'y' } } },
             },
           });
           App.registerChart(chart);
 
+          const svCount = edge.length + outside.length;
+          const wDiff = Math.abs(w - ols.w);
           container.querySelector('#svr-stats').innerHTML = `
-            <div class="stat-card"><div class="stat-label">ε</div><div class="stat-value">${eps.toFixed(1)}</div></div>
+            <div class="stat-card"><div class="stat-label">ε</div><div class="stat-value">${(+cEps.input.value).toFixed(2)}</div></div>
             <div class="stat-card"><div class="stat-label">C</div><div class="stat-value">${C.toFixed(2)}</div></div>
-            <div class="stat-card"><div class="stat-label">Вне трубы</div><div class="stat-value">${outside} / ${dataX.length}</div></div>
+            <div class="stat-card"><div class="stat-label">SVR наклон</div><div class="stat-value">${w.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">OLS наклон</div><div class="stat-value">${ols.w.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Истинный w</div><div class="stat-value">${trueW.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Опорные</div><div class="stat-value">${svCount}/${dataX.length}</div></div>
+            <div class="stat-card"><div class="stat-label">Σ штрафов (hinge)</div><div class="stat-value">${totalLoss.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">|w<sub>SVR</sub>−w<sub>OLS</sub>|</div><div class="stat-value">${wDiff.toFixed(3)}</div></div>
           `;
         }
 
-        [cEps, cC].forEach(c => c.input.addEventListener('input', update));
+        [cEps, cC].forEach(c => c.input.addEventListener('input', fitAndDraw));
+        [cNoise, cN].forEach(c => c.input.addEventListener('change', generate));
         container.querySelector('#svr-regen').onclick = generate;
+        container.querySelector('#svr-out').onclick = addOutlier;
         generate();
       },
     },

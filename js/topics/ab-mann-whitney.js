@@ -356,8 +356,10 @@ p-value (двусторонний) ≈ <b>0.007</b></div>
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Базовый тест',
+        html: `
         <h3>Ранговый тест: симуляция Манна-Уитни</h3>
         <p>Сгенерируй две выборки с разными распределениями и посмотри, как тест реагирует на реальный сдвиг.</p>
         <div class="sim-container">
@@ -507,7 +509,121 @@ p-value (двусторонний) ≈ <b>0.007</b></div>
         container.querySelector('#mw-run').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'MW vs t-test на тяжёлых хвостах',
+        html: `
+          <h3>Кто надёжнее при выбросах: MW или t-test?</h3>
+          <p>На симметричных нормальных данных t-test выигрывает. Но если распределение тяжёлое (log-normal, с выбросами), среднее «гуляет», дисперсия раздувается — t-test теряет мощность. Ранговый MW смотрит только на порядок, ему всё равно на экстремумы. Запусти серию Монте-Карло и сравни долю обнаружений.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="mw2-controls"></div>
+            <div class="sim-buttons"><button class="btn" id="mw2-run">🔄 Запустить Монте-Карло</button></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="mw2-chart"></canvas></div>
+              <div class="sim-stats" id="mw2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#mw2-controls');
+          const cN = App.makeControl('range', 'mw2-n', 'n в каждой группе', { min: 10, max: 200, step: 10, value: 40 });
+          const cShift = App.makeControl('range', 'mw2-shift', 'Истинный сдвиг (log-normal μ)', { min: 0, max: 1.5, step: 0.05, value: 0.3 });
+          const cContam = App.makeControl('range', 'mw2-contam', 'Доля выбросов %', { min: 0, max: 30, step: 1, value: 5 });
+          const cSim = App.makeControl('range', 'mw2-sim', 'Симуляций', { min: 100, max: 1000, step: 100, value: 300 });
+          [cN, cShift, cContam, cSim].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          // Simple t-test (Welch)
+          function welchT(a, b) {
+            const ma = App.Util.mean(a), mb = App.Util.mean(b);
+            const va = a.reduce((s, x) => s + (x - ma) ** 2, 0) / (a.length - 1);
+            const vb = b.reduce((s, x) => s + (x - mb) ** 2, 0) / (b.length - 1);
+            const se = Math.sqrt(va / a.length + vb / b.length);
+            if (se === 0) return { t: 0, p: 1 };
+            const t = (ma - mb) / se;
+            // Approximate p with normal (n≥20)
+            const p = 2 * (1 - App.Util.normalCDF(Math.abs(t)));
+            return { t, p };
+          }
+          function mwU(a, b) {
+            const n1 = a.length, n2 = b.length;
+            const combined = [...a.map(v => ({ v, g: 0 })), ...b.map(v => ({ v, g: 1 }))].sort((x, y) => x.v - y.v);
+            const ranks = new Array(combined.length);
+            let i = 0;
+            while (i < combined.length) {
+              let j = i;
+              while (j < combined.length && combined[j].v === combined[i].v) j++;
+              const avg = (i + j + 1) / 2;
+              for (let k = i; k < j; k++) ranks[k] = avg;
+              i = j;
+            }
+            let r1 = 0;
+            combined.forEach((it, idx) => { if (it.g === 0) r1 += ranks[idx]; });
+            const u1 = r1 - n1 * (n1 + 1) / 2;
+            const u2 = n1 * n2 - u1;
+            const u = Math.min(u1, u2);
+            const mu = n1 * n2 / 2;
+            const sigma = Math.sqrt(n1 * n2 * (n1 + n2 + 1) / 12);
+            const z = (u - mu) / sigma;
+            const p = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+            return { u, p };
+          }
+          function sampleLogNormal(n, muLog, contam) {
+            const s = new Array(n);
+            for (let i = 0; i < n; i++) {
+              if (Math.random() < contam) {
+                // Outlier: extreme log-normal
+                s[i] = Math.exp(muLog + App.Util.randn(0, 1) + 3);
+              } else {
+                s[i] = Math.exp(muLog + App.Util.randn(0, 0.7));
+              }
+            }
+            return s;
+          }
+          function run() {
+            const n = +cN.input.value;
+            const shift = +cShift.input.value;
+            const contam = +cContam.input.value / 100;
+            const nSim = +cSim.input.value;
+            let tRej = 0, mwRej = 0;
+            for (let s = 0; s < nSim; s++) {
+              const a = sampleLogNormal(n, 0, contam);
+              const b = sampleLogNormal(n, shift, contam);
+              if (welchT(a, b).p < 0.05) tRej++;
+              if (mwU(a, b).p < 0.05) mwRej++;
+            }
+            const tPower = tRej / nSim * 100;
+            const mwPower = mwRej / nSim * 100;
+            const ctx = container.querySelector('#mw2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['Welch t-test', 'Mann-Whitney U'],
+                datasets: [{
+                  label: 'Мощность %',
+                  data: [tPower, mwPower],
+                  backgroundColor: [
+                    tPower < mwPower ? 'rgba(239,68,68,0.55)' : 'rgba(16,185,129,0.7)',
+                    mwPower < tPower ? 'rgba(239,68,68,0.55)' : 'rgba(16,185,129,0.7)',
+                  ],
+                }],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: shift === 0 ? 'H₀ верна — должна быть ~5% (false positive rate)' : 'Мощность (доля обнаружений)' } }, scales: { y: { min: 0, max: 100, title: { display: true, text: '% отвергнутых H₀' } } } },
+            });
+            App.registerChart(chart);
+            const winner = Math.abs(tPower - mwPower) < 2 ? 'равны' : (tPower > mwPower ? 't-test' : 'MW');
+            container.querySelector('#mw2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">t-test power</div><div class="stat-value">' + tPower.toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">MW power</div><div class="stat-value">' + mwPower.toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Разница</div><div class="stat-value">' + (mwPower - tPower).toFixed(1) + ' п.п.</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Выигрывает</div><div class="stat-value">' + winner + '</div></div>';
+          }
+          [cN, cShift, cContam, cSim].forEach(c => c.input.addEventListener('change', run));
+          container.querySelector('#mw2-run').onclick = run;
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Тест Манна-Уитни в Python</h3>

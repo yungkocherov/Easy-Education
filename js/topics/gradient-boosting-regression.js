@@ -681,10 +681,12 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Итерации: приближение к sin(x)',
       html: `
         <h3>Симуляция: бустинг итерации</h3>
-        <p>Добавляй деревья одно за другим. Наблюдай, как предсказание улучшается с каждой итерацией.</p>
+        <p>Добавляй деревья одно за другим. Наблюдай, как предсказание улучшается с каждой итерацией и постепенно приближается к истинному <code>sin(x)</code>.</p>
         <div class="sim-container">
           <div class="sim-controls" id="gbr-controls"></div>
           <div class="sim-buttons">
@@ -849,6 +851,143 @@ App.registerTopic({
         reset();
       },
     },
+    {
+      title: 'Переобучение: слишком много деревьев',
+      html: `
+        <h3>Что если не останавливаться?</h3>
+        <p>Бустинг — жадный оптимизатор train-MSE. Если дать ему много итераций, он запомнит шум. Крутим до 400 деревьев и смотрим обе кривые: <b>train MSE падает всегда</b>, <b>test MSE сначала падает, потом растёт</b>. Точка минимума test — цель early stopping. Чем больше шум и глубина, тем раньше начинается переобучение.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="gbr2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="gbr2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="gbr2-chart"></canvas></div>
+            <div class="sim-stats" id="gbr2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#gbr2-controls');
+        const cLR = App.makeControl('range', 'gbr2-lr', 'Learning rate η', { min: 0.01, max: 1, step: 0.01, value: 0.1 });
+        const cDepth = App.makeControl('range', 'gbr2-depth', 'Глубина дерева', { min: 1, max: 5, step: 1, value: 3 });
+        const cNoise = App.makeControl('range', 'gbr2-noise', 'Шум σ', { min: 0, max: 1.5, step: 0.05, value: 0.6 });
+        const cNTrees = App.makeControl('range', 'gbr2-ntrees', 'Макс. деревьев', { min: 20, max: 400, step: 10, value: 300 });
+        [cLR, cDepth, cNoise, cNTrees].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let trainX = [], trainY = [], testX = [], testY = [];
+
+        function genData() {
+          const sigma = +cNoise.input.value;
+          trainX = []; trainY = []; testX = []; testY = [];
+          for (let i = 0; i < 40; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            trainX.push(x);
+            trainY.push(Math.sin(x) + App.Util.randn(0, sigma));
+          }
+          for (let i = 0; i < 200; i++) {
+            const x = Math.random() * 2 * Math.PI;
+            testX.push(x);
+            testY.push(Math.sin(x));
+          }
+          update();
+        }
+
+        function mean(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+
+        function grow(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2) return { leaf: true, val: mean(items.map(p => p.t)) };
+          const sorted = [...items].sort((a, b) => a.x - b.x);
+          const totalMean = mean(sorted.map(p => p.t));
+          const totalVar = sorted.reduce((s, p) => s + (p.t - totalMean) ** 2, 0);
+          let bestGain = -Infinity, bestThr = null, bestL = null, bestR = null;
+          for (let i = 1; i < sorted.length; i++) {
+            const thr = (sorted[i - 1].x + sorted[i].x) / 2;
+            const L = sorted.slice(0, i), R = sorted.slice(i);
+            const mL = mean(L.map(p => p.t)), mR = mean(R.map(p => p.t));
+            const vL = L.reduce((s, p) => s + (p.t - mL) ** 2, 0);
+            const vR = R.reduce((s, p) => s + (p.t - mR) ** 2, 0);
+            const g = totalVar - (vL + vR);
+            if (g > bestGain) { bestGain = g; bestThr = thr; bestL = L; bestR = R; }
+          }
+          if (bestGain <= 0) return { leaf: true, val: totalMean };
+          return { leaf: false, thr: bestThr, left: grow(bestL, depth + 1, maxDepth), right: grow(bestR, depth + 1, maxDepth) };
+        }
+        function predTree(tree, x) { return tree.leaf ? tree.val : (x < tree.thr ? predTree(tree.left, x) : predTree(tree.right, x)); }
+
+        function update() {
+          const lr = +cLR.input.value;
+          const depth = +cDepth.input.value;
+          const M = +cNTrees.input.value;
+
+          const F0 = mean(trainY);
+          const trainPred = new Array(trainX.length).fill(F0);
+          const testPred = new Array(testX.length).fill(F0);
+
+          function mseArr(ys, preds) {
+            let s = 0; for (let i = 0; i < ys.length; i++) s += (ys[i] - preds[i]) ** 2;
+            return s / ys.length;
+          }
+
+          const trainLoss = [mseArr(trainY, trainPred)];
+          const testLoss = [mseArr(testY, testPred)];
+
+          for (let m = 0; m < M; m++) {
+            const residuals = trainY.map((y, i) => y - trainPred[i]);
+            const items = trainX.map((x, i) => ({ x, t: residuals[i] }));
+            const tree = grow(items, 0, depth);
+            for (let i = 0; i < trainX.length; i++) trainPred[i] += lr * predTree(tree, trainX[i]);
+            for (let i = 0; i < testX.length; i++) testPred[i] += lr * predTree(tree, testX[i]);
+            trainLoss.push(mseArr(trainY, trainPred));
+            testLoss.push(mseArr(testY, testPred));
+          }
+
+          let bestIter = 0, bestTest = Infinity;
+          for (let i = 0; i < testLoss.length; i++) {
+            if (testLoss[i] < bestTest) { bestTest = testLoss[i]; bestIter = i; }
+          }
+
+          const labels = trainLoss.map((_, i) => i);
+          const ctx = container.querySelector('#gbr2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                { label: 'Train MSE', data: trainLoss, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Test MSE',  data: testLoss,  borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: `Train vs Test MSE (best iter = ${bestIter})` }, legend: { position: 'top' } },
+              scales: {
+                x: { title: { display: true, text: 'Итерация' } },
+                y: { title: { display: true, text: 'MSE' }, beginAtZero: true },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          const finalTest = testLoss[testLoss.length - 1];
+          const overfitBy = finalTest - bestTest;
+          container.querySelector('#gbr2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Best iter</div><div class="stat-value">${bestIter}</div></div>
+            <div class="stat-card"><div class="stat-label">Test MSE (best)</div><div class="stat-value">${bestTest.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Test MSE (final)</div><div class="stat-value">${finalTest.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Переобучились на</div><div class="stat-value">+${overfitBy.toFixed(3)}</div></div>
+          `;
+        }
+
+        [cLR, cDepth, cNTrees].forEach(c => c.input.addEventListener('input', update));
+        cNoise.input.addEventListener('input', genData);
+        container.querySelector('#gbr2-regen').onclick = genData;
+        genData();
+      },
+    },
+    ],
 
     python: `
       <h3>Python: Gradient Boosting регрессия</h3>

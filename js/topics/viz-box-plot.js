@@ -312,6 +312,123 @@ Q3 = медиана второй половины (9-й..15-й элемент) =
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Box plot vs гистограмма: что box скрывает</h3>
+        <p>Box plot показывает квартили — но <b>не форму</b>. Два распределения с одинаковыми Q1, Q2, Q3, хвостами могут выглядеть одинаково в boxplot, хотя одно унимодально, а другое бимодально. Переключай «смесь двух нормальных» → box plot почти не меняется, а гистограмма кричит о двух пиках.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="viz-box-ctrl"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="viz-box-chart"></canvas></div>
+            <div class="sim-stats" id="viz-box-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const ctrl = container.querySelector('#viz-box-ctrl');
+        const cDist = App.makeControl('select', 'viz-box-dist', 'Распределение', {
+          options: [
+            { value: 'normal', label: 'Нормальное' },
+            { value: 'bimodal', label: 'Смесь двух нормальных (БИМОДАЛЬНОЕ)' },
+            { value: 'skewed', label: 'Log-normal (правый скос)' },
+            { value: 'heavy', label: 'Тяжёлые хвосты (Student t₃)' },
+          ],
+          value: 'bimodal',
+        });
+        const cN = App.makeControl('range', 'viz-box-n', 'Размер выборки', { min: 50, max: 2000, step: 50, value: 400 });
+        const cK = App.makeControl('range', 'viz-box-k', 'k·IQR для выбросов', { min: 0.5, max: 3, step: 0.1, value: 1.5 });
+        [cDist, cN, cK].forEach(c => ctrl.appendChild(c.wrap));
+        let chart = null;
+        function gen() {
+          const n = +cN.input.value;
+          const d = cDist.input.value;
+          let data;
+          if (d === 'normal') data = App.Util.normalSample(n, 0, 1);
+          else if (d === 'bimodal') {
+            data = [];
+            for (let i = 0; i < n; i++) data.push(Math.random() < 0.5 ? App.Util.randn(-2, 0.5) : App.Util.randn(2, 0.5));
+          } else if (d === 'skewed') {
+            data = [];
+            for (let i = 0; i < n; i++) data.push(Math.exp(App.Util.randn(0, 0.7)));
+          } else {
+            data = [];
+            for (let i = 0; i < n; i++) {
+              // Student t3 via ratio of normals: Z / sqrt(chi2/df)
+              const z = App.Util.randn();
+              let chi = 0;
+              for (let j = 0; j < 3; j++) chi += App.Util.randn() ** 2;
+              data.push(z / Math.sqrt(chi / 3));
+            }
+          }
+          return data;
+        }
+        function draw() {
+          const data = gen();
+          const k = +cK.input.value;
+          const q1 = App.Util.quantile(data, 0.25);
+          const med = App.Util.quantile(data, 0.5);
+          const q3 = App.Util.quantile(data, 0.75);
+          const iqr = q3 - q1;
+          const lo = q1 - k * iqr;
+          const hi = q3 + k * iqr;
+          const outliers = data.filter(v => v < lo || v > hi).length;
+          // Histogram
+          const bins = 35;
+          const mn = App.Util.min(data), mx = App.Util.max(data);
+          const h = App.Util.histogram(data, bins, [mn, mx]);
+          const labels = h.centers.map(c => c.toFixed(2));
+          // Overlay box as horizontal lines at y-levels using annotations via datasets
+          const maxCount = Math.max(...h.counts);
+          const boxY = maxCount * 0.5;
+          // Build box trace: vertical segments at q1, med, q3, lo, hi
+          const segments = [];
+          function seg(val, label, color) {
+            const x = h.centers.findIndex((c, i) => i === h.centers.length - 1 || (c <= val && h.centers[i + 1] > val));
+            return { x: x >= 0 ? x : 0, val, label, color };
+          }
+          const boxSegments = [
+            seg(q1, 'Q1', '#3b82f6'),
+            seg(med, 'Median', '#10b981'),
+            seg(q3, 'Q3', '#3b82f6'),
+            seg(lo, 'LowerFence', '#f59e0b'),
+            seg(hi, 'UpperFence', '#f59e0b'),
+          ];
+          // Mark bins that contain box quartiles with distinct colors
+          const barColors = h.centers.map((c, i) => {
+            if (c >= q1 && c <= q3) return 'rgba(59,130,246,0.65)';
+            if ((c < lo) || (c > hi)) return 'rgba(239,68,68,0.55)';
+            return 'rgba(148,163,184,0.5)';
+          });
+          const ctx = container.querySelector('#viz-box-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Гистограмма (синий = IQR, красный = выбросы)',
+                data: h.counts,
+                backgroundColor: barColors,
+                borderWidth: 0,
+              }],
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Распределение. IQR =[' + q1.toFixed(2) + ', ' + q3.toFixed(2) + '], медиана=' + med.toFixed(2) } }, scales: { x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } }, y: { title: { display: true, text: 'Частота' } } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#viz-box-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">Q1</div><div class="stat-value">' + q1.toFixed(2) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Median</div><div class="stat-value">' + med.toFixed(2) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Q3</div><div class="stat-value">' + q3.toFixed(2) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">IQR</div><div class="stat-value">' + iqr.toFixed(2) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Выбросов</div><div class="stat-value">' + outliers + ' (' + (outliers / data.length * 100).toFixed(1) + '%)</div></div>';
+        }
+        cDist.input.addEventListener('change', draw);
+        cN.input.addEventListener('change', draw);
+        cK.input.addEventListener('input', draw);
+        draw();
+      },
+    },
+
     python: `
 <h3>Box Plot в Python</h3>
 

@@ -510,53 +510,188 @@ p_Fisher = 0.00067+0.01293+0.08289+0.08289+0.01293+0.00067
       }
     ],
 
-    simulation: {
-      html: `
-        <h3>χ²-тест для A/B/C</h3>
-        <p>Три варианта дизайна — есть ли разница в конверсиях?</p>
-        <div class="sim-container">
-          <div class="sim-controls" id="abchi-controls"></div>
-          <div class="sim-buttons"><button class="btn" id="abchi-run">🔄 Новый тест</button></div>
-          <div class="sim-output">
-            <div class="sim-chart-wrap"><canvas id="abchi-chart"></canvas></div>
-            <div class="sim-stats" id="abchi-stats"></div>
+    simulation: [
+      {
+        title: 'A/B/C за одним тестом',
+        html: `
+          <h3>χ²-тест для A/B/C</h3>
+          <p>Три варианта дизайна — есть ли разница в конверсиях?</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abchi-controls"></div>
+            <div class="sim-buttons"><button class="btn" id="abchi-run">🔄 Новый тест</button></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abchi-chart"></canvas></div>
+              <div class="sim-stats" id="abchi-stats"></div>
+            </div>
           </div>
-        </div>
-      `,
-      init(container) {
-        const controls = container.querySelector('#abchi-controls');
-        const cN = App.makeControl('range', 'abchi-n', 'n на вариант', { min: 100, max: 5000, step: 100, value: 1000 });
-        const cPA = App.makeControl('range', 'abchi-pa', 'p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
-        const cPB = App.makeControl('range', 'abchi-pb', 'p(B) %', { min: 1, max: 20, step: 0.5, value: 6 });
-        const cPC = App.makeControl('range', 'abchi-pc', 'p(C) %', { min: 1, max: 20, step: 0.5, value: 7 });
-        [cN, cPA, cPB, cPC].forEach(c => controls.appendChild(c.wrap));
-        let chart = null;
-        function run() {
-          const n = +cN.input.value;
-          const ps = [+cPA.input.value/100, +cPB.input.value/100, +cPC.input.value/100];
-          const obs = ps.map(p => { let s=0; for(let i=0;i<n;i++) if(Math.random()<p) s++; return s; });
-          const crs = obs.map(o => o/n);
-          const total = obs.reduce((a,b)=>a+b,0);
-          const pPool = total/(n*3);
-          const exp = n * pPool;
-          let chi2 = 0;
-          obs.forEach(o => { chi2 += (o-exp)**2/exp; chi2 += ((n-o)-(n-exp))**2/(n-exp); });
-          const pVal = chi2 > 10.83 ? 0.001 : chi2 > 5.99 ? 0.03 : chi2 > 4.61 ? 0.08 : 0.5;
-          const sig = pVal < 0.05;
-          const ctx = container.querySelector('#abchi-chart').getContext('2d');
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'bar', data: { labels: ['A', 'B', 'C'], datasets: [{ label: 'Конверсия %', data: crs.map(c=>c*100), backgroundColor: ['rgba(59,130,246,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Есть значимая разница' : '❌ Разница не значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(...crs) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
-          });
-          App.registerChart(chart);
-          container.querySelector('#abchi-stats').innerHTML = '<div class="stat-card"><div class="stat-label">χ²</div><div class="stat-value">' + chi2.toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">df</div><div class="stat-value">2</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">≈' + pVal.toFixed(3) + '</div></div>';
-        }
-        [cN, cPA, cPB, cPC].forEach(c => c.input.addEventListener('input', run));
-        container.querySelector('#abchi-run').onclick = run;
-        run();
+        `,
+        init(container) {
+          const controls = container.querySelector('#abchi-controls');
+          const cN = App.makeControl('range', 'abchi-n', 'n на вариант', { min: 100, max: 5000, step: 100, value: 1000 });
+          const cPA = App.makeControl('range', 'abchi-pa', 'p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
+          const cPB = App.makeControl('range', 'abchi-pb', 'p(B) %', { min: 1, max: 20, step: 0.5, value: 6 });
+          const cPC = App.makeControl('range', 'abchi-pc', 'p(C) %', { min: 1, max: 20, step: 0.5, value: 7 });
+          [cN, cPA, cPB, cPC].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          function run() {
+            const n = +cN.input.value;
+            const ps = [+cPA.input.value/100, +cPB.input.value/100, +cPC.input.value/100];
+            const obs = ps.map(p => { let s=0; for(let i=0;i<n;i++) if(Math.random()<p) s++; return s; });
+            const crs = obs.map(o => o/n);
+            const total = obs.reduce((a,b)=>a+b,0);
+            const pPool = total/(n*3);
+            const exp = n * pPool;
+            let chi2 = 0;
+            obs.forEach(o => { chi2 += (o-exp)**2/exp; chi2 += ((n-o)-(n-exp))**2/(n-exp); });
+            const pVal = chi2 > 10.83 ? 0.001 : chi2 > 5.99 ? 0.03 : chi2 > 4.61 ? 0.08 : 0.5;
+            const sig = pVal < 0.05;
+            const ctx = container.querySelector('#abchi-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar', data: { labels: ['A', 'B', 'C'], datasets: [{ label: 'Конверсия %', data: crs.map(c=>c*100), backgroundColor: ['rgba(59,130,246,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)'] }] },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Есть значимая разница' : '❌ Разница не значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(...crs) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
+            });
+            App.registerChart(chart);
+            container.querySelector('#abchi-stats').innerHTML = '<div class="stat-card"><div class="stat-label">χ²</div><div class="stat-value">' + chi2.toFixed(2) + '</div></div><div class="stat-card"><div class="stat-label">df</div><div class="stat-value">2</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">≈' + pVal.toFixed(3) + '</div></div>';
+          }
+          [cN, cPA, cPB, cPC].forEach(c => c.input.addEventListener('input', run));
+          container.querySelector('#abchi-run').onclick = run;
+          run();
+        },
       },
-    },
+      {
+        title: 'Observed vs Expected',
+        html: `
+          <h3>Контингентная таблица: что видим и что ожидали</h3>
+          <p>Правило $E \\geq 5$ — не ритуал. Когда ожидаемая частота в ячейке мала, нормальное приближение ломается и $\\chi^2$ врёт. Двигай $n$ и редкость события — смотри, где нарушается.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abchi2-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abchi2-chart"></canvas></div>
+              <div class="sim-stats" id="abchi2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abchi2-controls');
+          const cN = App.makeControl('range', 'abchi2-n', 'n на группу', { min: 20, max: 2000, step: 10, value: 100 });
+          const cP = App.makeControl('range', 'abchi2-p', 'Базовая p %', { min: 0.5, max: 30, step: 0.5, value: 3 });
+          const cLift = App.makeControl('range', 'abchi2-lift', 'Абсолютный lift %', { min: 0, max: 10, step: 0.5, value: 2 });
+          [cN, cP, cLift].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          function run() {
+            const n = +cN.input.value;
+            const pA = +cP.input.value / 100;
+            const pB = Math.min(0.99, pA + +cLift.input.value / 100);
+            // Observed (simulated)
+            let oAc = 0, oBc = 0;
+            for (let i = 0; i < n; i++) if (Math.random() < pA) oAc++;
+            for (let i = 0; i < n; i++) if (Math.random() < pB) oBc++;
+            const oAn = n - oAc, oBn = n - oBc;
+            // Expected under independence
+            const total = 2 * n;
+            const rowConv = oAc + oBc;
+            const rowNon = oAn + oBn;
+            const eAc = n * rowConv / total;
+            const eBc = n * rowConv / total;
+            const eAn = n * rowNon / total;
+            const eBn = n * rowNon / total;
+            function contrib(o, e) { return e > 0 ? (o - e) * (o - e) / e : 0; }
+            const chi2 = contrib(oAc, eAc) + contrib(oBc, eBc) + contrib(oAn, eAn) + contrib(oBn, eBn);
+            // p-value for df=1 chi-square (using z^2 relation, p = 2*(1-Φ(√χ²)))
+            const pVal = 2 * (1 - App.Util.normalCDF(Math.sqrt(chi2)));
+            const minExp = Math.min(eAc, eBc, eAn, eBn);
+            const tooSmall = minExp < 5;
+            const ctx = container.querySelector('#abchi2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['A: конв.', 'A: не конв.', 'B: конв.', 'B: не конв.'],
+                datasets: [
+                  { label: 'Observed', data: [oAc, oAn, oBc, oBn], backgroundColor: 'rgba(59,130,246,0.65)' },
+                  { label: 'Expected', data: [eAc, eAn, eBc, eBn], backgroundColor: 'rgba(239,68,68,0.55)' },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Observed vs Expected по ячейкам' + (tooSmall ? ' ⚠ E<5, χ² ненадёжен' : '') } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Наблюдения' } } } },
+            });
+            App.registerChart(chart);
+            container.querySelector('#abchi2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">χ²</div><div class="stat-value">' + chi2.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">min E</div><div class="stat-value">' + minExp.toFixed(1) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Правило E≥5</div><div class="stat-value">' + (tooSmall ? '❌ нарушено' : '✅ OK') + '</div></div>';
+          }
+          [cN, cP, cLift].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+      {
+        title: 'Мощность vs размер таблицы',
+        html: `
+          <h3>Power как функция $n$</h3>
+          <p>Ключ: при одинаковом истинном эффекте мощность растёт с $n$. Посмотри, насколько выборка должна вырасти, чтобы ловить мелкий эффект.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abchi3-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abchi3-chart"></canvas></div>
+              <div class="sim-stats" id="abchi3-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abchi3-controls');
+          const cBase = App.makeControl('range', 'abchi3-base', 'Базовая p %', { min: 1, max: 30, step: 0.5, value: 5 });
+          const cLift = App.makeControl('range', 'abchi3-lift', 'Относ. lift %', { min: 1, max: 50, step: 1, value: 15 });
+          const cSim = App.makeControl('range', 'abchi3-sim', 'Симуляций на точку', { min: 100, max: 2000, step: 100, value: 500 });
+          [cBase, cLift, cSim].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          function run() {
+            const pA = +cBase.input.value / 100;
+            const pB = pA * (1 + +cLift.input.value / 100);
+            const nSim = +cSim.input.value;
+            const ns = [100, 200, 500, 1000, 2000, 5000, 10000];
+            const powers = ns.map(n => {
+              let rej = 0;
+              for (let s = 0; s < nSim; s++) {
+                let oAc = 0, oBc = 0;
+                for (let i = 0; i < n; i++) if (Math.random() < pA) oAc++;
+                for (let i = 0; i < n; i++) if (Math.random() < pB) oBc++;
+                const oAn = n - oAc, oBn = n - oBc;
+                const total = 2 * n;
+                const rowC = oAc + oBc, rowN = oAn + oBn;
+                const eAc = n * rowC / total, eBc = n * rowC / total;
+                const eAn = n * rowN / total, eBn = n * rowN / total;
+                function c(o, e) { return e > 0 ? (o - e) * (o - e) / e : 0; }
+                const chi2 = c(oAc, eAc) + c(oBc, eBc) + c(oAn, eAn) + c(oBn, eBn);
+                if (chi2 > 3.841) rej++; // df=1, α=0.05
+              }
+              return rej / nSim * 100;
+            });
+            const ctx = container.querySelector('#abchi3-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ns,
+                datasets: [
+                  { label: 'Мощность %', data: powers, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', borderWidth: 2, pointRadius: 4, fill: true },
+                  { label: '80%', data: ns.map(() => 80), borderColor: '#10b981', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Мощность χ²-теста (Монте-Карло) при p(A)=' + (pA*100).toFixed(1) + '%, p(B)=' + (pB*100).toFixed(1) + '%' } }, scales: { x: { type: 'logarithmic', title: { display: true, text: 'n на группу (log)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Мощность %' } } } },
+            });
+            App.registerChart(chart);
+            container.querySelector('#abchi3-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Δ (абс.)</div><div class="stat-value">' + ((pB-pA)*100).toFixed(2) + ' п.п.</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Power n=1000</div><div class="stat-value">' + powers[3].toFixed(0) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Power n=5000</div><div class="stat-value">' + powers[5].toFixed(0) + '%</div></div>';
+          }
+          [cBase, cLift, cSim].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Хи-квадрат тест для A/B</h3>

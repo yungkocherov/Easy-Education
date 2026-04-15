@@ -508,8 +508,10 @@ Monte Carlo (N=100000):
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Posteriors + P(B>A)',
+        html: `
         <h3>Байесовский A/B: апостериорные распределения</h3>
         <p>Задай данные обеих групп — увидишь posteriors и P(B лучше A).</p>
         <div class="sim-container">
@@ -561,7 +563,88 @@ Monte Carlo (N=100000):
         [cNA, cSA, cNB, cSB].forEach(c => c.input.addEventListener('input', run));
         run();
       },
-    },
+      },
+      {
+        title: 'Prior → Posterior: как данные обновляют веру',
+        html: `
+          <h3>Байесовский апдейт в реальном времени</h3>
+          <p>Начни с prior $\\text{Beta}(\\alpha_0, \\beta_0)$ и смотри, как новые наблюдения стягивают posterior к истинному значению. Задай сильный prior (большие $\\alpha_0, \\beta_0$) — и увидишь, как он «сопротивляется» данным. Flat prior $\\text{Beta}(1,1)$ податливее.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abbay2-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="abbay2-step">▶ +10 наблюдений</button>
+              <button class="btn" id="abbay2-many">⏩ +100</button>
+              <button class="btn secondary" id="abbay2-reset">↺ Сбросить</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abbay2-chart"></canvas></div>
+              <div class="sim-stats" id="abbay2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abbay2-controls');
+          const cTrue = App.makeControl('range', 'abbay2-true', 'Истинная p %', { min: 1, max: 50, step: 0.5, value: 12 });
+          const cA0 = App.makeControl('range', 'abbay2-a0', 'Prior α₀', { min: 1, max: 100, step: 1, value: 2 });
+          const cB0 = App.makeControl('range', 'abbay2-b0', 'Prior β₀', { min: 1, max: 500, step: 1, value: 20 });
+          [cTrue, cA0, cB0].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          let seen = 0, succ = 0;
+          function betaPdf(x, a, b) { return x <= 0 || x >= 1 ? 0 : Math.pow(x, a - 1) * Math.pow(1 - x, b - 1); }
+          function drawPdf(label, a, b, color, n) {
+            const xs = App.Util.linspace(0.001, 0.999, n || 200);
+            const raw = xs.map(x => betaPdf(x, a, b));
+            const dx = xs[1] - xs[0];
+            const norm = raw.reduce((s, v) => s + v, 0) * dx;
+            return { xs, ys: raw.map(v => v / (norm || 1)), color, label };
+          }
+          function render() {
+            const a0 = +cA0.input.value, b0 = +cB0.input.value;
+            const aPost = a0 + succ, bPost = b0 + seen - succ;
+            const prior = drawPdf('Prior', a0, b0, '#94a3b8');
+            const posterior = drawPdf('Posterior', aPost, bPost, '#10b981');
+            const xs = prior.xs;
+            const ctx = container.querySelector('#abbay2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: xs.map(x => (x * 100).toFixed(1)),
+                datasets: [
+                  { label: 'Prior Beta(' + a0 + ',' + b0 + ')', data: prior.ys, borderColor: '#94a3b8', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false },
+                  { label: 'Posterior Beta(' + aPost + ',' + bPost + ')', data: posterior.ys, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', borderWidth: 2, pointRadius: 0, fill: true },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'После ' + seen + ' наблюдений (' + succ + ' успехов)' } }, scales: { x: { title: { display: true, text: 'p %' }, ticks: { maxTicksLimit: 12 } }, y: { title: { display: true, text: 'Плотность' } } } },
+            });
+            App.registerChart(chart);
+            const postMean = aPost / (aPost + bPost);
+            const postVar = aPost * bPost / ((aPost + bPost) ** 2 * (aPost + bPost + 1));
+            const postStd = Math.sqrt(postVar);
+            container.querySelector('#abbay2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Наблюдений</div><div class="stat-value">' + seen + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Успехов</div><div class="stat-value">' + succ + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Эмпирич. p̂</div><div class="stat-value">' + (seen > 0 ? (succ / seen * 100).toFixed(2) : '—') + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Posterior mean</div><div class="stat-value">' + (postMean * 100).toFixed(2) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Posterior std</div><div class="stat-value">' + (postStd * 100).toFixed(2) + '%</div></div>';
+          }
+          function add(k) {
+            const p = +cTrue.input.value / 100;
+            for (let i = 0; i < k; i++) {
+              seen++;
+              if (Math.random() < p) succ++;
+            }
+            render();
+          }
+          function reset() { seen = 0; succ = 0; render(); }
+          container.querySelector('#abbay2-step').onclick = () => add(10);
+          container.querySelector('#abbay2-many').onclick = () => add(100);
+          container.querySelector('#abbay2-reset').onclick = reset;
+          [cTrue, cA0, cB0].forEach(c => c.input.addEventListener('input', reset));
+          render();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Байесовский A/B тест в Python</h3>

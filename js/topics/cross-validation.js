@@ -535,8 +535,142 @@ k=3 vs k=5: одинаковый Mean и Std!
       }
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Схема фолдов',
+        html: `
+          <h3>Схема: как устроены K-Fold, Leave-One-Out и TimeSeriesSplit</h3>
+          <p>Каждая строка — одна итерация CV. Синие ячейки — train, красные — test. Смотри, какие ячейки закрашены в каждой итерации и как это зависит от стратегии.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="cvv-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;padding:0;"><canvas id="cvv-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="cvv-stats"></div>
+              <div class="lesson-box" style="margin-top:10px;">
+                <b>K-Fold:</b> данные шафлятся и делятся на k равных кусков; каждый раз один — test, остальные — train. <b>LOO:</b> k = n, на каждой итерации тестируется ровно один объект. <b>TimeSeriesSplit:</b> train всегда «раньше» test по времени, строки не шафлятся — это единственный способ избежать «утечки будущего» в задачах с хронологией.
+              </div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#cvv-controls');
+          const cMode = App.makeControl('select', 'cvv-mode', 'Стратегия', {
+            options: [
+              { value: 'kfold', label: 'K-Fold' },
+              { value: 'loo', label: 'Leave-One-Out' },
+              { value: 'ts', label: 'TimeSeriesSplit' },
+            ],
+            value: 'kfold',
+          });
+          const cN = App.makeControl('range', 'cvv-n', 'Объектов', { min: 8, max: 40, step: 1, value: 16 });
+          const cK = App.makeControl('range', 'cvv-k', 'k фолдов', { min: 2, max: 10, step: 1, value: 5 });
+          [cMode, cN, cK].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#cvv-canvas');
+          const ctx = canvas.getContext('2d');
+
+          function buildFolds() {
+            const n = +cN.input.value;
+            const mode = cMode.input.value;
+            let k = +cK.input.value;
+            if (mode === 'loo') k = n;
+            if (mode === 'ts') k = Math.min(k, n - 1);
+            const folds = [];
+            if (mode === 'ts') {
+              // Expanding window: на итерации i train = [0..i], test = [i+size..i+2size]
+              const size = Math.max(1, Math.floor(n / (k + 1)));
+              for (let i = 0; i < k; i++) {
+                const trainEnd = (i + 1) * size;
+                const testEnd = Math.min(n, trainEnd + size);
+                const train = [], test = [];
+                for (let j = 0; j < n; j++) {
+                  if (j < trainEnd) train.push(j);
+                  else if (j < testEnd) test.push(j);
+                }
+                if (test.length) folds.push({ train, test });
+              }
+            } else {
+              // K-Fold / LOO — «шаффл» детерминированный, чтобы картинка не прыгала
+              const order = Array.from({ length: n }, (_, i) => i)
+                .sort((a, b) => ((a * 9301 + 49297) % 233280) - ((b * 9301 + 49297) % 233280));
+              const foldSize = Math.floor(n / k);
+              for (let f = 0; f < k; f++) {
+                const start = f * foldSize, end = (f === k - 1) ? n : start + foldSize;
+                const testSet = new Set(order.slice(start, end));
+                const train = [], test = [];
+                for (let j = 0; j < n; j++) (testSet.has(j) ? test : train).push(j);
+                folds.push({ train, test });
+              }
+            }
+            return { folds, n };
+          }
+
+          function draw() {
+            const { folds, n } = buildFolds();
+            const r = canvas.getBoundingClientRect();
+            canvas.width = r.width; canvas.height = r.height;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+
+            const padL = 70, padT = 30, padR = 16, padB = 20;
+            const cellW = (W - padL - padR) / n;
+            const cellH = Math.min(28, (H - padT - padB) / folds.length);
+
+            // Header — indices
+            ctx.fillStyle = '#334155';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            for (let j = 0; j < n; j++) {
+              if (n <= 20 || j % 2 === 0) ctx.fillText(j + 1, padL + (j + 0.5) * cellW, padT - 8);
+            }
+            ctx.textAlign = 'left';
+            ctx.fillText('Объект →', padL, padT - 20);
+
+            folds.forEach((fold, i) => {
+              const y = padT + i * cellH;
+              ctx.fillStyle = '#334155';
+              ctx.textAlign = 'right';
+              ctx.fillText(`итер. ${i + 1}`, padL - 8, y + cellH * 0.65);
+              const testSet = new Set(fold.test);
+              for (let j = 0; j < n; j++) {
+                const x = padL + j * cellW;
+                const isTest = testSet.has(j);
+                ctx.fillStyle = isTest ? '#fca5a5' : '#bfdbfe';
+                ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+                if (isTest) {
+                  ctx.strokeStyle = '#dc2626';
+                  ctx.lineWidth = 1.2;
+                  ctx.strokeRect(x + 1, y + 1, cellW - 2, cellH - 2);
+                }
+              }
+            });
+
+            // Legend
+            const ly = padT + folds.length * cellH + 4;
+            ctx.fillStyle = '#bfdbfe'; ctx.fillRect(padL, ly, 14, 10);
+            ctx.fillStyle = '#334155'; ctx.textAlign = 'left';
+            ctx.fillText('train', padL + 18, ly + 9);
+            ctx.fillStyle = '#fca5a5'; ctx.fillRect(padL + 70, ly, 14, 10);
+            ctx.fillStyle = '#334155'; ctx.fillText('test', padL + 88, ly + 9);
+
+            const totalTest = folds.reduce((s, f) => s + f.test.length, 0);
+            const avgTrain = folds.reduce((s, f) => s + f.train.length, 0) / folds.length;
+            container.querySelector('#cvv-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Итераций</div><div class="stat-value">${folds.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Объектов</div><div class="stat-value">${n}</div></div>
+              <div class="stat-card"><div class="stat-label">Test-оценок всего</div><div class="stat-value">${totalTest}</div></div>
+              <div class="stat-card"><div class="stat-label">Средний train</div><div class="stat-value">${avgTrain.toFixed(1)}</div></div>
+            `;
+          }
+
+          [cMode, cN, cK].forEach(c => c.input.addEventListener('input', draw));
+          window.addEventListener('resize', draw);
+          setTimeout(draw, 50);
+        },
+      },
+      {
+        title: 'Разброс оценок',
+        html: `
         <h3>Симуляция: разброс оценок между фолдами</h3>
         <p>Меняй k и размер выборки. Смотри, как меняется среднее и разброс метрик.</p>
         <div class="sim-container">
@@ -631,7 +765,8 @@ k=3 vs k=5: одинаковый Mean и Std!
         container.querySelector('#cv-run').onclick = run;
         run();
       },
-    },
+      },
+    ],
 
     python: `
       <h3>Python: кросс-валидация и подбор гиперпараметров</h3>

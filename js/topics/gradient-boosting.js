@@ -425,10 +425,12 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Остатки шаг за шагом',
       html: `
         <h3>Симуляция: бустинг для регрессии</h3>
-        <p>Смотри, как каждое новое дерево исправляет остатки. Меняй глубину, η и число итераций.</p>
+        <p>Смотри, как каждое новое дерево исправляет остатки. Жми «1 итерация» — видно, что бустинг <b>добавляет</b> небольшую поправку к текущему предсказанию (η·tree на остатках). При малом η сходимость медленная, при большом η=1 — скачки.</p>
         <div class="sim-container">
           <div class="sim-controls" id="gb-controls"></div>
           <div class="sim-buttons">
@@ -600,6 +602,142 @@ App.registerTopic({
         genData();
       },
     },
+    {
+      title: 'Early stopping',
+      html: `
+        <h3>Когда пора остановиться?</h3>
+        <p>Крутим бустинг до 200 итераций и строим <b>Train vs Test</b> MSE. Train уходит вниз почти всегда, а Test — до определённого момента, после чего начинает расти. Эту точку и находит <b>early stopping</b>. Покрути η и глубину: агрессивные настройки (η=0.5, depth=5) переобучаются быстрее.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="gb2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="gb2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="gb2-chart"></canvas></div>
+            <div class="sim-stats" id="gb2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#gb2-controls');
+        const cLR = App.makeControl('range', 'gb2-lr', 'Learning rate η', { min: 0.01, max: 1, step: 0.01, value: 0.1 });
+        const cDepth = App.makeControl('range', 'gb2-depth', 'Глубина дерева', { min: 1, max: 6, step: 1, value: 3 });
+        const cNoise = App.makeControl('range', 'gb2-noise', 'Шум σ', { min: 0, max: 1.5, step: 0.05, value: 0.5 });
+        const cNTrees = App.makeControl('range', 'gb2-ntrees', 'Макс. итераций', { min: 20, max: 300, step: 10, value: 200 });
+        [cLR, cDepth, cNoise, cNTrees].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let trainX = [], trainY = [], testX = [], testY = [];
+
+        function genData() {
+          const sigma = +cNoise.input.value;
+          trainX = []; trainY = []; testX = []; testY = [];
+          for (let i = 0; i < 50; i++) {
+            const x = Math.random() * 10;
+            trainX.push(x);
+            trainY.push(Math.sin(x) + 0.3 * x + App.Util.randn(0, sigma));
+          }
+          for (let i = 0; i < 200; i++) {
+            const x = Math.random() * 10;
+            testX.push(x);
+            testY.push(Math.sin(x) + 0.3 * x); // чистый тест
+          }
+          update();
+        }
+
+        function mean(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+
+        function grow(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2) return { leaf: true, val: mean(items.map(p => p.t)) };
+          const sorted = [...items].sort((a, b) => a.x - b.x);
+          const totalMean = mean(sorted.map(p => p.t));
+          const totalVar = sorted.reduce((s, p) => s + (p.t - totalMean) ** 2, 0);
+          let bestGain = -Infinity, bestThr = null, bestL = null, bestR = null;
+          for (let i = 1; i < sorted.length; i++) {
+            const thr = (sorted[i - 1].x + sorted[i].x) / 2;
+            const L = sorted.slice(0, i), R = sorted.slice(i);
+            const mL = mean(L.map(p => p.t)), mR = mean(R.map(p => p.t));
+            const vL = L.reduce((s, p) => s + (p.t - mL) ** 2, 0);
+            const vR = R.reduce((s, p) => s + (p.t - mR) ** 2, 0);
+            const g = totalVar - (vL + vR);
+            if (g > bestGain) { bestGain = g; bestThr = thr; bestL = L; bestR = R; }
+          }
+          if (bestGain <= 0) return { leaf: true, val: totalMean };
+          return { leaf: false, thr: bestThr, left: grow(bestL, depth + 1, maxDepth), right: grow(bestR, depth + 1, maxDepth) };
+        }
+        function predTree(tree, x) { return tree.leaf ? tree.val : (x < tree.thr ? predTree(tree.left, x) : predTree(tree.right, x)); }
+
+        function update() {
+          const lr = +cLR.input.value;
+          const depth = +cDepth.input.value;
+          const M = +cNTrees.input.value;
+
+          const F0 = mean(trainY);
+          const trainPred = new Array(trainX.length).fill(F0);
+          const testPred = new Array(testX.length).fill(F0);
+          const trainLoss = [], testLoss = [];
+
+          function mseArr(ys, preds) {
+            let s = 0; for (let i = 0; i < ys.length; i++) s += (ys[i] - preds[i]) ** 2;
+            return s / ys.length;
+          }
+          trainLoss.push(mseArr(trainY, trainPred));
+          testLoss.push(mseArr(testY, testPred));
+
+          for (let m = 0; m < M; m++) {
+            const residuals = trainY.map((y, i) => y - trainPred[i]);
+            const items = trainX.map((x, i) => ({ x, t: residuals[i] }));
+            const tree = grow(items, 0, depth);
+            for (let i = 0; i < trainX.length; i++) trainPred[i] += lr * predTree(tree, trainX[i]);
+            for (let i = 0; i < testX.length; i++) testPred[i] += lr * predTree(tree, testX[i]);
+            trainLoss.push(mseArr(trainY, trainPred));
+            testLoss.push(mseArr(testY, testPred));
+          }
+
+          let bestIter = 0, bestTest = Infinity;
+          for (let i = 0; i < testLoss.length; i++) {
+            if (testLoss[i] < bestTest) { bestTest = testLoss[i]; bestIter = i; }
+          }
+
+          const labels = trainLoss.map((_, i) => i);
+          const ctx = container.querySelector('#gb2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                { label: 'Train MSE', data: trainLoss, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Test MSE',  data: testLoss,  borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: `Train vs Test MSE (best iter = ${bestIter})` }, legend: { position: 'top' } },
+              scales: {
+                x: { title: { display: true, text: 'Итерация' } },
+                y: { title: { display: true, text: 'MSE' }, beginAtZero: true },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          const finalGap = trainLoss[trainLoss.length - 1] - testLoss[testLoss.length - 1];
+          container.querySelector('#gb2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Best iter</div><div class="stat-value">${bestIter}</div></div>
+            <div class="stat-card"><div class="stat-label">Test MSE (best)</div><div class="stat-value">${bestTest.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Test MSE (final)</div><div class="stat-value">${testLoss[testLoss.length - 1].toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Переобучение</div><div class="stat-value">${finalGap < -0.01 ? 'да' : 'нет'}</div></div>
+          `;
+        }
+
+        [cLR, cDepth, cNTrees].forEach(c => c.input.addEventListener('input', update));
+        cNoise.input.addEventListener('input', genData);
+        container.querySelector('#gb2-regen').onclick = genData;
+        genData();
+      },
+    },
+    ],
 
     python: `
       <h3>Python: градиентный бустинг</h3>

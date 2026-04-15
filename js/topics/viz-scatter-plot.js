@@ -234,6 +234,135 @@ App.registerTopic({
       </ul>
     `,
 
+    simulation: {
+      html: `
+        <h3>Overplotting: когда точки сливаются в кляксу</h3>
+        <p>На 200 точках scatter отлично работает. На 20 000 — всё превращается в чёрный прямоугольник, и никакая структура не видна. Три классических решения: прозрачность (alpha), уменьшение точек, и hexbin. Увеличивай $n$ и смотри, где глаз перестаёт различать плотность.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="viz-sc-ctrl"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap" style="height:420px;padding:0;"><canvas id="viz-sc-canvas" class="sim-canvas"></canvas></div>
+            <div class="sim-stats" id="viz-sc-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const ctrl = container.querySelector('#viz-sc-ctrl');
+        const cN = App.makeControl('range', 'viz-sc-n', 'Число точек', { min: 100, max: 30000, step: 100, value: 5000 });
+        const cAlpha = App.makeControl('range', 'viz-sc-alpha', 'Alpha', { min: 0.02, max: 1, step: 0.01, value: 0.2 });
+        const cSize = App.makeControl('range', 'viz-sc-size', 'Радиус точки', { min: 1, max: 8, step: 0.5, value: 3 });
+        const cMode = App.makeControl('select', 'viz-sc-mode', 'Режим', {
+          options: [
+            { value: 'scatter', label: 'Scatter' },
+            { value: 'hexbin', label: 'Hexbin (2D density)' },
+          ],
+          value: 'scatter',
+        });
+        const cData = App.makeControl('select', 'viz-sc-data', 'Структура данных', {
+          options: [
+            { value: 'linear', label: 'Линейная + шум' },
+            { value: 'two', label: 'Два кластера' },
+            { value: 'ring', label: 'Кольцо' },
+            { value: 'uniform', label: 'Равномерно' },
+          ],
+          value: 'two',
+        });
+        [cN, cAlpha, cSize, cMode, cData].forEach(c => ctrl.appendChild(c.wrap));
+        const canvas = container.querySelector('#viz-sc-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        function regen() {
+          const n = +cN.input.value;
+          const d = cData.input.value;
+          points = [];
+          for (let i = 0; i < n; i++) {
+            let x, y;
+            if (d === 'linear') {
+              x = Math.random();
+              y = 0.15 + 0.7 * x + App.Util.randn(0, 0.08);
+            } else if (d === 'two') {
+              if (Math.random() < 0.5) { x = 0.3 + App.Util.randn(0, 0.08); y = 0.3 + App.Util.randn(0, 0.08); }
+              else { x = 0.7 + App.Util.randn(0, 0.08); y = 0.7 + App.Util.randn(0, 0.08); }
+            } else if (d === 'ring') {
+              const r = 0.35 + App.Util.randn(0, 0.03);
+              const t = Math.random() * 2 * Math.PI;
+              x = 0.5 + r * Math.cos(t);
+              y = 0.5 + r * Math.sin(t);
+            } else {
+              x = Math.random();
+              y = Math.random();
+            }
+            points.push([x, y]);
+          }
+          draw();
+        }
+        function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+        function draw() {
+          if (!canvas.width) return;
+          const W = canvas.width, H = canvas.height;
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, W, H);
+          const mode = cMode.input.value;
+          if (mode === 'scatter') {
+            const a = +cAlpha.input.value;
+            const s = +cSize.input.value;
+            ctx.fillStyle = `rgba(59,130,246,${a})`;
+            points.forEach(p => {
+              ctx.beginPath();
+              ctx.arc(p[0] * W, (1 - p[1]) * H, s, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+          } else {
+            // Hexbin
+            const hexSize = 14;
+            const cols = Math.floor(W / (hexSize * 1.5));
+            const rows = Math.floor(H / (hexSize * Math.sqrt(3)));
+            const counts = new Map();
+            points.forEach(p => {
+              const px = p[0] * W, py = (1 - p[1]) * H;
+              const col = Math.round(px / (hexSize * 1.5));
+              const offset = (col % 2) * hexSize * Math.sqrt(3) / 2;
+              const row = Math.round((py - offset) / (hexSize * Math.sqrt(3)));
+              const key = col + ',' + row;
+              counts.set(key, (counts.get(key) || 0) + 1);
+            });
+            let maxC = 0;
+            counts.forEach(v => { if (v > maxC) maxC = v; });
+            counts.forEach((v, key) => {
+              const [col, row] = key.split(',').map(Number);
+              const cx = col * hexSize * 1.5;
+              const offset = (col % 2) * hexSize * Math.sqrt(3) / 2;
+              const cy = row * hexSize * Math.sqrt(3) + offset;
+              const t = Math.log(1 + v) / Math.log(1 + maxC);
+              const r = Math.round(59 + (255 - 59) * t);
+              const g = Math.round(130 + (200 - 130) * (1 - Math.abs(t - 0.5) * 2));
+              const b = Math.round(246 * (1 - t) + 50);
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.beginPath();
+              for (let i = 0; i < 6; i++) {
+                const a = i * Math.PI / 3;
+                const x = cx + hexSize * Math.cos(a);
+                const y = cy + hexSize * Math.sin(a);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+              }
+              ctx.closePath();
+              ctx.fill();
+            });
+          }
+          const n = points.length;
+          container.querySelector('#viz-sc-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">Точек</div><div class="stat-value">' + n.toLocaleString('ru') + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Режим</div><div class="stat-value">' + (mode === 'scatter' ? 'Scatter' : 'Hexbin') + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Alpha</div><div class="stat-value">' + (+cAlpha.input.value).toFixed(2) + '</div></div>';
+        }
+        [cAlpha, cSize, cMode].forEach(c => c.input.addEventListener('input', draw));
+        cN.input.addEventListener('change', regen);
+        cData.input.addEventListener('change', regen);
+        setTimeout(() => { regen(); resize(); }, 50);
+        window.addEventListener('resize', resize);
+      },
+    },
+
     python: `
 <h3>Scatter Plot в Python</h3>
 

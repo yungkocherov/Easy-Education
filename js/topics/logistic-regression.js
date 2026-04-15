@@ -455,7 +455,7 @@ App.registerTopic({
     simulation: {
       html: `
         <h3>Симуляция: логистическая регрессия в 2D</h3>
-        <p>Два признака, два класса. Смотри, как меняется граница и вероятности при обучении.</p>
+        <p>Два признака, два класса. Поставь большую разделимость, λ=0 и жми «Обучить» несколько раз — увидишь, как $\\|w\\|$ уходит в бесконечность (классы разделимы → MLE не определён). Добавь L2 — и норма весов стабилизируется.</p>
         <div class="sim-container">
           <div class="sim-controls" id="logr-controls"></div>
           <div class="sim-buttons">
@@ -474,14 +474,15 @@ App.registerTopic({
         const cSep = App.makeControl('range', 'logr-sep', 'Разделимость классов', { min: 0.5, max: 5, step: 0.1, value: 2 });
         const cN = App.makeControl('range', 'logr-n', 'Точек на класс', { min: 20, max: 200, step: 10, value: 60 });
         const cLR = App.makeControl('range', 'logr-lr', 'Learning rate', { min: 0.01, max: 1, step: 0.01, value: 0.1 });
-        [cSep, cN, cLR].forEach((c) => controls.appendChild(c.wrap));
+        const cL2 = App.makeControl('range', 'logr-l2', 'L2 регуляризация λ', { min: 0, max: 1, step: 0.01, value: 0 });
+        [cSep, cN, cLR, cL2].forEach((c) => controls.appendChild(c.wrap));
 
         let chart = null;
         let X = [], y = [];
         let w = [0.01, 0.01, 0.01]; // w0 (bias), w1, w2
         let iterations = 0;
 
-        function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+        function sigmoid(z) { return 1 / (1 + Math.exp(-Math.max(-500, Math.min(500, z)))); }
 
         function regenerate() {
           const sep = +cSep.input.value;
@@ -498,6 +499,7 @@ App.registerTopic({
 
         function trainStep() {
           const lr = +cLR.input.value;
+          const lam = +cL2.input.value;
           const n = X.length;
           let g0 = 0, g1 = 0, g2 = 0;
           for (let i = 0; i < n; i++) {
@@ -508,9 +510,10 @@ App.registerTopic({
             g1 += err * X[i][0];
             g2 += err * X[i][1];
           }
-          w[0] -= lr * g0 / n;
-          w[1] -= lr * g1 / n;
-          w[2] -= lr * g2 / n;
+          // L2 регуляризация: штраф не применяется к bias
+          w[0] -= lr * (g0 / n);
+          w[1] -= lr * (g1 / n + lam * w[1]);
+          w[2] -= lr * (g2 / n + lam * w[2]);
           iterations++;
         }
 
@@ -558,12 +561,14 @@ App.registerTopic({
           });
           App.registerChart(chart);
 
+          const wNorm = Math.sqrt(w[1] * w[1] + w[2] * w[2]);
           const statsEl = container.querySelector('#logr-stats');
           statsEl.innerHTML = '';
           const cards = [
             ['Итераций', iterations],
             ['Log-loss', App.Util.round(loss, 4)],
             ['Accuracy', (correct / n * 100).toFixed(1) + '%'],
+            ['||w|| (без bias)', App.Util.round(wNorm, 2)],
             ['w₀ (bias)', App.Util.round(w[0], 3)],
             ['w₁', App.Util.round(w[1], 3)],
             ['w₂', App.Util.round(w[2], 3)],

@@ -906,10 +906,12 @@ T ~ Exp(λ = 4), в часах</div>
         const cType = App.makeControl('select', 'dist-type', 'Распределение', {
           options: [
             { value: 'normal', label: 'Нормальное' },
+            { value: 'lognorm', label: 'LogNormal' },
             { value: 'uniform', label: 'Равномерное' },
             { value: 'binomial', label: 'Биномиальное' },
             { value: 'poisson', label: 'Пуассона' },
             { value: 'exp', label: 'Экспоненциальное' },
+            { value: 'beta', label: 'Beta' },
           ],
           value: 'normal',
         });
@@ -920,11 +922,48 @@ T ~ Exp(λ = 4), в часах</div>
 
         const paramLabels = {
           normal: ['μ (среднее)', 'σ (ст.откл.)', { p1: { min: -20, max: 50, step: 0.5, value: 0 }, p2: { min: 0.5, max: 20, step: 0.5, value: 1 } }],
+          lognorm: ['μ (log-среднее)', 'σ (log-ст.откл.)', { p1: { min: -2, max: 3, step: 0.1, value: 0 }, p2: { min: 0.1, max: 2, step: 0.05, value: 0.6 } }],
           uniform: ['a (мин)', 'b (макс)', { p1: { min: -20, max: 20, step: 1, value: 0 }, p2: { min: 1, max: 50, step: 1, value: 10 } }],
           binomial: ['n испытаний', 'p успеха', { p1: { min: 1, max: 100, step: 1, value: 20 }, p2: { min: 0.05, max: 0.95, step: 0.05, value: 0.5 } }],
           poisson: ['λ', '—', { p1: { min: 0.5, max: 30, step: 0.5, value: 5 }, p2: { min: 0, max: 0, step: 0, value: 0 } }],
           exp: ['λ (интенсивность)', '—', { p1: { min: 0.1, max: 10, step: 0.1, value: 1 }, p2: { min: 0, max: 0, step: 0, value: 0 } }],
+          beta: ['α', 'β', { p1: { min: 0.3, max: 10, step: 0.1, value: 2 }, p2: { min: 0.3, max: 10, step: 0.1, value: 5 } }],
         };
+
+        // Локальные сэмплеры для Beta и LogNormal
+        function lognormSample(n, mu, sigma) {
+          const out = new Array(n);
+          for (let i = 0; i < n; i++) out[i] = Math.exp(App.Util.randn(mu, sigma));
+          return out;
+        }
+        function gammaSample(k) {
+          // Marsaglia-Tsang, для k >= 1
+          if (k < 1) {
+            return gammaSample(k + 1) * Math.pow(Math.random(), 1 / k);
+          }
+          const d = k - 1 / 3;
+          const c = 1 / Math.sqrt(9 * d);
+          while (true) {
+            let x, v;
+            do {
+              x = App.Util.randn();
+              v = 1 + c * x;
+            } while (v <= 0);
+            v = v * v * v;
+            const u = Math.random();
+            if (u < 1 - 0.0331 * x * x * x * x) return d * v;
+            if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+          }
+        }
+        function betaSample(n, alpha, beta) {
+          const out = new Array(n);
+          for (let i = 0; i < n; i++) {
+            const x = gammaSample(alpha);
+            const y = gammaSample(beta);
+            out[i] = x / (x + y);
+          }
+          return out;
+        }
 
         let chart = null;
 
@@ -950,19 +989,23 @@ T ~ Exp(λ = 4), в часах</div>
 
           let data;
           if (type === 'normal') data = App.Util.normalSample(n, p1, p2);
+          else if (type === 'lognorm') data = lognormSample(n, p1, p2);
           else if (type === 'uniform') data = App.Util.uniformSample(n, p1, p2);
           else if (type === 'binomial') data = App.Util.binomialSample(n, Math.round(p1), p2);
           else if (type === 'poisson') data = App.Util.poissonSample(n, p1);
+          else if (type === 'beta') data = betaSample(n, p1, p2);
           else data = App.Util.expSample(n, p1);
 
           const isDiscrete = type === 'binomial' || type === 'poisson';
           // Фиксированный range <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a> по типу распределения
           const fixedRange = {
             normal: [Math.floor(p1 - 4 * p2), Math.ceil(p1 + 4 * p2)],
+            lognorm: [0, Math.ceil(Math.exp(p1 + 3 * p2))],
             uniform: [Math.floor(p1 - 1), Math.ceil(p2 + 1)],
             binomial: [0, Math.round(p1) + 1],
             poisson: [0, Math.max(Math.ceil(p1 + 4 * Math.sqrt(p1)), 10)],
             exp: [0, Math.max(Math.ceil(5 / p1), 5)],
+            beta: [0, 1],
           }[type];
           const bins = isDiscrete ? Math.min(50, fixedRange[1] - fixedRange[0] + 1) : 50;
           const hist = App.Util.histogram(data, bins, fixedRange);

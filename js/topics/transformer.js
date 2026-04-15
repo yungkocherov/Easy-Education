@@ -767,8 +767,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Attention heatmap',
+        html: `
         <h3>Симуляция: self-attention heatmap</h3>
         <p>Показывает, как токены «смотрят» друг на друга. Веса обучаются на задаче: предсказать, связаны ли два слова. Синие ячейки — сильное внимание.</p>
         <div class="sim-container">
@@ -896,7 +898,117 @@ App.registerTopic({
         setTimeout(() => { resize(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+      },
+      {
+        title: 'Positional encoding',
+        html: `
+          <h3>Позиционное кодирование</h3>
+          <p>Self-attention не различает порядок токенов — для него набор слов. Чтобы сеть знала позицию, к эмбеддингам прибавляют позиционный вектор. В оригинальной статье его строят из синусов и косинусов разной частоты:</p>
+          <p>$$PE(pos, 2i) = \\sin(pos / 10000^{2i/d}),\\quad PE(pos, 2i+1) = \\cos(pos / 10000^{2i/d})$$</p>
+          <p>Каждая строка — позиция, каждый столбец — размерность. Низкие размерности меняются быстро (высокочастотные), высокие — медленно.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="trp-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;padding:0;"><canvas id="trp-heat" class="sim-canvas"></canvas></div>
+              <div class="sim-chart-wrap" style="height:200px;"><canvas id="trp-lines"></canvas></div>
+              <div class="sim-stats" id="trp-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#trp-controls');
+          const cSeq = App.makeControl('range', 'trp-seq', 'Длина последовательности', { min: 10, max: 80, step: 1, value: 40 });
+          const cDim = App.makeControl('range', 'trp-dim', 'Размерность d', { min: 8, max: 64, step: 2, value: 32 });
+          [cSeq, cDim].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#trp-heat');
+          const ctx = canvas.getContext('2d');
+          let chart = null;
+
+          function makePE(L, d) {
+            const pe = Array.from({ length: L }, () => new Array(d).fill(0));
+            for (let pos = 0; pos < L; pos++) {
+              for (let i = 0; i < d; i++) {
+                const twoI = 2 * Math.floor(i / 2);
+                const angle = pos / Math.pow(10000, twoI / d);
+                pe[pos][i] = (i % 2 === 0) ? Math.sin(angle) : Math.cos(angle);
+              }
+            }
+            return pe;
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const L = +cSeq.input.value;
+            const d = +cDim.input.value;
+            const pe = makePE(L, d);
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const padL = 50, padT = 30, padR = 20, padB = 30;
+            const cw = (W - padL - padR) / d;
+            const ch = (H - padT - padB) / L;
+            for (let pos = 0; pos < L; pos++) {
+              for (let i = 0; i < d; i++) {
+                const v = pe[pos][i]; // [-1, 1]
+                const t = (v + 1) / 2;
+                const r = Math.round(239 * (1 - t) + 59 * t);
+                const g = Math.round(68 * (1 - t) + 130 * t);
+                const b = Math.round(68 * (1 - t) + 246 * t);
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(padL + i * cw, padT + pos * ch, cw + 0.5, ch + 0.5);
+              }
+            }
+            ctx.fillStyle = '#0f172a';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            ctx.fillText('размерность →', padL + (W - padL - padR) / 2, padT - 8);
+            ctx.save();
+            ctx.translate(padL - 8, padT + (H - padT - padB) / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            ctx.fillText('позиция →', 0, 0);
+            ctx.restore();
+
+            // Line chart: выберем несколько размерностей, покажем как функция от позиции
+            const ctxL = container.querySelector('#trp-lines').getContext('2d');
+            if (chart) chart.destroy();
+            const dims = [0, 2, Math.floor(d / 4), Math.floor(d / 2)];
+            const labels = Array.from({ length: L }, (_, i) => i);
+            chart = new Chart(ctxL, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: dims.map((k, idx) => ({
+                  label: `PE[·, ${k}]`,
+                  data: pe.map(row => row[k]),
+                  borderColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'][idx],
+                  borderWidth: 2, pointRadius: 0, fill: false,
+                })),
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Синусоиды разной частоты по размерностям' } },
+                scales: { x: { title: { display: true, text: 'позиция' } }, y: { min: -1.1, max: 1.1 } },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#trp-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Длина</div><div class="stat-value">${L}</div></div>
+              <div class="stat-card"><div class="stat-label">d</div><div class="stat-value">${d}</div></div>
+              <div class="stat-card"><div class="stat-label">Период (i=0)</div><div class="stat-value">2π ≈ 6.3</div></div>
+              <div class="stat-card"><div class="stat-label">Период (i=d-1)</div><div class="stat-value">2π·10000 ≈ 63k</div></div>
+            `;
+          }
+
+          [cSeq, cDim].forEach(c => c.input.addEventListener('input', draw));
+          setTimeout(() => { resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Transformer на Python (PyTorch + HuggingFace)</h3>

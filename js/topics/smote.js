@@ -546,8 +546,10 @@ Recall = 100%! Но Precision упала, и 3 ложные тревоги.</div
       }
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Базовый SMOTE',
+        html: `
         <h3>Симуляция: дисбаланс и SMOTE</h3>
         <p>Смотри, как SMOTE создаёт синтетические примеры меньшинства.</p>
         <div class="sim-container">
@@ -642,7 +644,129 @@ Recall = 100%! Но Precision упала, и 3 ложные тревоги.</div
         container.querySelector('#smote-regen').onclick = regen;
         regen();
       },
-    },
+      },
+      {
+        title: 'Опасная зона у границы',
+        html: `
+          <h3>Когда SMOTE вредит: пересечение классов</h3>
+          <p>Если минорный класс не чётко отделён, а <b>перекрывается</b> с мажоритарным, SMOTE интерполирует между минорными точками — и часть синтетики попадает <i>внутрь</i> территории большинства. Модель учится на «ложных» точках и теряет precision. Лечится Borderline-SMOTE или SMOTE + Tomek links.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="smoteD-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="smoteD-apply">✨ Применить SMOTE</button>
+              <button class="btn secondary" id="smoteD-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:400px;"><canvas id="smoteD-chart"></canvas></div>
+              <div class="sim-stats" id="smoteD-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#smoteD-controls');
+          const cOverlap = App.makeControl('range', 'smoteD-over', 'Перекрытие классов', { min: 0, max: 1.2, step: 0.05, value: 0.6 });
+          const cNMaj = App.makeControl('range', 'smoteD-maj', 'Большинство', { min: 50, max: 250, step: 10, value: 120 });
+          const cNMin = App.makeControl('range', 'smoteD-min', 'Меньшинство', { min: 5, max: 40, step: 1, value: 15 });
+          const cK = App.makeControl('range', 'smoteD-k', 'k (соседей)', { min: 2, max: 8, step: 1, value: 5 });
+          [cOverlap, cNMaj, cNMin, cK].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          let maj = [], min_ = [], synth = [];
+
+          function regen() {
+            const nMaj = +cNMaj.input.value, nMin = +cNMin.input.value, ov = +cOverlap.input.value;
+            maj = []; min_ = []; synth = [];
+            // большинство центр (-1, 0), спред растёт с overlap
+            for (let i = 0; i < nMaj; i++) {
+              maj.push({ x: App.Util.randn(-1, 0.5 + ov * 0.4), y: App.Util.randn(0, 0.5 + ov * 0.4) });
+            }
+            // меньшинство центр (1, 0) — ближе при overlap→1
+            const cx = 1 - ov * 0.8;
+            for (let i = 0; i < nMin; i++) {
+              min_.push({ x: App.Util.randn(cx, 0.35), y: App.Util.randn(0, 0.35) });
+            }
+            draw();
+          }
+
+          function applySMOTE() {
+            const k = +cK.input.value;
+            synth = [];
+            if (min_.length < 2) { draw(); return; }
+            const target = maj.length;
+            const need = Math.max(0, target - min_.length);
+            for (let i = 0; i < need; i++) {
+              const base = min_[Math.floor(Math.random() * min_.length)];
+              const dists = min_.filter(p => p !== base).map(p => ({ p, d: (p.x - base.x) ** 2 + (p.y - base.y) ** 2 }));
+              dists.sort((a, b) => a.d - b.d);
+              const neighbor = dists[Math.floor(Math.random() * Math.min(k, dists.length))].p;
+              const alpha = Math.random();
+              synth.push({
+                x: base.x + alpha * (neighbor.x - base.x),
+                y: base.y + alpha * (neighbor.y - base.y),
+              });
+            }
+            draw();
+          }
+
+          function draw() {
+            const ctx = container.querySelector('#smoteD-chart').getContext('2d');
+            if (chart) chart.destroy();
+            // считаем, сколько синтетики попало «в чужое поле»
+            // простой прокси-классификатор: центроиды
+            let mxMaj = 0, myMaj = 0; maj.forEach(p => { mxMaj += p.x; myMaj += p.y; });
+            mxMaj /= Math.max(1, maj.length); myMaj /= Math.max(1, maj.length);
+            let mxMin = 0, myMin = 0; min_.forEach(p => { mxMin += p.x; myMin += p.y; });
+            mxMin /= Math.max(1, min_.length); myMin /= Math.max(1, min_.length);
+
+            // метим «плохую» синтетику (ближе к центроиду большинства)
+            const bad = [], good = [];
+            synth.forEach(p => {
+              const dMaj = (p.x - mxMaj) ** 2 + (p.y - myMaj) ** 2;
+              const dMin = (p.x - mxMin) ** 2 + (p.y - myMin) ** 2;
+              if (dMaj < dMin) bad.push(p); else good.push(p);
+            });
+
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: {
+                datasets: [
+                  { label: `Большинство (${maj.length})`, data: maj, backgroundColor: 'rgba(239,68,68,0.4)', pointRadius: 4 },
+                  { label: `Меньшинство (${min_.length})`, data: min_, backgroundColor: 'rgba(59,130,246,0.85)', pointRadius: 6 },
+                  { label: `Синтетика безопасная (${good.length})`, data: good, backgroundColor: 'rgba(16,185,129,0.7)', pointRadius: 5, pointStyle: 'triangle' },
+                  { label: `Синтетика в опасной зоне (${bad.length})`, data: bad, backgroundColor: 'rgba(234,88,12,0.9)', borderColor: '#7c2d12', borderWidth: 2, pointRadius: 6, pointStyle: 'rectRot' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { x: { type: 'linear', min: -3, max: 3 }, y: { min: -2.5, max: 2.5 } },
+              },
+            });
+            App.registerChart(chart);
+
+            const badPct = synth.length > 0 ? (bad.length / synth.length * 100) : 0;
+            const bg = badPct > 20 ? '#fee2e2' : (badPct > 5 ? '#fef3c7' : '#dcfce7');
+            const diag = badPct > 20
+              ? 'SMOTE создал много точек в зоне большинства. В продакшене precision упадёт.'
+              : badPct > 5
+                ? 'Небольшая часть синтетики зашла на чужую территорию.'
+                : 'Классы разделимы — синтетика безопасна.';
+
+            container.querySelector('#smoteD-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Синтетики всего</div><div class="stat-value">${synth.length}</div></div>
+              <div class="stat-card"><div class="stat-label">В опасной зоне</div><div class="stat-value">${bad.length}</div></div>
+              <div class="stat-card"><div class="stat-label">% «плохой» синтетики</div><div class="stat-value">${badPct.toFixed(0)}%</div></div>
+              <div class="stat-card" style="background:${bg}"><div class="stat-label">Диагноз</div><div class="stat-value" style="font-size:12px">${diag}</div></div>
+            `;
+          }
+
+          [cOverlap, cNMaj, cNMin].forEach(c => c.input.addEventListener('change', regen));
+          container.querySelector('#smoteD-apply').onclick = applySMOTE;
+          container.querySelector('#smoteD-regen').onclick = regen;
+          regen();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: SMOTE и балансировка классов</h3>

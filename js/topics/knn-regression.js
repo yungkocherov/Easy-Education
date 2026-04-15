@@ -363,10 +363,11 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [{
+      title: 'k, шум, взвешивание',
       html: `
-        <h3>Симуляция: kNN-регрессия — эффект k</h3>
-        <p>Меняй k, шум и число точек. Наблюдай, как сглаживается предсказание.</p>
+        <h3>Симуляция: kNN-регрессия — сглаживание и bias-variance</h3>
+        <p>Меняй k и наблюдай: при $k=1$ кривая проходит через каждую точку (нулевой train-MSE, огромный test-MSE — переобучение). При $k$ сравнимом с $n$ кривая сплющивается в константу — недообучение. Переключи <b>uniform → weighted (1/d)</b> — край ближайшей точки получит больший вес, кривая становится «цепляющейся» за данные вместо ступенчатой.</p>
         <div class="sim-container">
           <div class="sim-controls" id="knnr-controls"></div>
           <div class="sim-buttons">
@@ -380,53 +381,63 @@ App.registerTopic({
       `,
       init(container) {
         const controls = container.querySelector('#knnr-controls');
-        const cK = App.makeControl('range', 'knnr-k', 'k (соседей)', { min: 1, max: 20, step: 1, value: 5 });
-        const cNoise = App.makeControl('range', 'knnr-noise', 'Шум σ', { min: 0.1, max: 2, step: 0.1, value: 0.5 });
+        const cK = App.makeControl('range', 'knnr-k', 'k (соседей)', { min: 1, max: 40, step: 1, value: 5 });
+        const cNoise = App.makeControl('range', 'knnr-noise', 'Шум σ', { min: 0, max: 2, step: 0.05, value: 0.5 });
         const cN = App.makeControl('range', 'knnr-n', 'Число точек', { min: 30, max: 200, step: 5, value: 80 });
-        [cK, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
+        const cW = App.makeControl('select', 'knnr-w', 'Голосование', {
+          options: [{ value: 'uniform', label: 'Uniform' }, { value: 'distance', label: 'Weighted 1/d' }],
+          value: 'uniform',
+        });
+        [cK, cNoise, cN, cW].forEach(c => controls.appendChild(c.wrap));
 
         let chart = null;
-        let dataX = [], dataY = [];
+        let trainX = [], trainY = [], testX = [], testY = [];
 
         function generate() {
           const n = +cN.input.value;
           const sigma = +cNoise.input.value;
-          dataX = []; dataY = [];
+          trainX = []; trainY = []; testX = []; testY = [];
+          const all = [];
           for (let i = 0; i < n; i++) {
             const x = Math.random() * 2 * Math.PI;
-            dataX.push(x);
-            dataY.push(Math.sin(x) + App.Util.randn(0, sigma));
+            all.push({ x, y: Math.sin(x) + App.Util.randn(0, sigma) });
           }
+          // 70/30 split
+          App.Util.shuffle(all);
+          const split = Math.floor(all.length * 0.7);
+          for (let i = 0; i < split; i++) { trainX.push(all[i].x); trainY.push(all[i].y); }
+          for (let i = split; i < all.length; i++) { testX.push(all[i].x); testY.push(all[i].y); }
           update();
+        }
+
+        function predict(gx, k) {
+          const weighted = cW.input.value === 'distance';
+          const dists = trainX.map((dx, i) => ({ d: Math.abs(dx - gx), y: trainY[i] }));
+          dists.sort((a, b) => a.d - b.d);
+          let num = 0, den = 0;
+          for (let j = 0; j < Math.min(k, dists.length); j++) {
+            const w = weighted ? 1 / (dists[j].d + 1e-6) : 1;
+            num += w * dists[j].y;
+            den += w;
+          }
+          return num / (den || 1);
         }
 
         function update() {
           const k = +cK.input.value;
-          // build prediction curve
           const gridX = App.Util.linspace(0, 2 * Math.PI, 200);
-          const predY = gridX.map(gx => {
-            const dists = dataX.map((dx, i) => ({ d: Math.abs(dx - gx), y: dataY[i] }));
-            dists.sort((a, b) => a.d - b.d);
-            let s = 0;
-            for (let j = 0; j < k; j++) s += dists[j].y;
-            return s / k;
-          });
-
-          // MSE on training data
-          let mse = 0;
-          for (let i = 0; i < dataX.length; i++) {
-            const dists = dataX.map((dx, j) => ({ d: Math.abs(dx - dataX[i]), y: dataY[j] }));
-            dists.sort((a, b) => a.d - b.d);
-            let s = 0;
-            for (let j = 0; j < k; j++) s += dists[j].y;
-            const pred = s / k;
-            mse += (dataY[i] - pred) ** 2;
-          }
-          mse /= dataX.length;
-
-          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
-          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const curve = gridX.map(x => ({ x, y: predict(x, k) }));
           const trueCurve = gridX.map(x => ({ x, y: Math.sin(x) }));
+
+          let trainMSE = 0;
+          for (let i = 0; i < trainX.length; i++) trainMSE += (trainY[i] - predict(trainX[i], k)) ** 2;
+          trainMSE /= Math.max(1, trainX.length);
+          let testMSE = 0;
+          for (let i = 0; i < testX.length; i++) testMSE += (testY[i] - predict(testX[i], k)) ** 2;
+          testMSE /= Math.max(1, testX.length);
+
+          const trainScatter = trainX.map((x, i) => ({ x, y: trainY[i] }));
+          const testScatter = testX.map((x, i) => ({ x, y: testY[i] }));
 
           const ctx = container.querySelector('#knnr-chart').getContext('2d');
           if (chart) chart.destroy();
@@ -434,14 +445,15 @@ App.registerTopic({
             type: 'scatter',
             data: {
               datasets: [
-                { label: 'Данные', data: scatter, backgroundColor: 'rgba(99,102,241,0.4)', pointRadius: 4 },
-                { label: 'kNN предсказание', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
-                { label: 'sin(x) истинная', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.6)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
+                { label: 'Train', data: trainScatter, backgroundColor: 'rgba(99,102,241,0.45)', pointRadius: 4 },
+                { label: 'Test',  data: testScatter, backgroundColor: 'rgba(234,88,12,0.6)', pointRadius: 5 },
+                { label: 'kNN предсказание', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2.5, pointRadius: 0, fill: false, showLine: true },
+                { label: 'sin(x) истинная', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.7)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, showLine: true },
               ],
             },
             options: {
               responsive: true, maintainAspectRatio: false,
-              plugins: { title: { display: true, text: 'kNN-регрессия' } },
+              plugins: { title: { display: true, text: 'kNN-регрессия: train vs test' } },
               scales: { x: { type: 'linear', min: 0, max: 6.5 }, y: { suggestedMin: -2.5, suggestedMax: 2.5 } },
             },
           });
@@ -449,16 +461,119 @@ App.registerTopic({
 
           container.querySelector('#knnr-stats').innerHTML = `
             <div class="stat-card"><div class="stat-label">k</div><div class="stat-value">${k}</div></div>
-            <div class="stat-card"><div class="stat-label">MSE</div><div class="stat-value">${mse.toFixed(4)}</div></div>
+            <div class="stat-card"><div class="stat-label">train MSE</div><div class="stat-value">${trainMSE.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">test  MSE</div><div class="stat-value">${testMSE.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Режим</div><div class="stat-value" style="font-size:12px;">${k === 1 ? 'переобучение' : (k >= trainX.length * 0.7 ? 'недообучение' : 'ok')}</div></div>
+            <div class="stat-card"><div class="stat-label">Голосование</div><div class="stat-value" style="font-size:12px;">${cW.input.value}</div></div>
           `;
         }
 
-        [cNoise, cN].forEach(c => c.input.addEventListener('input', generate));
-        cK.input.addEventListener('input', update);
+        [cNoise, cN].forEach(c => c.input.addEventListener('change', generate));
+        [cK, cW].forEach(c => c.input.addEventListener('input', update));
         container.querySelector('#knnr-regen').onclick = generate;
         generate();
       },
-    },
+    }, {
+      title: 'Нет экстраполяции',
+      html: `
+        <h3>Главный провал kNN-регрессии: нет экстраполяции</h3>
+        <p>Линейная регрессия за пределами train продолжает тренд. <b>kNN просто упирается в плато</b>: для любого $x$ за правой границей $k$ ближайших соседей — это всегда одни и те же $k$ последних train-точек, их среднее — константа. Хоть на Луну уезжай — прогноз не изменится.</p>
+        <p>Подвинь <b>диапазон прогноза</b> вправо — увидишь, как красная kNN-кривая сплющивается в горизонтальную линию, а зелёная линейная регрессия продолжает лететь вверх.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="knnr-ext-controls"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="knnr-ext-chart"></canvas></div>
+            <div class="sim-stats" id="knnr-ext-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#knnr-ext-controls');
+        const cK = App.makeControl('range', 'knnr-ext-k', 'k', { min: 1, max: 20, step: 1, value: 5 });
+        const cSlope = App.makeControl('range', 'knnr-ext-slope', 'Истинный наклон', { min: 0, max: 3, step: 0.1, value: 1.2 });
+        const cRange = App.makeControl('range', 'knnr-ext-range', 'Правая граница прогноза', { min: 10, max: 30, step: 1, value: 15 });
+        const cCurv  = App.makeControl('range', 'knnr-ext-curv', 'Кривизна (sin компонент)', { min: 0, max: 2, step: 0.1, value: 0.6 });
+        [cK, cSlope, cRange, cCurv].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+
+        function update() {
+          const k = +cK.input.value;
+          const slope = +cSlope.input.value;
+          const rhs = +cRange.input.value;
+          const curv = +cCurv.input.value;
+
+          // Train data: x in [0, 10] only (small training domain)
+          const trainX = [], trainY = [];
+          const n = 50;
+          const rand = (seed => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; })(777);
+          for (let i = 0; i < n; i++) {
+            const x = 10 * rand();
+            trainX.push(x);
+            trainY.push(slope * x + curv * Math.sin(x) + App.Util.randn(0, 0.4));
+          }
+
+          // Fit OLS for comparison
+          const mx = App.Util.mean(trainX), my = App.Util.mean(trainY);
+          let num = 0, den = 0;
+          for (let i = 0; i < n; i++) { num += (trainX[i] - mx) * (trainY[i] - my); den += (trainX[i] - mx) ** 2; }
+          const wL = num / (den || 1), bL = my - wL * mx;
+
+          // Prediction grid spanning out to rhs — well beyond train
+          const grid = App.Util.linspace(0, rhs, 200);
+          const knnCurve = grid.map(gx => {
+            const dists = trainX.map((x, i) => ({ d: Math.abs(x - gx), y: trainY[i] }));
+            dists.sort((a, b) => a.d - b.d);
+            let s = 0;
+            for (let j = 0; j < Math.min(k, n); j++) s += dists[j].y;
+            return { x: gx, y: s / Math.min(k, n) };
+          });
+          const linCurve = grid.map(x => ({ x, y: wL * x + bL }));
+          const trueCurve = grid.map(x => ({ x, y: slope * x + curv * Math.sin(x) }));
+
+          // Shade "train domain"
+          const ctx = container.querySelector('#knnr-ext-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Train (x ∈ [0, 10])', data: trainX.map((x, i) => ({ x, y: trainY[i] })), backgroundColor: 'rgba(99,102,241,0.55)', pointRadius: 4 },
+                { type: 'line', label: 'kNN predict', data: knnCurve, borderColor: '#dc2626', borderWidth: 2.5, pointRadius: 0, fill: false },
+                { type: 'line', label: 'Linear regression', data: linCurve, borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false },
+                { type: 'line', label: 'Истинная', data: trueCurve, borderColor: 'rgba(100,116,139,0.7)', borderWidth: 1.25, borderDash: [2,3], pointRadius: 0, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'kNN упирается в плато за пределами train' }, legend: { position: 'top' } },
+              scales: {
+                x: { type: 'linear', min: 0, max: 30, title: { display: true, text: 'x (вертикальная линия = край train)' } },
+                y: { suggestedMin: -5, suggestedMax: 60, title: { display: true, text: 'y' } },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          // Stats: what is the kNN prediction for x=rhs vs x=10 (edge of train) and linear diff
+          const knnRhs = knnCurve[knnCurve.length - 1].y;
+          const knnEdge = knnCurve.find(p => p.x >= 10) ? knnCurve.find(p => p.x >= 10).y : knnCurve[knnCurve.length - 1].y;
+          const linRhs = wL * rhs + bL;
+          const trueRhs = slope * rhs + curv * Math.sin(rhs);
+          container.querySelector('#knnr-ext-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">k</div><div class="stat-value">${k}</div></div>
+            <div class="stat-card"><div class="stat-label">Прогноз kNN в x=${rhs}</div><div class="stat-value">${knnRhs.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Прогноз kNN в x=10 (край)</div><div class="stat-value">${knnEdge.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Прогноз OLS в x=${rhs}</div><div class="stat-value">${linRhs.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Истинное в x=${rhs}</div><div class="stat-value">${trueRhs.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Ошибка kNN</div><div class="stat-value">${Math.abs(knnRhs - trueRhs).toFixed(2)}</div></div>
+          `;
+        }
+
+        [cK, cSlope, cRange, cCurv].forEach(c => c.input.addEventListener('input', update));
+        update();
+      },
+    }],
 
     python: `
       <h4>1. Базовый KNeighborsRegressor</h4>

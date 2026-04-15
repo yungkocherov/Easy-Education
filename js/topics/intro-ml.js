@@ -331,6 +331,232 @@ App.registerTopic({
       }
     ],
 
+    simulation: [
+      {
+        title: 'Train / Test split',
+        html: `
+          <h3>Симуляция: зачем нужен train/test split</h3>
+          <p>Модель учится только на синих точках (train). Красные (test) — спрятаны. Смотри, совпадает ли train-качество с test-качеством.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="introml-split-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="introml-split-regen">🔄 Перемешать / новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:340px;"><canvas id="introml-split-chart"></canvas></div>
+              <div class="sim-stats" id="introml-split-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#introml-split-controls');
+          const cTest = App.makeControl('range', 'introml-split-test', 'Доля test (%)', { min: 10, max: 60, step: 5, value: 30 });
+          const cN = App.makeControl('range', 'introml-split-n', 'Всего точек', { min: 20, max: 200, step: 10, value: 60 });
+          const cNoise = App.makeControl('range', 'introml-split-noise', 'Шум σ', { min: 0, max: 1.2, step: 0.05, value: 0.4 });
+          [cTest, cN, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          let xs = [], ys = [];
+
+          function truefn(x) { return 0.6 * x + 0.4; }
+
+          function regen() {
+            const n = +cN.input.value, noise = +cNoise.input.value;
+            xs = []; ys = [];
+            for (let i = 0; i < n; i++) {
+              const x = -3 + 6 * Math.random();
+              xs.push(x); ys.push(truefn(x) + App.Util.randn(0, noise));
+            }
+            update();
+          }
+
+          function update() {
+            const frac = +cTest.input.value / 100;
+            const n = xs.length;
+            // детерминированное разбиение: каждая точка получает номер, первые k — train
+            const idx = xs.map((_, i) => i);
+            // простое «перемешивание» детерминированным seed чтобы не прыгало на слайдерах
+            const order = idx.slice().sort((a, b) => ((a * 9301 + 49297) % 233280) - ((b * 9301 + 49297) % 233280));
+            const nTest = Math.max(1, Math.round(n * frac));
+            const testIdx = new Set(order.slice(0, nTest));
+
+            const trainX = [], trainY = [], testX = [], testY = [];
+            for (let i = 0; i < n; i++) {
+              if (testIdx.has(i)) { testX.push(xs[i]); testY.push(ys[i]); }
+              else { trainX.push(xs[i]); trainY.push(ys[i]); }
+            }
+
+            // линейная регрессия на train
+            const mx = App.Util.mean(trainX), my = App.Util.mean(trainY);
+            let num = 0, den = 0;
+            for (let i = 0; i < trainX.length; i++) { num += (trainX[i] - mx) * (trainY[i] - my); den += (trainX[i] - mx) ** 2; }
+            const w1 = den === 0 ? 0 : num / den;
+            const w0 = my - w1 * mx;
+            const pred = x => w0 + w1 * x;
+
+            let trainMSE = 0; trainX.forEach((x, i) => { trainMSE += (trainY[i] - pred(x)) ** 2; }); trainMSE /= Math.max(1, trainX.length);
+            let testMSE = 0; testX.forEach((x, i) => { testMSE += (testY[i] - pred(x)) ** 2; }); testMSE /= Math.max(1, testX.length);
+
+            const gridX = App.Util.linspace(-3.5, 3.5, 60);
+            const ctx = container.querySelector('#introml-split-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: {
+                datasets: [
+                  { label: 'Train', data: trainX.map((x, i) => ({ x, y: trainY[i] })), backgroundColor: 'rgba(59,130,246,0.7)', pointRadius: 4 },
+                  { label: 'Test', data: testX.map((x, i) => ({ x, y: testY[i] })), backgroundColor: 'rgba(239,68,68,0.85)', pointRadius: 5, pointStyle: 'triangle' },
+                  { type: 'line', label: 'Модель (обучена на train)', data: gridX.map(x => ({ x, y: pred(x) })), borderColor: '#16a34a', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: `Train: ${trainX.length} точек, Test: ${testX.length} точек` } },
+                scales: { x: { type: 'linear', min: -3.5, max: 3.5, title: { display: true, text: 'x' } }, y: { title: { display: true, text: 'y' } } },
+              },
+            });
+            App.registerChart(chart);
+
+            const gap = testMSE - trainMSE;
+            const warn = testX.length < 5 ? '<div class="stat-card" style="background:#fee2e2;"><div class="stat-label">!</div><div class="stat-value" style="font-size:13px;">Test слишком мал</div></div>' : '';
+            container.querySelector('#introml-split-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Train MSE</div><div class="stat-value">${trainMSE.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Test MSE</div><div class="stat-value">${testMSE.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Gap (test − train)</div><div class="stat-value">${gap.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">w₀ / w₁</div><div class="stat-value">${w0.toFixed(2)} / ${w1.toFixed(2)}</div></div>
+              ${warn}
+            `;
+          }
+
+          [cTest].forEach(c => c.input.addEventListener('input', update));
+          [cN, cNoise].forEach(c => c.input.addEventListener('change', regen));
+          container.querySelector('#introml-split-regen').onclick = regen;
+          regen();
+        },
+      },
+      {
+        title: 'Overfitting: гибкость модели',
+        html: `
+          <h3>Симуляция: сложность модели и переобучение</h3>
+          <p>Чем выше степень полинома, тем точнее модель на train. Но с какого-то момента она начинает запоминать шум вместо сигнала — и test-ошибка растёт.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="introml-of-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="introml-of-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:320px;"><canvas id="introml-of-chart"></canvas></div>
+              <div class="sim-stats" id="introml-of-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#introml-of-controls');
+          const cDeg = App.makeControl('range', 'introml-of-deg', 'Степень полинома', { min: 1, max: 12, step: 1, value: 1 });
+          const cN = App.makeControl('range', 'introml-of-n', 'Train точек', { min: 6, max: 40, step: 1, value: 12 });
+          const cNoise = App.makeControl('range', 'introml-of-noise', 'Шум σ', { min: 0, max: 1, step: 0.05, value: 0.35 });
+          [cDeg, cN, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          let xTrain = [], yTrain = [], xTest = [], yTest = [];
+
+          function truefn(x) { return Math.sin(1.3 * x); }
+
+          function regen() {
+            const n = +cN.input.value, noise = +cNoise.input.value;
+            xTrain = []; yTrain = []; xTest = []; yTest = [];
+            for (let i = 0; i < n; i++) {
+              const x = -3 + 6 * Math.random();
+              xTrain.push(x); yTrain.push(truefn(x) + App.Util.randn(0, noise));
+            }
+            for (let i = 0; i < 40; i++) {
+              const x = -3 + 6 * Math.random();
+              xTest.push(x); yTest.push(truefn(x) + App.Util.randn(0, noise));
+            }
+            update();
+          }
+
+          function fitPoly(xs, ys, deg) {
+            const n = xs.length, p = deg + 1;
+            const X = xs.map(x => { const row = []; for (let d = 0; d <= deg; d++) row.push(Math.pow(x, d)); return row; });
+            const A = Array.from({ length: p }, () => new Array(p).fill(0));
+            const b = new Array(p).fill(0);
+            for (let i = 0; i < n; i++) {
+              for (let r = 0; r < p; r++) {
+                for (let c = 0; c < p; c++) A[r][c] += X[i][r] * X[i][c];
+                b[r] += X[i][r] * ys[i];
+              }
+            }
+            for (let r = 0; r < p; r++) A[r][r] += 1e-8;
+            for (let i = 0; i < p; i++) {
+              let mx = i;
+              for (let k = i + 1; k < p; k++) if (Math.abs(A[k][i]) > Math.abs(A[mx][i])) mx = k;
+              [A[i], A[mx]] = [A[mx], A[i]]; [b[i], b[mx]] = [b[mx], b[i]];
+              for (let k = i + 1; k < p; k++) {
+                const f = A[k][i] / A[i][i];
+                for (let j = i; j < p; j++) A[k][j] -= f * A[i][j];
+                b[k] -= f * b[i];
+              }
+            }
+            const w = new Array(p).fill(0);
+            for (let i = p - 1; i >= 0; i--) {
+              let s = b[i];
+              for (let j = i + 1; j < p; j++) s -= A[i][j] * w[j];
+              w[i] = s / A[i][i];
+            }
+            return w;
+          }
+
+          function predict(w, x) { let s = 0; for (let d = 0; d < w.length; d++) s += w[d] * Math.pow(x, d); return s; }
+
+          function update() {
+            const deg = +cDeg.input.value;
+            const w = fitPoly(xTrain, yTrain, deg);
+            let trainErr = 0; xTrain.forEach((x, i) => { trainErr += (yTrain[i] - predict(w, x)) ** 2; }); trainErr /= xTrain.length;
+            let testErr = 0; xTest.forEach((x, i) => { testErr += (yTest[i] - predict(w, x)) ** 2; }); testErr /= xTest.length;
+
+            const gridX = App.Util.linspace(-3, 3, 200);
+            const ctx = container.querySelector('#introml-of-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: {
+                datasets: [
+                  { label: 'Train', data: xTrain.map((x, i) => ({ x, y: yTrain[i] })), backgroundColor: 'rgba(59,130,246,0.7)', pointRadius: 4 },
+                  { type: 'line', label: 'Истинная f(x)', data: gridX.map(x => ({ x, y: truefn(x) })), borderColor: '#94a3b8', borderWidth: 2, pointRadius: 0, fill: false, borderDash: [6, 4] },
+                  { type: 'line', label: `Модель, степень ${deg}`, data: gridX.map(x => ({ x, y: predict(w, x) })), borderColor: '#dc2626', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { x: { type: 'linear', min: -3.2, max: 3.2 }, y: { suggestedMin: -2.5, suggestedMax: 2.5 } },
+              },
+            });
+            App.registerChart(chart);
+
+            let label = 'OK';
+            if (deg <= 2 && trainErr > 0.3) label = 'Недообучение';
+            else if (testErr > trainErr * 2 && testErr > 0.3) label = 'Переобучение';
+            else if (testErr < 0.2 && trainErr < 0.2) label = 'Баланс';
+
+            container.querySelector('#introml-of-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Степень</div><div class="stat-value">${deg}</div></div>
+              <div class="stat-card"><div class="stat-label">Параметров</div><div class="stat-value">${deg + 1}</div></div>
+              <div class="stat-card"><div class="stat-label">Train MSE</div><div class="stat-value">${trainErr.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Test MSE</div><div class="stat-value">${testErr.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Диагноз</div><div class="stat-value" style="font-size:14px;">${label}</div></div>
+            `;
+          }
+
+          cDeg.input.addEventListener('input', update);
+          [cN, cNoise].forEach(c => c.input.addEventListener('change', regen));
+          container.querySelector('#introml-of-regen').onclick = regen;
+          regen();
+        },
+      },
+    ],
+
     python: `
 <h3>Минимальный ML-pipeline на Python</h3>
 <pre><code># 1. Импортируем библиотеки

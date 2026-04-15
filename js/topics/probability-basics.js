@@ -647,7 +647,9 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
       }
     ],
 
-    simulation: {
+    simulation: [
+      {
+        title: 'Закон больших чисел',
       html: `
         <h3>Симуляция: бросок кубика и закон больших чисел</h3>
         <p>Увеличивай число бросков и наблюдай, как среднее сходится к 3.5.</p>
@@ -747,7 +749,137 @@ t = 2.996 / 0.5 = <b>5.99 сек</b></div>
         container.querySelector('#dice-regen').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Парадокс Монти Холла',
+        html: `
+          <h3>Monty Hall: менять или не менять дверь?</h3>
+          <p>Три двери, за одной приз. Ты выбираешь одну, ведущий (который знает правильный ответ) открывает одну из двух оставшихся — пустую. Теперь у тебя выбор: остаться или поменять. Интуитивно кажется 50/50, но правильная стратегия — <b>всегда менять</b> (выигрыш 2/3 вместо 1/3). Monte Carlo покажет.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="mh-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="mh-run">▶ Симулировать</button>
+              <button class="btn secondary" id="mh-reset">↺ Сброс</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="mh-chart"></canvas></div>
+              <div class="sim-stats" id="mh-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#mh-controls');
+          const cN = App.makeControl('range', 'mh-n', 'Игр за запуск', { min: 50, max: 5000, step: 50, value: 1000 });
+          const cDoors = App.makeControl('range', 'mh-doors', 'Дверей всего', { min: 3, max: 10, step: 1, value: 3 });
+          [cN, cDoors].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          const history = { stayWins: 0, stayTotal: 0, switchWins: 0, switchTotal: 0, runAvgStay: [], runAvgSwitch: [], xs: [] };
+
+          function simulateOne(doors) {
+            const prize = Math.floor(Math.random() * doors);
+            const pick = Math.floor(Math.random() * doors);
+            // Ведущий открывает все двери кроме pick и одной закрытой (где приз, если pick != prize; иначе случайной другой).
+            let stayWin = pick === prize;
+            let switchPick;
+            if (pick === prize) {
+              // Оставшаяся закрытая — любая случайная из остальных
+              const others = [];
+              for (let i = 0; i < doors; i++) if (i !== pick) others.push(i);
+              switchPick = others[Math.floor(Math.random() * others.length)];
+            } else {
+              switchPick = prize; // единственная оставшаяся закрытая
+            }
+            const switchWin = switchPick === prize;
+            return { stayWin, switchWin };
+          }
+
+          function draw() {
+            const ctx = container.querySelector('#mh-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: history.xs,
+                datasets: [
+                  {
+                    label: 'Стратегия «остаться»',
+                    data: history.runAvgStay,
+                    borderColor: 'rgba(239,68,68,0.9)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                  },
+                  {
+                    label: 'Стратегия «поменять»',
+                    data: history.runAvgSwitch,
+                    borderColor: 'rgba(16,185,129,0.9)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Доля выигрышей по ходу симуляции' } },
+                scales: {
+                  x: { title: { display: true, text: 'Игра' }, ticks: { maxTicksLimit: 10 } },
+                  y: { min: 0, max: 1, title: { display: true, text: 'P(выигрыш)' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#mh-stats');
+            const doors = +cDoors.input.value;
+            const theoryStay = 1 / doors;
+            const theorySwitch = doors === 1 ? 0 : (doors - 1) / doors;
+            const empStay = history.stayTotal ? history.stayWins / history.stayTotal : 0;
+            const empSwitch = history.switchTotal ? history.switchWins / history.switchTotal : 0;
+            statsEl.innerHTML = `
+              <div class="stat-card"><div class="stat-label">Игр</div><div class="stat-value">${history.stayTotal}</div></div>
+              <div class="stat-card"><div class="stat-label">«остаться» — факт</div><div class="stat-value">${(empStay * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">«остаться» — теория</div><div class="stat-value">${(theoryStay * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">«поменять» — факт</div><div class="stat-value">${(empSwitch * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">«поменять» — теория</div><div class="stat-value">${(theorySwitch * 100).toFixed(1)}%</div></div>
+            `;
+          }
+
+          function runBatch() {
+            const n = +cN.input.value;
+            const doors = +cDoors.input.value;
+            const step = Math.max(1, Math.floor(n / 200));
+            for (let i = 0; i < n; i++) {
+              const { stayWin, switchWin } = simulateOne(doors);
+              if (stayWin) history.stayWins++;
+              history.stayTotal++;
+              if (switchWin) history.switchWins++;
+              history.switchTotal++;
+              if (history.stayTotal % step === 0) {
+                history.xs.push(history.stayTotal);
+                history.runAvgStay.push(history.stayWins / history.stayTotal);
+                history.runAvgSwitch.push(history.switchWins / history.switchTotal);
+              }
+            }
+            draw();
+          }
+
+          function reset() {
+            history.stayWins = 0; history.stayTotal = 0;
+            history.switchWins = 0; history.switchTotal = 0;
+            history.runAvgStay = []; history.runAvgSwitch = []; history.xs = [];
+            draw();
+          }
+
+          container.querySelector('#mh-run').onclick = runBatch;
+          container.querySelector('#mh-reset').onclick = reset;
+          cDoors.input.addEventListener('change', reset);
+          reset();
+          runBatch();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Вероятность и распределения в Python</h3>

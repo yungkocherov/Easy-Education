@@ -142,6 +142,107 @@ App.registerTopic({
       </ul>
     `,
 
+    simulation: {
+      html: `
+        <h3>Ширина ядра (bandwidth) — главный параметр violin</h3>
+        <p>Violin plot = симметричное KDE. Узкое ядро показывает каждую точку как горбик (перешумленная картинка). Широкое ядро стирает все моды в одну гладкую гауссиану. Двигай bandwidth на бимодальной выборке — смотри, где два горба «склеиваются» в один.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="viz-viol-ctrl"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="viz-viol-chart"></canvas></div>
+            <div class="sim-stats" id="viz-viol-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const ctrl = container.querySelector('#viz-viol-ctrl');
+        const cBw = App.makeControl('range', 'viz-viol-bw', 'Bandwidth (× Silverman)', { min: 0.1, max: 3, step: 0.05, value: 1 });
+        const cN = App.makeControl('range', 'viz-viol-n', 'Размер выборки', { min: 50, max: 2000, step: 50, value: 300 });
+        const cDist = App.makeControl('select', 'viz-viol-dist', 'Распределение', {
+          options: [
+            { value: 'bimodal', label: 'Смесь двух нормальных' },
+            { value: 'trimodal', label: 'Смесь трёх нормальных' },
+            { value: 'normal', label: 'Нормальное' },
+            { value: 'skewed', label: 'Log-normal' },
+          ],
+          value: 'bimodal',
+        });
+        [cBw, cN, cDist].forEach(c => ctrl.appendChild(c.wrap));
+        let chart = null;
+        let data = [];
+        function regen() {
+          const n = +cN.input.value;
+          const d = cDist.input.value;
+          data = [];
+          if (d === 'normal') data = App.Util.normalSample(n, 0, 1);
+          else if (d === 'bimodal') {
+            for (let i = 0; i < n; i++) data.push(Math.random() < 0.5 ? App.Util.randn(-2, 0.5) : App.Util.randn(2, 0.5));
+          } else if (d === 'trimodal') {
+            for (let i = 0; i < n; i++) {
+              const r = Math.random();
+              if (r < 0.33) data.push(App.Util.randn(-3, 0.45));
+              else if (r < 0.66) data.push(App.Util.randn(0, 0.45));
+              else data.push(App.Util.randn(3, 0.45));
+            }
+          } else {
+            for (let i = 0; i < n; i++) data.push(Math.exp(App.Util.randn(0, 0.7)));
+          }
+          draw();
+        }
+        function kde(xs, data, bw) {
+          const n = data.length;
+          return xs.map(x => {
+            let s = 0;
+            for (let i = 0; i < n; i++) {
+              const u = (x - data[i]) / bw;
+              s += Math.exp(-0.5 * u * u);
+            }
+            return s / (n * bw * Math.sqrt(2 * Math.PI));
+          });
+        }
+        function draw() {
+          const lo = App.Util.min(data);
+          const hi = App.Util.max(data);
+          const pad = (hi - lo) * 0.1;
+          const xs = App.Util.linspace(lo - pad, hi + pad, 200);
+          const std = App.Util.std(data);
+          const silverman = 1.06 * std * Math.pow(data.length, -1 / 5);
+          const bw = silverman * (+cBw.input.value);
+          const dens = kde(xs, data, bw);
+          // Count modes: local maxima
+          let modes = 0;
+          for (let i = 2; i < dens.length - 2; i++) {
+            if (dens[i] > dens[i - 1] && dens[i] > dens[i - 2] && dens[i] > dens[i + 1] && dens[i] > dens[i + 2] && dens[i] > 0.02) modes++;
+          }
+          // Mirror for violin shape: symmetric dens+/- at x=value axis vertically
+          // Use horizontal chart: x = value, y = density
+          const ctx = container.querySelector('#viz-viol-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: xs.map(x => x.toFixed(2)),
+              datasets: [
+                { label: 'Верх violin (+KDE)', data: dens, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.35)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1 },
+                { label: 'Низ violin (-KDE)', data: dens.map(v => -v), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.35)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1 },
+              ],
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Violin: bw=' + bw.toFixed(3) + ' (× ' + (+cBw.input.value).toFixed(2) + ' от Silverman)' } }, scales: { x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } }, y: { title: { display: true, text: 'Плотность (зеркально)' } } } },
+          });
+          App.registerChart(chart);
+          container.querySelector('#viz-viol-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">Silverman bw</div><div class="stat-value">' + silverman.toFixed(3) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Текущее bw</div><div class="stat-value">' + bw.toFixed(3) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Мод найдено</div><div class="stat-value">' + modes + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Σ under curve</div><div class="stat-value">' + (dens.reduce((s, v) => s + v, 0) * (xs[1] - xs[0])).toFixed(2) + '</div></div>';
+        }
+        cBw.input.addEventListener('input', draw);
+        cN.input.addEventListener('change', regen);
+        cDist.input.addEventListener('change', regen);
+        regen();
+      },
+    },
+
     python: `
 <h3>Violin Plot в Python</h3>
 

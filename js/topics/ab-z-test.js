@@ -436,53 +436,214 @@ p-value = 2×(1 − Φ(3.935)) ≈ <b>0.000083</b> ≪ 0.001</div>
       }
     ],
 
-    simulation: {
-      html: `
-        <h3>Симуляция z-теста для пропорций</h3>
-        <p>Задай истинные конверсии и размер выборки — увидишь, обнаружит ли тест разницу.</p>
-        <div class="sim-container">
-          <div class="sim-controls" id="abz-controls"></div>
-          <div class="sim-buttons"><button class="btn" id="abz-run">🔄 Новый тест</button></div>
-          <div class="sim-output">
-            <div class="sim-chart-wrap"><canvas id="abz-chart"></canvas></div>
-            <div class="sim-stats" id="abz-stats"></div>
+    simulation: [
+      {
+        title: 'Базовый z-тест',
+        html: `
+          <h3>Симуляция z-теста для пропорций</h3>
+          <p>Задай истинные конверсии и размер выборки — увидишь, обнаружит ли тест разницу.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abz-controls"></div>
+            <div class="sim-buttons"><button class="btn" id="abz-run">🔄 Новый тест</button></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abz-chart"></canvas></div>
+              <div class="sim-stats" id="abz-stats"></div>
+            </div>
           </div>
-        </div>
-      `,
-      init(container) {
-        const controls = container.querySelector('#abz-controls');
-        const cNA = App.makeControl('range', 'abz-na', 'n группы A', { min: 100, max: 10000, step: 100, value: 2000 });
-        const cNB = App.makeControl('range', 'abz-nb', 'n группы B', { min: 100, max: 10000, step: 100, value: 2000 });
-        const cPA = App.makeControl('range', 'abz-pa', 'Истинная p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
-        const cPB = App.makeControl('range', 'abz-pb', 'Истинная p(B) %', { min: 1, max: 20, step: 0.5, value: 6.5 });
-        [cNA, cNB, cPA, cPB].forEach(c => controls.appendChild(c.wrap));
-        let chart = null;
-        function run() {
-          const nA = +cNA.input.value, nB = +cNB.input.value;
-          const pA = +cPA.input.value / 100, pB = +cPB.input.value / 100;
-          let sA = 0, sB = 0;
-          for (let i = 0; i < nA; i++) if (Math.random() < pA) sA++;
-          for (let i = 0; i < nB; i++) if (Math.random() < pB) sB++;
-          const crA = sA / nA, crB = sB / nB;
-          const pPool = (sA + sB) / (nA + nB);
-          const se = Math.sqrt(pPool * (1 - pPool) * (1 / nA + 1 / nB));
-          const z = se > 0 ? (crB - crA) / se : 0;
-          const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
-          const sig = pVal < 0.05;
-          const ctx = container.querySelector('#abz-chart').getContext('2d');
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'bar', data: { labels: ['A', 'B'], datasets: [{ data: [crA * 100, crB * 100], backgroundColor: ['rgba(59,130,246,0.6)', sig ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.5)'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Разница значима (p < 0.05)' : '❌ Разница НЕ значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(crA, crB) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
-          });
-          App.registerChart(chart);
-          container.querySelector('#abz-stats').innerHTML = '<div class="stat-card"><div class="stat-label">CR(A)</div><div class="stat-value">' + (crA*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">CR(B)</div><div class="stat-value">' + (crB*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">z-статистика</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>';
-        }
-        [cNA, cNB, cPA, cPB].forEach(c => c.input.addEventListener('input', run));
-        container.querySelector('#abz-run').onclick = run;
-        run();
+        `,
+        init(container) {
+          const controls = container.querySelector('#abz-controls');
+          const cNA = App.makeControl('range', 'abz-na', 'n группы A', { min: 100, max: 10000, step: 100, value: 2000 });
+          const cNB = App.makeControl('range', 'abz-nb', 'n группы B', { min: 100, max: 10000, step: 100, value: 2000 });
+          const cPA = App.makeControl('range', 'abz-pa', 'Истинная p(A) %', { min: 1, max: 20, step: 0.5, value: 5 });
+          const cPB = App.makeControl('range', 'abz-pb', 'Истинная p(B) %', { min: 1, max: 20, step: 0.5, value: 6.5 });
+          [cNA, cNB, cPA, cPB].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          function run() {
+            const nA = +cNA.input.value, nB = +cNB.input.value;
+            const pA = +cPA.input.value / 100, pB = +cPB.input.value / 100;
+            let sA = 0, sB = 0;
+            for (let i = 0; i < nA; i++) if (Math.random() < pA) sA++;
+            for (let i = 0; i < nB; i++) if (Math.random() < pB) sB++;
+            const crA = sA / nA, crB = sB / nB;
+            const pPool = (sA + sB) / (nA + nB);
+            const se = Math.sqrt(pPool * (1 - pPool) * (1 / nA + 1 / nB));
+            const z = se > 0 ? (crB - crA) / se : 0;
+            const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+            const sig = pVal < 0.05;
+            const ctx = container.querySelector('#abz-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar', data: { labels: ['A', 'B'], datasets: [{ data: [crA * 100, crB * 100], backgroundColor: ['rgba(59,130,246,0.6)', sig ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.5)'] }] },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: sig ? '✅ Разница значима (p < 0.05)' : '❌ Разница НЕ значима' } }, scales: { y: { min: 0, suggestedMax: Math.ceil(Math.max(crA, crB) * 100 * 1.3), title: { display: true, text: 'Конверсия %' } } } },
+            });
+            App.registerChart(chart);
+            container.querySelector('#abz-stats').innerHTML = '<div class="stat-card"><div class="stat-label">CR(A)</div><div class="stat-value">' + (crA*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">CR(B)</div><div class="stat-value">' + (crB*100).toFixed(2) + '%</div></div><div class="stat-card"><div class="stat-label">z-статистика</div><div class="stat-value">' + z.toFixed(3) + '</div></div><div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>';
+          }
+          [cNA, cNB, cPA, cPB].forEach(c => c.input.addEventListener('input', run));
+          container.querySelector('#abz-run').onclick = run;
+          run();
+        },
       },
-    },
+      {
+        title: 'Мощность vs n и effect size',
+        html: `
+          <h3>Как $n$ и размер эффекта управляют мощностью</h3>
+          <p>Ключевая интуиция A/B-тестов: чтобы увидеть маленький эффект, нужна большая выборка. Сдвигай $n$ и разницу конверсий — смотри, как меняется <b>мощность</b> (вероятность обнаружить реальный эффект) и ожидаемая $z$-статистика.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abzp-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abzp-chart"></canvas></div>
+              <div class="sim-stats" id="abzp-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abzp-controls');
+          const cBase = App.makeControl('range', 'abzp-base', 'Базовая p(A) %', { min: 1, max: 30, step: 0.5, value: 5 });
+          const cLift = App.makeControl('range', 'abzp-lift', 'Относ. lift % (B vs A)', { min: 1, max: 50, step: 1, value: 10 });
+          const cAlpha = App.makeControl('range', 'abzp-alpha', 'α', { min: 0.01, max: 0.1, step: 0.01, value: 0.05 });
+          [cBase, cLift, cAlpha].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          // Power of two-proportion z-test (two-sided, pooled SE)
+          function power(n, pA, pB, alpha) {
+            const pBar = (pA + pB) / 2;
+            const se0 = Math.sqrt(2 * pBar * (1 - pBar) / n);
+            const se1 = Math.sqrt(pA * (1 - pA) / n + pB * (1 - pB) / n);
+            const zcrit = App.Util.normalCDF ? -inverseNormal(alpha / 2) : 1.96;
+            // mean shift in standardized units
+            const delta = Math.abs(pB - pA);
+            const mu = delta / se1;
+            const crit = zcrit * se0 / se1;
+            // P(|Z*| > crit) where Z* ~ N(mu, 1)
+            return (1 - App.Util.normalCDF(crit - mu)) + App.Util.normalCDF(-crit - mu);
+          }
+          // Abramowitz-Stegun approximation of inverse normal
+          function inverseNormal(p) {
+            if (p <= 0) return -Infinity;
+            if (p >= 1) return Infinity;
+            const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+            const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+            const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+            const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+            const plow = 0.02425, phigh = 1 - plow;
+            let q, r;
+            if (p < plow) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+            if (p <= phigh) { q = p - 0.5; r = q*q; return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+            q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+          }
+          function run() {
+            const pA = +cBase.input.value / 100;
+            const lift = +cLift.input.value / 100;
+            const pB = pA * (1 + lift);
+            const alpha = +cAlpha.input.value;
+            const ns = [];
+            const powers = [];
+            for (let n = 100; n <= 50000; n = Math.round(n * 1.15)) {
+              ns.push(n);
+              powers.push(power(n, pA, pB, alpha) * 100);
+            }
+            // Find n for 80% power
+            let n80 = null;
+            for (let i = 0; i < ns.length; i++) if (powers[i] >= 80 && n80 === null) n80 = ns[i];
+            const ctx = container.querySelector('#abzp-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ns,
+                datasets: [
+                  { label: 'Мощность %', data: powers, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', borderWidth: 2, pointRadius: 0, fill: true },
+                  { label: '80%', data: ns.map(() => 80), borderColor: '#10b981', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Мощность как функция размера выборки' } }, scales: { x: { type: 'logarithmic', title: { display: true, text: 'n на группу (log-scale)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Мощность %' } } } },
+            });
+            App.registerChart(chart);
+            container.querySelector('#abzp-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">p(A)</div><div class="stat-value">' + (pA*100).toFixed(2) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">p(B)</div><div class="stat-value">' + (pB*100).toFixed(2) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Δ (абс.)</div><div class="stat-value">' + ((pB-pA)*100).toFixed(2) + ' п.п.</div></div>' +
+              '<div class="stat-card"><div class="stat-label">n для 80% power</div><div class="stat-value">' + (n80 ? n80.toLocaleString('ru') : '>50k') + '</div></div>';
+          }
+          [cBase, cLift, cAlpha].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+      {
+        title: 'z vs t: сходимость',
+        html: `
+          <h3>Когда z и t дают один ответ</h3>
+          <p>На малых $n$ распределение Стьюдента имеет тяжелее хвосты, чем нормальное — $t$-критическое значение больше $z$. С ростом $n$ они стягиваются. Посмотри, где граница «пофиг, какой тест применять».</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abzt-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abzt-chart"></canvas></div>
+              <div class="sim-stats" id="abzt-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abzt-controls');
+          const cAlpha = App.makeControl('range', 'abzt-alpha', 'α (two-sided)', { min: 0.01, max: 0.2, step: 0.01, value: 0.05 });
+          controls.appendChild(cAlpha.wrap);
+          let chart = null;
+          // Two-sided t critical value — good approximation via Wilson-Hilferty / series
+          // Use simple method: compute from incomplete beta isn't trivial; use a reasonable approximation
+          function tCrit(alpha, df) {
+            // Use normal z for df≥120
+            const z = zCrit(alpha);
+            if (df >= 120) return z;
+            // Approximation (Hill 1970-ish fallback): z * sqrt(df/(df-2)) bias-corrected isn't precise.
+            // Better: use known formula — t_crit ≈ z * (1 + (z^2 + 1)/(4*df) + ...) for small df
+            return z * (1 + (z*z + 1) / (4 * df) + (5*z*z*z*z + 16*z*z + 3) / (96 * df * df));
+          }
+          function zCrit(alpha) {
+            // inverse normal at 1 - alpha/2
+            const p = 1 - alpha / 2;
+            // Beasley-Springer/Moro not needed — simple rational approximation
+            const a = [2.515517, 0.802853, 0.010328];
+            const b = [1.432788, 0.189269, 0.001308];
+            const q = p > 0.5 ? 1 - p : p;
+            const t = Math.sqrt(-2 * Math.log(q));
+            const num = a[0] + a[1]*t + a[2]*t*t;
+            const den = 1 + b[0]*t + b[1]*t*t + b[2]*t*t*t;
+            const x = t - num / den;
+            return p > 0.5 ? x : -x;
+          }
+          function run() {
+            const alpha = +cAlpha.input.value;
+            const dfs = [2,3,4,5,6,8,10,15,20,30,50,100,200,500,1000];
+            const zc = zCrit(alpha);
+            const tcs = dfs.map(df => tCrit(alpha, df));
+            const zs = dfs.map(() => zc);
+            const ctx = container.querySelector('#abzt-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: dfs,
+                datasets: [
+                  { label: 't-критическое', data: tcs, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.15)', borderWidth: 2, pointRadius: 3, fill: false },
+                  { label: 'z-критическое', data: zs, borderColor: '#3b82f6', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 't и z критические значения vs степени свободы' } }, scales: { x: { type: 'logarithmic', title: { display: true, text: 'df (log-scale)' } }, y: { title: { display: true, text: 'Критическое значение' } } } },
+            });
+            App.registerChart(chart);
+            const t30 = tCrit(alpha, 30), t100 = tCrit(alpha, 100);
+            container.querySelector('#abzt-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">z (α=' + alpha.toFixed(2) + ')</div><div class="stat-value">' + zc.toFixed(3) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">t при df=5</div><div class="stat-value">' + tCrit(alpha, 5).toFixed(3) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">t при df=30</div><div class="stat-value">' + t30.toFixed(3) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">t при df=100</div><div class="stat-value">' + t100.toFixed(3) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Разрыв df=30</div><div class="stat-value">' + ((t30-zc)/zc*100).toFixed(1) + '%</div></div>';
+          }
+          cAlpha.input.addEventListener('input', run);
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 z-тест для пропорций в Python</h3>

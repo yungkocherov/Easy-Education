@@ -389,97 +389,319 @@ df['price_vs_category_mean'] = df['price'] / df.groupby('category')['price'].tra
       }
     ],
 
-    simulation: `
-      <div class="sim-container">
-        <div class="sim-controls">
-          <h3>Симуляция: влияние кодирования и масштабирования</h3>
-          <div class="control-group">
-            <label>Метод кодирования:</label>
-            <select id="fe-encoding-type">
-              <option value="label">Label Encoding</option>
-              <option value="ohe" selected>One-Hot Encoding</option>
-              <option value="target">Target Encoding</option>
-              <option value="freq">Frequency Encoding</option>
-            </select>
+    simulation: [
+      {
+        title: 'Кодирование и масштабирование',
+        html: `
+          <h3>Симуляция: кодирование категорий + масштабирование чисел</h3>
+          <p>Выбери метод кодирования категории, метод масштабирования числового признака и включи выброс — посмотри, как разные скейлеры реагируют на экстремальные значения.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="fe-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="fe-chart"></canvas></div>
+              <div class="sim-stats" id="fe-stats"></div>
+              <div id="fe-table" style="margin-top:12px;"></div>
+            </div>
           </div>
-          <div class="control-group">
-            <label>Метод масштабирования:</label>
-            <select id="fe-scaling-type">
-              <option value="none">Без масштабирования</option>
-              <option value="standard" selected>StandardScaler</option>
-              <option value="minmax">MinMaxScaler</option>
-              <option value="robust">RobustScaler</option>
-            </select>
+        `,
+        init(container) {
+          const controls = container.querySelector('#fe-controls');
+          const cEnc = App.makeControl('select', 'fe-enc', 'Кодирование', {
+            options: [
+              { value: 'label', label: 'Label Encoding' },
+              { value: 'ohe', label: 'One-Hot Encoding' },
+              { value: 'target', label: 'Target Encoding' },
+              { value: 'freq', label: 'Frequency Encoding' },
+            ],
+            value: 'ohe',
+          });
+          const cScl = App.makeControl('select', 'fe-scl', 'Масштабирование', {
+            options: [
+              { value: 'none', label: 'Без масштабирования' },
+              { value: 'standard', label: 'StandardScaler' },
+              { value: 'minmax', label: 'MinMaxScaler' },
+              { value: 'robust', label: 'RobustScaler' },
+            ],
+            value: 'standard',
+          });
+          const cOut = App.makeControl('range', 'fe-out', 'Выброс ×', { min: 1, max: 20, step: 1, value: 1 });
+          [cEnc, cScl, cOut].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          const categories = ['Москва', 'Питер', 'Казань', 'Москва', 'Питер', 'Казань', 'Москва', 'Питер', 'Казань'];
+          const targets = [500, 350, 280, 520, 370, 290, 510, 360, 285];
+          const baseValues = [23, 45, 67, 34, 56, 12, 89, 41, 63];
+
+          function run() {
+            const enc = cEnc.input.value;
+            const scl = cScl.input.value;
+            const outK = +cOut.input.value;
+            const rawValues = baseValues.slice();
+            rawValues[8] = 63 * outK;
+
+            const encNames = { label: 'Label', ohe: 'One-Hot', target: 'Target', freq: 'Frequency' };
+            const sclNames = { none: 'сырой', standard: 'Standard', minmax: 'MinMax', robust: 'Robust' };
+
+            let catResult;
+            if (enc === 'label') {
+              const map = { Москва: 0, Питер: 1, Казань: 2 };
+              catResult = categories.map(c => String(map[c]));
+            } else if (enc === 'ohe') {
+              catResult = categories.map(c => '[' + (c === 'Москва' ? '1,0,0' : c === 'Питер' ? '0,1,0' : '0,0,1') + ']');
+            } else if (enc === 'target') {
+              const tmap = {};
+              ['Москва', 'Питер', 'Казань'].forEach(cat => {
+                const vals = targets.filter((_, i) => categories[i] === cat);
+                tmap[cat] = App.Util.mean(vals);
+              });
+              catResult = categories.map(c => tmap[c].toFixed(0));
+            } else {
+              const fmap = {};
+              categories.forEach(c => { fmap[c] = (fmap[c] || 0) + 1; });
+              Object.keys(fmap).forEach(k => { fmap[k] /= categories.length; });
+              catResult = categories.map(c => fmap[c].toFixed(2));
+            }
+
+            const n = rawValues.length;
+            const mean = App.Util.mean(rawValues);
+            const std = App.Util.std(rawValues, false);
+            const mn = Math.min(...rawValues);
+            const mx = Math.max(...rawValues);
+            const q1 = App.Util.quantile(rawValues, 0.25);
+            const q2 = App.Util.quantile(rawValues, 0.5);
+            const q3 = App.Util.quantile(rawValues, 0.75);
+            const iqr = q3 - q1 || 1;
+
+            let scaled;
+            if (scl === 'none') scaled = rawValues.slice();
+            else if (scl === 'standard') scaled = rawValues.map(v => (v - mean) / (std || 1));
+            else if (scl === 'minmax') scaled = rawValues.map(v => (v - mn) / (mx - mn || 1));
+            else scaled = rawValues.map(v => (v - q2) / iqr);
+
+            const ctx = container.querySelector('#fe-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: scaled.map((_, i) => '№' + (i + 1)),
+                datasets: [{
+                  label: sclNames[scl] + ' значение',
+                  data: scaled.map(v => +v.toFixed(3)),
+                  backgroundColor: scaled.map((v, i) => i === 8 && outK > 1 ? 'rgba(239,68,68,0.8)' : 'rgba(59,130,246,0.65)'),
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, title: { display: true, text: 'Масштабированный признак (красный — выброс)' } },
+                scales: { y: { title: { display: true, text: 'Значение после ' + sclNames[scl] } } },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#fe-stats');
+            statsEl.innerHTML = '';
+            const outlierHit = Math.abs(scaled[8]) > (scl === 'robust' ? 20 : 2.5) && outK > 1;
+            const cards = [
+              ['Min / Max', mn + ' / ' + mx],
+              ['Mean / Std', mean.toFixed(1) + ' / ' + std.toFixed(1)],
+              ['Q1 / Q3 / IQR', q1.toFixed(0) + ' / ' + q3.toFixed(0) + ' / ' + iqr.toFixed(0)],
+              ['Выброс после scale', scaled[8].toFixed(2) + (outlierHit ? ' ⚠' : '')],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+
+            const tableEl = container.querySelector('#fe-table');
+            tableEl.innerHTML = `
+              <table class="data-table">
+                <thead><tr><th>№</th><th>Город</th><th>${encNames[enc]}</th><th>Сырой</th><th>${sclNames[scl]}</th></tr></thead>
+                <tbody>
+                  ${rawValues.map((v, i) => `<tr${i === 8 && outK > 1 ? ' style="background:#fef2f2;"' : ''}><td>${i + 1}</td><td>${categories[i]}</td><td>${catResult[i]}</td><td>${v}</td><td>${scaled[i].toFixed(3)}</td></tr>`).join('')}
+                </tbody>
+              </table>
+            `;
+          }
+
+          [cEnc, cScl].forEach(c => c.input.addEventListener('change', run));
+          cOut.input.addEventListener('input', run);
+          run();
+        },
+      },
+      {
+        title: 'Binning непрерывных признаков',
+        html: `
+          <h3>Биннинг: equal-width, equal-frequency, quantile</h3>
+          <p>Непрерывный признак можно разбить на корзины — превратив его в категориальный. Это полезно для линейных моделей (ловят нелинейность), для деревьев — обычно бесполезно. Смотри, как разные стратегии бьют распределение: equal-width даёт «пустые» корзины на хвостах, equal-frequency выравнивает наполнение, но ширина корзин плавает.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="feBin-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="feBin-chart"></canvas></div>
+              <div class="sim-stats" id="feBin-stats"></div>
+            </div>
           </div>
-          <div class="control-group">
-            <label>Добавить выброс:</label>
-            <input type="checkbox" id="fe-add-outlier"> <span>(экстремальное значение × 10)</span>
-          </div>
-          <button class="btn-primary" onclick="runFESimulation()">Применить преобразования</button>
-        </div>
-        <div id="fe-sim-output" class="sim-output">
-          <p style="color:#64748b;">Нажмите «Применить преобразования» чтобы увидеть результат.</p>
-        </div>
-      </div>
-      <script>
-      function runFESimulation() {
-        const encoding = document.getElementById('fe-encoding-type').value;
-        const scaling = document.getElementById('fe-scaling-type').value;
-        const outlier = document.getElementById('fe-add-outlier').checked;
-        const out = document.getElementById('fe-sim-output');
+        `,
+        init(container) {
+          const controls = container.querySelector('#feBin-controls');
+          const cDist = App.makeControl('select', 'feBin-dist', 'Распределение', {
+            options: [
+              { value: 'normal', label: 'Нормальное' },
+              { value: 'lognorm', label: 'LogNormal (скошенное)' },
+              { value: 'bimodal', label: 'Бимодальное' },
+              { value: 'uniform', label: 'Равномерное' },
+            ],
+            value: 'lognorm',
+          });
+          const cStrategy = App.makeControl('select', 'feBin-strat', 'Стратегия', {
+            options: [
+              { value: 'uniform', label: 'Equal-width' },
+              { value: 'quantile', label: 'Equal-frequency (quantile)' },
+              { value: 'kmeans', label: 'KMeans (1D)' },
+            ],
+            value: 'uniform',
+          });
+          const cK = App.makeControl('range', 'feBin-k', 'Число корзин', { min: 2, max: 15, step: 1, value: 5 });
+          const cN = App.makeControl('range', 'feBin-n', 'Размер выборки', { min: 200, max: 3000, step: 100, value: 1000 });
+          [cDist, cStrategy, cK, cN].forEach(c => controls.appendChild(c.wrap));
 
-        const rawValues = outlier ? [23, 45, 67, 34, 56, 12, 89, 41, 630] : [23, 45, 67, 34, 56, 12, 89, 41, 63];
-        const categories = ['Москва','Питер','Казань','Москва','Питер','Казань','Москва','Питер','Казань'];
-        const targets = [500, 350, 280, 520, 370, 290, 510, 360, 285];
+          let chart = null;
 
-        let catResult = [], numResult = [];
+          function sampleDist(type, n) {
+            const out = [];
+            for (let i = 0; i < n; i++) {
+              if (type === 'normal') out.push(App.Util.randn(0, 1));
+              else if (type === 'lognorm') out.push(Math.exp(App.Util.randn(0, 0.7)));
+              else if (type === 'bimodal') out.push(Math.random() < 0.5 ? App.Util.randn(-2, 0.6) : App.Util.randn(2, 0.6));
+              else out.push(Math.random() * 10 - 5);
+            }
+            return out;
+          }
 
-        if (encoding === 'label') {
-          const map = {'Москва':0,'Питер':1,'Казань':2};
-          catResult = categories.map(c => map[c]);
-        } else if (encoding === 'ohe') {
-          catResult = categories.map(c => '[' + (c==='Москва'?'1,0,0':c==='Питер'?'0,1,0':'0,0,1') + ']');
-        } else if (encoding === 'target') {
-          const tmap = {'Москва':510,'Питер':360,'Казань':285};
-          catResult = categories.map(c => tmap[c]);
-        } else {
-          const fmap = {'Москва':0.33,'Питер':0.33,'Казань':0.33};
-          catResult = categories.map(c => fmap[c].toFixed(2));
-        }
+          function computeEdges(data, strategy, k) {
+            if (strategy === 'uniform') {
+              const lo = Math.min(...data), hi = Math.max(...data);
+              const step = (hi - lo) / k;
+              const edges = [];
+              for (let i = 0; i <= k; i++) edges.push(lo + step * i);
+              return edges;
+            }
+            if (strategy === 'quantile') {
+              const edges = [Math.min(...data)];
+              for (let i = 1; i < k; i++) edges.push(App.Util.quantile(data, i / k));
+              edges.push(Math.max(...data));
+              return edges;
+            }
+            // KMeans 1D
+            const sorted = [...data].sort((a, b) => a - b);
+            const centers = [];
+            for (let i = 0; i < k; i++) centers.push(sorted[Math.floor((i + 0.5) * sorted.length / k)]);
+            for (let it = 0; it < 30; it++) {
+              const groups = Array.from({ length: k }, () => []);
+              for (const v of data) {
+                let best = 0, bd = Infinity;
+                for (let j = 0; j < k; j++) {
+                  const d = Math.abs(v - centers[j]);
+                  if (d < bd) { bd = d; best = j; }
+                }
+                groups[best].push(v);
+              }
+              for (let j = 0; j < k; j++) if (groups[j].length) centers[j] = App.Util.mean(groups[j]);
+            }
+            centers.sort((a, b) => a - b);
+            const edges = [Math.min(...data)];
+            for (let i = 0; i < k - 1; i++) edges.push((centers[i] + centers[i + 1]) / 2);
+            edges.push(Math.max(...data));
+            return edges;
+          }
 
-        const n = rawValues.length;
-        const mean = rawValues.reduce((a,b)=>a+b,0)/n;
-        const std = Math.sqrt(rawValues.map(v=>(v-mean)**2).reduce((a,b)=>a+b,0)/n);
-        const mn = Math.min(...rawValues), mx = Math.max(...rawValues);
-        const sorted = [...rawValues].sort((a,b)=>a-b);
-        const q1 = sorted[Math.floor(n*0.25)], q3 = sorted[Math.floor(n*0.75)], q2 = sorted[Math.floor(n*0.5)];
-        const iqr = q3 - q1;
+          function run() {
+            const n = +cN.input.value;
+            const k = +cK.input.value;
+            const data = sampleDist(cDist.input.value, n);
+            const edges = computeEdges(data, cStrategy.input.value, k);
 
-        if (scaling === 'none') numResult = rawValues;
-        else if (scaling === 'standard') numResult = rawValues.map(v => ((v-mean)/std).toFixed(2));
-        else if (scaling === 'minmax') numResult = rawValues.map(v => ((v-mn)/(mx-mn)).toFixed(2));
-        else numResult = rawValues.map(v => ((v-q2)/iqr).toFixed(2));
+            // счётчик по корзинам
+            const counts = new Array(k).fill(0);
+            for (const v of data) {
+              for (let i = 0; i < k; i++) {
+                if (v <= edges[i + 1]) { counts[i]++; break; }
+              }
+            }
+            const widths = [];
+            for (let i = 0; i < k; i++) widths.push(edges[i + 1] - edges[i]);
 
-        const scalingNames = {none:'Без масштабирования', standard:'StandardScaler', minmax:'MinMaxScaler', robust:'RobustScaler'};
-        const encNames = {label:'Label Encoding', ohe:'One-Hot Encoding', target:'Target Encoding', freq:'Frequency Encoding'};
+            const labels = [];
+            for (let i = 0; i < k; i++) labels.push('[' + edges[i].toFixed(1) + ', ' + edges[i + 1].toFixed(1) + ']');
 
-        out.innerHTML = \`
-          <h4>Результат: \${encNames[encoding]} + \${scalingNames[scaling]}</h4>
-          <table class="data-table">
-            <thead><tr><th>№</th><th>Город (сырой)</th><th>Город (\${encNames[encoding]})</th><th>Признак (сырой)</th><th>Признак (\${scalingNames[scaling]})</th></tr></thead>
-            <tbody>
-              \${rawValues.map((v,i)=>\`<tr><td>\${i+1}</td><td>\${categories[i]}</td><td>\${catResult[i]}</td><td>\${v}</td><td>\${numResult[i]}</td></tr>\`).join('')}
-            </tbody>
-          </table>
-          <div style="margin-top:12px;padding:10px;background:#f0fdf4;border-radius:6px;">
-            <b>Статистики числового признака:</b>
-            Мин=\${mn}, Макс=\${mx}, Среднее=\${mean.toFixed(1)}, Std=\${std.toFixed(1)}
-            \${outlier ? '<span style="color:#ef4444;font-weight:600;"> ⚠ Выброс искажает StandardScaler и MinMaxScaler!</span>' : ''}
-          </div>
-        \`;
-      }
-      </script>
-    `,
+            const ctx = container.querySelector('#feBin-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [
+                  {
+                    label: 'Точек в корзине',
+                    data: counts,
+                    backgroundColor: 'rgba(59,130,246,0.65)',
+                    yAxisID: 'y',
+                  },
+                  {
+                    label: 'Ширина корзины',
+                    data: widths,
+                    type: 'line',
+                    borderColor: 'rgba(239,68,68,0.9)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    yAxisID: 'y1',
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Размер и ширина корзин' } },
+                scales: {
+                  x: { ticks: { maxRotation: 40 } },
+                  y: { position: 'left', beginAtZero: true, title: { display: true, text: 'Точек' } },
+                  y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Ширина' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            // метрики качества биннинга
+            const avg = n / k;
+            let maxDev = 0;
+            for (const c of counts) maxDev = Math.max(maxDev, Math.abs(c - avg) / avg);
+            const minCount = Math.min(...counts);
+            const maxCount = Math.max(...counts);
+
+            const statsEl = container.querySelector('#feBin-stats');
+            statsEl.innerHTML = '';
+            const cards = [
+              ['Корзин', k],
+              ['Среднее наполнение', avg.toFixed(0)],
+              ['Min / Max', minCount + ' / ' + maxCount],
+              ['Макс. отклонение', (maxDev * 100).toFixed(0) + '%'],
+              ['Ширина корзин равна?', cStrategy.input.value === 'uniform' ? 'да' : 'нет'],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cK, cN].forEach(c => c.input.addEventListener('input', run));
+          [cDist, cStrategy].forEach(c => c.input.addEventListener('change', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>🐍 Feature Engineering в sklearn</h3>

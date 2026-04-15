@@ -468,8 +468,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Декомпозиция',
+        html: `
         <h3>Симуляция: генератор временного ряда и декомпозиция</h3>
         <p>Настрой тренд, сезонность и шум. Наблюдай исходный ряд, тренд-линию и сезонный паттерн.</p>
         <div class="sim-container">
@@ -607,7 +609,261 @@ App.registerTopic({
         [cTrend, cSeason, cNoise, cPeriod].forEach(c => c.input.addEventListener('input', generate));
         generate();
       },
-    },
+      },
+      {
+        title: 'Стационарность (rolling mean/std)',
+        html: `
+          <h3>Визуальный тест на стационарность</h3>
+          <p>Стационарный ряд имеет постоянное среднее и дисперсию во времени. Если rolling mean ползёт вверх или rolling std «дышит» — ряд нестационарен. Попробуй применить дифференцирование: $\\nabla Y_t = Y_t - Y_{t-1}$ — тренд часто исчезает.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tsStat-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="tsStat-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="tsStat-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="tsStat-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#tsStat-controls');
+          const cTrend = App.makeControl('range', 'tsStat-trend', 'Сила тренда', { min: 0, max: 4, step: 0.2, value: 1.5 });
+          const cNoise = App.makeControl('range', 'tsStat-noise', 'Шум σ', { min: 1, max: 20, step: 1, value: 5 });
+          const cWindow = App.makeControl('range', 'tsStat-win', 'Окно rolling', { min: 4, max: 20, step: 1, value: 8 });
+          const cDiff = App.makeControl('select', 'tsStat-diff', 'Дифференцирование', {
+            options: [
+              { value: '0', label: 'нет' },
+              { value: '1', label: '1-й порядок' },
+            ],
+            value: '0',
+          });
+          [cTrend, cNoise, cWindow, cDiff].forEach(c => controls.appendChild(c.wrap));
+
+          const N = 80;
+          let baseNoise = Array.from({ length: N }, () => App.Util.randn(0, 1));
+          let chart = null;
+
+          function rolling(arr, w, fn) {
+            const out = new Array(arr.length).fill(null);
+            for (let i = w - 1; i < arr.length; i++) {
+              const slice = arr.slice(i - w + 1, i + 1);
+              out[i] = fn(slice);
+            }
+            return out;
+          }
+
+          function update() {
+            const trend = parseFloat(cTrend.input.value);
+            const noiseLevel = parseFloat(cNoise.input.value);
+            const w = parseInt(cWindow.input.value, 10);
+            const doDiff = cDiff.input.value === '1';
+
+            let labels = [];
+            let Y = [];
+            for (let t = 0; t < N; t++) {
+              labels.push('t' + (t + 1));
+              Y.push(100 + trend * t + 8 * Math.sin((2 * Math.PI * t) / 12) + baseNoise[t] * noiseLevel);
+            }
+
+            if (doDiff) {
+              const dY = [];
+              const dLabels = [];
+              for (let t = 1; t < N; t++) {
+                dY.push(Y[t] - Y[t - 1]);
+                dLabels.push(labels[t]);
+              }
+              Y = dY;
+              labels = dLabels;
+            }
+
+            const rMean = rolling(Y, w, (s) => s.reduce((a, b) => a + b, 0) / s.length);
+            const rStd = rolling(Y, w, (s) => {
+              const m = s.reduce((a, b) => a + b, 0) / s.length;
+              return Math.sqrt(s.reduce((a, b) => a + (b - m) ** 2, 0) / s.length);
+            });
+
+            const ctx = container.querySelector('#tsStat-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'Ряд Y_t', data: Y, borderColor: 'rgba(99,102,241,0.85)', backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 2, pointRadius: 1, fill: true, tension: 0.2 },
+                  { label: 'Rolling mean', data: rMean, borderColor: 'rgba(220,38,38,0.95)', borderWidth: 2.5, pointRadius: 0, fill: false },
+                  { label: 'Rolling std', data: rStd, borderColor: 'rgba(234,88,12,0.9)', borderDash: [5, 3], borderWidth: 2, pointRadius: 0, fill: false, yAxisID: 'y1' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: doDiff ? 'Ряд после дифференцирования' : 'Исходный ряд' }, legend: { position: 'top' } },
+                scales: {
+                  x: { ticks: { maxTicksLimit: 12 } },
+                  y: { title: { display: true, text: 'значение' } },
+                  y1: { position: 'right', title: { display: true, text: 'std' }, grid: { drawOnChartArea: false } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            // Тест «стационарности»: сравнить mean/std первой и второй половины
+            const half = Math.floor(Y.length / 2);
+            const h1 = Y.slice(0, half), h2 = Y.slice(half);
+            const m1 = App.Util.mean(h1), m2 = App.Util.mean(h2);
+            const s1 = App.Util.std(h1), s2 = App.Util.std(h2);
+            const drift = Math.abs(m2 - m1);
+            const spreadDiff = Math.abs(s2 - s1);
+            const stationary = drift < 0.5 * s1 && spreadDiff < 0.4 * s1;
+
+            container.querySelector('#tsStat-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Mean (1-я пол.)</div><div class="stat-value">' + m1.toFixed(1) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Mean (2-я пол.)</div><div class="stat-value">' + m2.toFixed(1) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">|Δ mean|</div><div class="stat-value">' + drift.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Вердикт</div><div class="stat-value">' + (stationary ? '≈ стац.' : 'нестац.') + '</div></div>';
+          }
+
+          [cTrend, cNoise, cWindow, cDiff].forEach(c => c.input.addEventListener('input', update));
+          container.querySelector('#tsStat-regen').onclick = () => {
+            baseNoise = Array.from({ length: N }, () => App.Util.randn(0, 1));
+            update();
+          };
+          update();
+        },
+      },
+      {
+        title: 'ARIMA vs наивный прогноз',
+        html: `
+          <h3>Прогноз: наивный (Y_{t-1}) vs сезонно-наивный vs AR(1)</h3>
+          <p>На одном и том же ряде сравниваем три простых прогноза. Увеличивай сезонность — и смотри, как сезонно-наивный начинает обходить остальных. Уменьшай шум — AR(1) становится заметно точнее.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tsFcst-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="tsFcst-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="tsFcst-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="tsFcst-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#tsFcst-controls');
+          const cTrend = App.makeControl('range', 'tsFcst-trend', 'Тренд', { min: 0, max: 3, step: 0.25, value: 1 });
+          const cSeason = App.makeControl('range', 'tsFcst-season', 'Сезонность (амплитуда)', { min: 0, max: 30, step: 1, value: 15 });
+          const cNoise = App.makeControl('range', 'tsFcst-noise', 'Шум σ', { min: 1, max: 20, step: 1, value: 5 });
+          const cPhi = App.makeControl('range', 'tsFcst-phi', 'AR(1) коэф. φ', { min: -0.9, max: 0.9, step: 0.1, value: 0.6 });
+          [cTrend, cSeason, cNoise, cPhi].forEach(c => controls.appendChild(c.wrap));
+
+          const N = 48;       // train
+          const H = 12;       // горизонт
+          const period = 12;
+          let noiseSeed = Array.from({ length: N + H }, () => App.Util.randn(0, 1));
+          let chart = null;
+
+          function update() {
+            const trend = parseFloat(cTrend.input.value);
+            const seasonAmp = parseFloat(cSeason.input.value);
+            const noise = parseFloat(cNoise.input.value);
+            const phi = parseFloat(cPhi.input.value);
+
+            // Генерация: тренд + сезонность + AR(1) процесс шума
+            const full = [];
+            let prevAR = 0;
+            for (let t = 0; t < N + H; t++) {
+              prevAR = phi * prevAR + noiseSeed[t] * noise;
+              full.push(100 + trend * t + seasonAmp * Math.sin((2 * Math.PI * t) / period) + prevAR);
+            }
+            const train = full.slice(0, N);
+            const test = full.slice(N);
+
+            // Прогнозы на горизонте H
+            const naive = new Array(H).fill(train[N - 1]);
+            const seasonalNaive = [];
+            for (let h = 0; h < H; h++) seasonalNaive.push(train[N - period + (h % period)]);
+
+            // AR(1) оценка на центрированном разностном ряде
+            const diff = [];
+            for (let t = 1; t < N; t++) diff.push(train[t] - train[t - 1]);
+            const mD = App.Util.mean(diff);
+            let num = 0, den = 0;
+            for (let t = 1; t < diff.length; t++) {
+              num += (diff[t] - mD) * (diff[t - 1] - mD);
+              den += (diff[t - 1] - mD) ** 2;
+            }
+            const phiHat = den > 0 ? num / den : 0;
+            // Прогноз: Y_{N+h} = Y_{N-1+h} + mD + phiHat * (last_diff - mD)
+            const ar = [];
+            let lastY = train[N - 1];
+            let lastD = train[N - 1] - train[N - 2];
+            for (let h = 0; h < H; h++) {
+              const dHat = mD + phiHat * (lastD - mD);
+              lastY = lastY + dHat;
+              lastD = dHat;
+              ar.push(lastY);
+            }
+
+            function rmse(pred) {
+              let s = 0;
+              for (let i = 0; i < H; i++) s += (pred[i] - test[i]) ** 2;
+              return Math.sqrt(s / H);
+            }
+            const rmseN = rmse(naive);
+            const rmseS = rmse(seasonalNaive);
+            const rmseA = rmse(ar);
+
+            const labels = [];
+            for (let t = 0; t < N + H; t++) labels.push('t' + (t + 1));
+            const pad = (arr, offset) => {
+              const out = new Array(labels.length).fill(null);
+              for (let i = 0; i < arr.length; i++) out[offset + i] = arr[i];
+              return out;
+            };
+
+            const ctx = container.querySelector('#tsFcst-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'Train', data: pad(train, 0), borderColor: 'rgba(99,102,241,0.85)', borderWidth: 2, pointRadius: 1, fill: false },
+                  { label: 'Test (факт)', data: pad(test, N), borderColor: 'rgba(15,23,42,0.9)', borderWidth: 2.5, pointRadius: 2, fill: false },
+                  { label: 'Naive', data: pad(naive, N), borderColor: 'rgba(239,68,68,0.9)', borderDash: [4, 3], borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'Seasonal naive', data: pad(seasonalNaive, N), borderColor: 'rgba(245,158,11,0.9)', borderDash: [6, 3], borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'AR(1) на diff', data: pad(ar, N), borderColor: 'rgba(16,185,129,0.95)', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Прогноз на горизонт H=' + H }, legend: { position: 'top' } },
+                scales: { x: { ticks: { maxTicksLimit: 12 } } },
+              },
+            });
+            App.registerChart(chart);
+
+            function badge(val, best) {
+              const cls = Math.abs(val - best) < 1e-9 ? 'stat-value' : 'stat-value';
+              return '<div class="' + cls + '">' + val.toFixed(2) + '</div>';
+            }
+            const best = Math.min(rmseN, rmseS, rmseA);
+            const winner = best === rmseA ? 'AR(1)' : best === rmseS ? 'Seasonal naive' : 'Naive';
+            container.querySelector('#tsFcst-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">RMSE Naive</div>' + badge(rmseN, best) + '</div>' +
+              '<div class="stat-card"><div class="stat-label">RMSE Seasonal</div>' + badge(rmseS, best) + '</div>' +
+              '<div class="stat-card"><div class="stat-label">RMSE AR(1)</div>' + badge(rmseA, best) + '</div>' +
+              '<div class="stat-card"><div class="stat-label">Победитель</div><div class="stat-value">' + winner + '</div></div>';
+          }
+
+          [cTrend, cSeason, cNoise, cPhi].forEach(c => c.input.addEventListener('input', update));
+          container.querySelector('#tsFcst-regen').onclick = () => {
+            noiseSeed = Array.from({ length: N + H }, () => App.Util.randn(0, 1));
+            update();
+          };
+          update();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: анализ временных рядов</h3>

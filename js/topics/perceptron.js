@@ -504,10 +504,11 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [{
+      title: 'Сходимость на разделимых данных',
       html: `
         <h3>Симуляция: обучение перцептрона</h3>
-        <p>Посмотри, как меняется граница на каждом шаге. Клик по полю — добавить точку.</p>
+        <p>Посмотри, как меняется граница на каждом шаге. Клик по полю — добавить точку. Уменьши разделимость до &lt;1 — классы начнут пересекаться, и перцептрон <b>зациклится</b> (ошибки никогда не уйдут в 0).</p>
         <div class="sim-container">
           <div class="sim-controls" id="perc-controls"></div>
           <div class="sim-buttons">
@@ -638,7 +639,182 @@ App.registerTopic({
         setTimeout(() => { genData(); resize(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+    }, {
+      title: 'Провал на XOR и спасение через φ(x)',
+      html: `
+        <h3>Катастрофа XOR — и как её обходят</h3>
+        <p>Классический контрпример Минского-Паперта: XOR. Четыре точки, два класса, но <b>ни одна прямая</b> их не разделит. Перцептрон на исходных $(x_1, x_2)$ будет вечно колебаться. Включи <b>признак $x_1 \\cdot x_2$</b> — и перцептрон мгновенно сойдётся в расширенном пространстве. Это прообраз kernel trick и первый слой MLP.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="perc2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="perc2-step">▶ 5 проходов</button>
+            <button class="btn" id="perc2-train">⏩ 100 проходов</button>
+            <button class="btn secondary" id="perc2-reset">↺ Сбросить</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap" style="height:380px;padding:0;"><canvas id="perc2-canvas" class="sim-canvas"></canvas></div>
+            <div class="sim-stats" id="perc2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#perc2-controls');
+        const cTask = App.makeControl('select', 'perc2-task', 'Задача', {
+          options: [
+            { value: 'xor', label: 'XOR (неразделим линейно)' },
+            { value: 'and', label: 'AND (разделим)' },
+            { value: 'or',  label: 'OR  (разделим)' },
+          ],
+          value: 'xor',
+        });
+        const cFeat = App.makeControl('select', 'perc2-feat', 'Пространство признаков', {
+          options: [
+            { value: 'raw',  label: 'Сырой  φ(x) = (x₁, x₂)' },
+            { value: 'prod', label: 'С произведением φ(x) = (x₁, x₂, x₁·x₂)' },
+          ],
+          value: 'raw',
+        });
+        [cTask, cFeat].forEach(c => controls.appendChild(c.wrap));
+
+        const canvas = container.querySelector('#perc2-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];   // {x1, x2, cls: ±1}
+        let w = [];        // variable length
+        let epoch = 0;
+        let errHistory = [];
+
+        function task() { return cTask.input.value; }
+        function feat() { return cFeat.input.value; }
+
+        function genData() {
+          // Classic 4-point binary logic tasks; add a little noise so it's not degenerate
+          const base = [
+            [0, 0], [0, 1], [1, 0], [1, 1],
+          ];
+          let labels;
+          if (task() === 'xor') labels = [-1, 1, 1, -1];
+          else if (task() === 'and') labels = [-1, -1, -1, 1];
+          else labels = [-1, 1, 1, 1];
+          points = [];
+          for (let k = 0; k < 8; k++) {
+            base.forEach((p, i) => {
+              points.push({
+                x1: p[0] + App.Util.randn(0, 0.04),
+                x2: p[1] + App.Util.randn(0, 0.04),
+                cls: labels[i],
+              });
+            });
+          }
+          reset();
+        }
+
+        function phi(p) {
+          // returns feature vector incl. bias as first entry
+          if (feat() === 'raw') return [1, p.x1, p.x2];
+          return [1, p.x1, p.x2, p.x1 * p.x2];
+        }
+
+        function reset() {
+          const sample = points[0] || { x1: 0, x2: 0 };
+          w = new Array(phi(sample).length).fill(0);
+          epoch = 0;
+          errHistory = [];
+          draw();
+        }
+
+        function oneEpoch() {
+          let err = 0;
+          const shuffled = App.Util.shuffle(points);
+          shuffled.forEach(p => {
+            const x = phi(p);
+            let z = 0;
+            for (let i = 0; i < w.length; i++) z += w[i] * x[i];
+            const pred = z >= 0 ? 1 : -1;
+            if (pred !== p.cls) {
+              for (let i = 0; i < w.length; i++) w[i] += 0.5 * p.cls * x[i];
+              err++;
+            }
+          });
+          epoch++;
+          errHistory.push(err);
+          return err;
+        }
+
+        function trainMany(n) {
+          for (let i = 0; i < n; i++) {
+            if (oneEpoch() === 0) break;
+          }
+          draw();
+        }
+
+        function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+        function predictPoint(x1, x2) {
+          const x = feat() === 'raw' ? [1, x1, x2] : [1, x1, x2, x1 * x2];
+          let z = 0; for (let i = 0; i < w.length; i++) z += w[i] * x[i];
+          return z;
+        }
+
+        function draw() {
+          if (!canvas.width) return;
+          const W = canvas.width, H = canvas.height;
+          const xMin = -0.4, xMax = 1.4;
+          const toC = (x, y) => [((x - xMin) / (xMax - xMin)) * W, ((xMax - y) / (xMax - xMin)) * H];
+          ctx.clearRect(0, 0, W, H);
+          // fill grid — shows the nonlinear boundary when φ includes x1*x2
+          const step = 10;
+          for (let px = 0; px < W; px += step) {
+            for (let py = 0; py < H; py += step) {
+              const x1 = xMin + (px / W) * (xMax - xMin);
+              const x2 = xMax - (py / H) * (xMax - xMin);
+              const z = predictPoint(x1, x2);
+              ctx.fillStyle = z >= 0 ? 'rgba(59,130,246,0.14)' : 'rgba(239,68,68,0.14)';
+              ctx.fillRect(px, py, step, step);
+            }
+          }
+          // draw the four canonical corner labels
+          const corners = [
+            { x1: 0, x2: 0 }, { x1: 0, x2: 1 }, { x1: 1, x2: 0 }, { x1: 1, x2: 1 },
+          ];
+          ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left';
+          corners.forEach(c => {
+            const [cx, cy] = toC(c.x1, c.x2);
+            ctx.fillText(`(${c.x1},${c.x2})`, cx + 10, cy - 8);
+          });
+          // points
+          points.forEach(p => {
+            const [cx, cy] = toC(p.x1, p.x2);
+            ctx.fillStyle = p.cls === 1 ? '#3b82f6' : '#ef4444';
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+          });
+
+          // stats
+          let correct = 0;
+          points.forEach(p => { if ((predictPoint(p.x1, p.x2) >= 0 ? 1 : -1) === p.cls) correct++; });
+          const acc = (correct / points.length * 100).toFixed(0);
+          const lastErrs = errHistory.slice(-5).join(', ') || '—';
+          const wStr = w.map((v, i) => `w<sub>${i}</sub>=${v.toFixed(2)}`).join(' ');
+          container.querySelector('#perc2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Задача</div><div class="stat-value" style="font-size:14px;">${task().toUpperCase()}</div></div>
+            <div class="stat-card"><div class="stat-label">φ(x)</div><div class="stat-value" style="font-size:12px;">${feat() === 'raw' ? '(x₁, x₂)' : '(x₁, x₂, x₁·x₂)'}</div></div>
+            <div class="stat-card"><div class="stat-label">Эпоха</div><div class="stat-value">${epoch}</div></div>
+            <div class="stat-card"><div class="stat-label">Accuracy</div><div class="stat-value">${acc}%</div></div>
+            <div class="stat-card"><div class="stat-label">Ошибок (5 последних)</div><div class="stat-value" style="font-size:13px;">${lastErrs}</div></div>
+            <div class="stat-card" style="min-width:220px;"><div class="stat-label">Веса</div><div class="stat-value" style="font-size:12px;">${wStr}</div></div>
+          `;
+        }
+
+        cTask.input.addEventListener('change', genData);
+        cFeat.input.addEventListener('change', reset);
+        container.querySelector('#perc2-step').onclick = () => { trainMany(5); };
+        container.querySelector('#perc2-train').onclick = () => { trainMany(100); };
+        container.querySelector('#perc2-reset').onclick = reset;
+
+        setTimeout(() => { genData(); resize(); }, 50);
+        window.addEventListener('resize', resize);
+      },
+    }],
 
     python: `
       <h3>Перцептрон на Python</h3>

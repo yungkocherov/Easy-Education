@@ -552,8 +552,10 @@ LTV/CAC = 26 250 / 12 000 = <b>2.19</b>  ← ниже нормы (≥3)
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Воронка',
+        html: `
         <h3>Симуляция: воронка конверсий</h3>
         <p>Настрой конверсию на каждом шаге и число пользователей. Наблюдай, где теряется больше всего.</p>
         <div class="sim-container">
@@ -644,7 +646,166 @@ LTV/CAC = 26 250 / 12 000 = <b>2.19</b>  ← ниже нормы (≥3)
         [cUsers, cS1, cS2, cS3, cS4].forEach(c => c.input.addEventListener('input', update));
         update();
       },
-    },
+      },
+      {
+        title: 'Cohort retention',
+        html: `
+          <h3>Heatmap когортного retention</h3>
+          <p>Каждая строка — когорта (неделя регистрации), столбцы — дни жизни. Цвет ячейки — доля когорты, вернувшаяся в этот день. Сравни разные скорости затухания и эффект «липкости»: что случится, если D1 поднимется с 40% до 60%?</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="pa-cohort-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:auto;padding:0;"><div id="pa-cohort-grid" style="padding:12px;"></div></div>
+              <div class="sim-stats" id="pa-cohort-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#pa-cohort-controls');
+          const cD1 = App.makeControl('range', 'pa-d1', 'D1 retention %', { min: 10, max: 90, step: 5, value: 45 });
+          const cDecay = App.makeControl('range', 'pa-decay', 'Скорость затухания', { min: 0.01, max: 0.2, step: 0.01, value: 0.08 });
+          const cFloor = App.makeControl('range', 'pa-floor', 'Floor (вечные юзеры) %', { min: 0, max: 30, step: 1, value: 10 });
+          const cTrend = App.makeControl('range', 'pa-trend', 'Тренд когорт (%/нед)', { min: -3, max: 3, step: 0.5, value: 0.5 });
+          [cD1, cDecay, cFloor, cTrend].forEach(c => controls.appendChild(c.wrap));
+
+          function draw() {
+            const d1 = parseFloat(cD1.input.value) / 100;
+            const decay = parseFloat(cDecay.input.value);
+            const floor = parseFloat(cFloor.input.value) / 100;
+            const trend = parseFloat(cTrend.input.value) / 100;
+            const cohorts = 8;
+            const days = [0, 1, 3, 7, 14, 21, 30];
+
+            function cell(cohortIdx, d) {
+              if (d === 0) return 1;
+              const tr = d1 + cohortIdx * trend;
+              const base = Math.max(floor, Math.min(0.95, tr) * Math.exp(-decay * (d - 1)) + floor * (1 - Math.exp(-decay * (d - 1))));
+              return Math.max(0, Math.min(1, base));
+            }
+
+            function color(v) {
+              // 0 → белый, 1 → насыщенный оранжевый
+              const t = Math.max(0, Math.min(1, v));
+              const r = Math.round(255 - (255 - 217) * t);
+              const g = Math.round(255 - (255 - 95) * t);
+              const b = Math.round(255 - (255 - 14) * t);
+              return 'rgb(' + r + ',' + g + ',' + b + ')';
+            }
+
+            let html = '<table style="border-collapse:collapse;font-size:12px;margin:0 auto;">';
+            html += '<tr><th style="padding:4px 8px;">Когорта</th>';
+            days.forEach(d => { html += '<th style="padding:4px 8px;">D' + d + '</th>'; });
+            html += '</tr>';
+            for (let c = 0; c < cohorts; c++) {
+              html += '<tr><th style="padding:4px 8px;text-align:left;">W' + (c + 1) + '</th>';
+              days.forEach(d => {
+                const v = cell(c, d);
+                const txt = d === 0 ? '100%' : (v * 100).toFixed(0) + '%';
+                const fg = v > 0.5 ? '#fff' : '#0f172a';
+                html += '<td style="width:52px;height:28px;text-align:center;border:1px solid #e2e8f0;background:' + color(v) + ';color:' + fg + ';font-weight:600;">' + txt + '</td>';
+              });
+              html += '</tr>';
+            }
+            html += '</table>';
+            container.querySelector('#pa-cohort-grid').innerHTML = html;
+
+            // Средний D7 и D30 по когортам
+            let sum7 = 0, sum30 = 0;
+            for (let c = 0; c < cohorts; c++) { sum7 += cell(c, 7); sum30 += cell(c, 30); }
+            const avg7 = sum7 / cohorts * 100;
+            const avg30 = sum30 / cohorts * 100;
+            // LTV proxy: сумма по дням 0..30
+            let ltv = 0;
+            for (let d = 0; d <= 30; d++) ltv += cell(0, d);
+            container.querySelector('#pa-cohort-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Средний D7</div><div class="stat-value">' + avg7.toFixed(0) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Средний D30</div><div class="stat-value">' + avg30.toFixed(0) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Σ дней (0..30, 1-я когорта)</div><div class="stat-value">' + ltv.toFixed(1) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Тренд</div><div class="stat-value">' + (trend >= 0 ? '↑' : '↓') + ' ' + Math.abs(trend * 100).toFixed(1) + '%/нед</div></div>';
+          }
+
+          [cD1, cDecay, cFloor, cTrend].forEach(c => c.input.addEventListener('input', draw));
+          draw();
+        },
+      },
+      {
+        title: 'North Star vs vanity',
+        html: `
+          <h3>North Star метрика vs vanity metrics</h3>
+          <p>Вливаем маркетинговый бюджет — регистрации растут вверх (vanity). Но если retention и активация слабые, North Star (активные пользователи, реально использующие продукт) почти не двигается. Меняй бюджет и качество продукта — смотри, как расходятся кривые.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="pa-ns-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="pa-ns-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="pa-ns-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#pa-ns-controls');
+          const cBudget = App.makeControl('range', 'pa-ns-budget', 'Рост маркетинг-бюджета %/нед', { min: 0, max: 30, step: 1, value: 15 });
+          const cAct = App.makeControl('range', 'pa-ns-act', 'Активация %', { min: 5, max: 80, step: 1, value: 30 });
+          const cRet = App.makeControl('range', 'pa-ns-ret', 'Weekly retention %', { min: 30, max: 95, step: 1, value: 70 });
+          [cBudget, cAct, cRet].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function run() {
+            const growth = parseFloat(cBudget.input.value) / 100;
+            const act = parseFloat(cAct.input.value) / 100;
+            const ret = parseFloat(cRet.input.value) / 100;
+            const weeks = 16;
+            const labels = [];
+            const signups = [];    // vanity — кумулятивно
+            const dau = [];        // vanity — ежедневные заходы
+            const nsActive = [];   // North Star
+
+            let base = 1000;
+            let activeUsers = 0;
+            for (let w = 0; w < weeks; w++) {
+              labels.push('W' + (w + 1));
+              const newSign = Math.round(base * (1 + growth) ** w);
+              const newActive = newSign * act;
+              activeUsers = activeUsers * ret + newActive;
+              signups.push(newSign);
+              // DAU: все кто открыл, даже если не активированы (просто зашли)
+              dau.push(Math.round(newSign * 0.6 + activeUsers * 0.9));
+              nsActive.push(Math.round(activeUsers));
+            }
+
+            const ctx = container.querySelector('#pa-ns-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'Регистрации (vanity)', data: signups, borderColor: 'rgba(148,163,184,0.8)', borderDash: [6, 3], borderWidth: 2, pointRadius: 2, fill: false },
+                  { label: 'DAU (vanity)', data: dau, borderColor: 'rgba(245,158,11,0.85)', borderWidth: 2, pointRadius: 2, fill: false },
+                  { label: 'North Star: активные', data: nsActive, borderColor: 'rgba(16,185,129,0.95)', backgroundColor: 'rgba(16,185,129,0.12)', borderWidth: 3, pointRadius: 2, fill: true },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Vanity растут от бюджета, North Star — только от продукта' }, legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } },
+              },
+            });
+            App.registerChart(chart);
+
+            const ratio = signups[weeks - 1] > 0 ? (nsActive[weeks - 1] / signups[weeks - 1] * 100) : 0;
+            container.querySelector('#pa-ns-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Регистраций W16</div><div class="stat-value">' + signups[weeks - 1].toLocaleString() + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">NS активных W16</div><div class="stat-value">' + nsActive[weeks - 1].toLocaleString() + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">NS / регистрации</div><div class="stat-value">' + ratio.toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Retention × активация</div><div class="stat-value">' + (ret * act * 100).toFixed(1) + '%</div></div>';
+          }
+
+          [cBudget, cAct, cRet].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Когортный анализ Retention в Pandas</h3>

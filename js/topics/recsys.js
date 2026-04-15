@@ -596,6 +596,396 @@ App.registerTopic({
       },
     ],
 
+    simulation: [
+      {
+        title: 'Collaborative filtering',
+        html: `
+          <h3>Заполнение матрицы user × item</h3>
+          <p>Серая сетка — матрица оценок. Синие ячейки — известные оценки, белые — пропуски. User-based CF: для предсказания ячейки (u, i) берутся соседи пользователя $u$ по косинусному сходству и усредняется их оценка на item $i$. Нажми «Предсказать» — пустые ячейки заполнятся.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="rcf-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="rcf-predict">▶ Предсказать</button>
+              <button class="btn secondary" id="rcf-reset">↺ Сброс</button>
+              <button class="btn secondary" id="rcf-regen">🔄 Новая матрица</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:auto;padding:0;"><div id="rcf-grid" style="padding:12px;"></div></div>
+              <div class="sim-stats" id="rcf-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#rcf-controls');
+          const cSparsity = App.makeControl('range', 'rcf-sparsity', 'Плотность известных оценок', { min: 0.2, max: 0.9, step: 0.05, value: 0.5 });
+          const cK = App.makeControl('range', 'rcf-k', 'Соседей (k)', { min: 1, max: 5, step: 1, value: 3 });
+          [cSparsity, cK].forEach(c => controls.appendChild(c.wrap));
+
+          const U = 8, I = 10;
+          let R = [];           // истинная матрица
+          let mask = [];        // какие ячейки известны
+          let predicted = null;
+
+          function regen() {
+            // 2 латентных фактора по каждому юзеру и item → оценка 1..5
+            R = [];
+            const uFactors = Array.from({ length: U }, () => [Math.random(), Math.random()]);
+            const iFactors = Array.from({ length: I }, () => [Math.random(), Math.random()]);
+            for (let u = 0; u < U; u++) {
+              const row = [];
+              for (let i = 0; i < I; i++) {
+                const s = uFactors[u][0] * iFactors[i][0] + uFactors[u][1] * iFactors[i][1];
+                row.push(Math.max(1, Math.min(5, Math.round(1 + 4 * s + App.Util.randn(0, 0.2)))));
+              }
+              R.push(row);
+            }
+            mask = [];
+            const dens = parseFloat(cSparsity.input.value);
+            for (let u = 0; u < U; u++) {
+              const row = [];
+              for (let i = 0; i < I; i++) row.push(Math.random() < dens ? 1 : 0);
+              mask.push(row);
+            }
+            predicted = null;
+            draw();
+          }
+
+          function predict() {
+            const k = parseInt(cK.input.value, 10);
+            predicted = Array.from({ length: U }, () => new Array(I).fill(null));
+            // Косинусное сходство по известным пересечениям
+            function sim(u, v) {
+              let dot = 0, nu = 0, nv = 0, common = 0;
+              for (let i = 0; i < I; i++) {
+                if (mask[u][i] && mask[v][i]) {
+                  dot += R[u][i] * R[v][i];
+                  nu += R[u][i] * R[u][i];
+                  nv += R[v][i] * R[v][i];
+                  common++;
+                }
+              }
+              if (common < 1 || nu === 0 || nv === 0) return 0;
+              return dot / (Math.sqrt(nu) * Math.sqrt(nv));
+            }
+
+            for (let u = 0; u < U; u++) {
+              for (let i = 0; i < I; i++) {
+                if (mask[u][i]) continue;
+                // ближайшие соседи, у которых известна i
+                const neigh = [];
+                for (let v = 0; v < U; v++) {
+                  if (v === u || !mask[v][i]) continue;
+                  neigh.push({ v, s: sim(u, v) });
+                }
+                neigh.sort((a, b) => b.s - a.s);
+                const top = neigh.slice(0, k).filter(n => n.s > 0);
+                if (top.length === 0) {
+                  // fallback: среднее по item
+                  let sum = 0, cnt = 0;
+                  for (let v = 0; v < U; v++) if (mask[v][i]) { sum += R[v][i]; cnt++; }
+                  predicted[u][i] = cnt > 0 ? sum / cnt : 3;
+                } else {
+                  let num = 0, den = 0;
+                  top.forEach(n => { num += n.s * R[n.v][i]; den += n.s; });
+                  predicted[u][i] = num / den;
+                }
+              }
+            }
+            draw();
+          }
+
+          function colorFor(val) {
+            // 1 → красный, 5 → зелёный
+            const t = (val - 1) / 4;
+            const r = Math.round(239 - t * (239 - 16));
+            const g = Math.round(68 + t * (185 - 68));
+            const b = Math.round(68 + t * (129 - 68));
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+          }
+
+          function draw() {
+            const grid = container.querySelector('#rcf-grid');
+            let html = '<table style="border-collapse:collapse;font-size:12px;margin:0 auto;">';
+            html += '<tr><th></th>';
+            for (let i = 0; i < I; i++) html += '<th style="padding:4px 6px;">i' + (i + 1) + '</th>';
+            html += '</tr>';
+            for (let u = 0; u < U; u++) {
+              html += '<tr><th style="padding:4px 6px;">u' + (u + 1) + '</th>';
+              for (let i = 0; i < I; i++) {
+                if (mask[u][i]) {
+                  html += '<td style="width:34px;height:28px;text-align:center;border:1px solid #cbd5e1;background:' + colorFor(R[u][i]) + ';color:#fff;font-weight:600;">' + R[u][i] + '</td>';
+                } else if (predicted && predicted[u][i] != null) {
+                  const v = predicted[u][i];
+                  html += '<td style="width:34px;height:28px;text-align:center;border:1px dashed #94a3b8;background:' + colorFor(v) + ';color:#fff;opacity:0.7;font-style:italic;">' + v.toFixed(1) + '</td>';
+                } else {
+                  html += '<td style="width:34px;height:28px;text-align:center;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;">·</td>';
+                }
+              }
+              html += '</tr>';
+            }
+            html += '</table>';
+            html += '<div style="margin-top:10px;font-size:12px;color:#64748b;text-align:center;">Синяя сетка — известные оценки (1-5). Прозрачные курсивные — предсказания CF.</div>';
+            grid.innerHTML = html;
+
+            // RMSE по предсказанным
+            let total = 0, cnt = 0;
+            if (predicted) {
+              for (let u = 0; u < U; u++) for (let i = 0; i < I; i++) {
+                if (!mask[u][i] && predicted[u][i] != null) {
+                  total += (predicted[u][i] - R[u][i]) ** 2;
+                  cnt++;
+                }
+              }
+            }
+            const rmse = cnt > 0 ? Math.sqrt(total / cnt) : null;
+            let known = 0;
+            for (let u = 0; u < U; u++) for (let i = 0; i < I; i++) if (mask[u][i]) known++;
+            container.querySelector('#rcf-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Известно</div><div class="stat-value">' + known + '/' + (U * I) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Плотность</div><div class="stat-value">' + (known / (U * I) * 100).toFixed(0) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Предсказано</div><div class="stat-value">' + cnt + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">RMSE</div><div class="stat-value">' + (rmse == null ? '—' : rmse.toFixed(2)) + '</div></div>';
+          }
+
+          [cSparsity].forEach(c => c.input.addEventListener('change', regen));
+          container.querySelector('#rcf-predict').onclick = predict;
+          container.querySelector('#rcf-reset').onclick = () => { predicted = null; draw(); };
+          container.querySelector('#rcf-regen').onclick = regen;
+          regen();
+        },
+      },
+      {
+        title: 'Cold start',
+        html: `
+          <h3>Проблема холодного старта</h3>
+          <p>У нового пользователя — 0-1 оценка. Какой метод справится? Popularity (всем одно и то же), content-based (по описанию items) и collaborative filtering (по соседям). Меняй число известных оценок нового юзера и смотри, как качество рекомендаций для него меняется.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="rcs-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="rcs-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="rcs-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#rcs-controls');
+          const cKnown = App.makeControl('range', 'rcs-known', 'Известных оценок у нового юзера', { min: 0, max: 10, step: 1, value: 1 });
+          const cNoise = App.makeControl('range', 'rcs-noise', 'Шум оценок', { min: 0, max: 1, step: 0.05, value: 0.3 });
+          [cKnown, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function run() {
+            // 20 существующих юзеров, 30 items с 3-мерным признаком (жанр)
+            const U = 20, I = 30, D = 3;
+            const itemF = Array.from({ length: I }, () => {
+              const v = Array.from({ length: D }, () => Math.random());
+              const s = Math.sqrt(v.reduce((a, b) => a + b * b, 0));
+              return v.map(x => x / s);
+            });
+            const userF = Array.from({ length: U }, () => {
+              const v = Array.from({ length: D }, () => Math.random());
+              const s = Math.sqrt(v.reduce((a, b) => a + b * b, 0));
+              return v.map(x => x / s);
+            });
+            // Истинные оценки = dot product * 5
+            function trueRating(uF, i) {
+              let s = 0;
+              for (let d = 0; d < D; d++) s += uF[d] * itemF[i][d];
+              return 1 + 4 * s;
+            }
+            const R = userF.map(uf => itemF.map((_, i) => trueRating(uf, i)));
+
+            // Новый юзер
+            const newF = Array.from({ length: D }, () => Math.random());
+            const ns = Math.sqrt(newF.reduce((a, b) => a + b * b, 0));
+            for (let d = 0; d < D; d++) newF[d] /= ns;
+            const trueNew = itemF.map((_, i) => trueRating(newF, i));
+
+            const known = parseInt(cKnown.input.value, 10);
+            const noise = parseFloat(cNoise.input.value);
+            // Случайные известные items
+            const idxs = Array.from({ length: I }, (_, i) => i).sort(() => Math.random() - 0.5);
+            const knownIdxs = idxs.slice(0, known);
+            const observed = {};
+            knownIdxs.forEach(i => { observed[i] = trueNew[i] + App.Util.randn(0, noise); });
+
+            // Popularity: средняя оценка по всем существующим юзерам
+            const pop = itemF.map((_, i) => {
+              let s = 0;
+              for (let u = 0; u < U; u++) s += R[u][i];
+              return s / U;
+            });
+
+            // Content-based: среднее оценок новых известных, взвешенное косинусным сходством items
+            function cb(i) {
+              if (knownIdxs.length === 0) return 3;
+              let num = 0, den = 0;
+              knownIdxs.forEach(j => {
+                let dot = 0;
+                for (let d = 0; d < D; d++) dot += itemF[i][d] * itemF[j][d];
+                const w = Math.max(0, dot);
+                num += w * observed[j];
+                den += w;
+              });
+              return den > 0 ? num / den : 3;
+            }
+
+            // Collaborative: находим похожих юзеров по known ratings
+            function cf(i) {
+              if (knownIdxs.length === 0) return 3;
+              const sims = [];
+              for (let u = 0; u < U; u++) {
+                let dot = 0, na = 0, nb = 0;
+                knownIdxs.forEach(j => {
+                  dot += R[u][j] * observed[j];
+                  na += R[u][j] * R[u][j];
+                  nb += observed[j] * observed[j];
+                });
+                if (na === 0 || nb === 0) sims.push(0);
+                else sims.push(dot / (Math.sqrt(na) * Math.sqrt(nb)));
+              }
+              let num = 0, den = 0;
+              for (let u = 0; u < U; u++) {
+                const w = Math.max(0, sims[u]);
+                num += w * R[u][i];
+                den += w;
+              }
+              return den > 0 ? num / den : 3;
+            }
+
+            // Считаем RMSE на неизвестных items
+            const unknown = idxs.slice(known);
+            function rmseOf(fn) {
+              let s = 0;
+              unknown.forEach(i => { s += (fn(i) - trueNew[i]) ** 2; });
+              return Math.sqrt(s / unknown.length);
+            }
+            const rPop = rmseOf(i => pop[i]);
+            const rCB = rmseOf(cb);
+            const rCF = rmseOf(cf);
+
+            const ctx = container.querySelector('#rcs-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['Popularity', 'Content-based', 'Collaborative'],
+                datasets: [{
+                  label: 'RMSE (меньше = лучше)',
+                  data: [rPop, rCB, rCF],
+                  backgroundColor: ['rgba(148,163,184,0.7)', 'rgba(245,158,11,0.7)', 'rgba(59,130,246,0.7)'],
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, title: { display: true, text: 'Качество рекомендаций для нового юзера (k=' + known + ' известно)' } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'RMSE' } } },
+              },
+            });
+            App.registerChart(chart);
+
+            const best = Math.min(rPop, rCB, rCF);
+            const winner = best === rCF ? 'Collaborative' : best === rCB ? 'Content-based' : 'Popularity';
+            container.querySelector('#rcs-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Popularity RMSE</div><div class="stat-value">' + rPop.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Content-based</div><div class="stat-value">' + rCB.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Collaborative</div><div class="stat-value">' + rCF.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Лучший</div><div class="stat-value">' + winner + '</div></div>';
+          }
+
+          [cKnown, cNoise].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+      {
+        title: 'Similarity metrics',
+        html: `
+          <h3>Сравнение метрик сходства</h3>
+          <p>Один и тот же вектор оценок пользователя, разные метрики — разный топ. Dot product предпочитает активных юзеров (кто много оценил). Cosine нормализует длину вектора. Pearson вычитает среднее — устраняет «добрых» и «злых» оценщиков.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="rsim-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="rsim-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="rsim-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#rsim-controls');
+          const cBias = App.makeControl('range', 'rsim-bias', 'Сдвиг оценок юзера B (+k)', { min: -2, max: 2, step: 0.25, value: 1 });
+          const cScale = App.makeControl('range', 'rsim-scale', 'Активность юзера C (×)', { min: 0.3, max: 3, step: 0.1, value: 2 });
+          [cBias, cScale].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function run() {
+            const bias = parseFloat(cBias.input.value);
+            const scale = parseFloat(cScale.input.value);
+            // Target: оценки «как у меня»
+            const target = [4, 5, 3, 2, 4, 5, 1, 3];
+            // A — абсолютно похож
+            const A = target.slice();
+            // B — тот же паттерн, но «добрый оценщик» (+bias)
+            const B = target.map(v => Math.max(1, Math.min(5, v + bias)));
+            // C — та же форма, но амплитуда другая
+            const mT = App.Util.mean(target);
+            const C = target.map(v => Math.max(1, Math.min(5, mT + (v - mT) * scale)));
+            // D — шум
+            const D = target.map(() => 1 + Math.floor(Math.random() * 5));
+
+            function dot(x, y) { let s = 0; for (let i = 0; i < x.length; i++) s += x[i] * y[i]; return s; }
+            function norm(x) { return Math.sqrt(dot(x, x)); }
+            function cosine(x, y) { return dot(x, y) / (norm(x) * norm(y)); }
+            function pearson(x, y) {
+              const mx = App.Util.mean(x), my = App.Util.mean(y);
+              const xc = x.map(v => v - mx), yc = y.map(v => v - my);
+              const num = dot(xc, yc);
+              const den = Math.sqrt(dot(xc, xc) * dot(yc, yc));
+              return den > 0 ? num / den : 0;
+            }
+
+            const users = [{ n: 'A (копия)', v: A }, { n: 'B (+сдвиг)', v: B }, { n: 'C (×масштаб)', v: C }, { n: 'D (шум)', v: D }];
+            const dots = users.map(u => dot(target, u.v));
+            const coss = users.map(u => cosine(target, u.v));
+            const pears = users.map(u => pearson(target, u.v));
+
+            const ctx = container.querySelector('#rsim-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: users.map(u => u.n),
+                datasets: [
+                  { label: 'Dot', data: dots, backgroundColor: 'rgba(148,163,184,0.7)' },
+                  { label: 'Cosine', data: coss, backgroundColor: 'rgba(59,130,246,0.7)' },
+                  { label: 'Pearson', data: pears, backgroundColor: 'rgba(16,185,129,0.7)' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Сходство с целевым пользователем по 4 кандидатам' }, legend: { position: 'top' } },
+                scales: { y: { title: { display: true, text: 'значение метрики' } } },
+              },
+            });
+            App.registerChart(chart);
+
+            function topBy(arr) {
+              const idx = arr.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0])[0][1];
+              return users[idx].n;
+            }
+            container.querySelector('#rsim-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Dot #1</div><div class="stat-value">' + topBy(dots) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Cosine #1</div><div class="stat-value">' + topBy(coss) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Pearson #1</div><div class="stat-value">' + topBy(pears) + '</div></div>';
+          }
+
+          [cBias, cScale].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
+
     python: `
       <h3>Python: рекомендательные системы</h3>
       <p>Основные библиотеки: <b>surprise</b> (collaborative filtering), <b>implicit</b> (implicit feedback, ALS), <b>sklearn</b> (cosine_similarity для content-based).</p>

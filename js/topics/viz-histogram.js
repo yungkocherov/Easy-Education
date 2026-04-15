@@ -317,6 +317,126 @@ App.registerTopic({
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Число бинов: слишком мало → теряешь моды, слишком много → шум</h3>
+        <p>Это <b>главная</b> настройка гистограммы. С 5 бинами ты усредняешь всё в плоскую заливку и не видишь бимодальности. Со 100 бинами каждый столбец — это одно-два наблюдения, и ты «видишь» пики там, где их нет. Попробуй двигать на смеси двух нормальных — там два реальных пика, и настройка бинов показывает/прячет их.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="viz-hist-ctrl"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="viz-hist-chart"></canvas></div>
+            <div class="sim-stats" id="viz-hist-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const ctrl = container.querySelector('#viz-hist-ctrl');
+        const cBins = App.makeControl('range', 'viz-hist-bins', 'Число бинов', { min: 3, max: 100, step: 1, value: 20 });
+        const cN = App.makeControl('range', 'viz-hist-n', 'Размер выборки', { min: 50, max: 5000, step: 50, value: 500 });
+        const cDist = App.makeControl('select', 'viz-hist-dist', 'Распределение', {
+          options: [
+            { value: 'normal', label: 'Нормальное' },
+            { value: 'bimodal', label: 'Смесь двух нормальных (бимодальное)' },
+            { value: 'skewed', label: 'Log-normal (правый скос)' },
+            { value: 'uniform', label: 'Равномерное' },
+          ],
+          value: 'bimodal',
+        });
+        const cKde = App.makeControl('select', 'viz-hist-kde', 'KDE наложение', {
+          options: [{ value: 'no', label: 'Нет' }, { value: 'yes', label: 'Да' }],
+          value: 'yes',
+        });
+        [cBins, cN, cDist, cKde].forEach(c => ctrl.appendChild(c.wrap));
+        let chart = null;
+        let data = [];
+        function regen() {
+          const n = +cN.input.value;
+          const dist = cDist.input.value;
+          if (dist === 'normal') data = App.Util.normalSample(n, 0, 1);
+          else if (dist === 'bimodal') {
+            data = [];
+            for (let i = 0; i < n; i++) data.push(Math.random() < 0.5 ? App.Util.randn(-2, 0.6) : App.Util.randn(2, 0.6));
+          } else if (dist === 'skewed') {
+            data = [];
+            for (let i = 0; i < n; i++) data.push(Math.exp(App.Util.randn(0, 0.7)));
+          } else {
+            data = [];
+            for (let i = 0; i < n; i++) data.push(Math.random() * 6 - 3);
+          }
+          draw();
+        }
+        function kde(xs, data, bw) {
+          const n = data.length;
+          return xs.map(x => {
+            let s = 0;
+            for (let i = 0; i < n; i++) {
+              const u = (x - data[i]) / bw;
+              s += Math.exp(-0.5 * u * u);
+            }
+            return s / (n * bw * Math.sqrt(2 * Math.PI));
+          });
+        }
+        function draw() {
+          const bins = +cBins.input.value;
+          const lo = App.Util.min(data);
+          const hi = App.Util.max(data);
+          const h = App.Util.histogram(data, bins, [lo, hi]);
+          const binWidth = (hi - lo) / bins;
+          // normalize counts to density
+          const densities = h.counts.map(c => c / (data.length * binWidth));
+          const datasets = [{
+            type: 'bar',
+            label: 'Histogram density',
+            data: densities,
+            backgroundColor: 'rgba(59,130,246,0.55)',
+            borderColor: 'rgba(59,130,246,1)',
+            borderWidth: 1,
+          }];
+          if (cKde.input.value === 'yes') {
+            // Silverman's rule of thumb
+            const std = App.Util.std(data);
+            const bw = 1.06 * std * Math.pow(data.length, -1 / 5);
+            const xs = h.centers;
+            const kd = kde(xs, data, bw);
+            datasets.push({
+              type: 'line',
+              label: 'KDE',
+              data: kd,
+              borderColor: '#ef4444',
+              backgroundColor: 'transparent',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              fill: false,
+              tension: 0.3,
+            });
+          }
+          const ctx = container.querySelector('#viz-hist-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            data: { labels: h.centers.map(c => c.toFixed(2)), datasets },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: bins + ' бинов, ' + data.length + ' точек' } }, scales: { x: { title: { display: true, text: 'Значение' } }, y: { title: { display: true, text: 'Плотность' }, beginAtZero: true } } },
+          });
+          App.registerChart(chart);
+          // Sturges / Freedman-Diaconis suggestions
+          const sturges = Math.ceil(Math.log2(data.length) + 1);
+          const q1 = App.Util.quantile(data, 0.25);
+          const q3 = App.Util.quantile(data, 0.75);
+          const iqr = q3 - q1;
+          const fd = Math.max(1, Math.ceil((hi - lo) / (2 * iqr * Math.pow(data.length, -1 / 3))));
+          container.querySelector('#viz-hist-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">Sturges</div><div class="stat-value">' + sturges + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Freedman-Diaconis</div><div class="stat-value">' + fd + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Текущее</div><div class="stat-value">' + bins + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Ширина бина</div><div class="stat-value">' + binWidth.toFixed(3) + '</div></div>';
+        }
+        cBins.input.addEventListener('input', draw);
+        cKde.input.addEventListener('change', draw);
+        cN.input.addEventListener('change', regen);
+        cDist.input.addEventListener('change', regen);
+        regen();
+      },
+    },
+
     python: `
 <h3>Гистограмма в Python</h3>
 

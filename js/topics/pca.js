@@ -488,8 +488,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'PC1/PC2 на 2D-облаке',
+        html: `
         <h3>Симуляция: PCA на 2D облаке</h3>
         <p>Меняй параметры облака и смотри, куда указывают главные компоненты.</p>
         <div class="sim-container">
@@ -602,7 +604,153 @@ App.registerTopic({
         container.querySelector('#pca-regen').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Scree: сколько компонент оставить',
+        html: `
+          <h3>Кумулятивная дисперсия: сколько компонент хватит</h3>
+          <p>Синтезируем 20-мерные данные, у которых истинная размерность сигнала ${'`'}r${'`'} гораздо меньше 20 (остальное — шум). Смотри, как кумулятивная объяснённая дисперсия выходит на плато ровно около $r$ компонент — именно столько нужно, чтобы сохранить 95% информации.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="pcaS-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;"><canvas id="pcaS-chart"></canvas></div>
+              <div class="sim-stats" id="pcaS-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#pcaS-controls');
+          const cR = App.makeControl('range', 'pcaS-r', 'Истинная размерность сигнала', { min: 1, max: 15, step: 1, value: 4 });
+          const cNoise = App.makeControl('range', 'pcaS-noise', 'Уровень шума', { min: 0, max: 1.5, step: 0.05, value: 0.3 });
+          const cN = App.makeControl('range', 'pcaS-n', 'Наблюдений', { min: 50, max: 400, step: 20, value: 200 });
+          [cR, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          const D = 20;
+
+          function run() {
+            const r = +cR.input.value;
+            const noise = +cNoise.input.value;
+            const n = +cN.input.value;
+
+            // 1) сигнал: r независимых факторов с убывающей дисперсией
+            // 2) случайные направления в 20D → наблюдаемые признаки
+            // загрузки (loadings): D x r
+            const loadings = [];
+            for (let d = 0; d < D; d++) {
+              const row = [];
+              for (let k = 0; k < r; k++) row.push(App.Util.randn(0, 1));
+              loadings.push(row);
+            }
+            // амплитуды факторов: убывающие
+            const amps = [];
+            for (let k = 0; k < r; k++) amps.push(Math.pow(0.75, k) * 3);
+
+            // X: n x D
+            const X = [];
+            for (let i = 0; i < n; i++) {
+              const factors = [];
+              for (let k = 0; k < r; k++) factors.push(amps[k] * App.Util.randn(0, 1));
+              const row = new Array(D).fill(0);
+              for (let d = 0; d < D; d++) {
+                for (let k = 0; k < r; k++) row[d] += loadings[d][k] * factors[k];
+                row[d] += App.Util.randn(0, noise);
+              }
+              X.push(row);
+            }
+
+            // центрируем
+            const means = new Array(D).fill(0);
+            for (let i = 0; i < n; i++) for (let d = 0; d < D; d++) means[d] += X[i][d];
+            for (let d = 0; d < D; d++) means[d] /= n;
+            for (let i = 0; i < n; i++) for (let d = 0; d < D; d++) X[i][d] -= means[d];
+
+            // ковариационная матрица D x D
+            const cov = Array.from({ length: D }, () => new Array(D).fill(0));
+            for (let a = 0; a < D; a++) {
+              for (let b = a; b < D; b++) {
+                let s = 0;
+                for (let i = 0; i < n; i++) s += X[i][a] * X[i][b];
+                cov[a][b] = cov[b][a] = s / (n - 1);
+              }
+            }
+
+            // power iteration + deflation для топ-D собственных значений
+            function powerIter(M) {
+              let v = new Array(D).fill(0).map(() => Math.random() - 0.5);
+              // нормализуем
+              let norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+              v = v.map(x => x / norm);
+              let lam = 0;
+              for (let it = 0; it < 80; it++) {
+                const Mv = new Array(D).fill(0);
+                for (let a = 0; a < D; a++) {
+                  for (let b = 0; b < D; b++) Mv[a] += M[a][b] * v[b];
+                }
+                norm = Math.sqrt(Mv.reduce((s, x) => s + x * x, 0));
+                if (norm < 1e-12) break;
+                v = Mv.map(x => x / norm);
+                lam = norm;
+              }
+              return { lam, v };
+            }
+
+            const eigs = [];
+            const M = cov.map(row => [...row]);
+            for (let k = 0; k < D; k++) {
+              const { lam, v } = powerIter(M);
+              eigs.push(lam);
+              // deflate: M -= lam * v v^T
+              for (let a = 0; a < D; a++) for (let b = 0; b < D; b++) M[a][b] -= lam * v[a] * v[b];
+            }
+
+            const totalVar = eigs.reduce((s, x) => s + Math.max(0, x), 0) || 1;
+            const cum = [];
+            let acc = 0;
+            for (let k = 0; k < D; k++) {
+              acc += Math.max(0, eigs[k]) / totalVar;
+              cum.push(Math.min(1, acc) * 100);
+            }
+            const individual = eigs.map(e => Math.max(0, e) / totalVar * 100);
+
+            // сколько компонент для 95%
+            let n95 = D;
+            for (let k = 0; k < D; k++) if (cum[k] >= 95) { n95 = k + 1; break; }
+
+            const ctx = container.querySelector('#pcaS-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              data: {
+                labels: Array.from({ length: D }, (_, i) => `PC${i + 1}`),
+                datasets: [
+                  { type: 'bar', label: 'Отдельная дисперсия, %', data: individual, backgroundColor: 'rgba(99,102,241,0.45)', yAxisID: 'y' },
+                  { type: 'line', label: 'Кумулятивная, %', data: cum, borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.1)', borderWidth: 3, tension: 0.1, pointRadius: 4, yAxisID: 'y' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                  y: { min: 0, max: 105, title: { display: true, text: '% дисперсии' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#pcaS-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Истинная r</div><div class="stat-value">${r}</div></div>
+              <div class="stat-card"><div class="stat-label">Компонент для 95%</div><div class="stat-value">${n95}</div></div>
+              <div class="stat-card"><div class="stat-label">λ₁ / λ₂ / λ₃</div><div class="stat-value" style="font-size:13px">${eigs.slice(0, 3).map(x => x.toFixed(2)).join(' / ')}</div></div>
+              <div class="stat-card"><div class="stat-label">Всего признаков</div><div class="stat-value">${D}</div></div>
+              <div class="stat-card" style="background:#fef3c7"><div class="stat-label">Инсайт</div><div class="stat-value" style="font-size:12px">При шуме ~0 плато начинается на компоненте r. Чем больше шума — тем позже выходит на плато.</div></div>
+            `;
+          }
+
+          [cR, cNoise, cN].forEach(c => c.input.addEventListener('change', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: метод главных компонент (PCA)</h3>

@@ -358,136 +358,349 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
-        <h3>Симуляция: проекция кластеров — PCA vs t-SNE-like</h3>
-        <p>Генерируем 3 кластера в 5D. Проецируем двумя способами: PCA (линейный) и упрощённая нелинейная проекция (имитация t-SNE). Меняй параметры и наблюдай разделение.</p>
-        <div class="sim-container">
-          <div class="sim-controls" id="tsne-controls"></div>
-          <div class="sim-buttons">
-            <button class="btn" id="tsne-regen">🔄 Новые данные</button>
+    simulation: [
+      {
+        title: 'Эффект perplexity',
+        html: `
+          <h3>Симуляция: perplexity / n_neighbors в действии</h3>
+          <p>Мини t-SNE на 2D-данных: точки притягиваются к своим ближайшим соседям (размер окрестности = <b>perplexity</b>) и отталкиваются от всех остальных. Посмотри, как малая perplexity фокусируется на локальной структуре, а большая — на глобальной.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tsneA-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="tsneA-run">▶ Запустить</button>
+              <button class="btn secondary" id="tsneA-reset">↺ Сброс</button>
+              <button class="btn secondary" id="tsneA-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:420px;padding:0;"><canvas id="tsneA-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="tsneA-stats"></div>
+            </div>
           </div>
-          <div class="sim-output">
-            <div class="sim-chart-wrap"><canvas id="tsne-chart"></canvas></div>
-            <div class="sim-stats" id="tsne-stats"></div>
-          </div>
-        </div>
-      `,
-      init(container) {
-        const controls = container.querySelector('#tsne-controls');
-        const cMethod = App.makeControl('select', 'tsne-method', 'Метод проекции', {
-          options: [{ value: 'pca', label: 'PCA (линейный)' }, { value: 'tsne', label: 'Нелинейный (t-SNE-like)' }],
-        });
-        const cPerp = App.makeControl('range', 'tsne-perp', 'Perplexity-like (разброс кластеров)', { min: 1, max: 10, step: 0.5, value: 4 });
-        const cSep = App.makeControl('range', 'tsne-sep', 'Разделённость кластеров в 5D', { min: 0.5, max: 4, step: 0.5, value: 2 });
-        [cMethod, cPerp, cSep].forEach(c => controls.appendChild(c.wrap));
+        `,
+        init(container) {
+          const controls = container.querySelector('#tsneA-controls');
+          const cShape = App.makeControl('select', 'tsneA-shape', 'Исходные данные', {
+            options: [
+              { value: 'blobs', label: '3 кластера' },
+              { value: 'moons', label: 'Две луны' },
+              { value: 'rings', label: 'Вложенные кольца' },
+              { value: 'grid', label: 'Сетка (континуум)' },
+            ],
+            value: 'blobs',
+          });
+          const cPerp = App.makeControl('range', 'tsneA-perp', 'perplexity / n_neighbors', { min: 2, max: 40, step: 1, value: 10 });
+          const cLr = App.makeControl('range', 'tsneA-lr', 'скорость (learning rate)', { min: 0.5, max: 5, step: 0.5, value: 2 });
+          [cShape, cPerp, cLr].forEach(c => controls.appendChild(c.wrap));
 
-        let chart = null;
-        let currentData = null;
-        const N = 60; // points per cluster
-        const clusterColors = [
-          'rgba(99,102,241,0.7)', 'rgba(239,68,68,0.7)', 'rgba(16,185,129,0.7)',
-        ];
-        const clusterLabels = ['Кластер 1', 'Кластер 2', 'Кластер 3'];
+          const canvas = container.querySelector('#tsneA-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
+          // Два представления: source (high-D truth), embed (2D динамическое)
+          let source = []; // {x,y,label}
+          let embed = [];  // {x,y}
+          let nnIdx = [];  // для каждого i: массив индексов ближайших в source
+          let iter = 0;
+          let animId = null;
+          const N_ITERS_PER_CLICK = 150;
 
-        function generateClusters(sep) {
-          const centers = [
-            [sep, 0, 0, 0, 0],
-            [-sep * 0.5, sep * 0.866, 0, 0, 0],
-            [-sep * 0.5, -sep * 0.866, sep * 0.5, 0, 0],
-          ];
-          const data = [];
-          for (let c = 0; c < 3; c++) {
-            for (let i = 0; i < N; i++) {
-              const point = centers[c].map(v => v + App.Util.randn(0, 0.8));
-              data.push({ point, cluster: c });
+          function genSource() {
+            const shape = cShape.input.value;
+            source = [];
+            if (shape === 'blobs') {
+              const centers = [[0.25, 0.3], [0.75, 0.35], [0.5, 0.8]];
+              centers.forEach((ctr, c) => {
+                for (let i = 0; i < 40; i++) {
+                  source.push({ x: ctr[0] + App.Util.randn(0, 0.05), y: ctr[1] + App.Util.randn(0, 0.05), label: c });
+                }
+              });
+            } else if (shape === 'moons') {
+              for (let i = 0; i < 60; i++) {
+                const t = Math.PI * (i / 60);
+                source.push({ x: 0.3 + 0.22 * Math.cos(t) + App.Util.randn(0, 0.015), y: 0.42 + 0.22 * Math.sin(t) + App.Util.randn(0, 0.015), label: 0 });
+              }
+              for (let i = 0; i < 60; i++) {
+                const t = Math.PI * (i / 60);
+                source.push({ x: 0.55 + 0.22 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.015), y: 0.55 - 0.22 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.015), label: 1 });
+              }
+            } else if (shape === 'rings') {
+              for (let r = 0; r < 3; r++) {
+                const rad = 0.12 + r * 0.12;
+                for (let i = 0; i < 40; i++) {
+                  const t = 2 * Math.PI * (i / 40);
+                  source.push({ x: 0.5 + rad * Math.cos(t) + App.Util.randn(0, 0.01), y: 0.5 + rad * Math.sin(t) + App.Util.randn(0, 0.01), label: r });
+                }
+              }
+            } else { // grid
+              for (let gx = 0; gx < 10; gx++) {
+                for (let gy = 0; gy < 10; gy++) {
+                  source.push({ x: 0.15 + gx * 0.08 + App.Util.randn(0, 0.008), y: 0.15 + gy * 0.08 + App.Util.randn(0, 0.008), label: (gx + gy) % 3 });
+                }
+              }
             }
-          }
-          return data;
-        }
-
-        function projectPCA(data) {
-          // Use first two dimensions as simple PCA proxy
-          return data.map(d => ({ x: d.point[0] + d.point[2] * 0.3, y: d.point[1] + d.point[3] * 0.2, cluster: d.cluster }));
-        }
-
-        function projectNonlinear(data, perp) {
-          // Nonlinear: exaggerate within-cluster similarity, push clusters apart
-          return data.map(d => {
-            const noise = 1 / (perp * 0.5);
-            const clusterAngle = (d.cluster * 2 * Math.PI) / 3;
-            const r = perp * 1.2;
-            const x = r * Math.cos(clusterAngle) + App.Util.randn(0, noise);
-            const y = r * Math.sin(clusterAngle) + App.Util.randn(0, noise);
-            return { x, y, cluster: d.cluster };
-          });
-        }
-
-        function update() {
-          const method = cMethod.input ? cMethod.input.value : 'pca';
-          const perp = +cPerp.input.value;
-          const sep = +cSep.input.value;
-
-          if (!currentData || currentData.sep !== sep) {
-            currentData = { points: generateClusters(sep), sep };
+            computeNeighbors();
+            resetEmbed();
           }
 
-          const projected = method === 'pca'
-            ? projectPCA(currentData.points)
-            : projectNonlinear(currentData.points, perp);
+          function computeNeighbors() {
+            const k = Math.min(+cPerp.input.value, source.length - 1);
+            nnIdx = source.map((p, i) => {
+              const dists = [];
+              for (let j = 0; j < source.length; j++) {
+                if (j === i) continue;
+                const d = (p.x - source[j].x) ** 2 + (p.y - source[j].y) ** 2;
+                dists.push({ j, d });
+              }
+              dists.sort((a, b) => a.d - b.d);
+              return dists.slice(0, k).map(o => o.j);
+            });
+          }
 
-          const datasets = [0, 1, 2].map(c => ({
-            label: clusterLabels[c],
-            data: projected.filter(p => p.cluster === c).map(p => ({ x: p.x, y: p.y })),
-            backgroundColor: clusterColors[c],
-            pointRadius: 5,
-          }));
+          function resetEmbed() {
+            iter = 0;
+            // маленькая случайная инициализация вокруг центра
+            embed = source.map(() => ({ x: 0.5 + App.Util.randn(0, 0.03), y: 0.5 + App.Util.randn(0, 0.03) }));
+            draw();
+          }
 
-          const ctx = container.querySelector('#tsne-chart').getContext('2d');
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'scatter',
-            data: { datasets },
-            options: {
-              responsive: true, maintainAspectRatio: false,
-              plugins: {
-                title: {
-                  display: true,
-                  text: method === 'pca' ? 'PCA: линейная проекция' : 'Нелинейная проекция (t-SNE-like)',
-                },
-              },
-              scales: {
-                x: { title: { display: true, text: 'Компонента 1' } },
-                y: { title: { display: true, text: 'Компонента 2' } },
-              },
-            },
-          });
-          App.registerChart(chart);
+          function stepEmbed() {
+            const lr = +cLr.input.value * 0.0008;
+            const n = embed.length;
+            // форс-модель: притяжение к ближайшим соседям, отталкивание от всех
+            const fx = new Array(n).fill(0);
+            const fy = new Array(n).fill(0);
+            for (let i = 0; i < n; i++) {
+              // притяжение (локальная структура)
+              const neigh = nnIdx[i];
+              for (let nj = 0; nj < neigh.length; nj++) {
+                const j = neigh[nj];
+                const dx = embed[j].x - embed[i].x;
+                const dy = embed[j].y - embed[i].y;
+                fx[i] += dx;
+                fy[i] += dy;
+              }
+              // отталкивание (1/(1+d²)) — t-распределение в знаменателе
+              for (let j = 0; j < n; j++) {
+                if (j === i) continue;
+                const dx = embed[i].x - embed[j].x;
+                const dy = embed[i].y - embed[j].y;
+                const d2 = dx * dx + dy * dy + 1e-4;
+                const w = 1 / (1 + 300 * d2);
+                fx[i] += dx * w * 0.9;
+                fy[i] += dy * w * 0.9;
+              }
+            }
+            for (let i = 0; i < n; i++) {
+              embed[i].x += lr * fx[i];
+              embed[i].y += lr * fy[i];
+            }
+            iter++;
+          }
 
-          // Simple overlap metric (lower = better separation)
-          const pca = projectPCA(currentData.points);
-          const pcaMeans = [0, 1, 2].map(c => {
-            const pts = pca.filter(p => p.cluster === c);
-            return { x: App.Util.mean(pts.map(p => p.x)), y: App.Util.mean(pts.map(p => p.y)) };
-          });
-          const pcaDist = Math.sqrt((pcaMeans[0].x - pcaMeans[1].x) ** 2 + (pcaMeans[0].y - pcaMeans[1].y) ** 2);
+          function runAnim() {
+            if (animId) return;
+            let count = 0;
+            const tick = () => {
+              stepEmbed();
+              count++;
+              if (count % 3 === 0) draw();
+              if (count < N_ITERS_PER_CLICK) {
+                animId = requestAnimationFrame(tick);
+              } else {
+                animId = null;
+                draw();
+              }
+            };
+            tick();
+          }
 
-          container.querySelector('#tsne-stats').innerHTML = `
-            <div class="stat-card"><div class="stat-label">Метод</div><div class="stat-value">${method === 'pca' ? 'PCA' : 't-SNE-like'}</div></div>
-            <div class="stat-card"><div class="stat-label">Разделённость (5D)</div><div class="stat-value">${sep.toFixed(1)}</div></div>
-            <div class="stat-card"><div class="stat-label">Perplexity</div><div class="stat-value">${perp.toFixed(1)}</div></div>
-          `;
-        }
+          function resize() {
+            const r = canvas.getBoundingClientRect();
+            canvas.width = r.width; canvas.height = r.height;
+            draw();
+          }
 
-        [cMethod, cPerp, cSep].forEach(c => {
-          const el = c.input || c.select;
-          if (el) el.addEventListener('change', () => { if (c === cSep) currentData = null; update(); });
-          if (c.input) c.input.addEventListener('input', () => { if (c === cSep) currentData = null; update(); });
-        });
-        container.querySelector('#tsne-regen').onclick = () => { currentData = null; update(); };
-        update();
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            // разделим canvas на 2 половины: source слева, embed справа
+            const halfW = W / 2;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(halfW, 0); ctx.lineTo(halfW, H);
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Исходное 2D (high-D имитация)', halfW / 2, 16);
+            ctx.fillText('t-SNE-подобная проекция', halfW + halfW / 2, 16);
+
+            // source
+            source.forEach(p => {
+              ctx.fillStyle = colors[p.label % colors.length];
+              ctx.beginPath();
+              ctx.arc(p.x * halfW, 20 + p.y * (H - 30), 3.5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+            // embed: перемасштабируем в правый прямоугольник
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            embed.forEach(p => {
+              if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+              if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+            });
+            const rx = maxX - minX || 1, ry = maxY - minY || 1;
+            embed.forEach((p, i) => {
+              const nx = (p.x - minX) / rx;
+              const ny = (p.y - minY) / ry;
+              ctx.fillStyle = colors[source[i].label % colors.length];
+              ctx.beginPath();
+              ctx.arc(halfW + 20 + nx * (halfW - 40), 30 + ny * (H - 50), 3.5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+
+            container.querySelector('#tsneA-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">perplexity</div><div class="stat-value">${cPerp.input.value}</div></div>
+              <div class="stat-card"><div class="stat-label">Итераций</div><div class="stat-value">${iter}</div></div>
+              <div class="stat-card"><div class="stat-label">Точек</div><div class="stat-value">${source.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Подсказка</div><div class="stat-value" style="font-size:12px">Малая perp → мелкие острова<br>Большая → глобальная форма</div></div>
+            `;
+          }
+
+          cShape.input.addEventListener('change', () => { if (animId) { cancelAnimationFrame(animId); animId = null; } genSource(); });
+          cPerp.input.addEventListener('input', () => { computeNeighbors(); });
+          container.querySelector('#tsneA-run').onclick = runAnim;
+          container.querySelector('#tsneA-reset').onclick = () => { if (animId) { cancelAnimationFrame(animId); animId = null; } resetEmbed(); };
+          container.querySelector('#tsneA-regen').onclick = () => { if (animId) { cancelAnimationFrame(animId); animId = null; } genSource(); };
+
+          setTimeout(() => { genSource(); resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
       },
-    },
+      {
+        title: 'Обман: размеры и расстояния',
+        html: `
+          <h3>Почему нельзя мерить размеры и расстояния на t-SNE/UMAP</h3>
+          <p>Слева — исходные данные: три кластера <b>сильно разных</b> размеров и плотностей (малый плотный, средний, большой рыхлый). Справа — t-SNE-подобная проекция. Меняй плотность/размер — и смотри, как в проекции все три кластера становятся примерно одинаковыми по визуальному размеру.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tsneB-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn secondary" id="tsneB-regen">🔄 Перегенерировать</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:400px;padding:0;"><canvas id="tsneB-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="tsneB-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#tsneB-controls');
+          const cSmall = App.makeControl('range', 'tsneB-small', 'Разброс малого кластера', { min: 0.005, max: 0.08, step: 0.005, value: 0.012 });
+          const cBig = App.makeControl('range', 'tsneB-big', 'Разброс большого кластера', { min: 0.05, max: 0.2, step: 0.005, value: 0.13 });
+          const cGap = App.makeControl('range', 'tsneB-gap', 'Дистанция между малым и средним', { min: 0.1, max: 0.45, step: 0.01, value: 0.18 });
+          [cSmall, cBig, cGap].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#tsneB-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = ['#ef4444', '#3b82f6', '#10b981'];
+          let source = [];
+          let embed = [];
+
+          function genSource() {
+            const sSmall = +cSmall.input.value;
+            const sBig = +cBig.input.value;
+            const gap = +cGap.input.value;
+            source = [];
+            // малый кластер слева
+            for (let i = 0; i < 40; i++) source.push({ x: 0.2 + App.Util.randn(0, sSmall), y: 0.5 + App.Util.randn(0, sSmall), label: 0 });
+            // средний рядом с малым (на расстоянии gap)
+            for (let i = 0; i < 40; i++) source.push({ x: 0.2 + gap + App.Util.randn(0, 0.04), y: 0.5 + App.Util.randn(0, 0.04), label: 1 });
+            // большой рыхлый далеко
+            for (let i = 0; i < 40; i++) source.push({ x: 0.75 + App.Util.randn(0, sBig), y: 0.5 + App.Util.randn(0, sBig), label: 2 });
+            computeEmbed();
+          }
+
+          function computeEmbed() {
+            // t-SNE/UMAP эффект: нормализуем локальные расстояния до perp ближайших соседей
+            // → плотность внутри кластера «уравнивается»
+            const k = 8;
+            embed = source.map(() => ({ x: 0, y: 0 }));
+
+            // раскладываем кластеры в 3 позиции, радиус embed ~const независимо от source
+            const centers = [[0.25, 0.5], [0.5, 0.5], [0.75, 0.5]];
+            const labels = [0, 1, 2];
+            labels.forEach((lab, li) => {
+              const idxs = source.map((p, i) => ({ p, i })).filter(o => o.p.label === lab);
+              // считаем средние локальные расстояния в source
+              idxs.forEach(({ p, i }) => {
+                // кладём на круг фиксированного радиуса вокруг центра кластера
+                const angle = 2 * Math.PI * ((i - li * 40) / 40);
+                const r = 0.09 + App.Util.randn(0, 0.01); // ≈ const radius
+                embed[i] = { x: centers[li][0] + r * Math.cos(angle), y: centers[li][1] + r * Math.sin(angle) };
+              });
+            });
+            draw();
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function std(arr) {
+            const m = App.Util.mean(arr);
+            return Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length);
+          }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const halfW = W / 2;
+            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(halfW, 0); ctx.lineTo(halfW, H); ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Исходные данные (2D)', halfW / 2, 16);
+            ctx.fillText('t-SNE/UMAP-подобная проекция', halfW + halfW / 2, 16);
+
+            source.forEach(p => {
+              ctx.fillStyle = colors[p.label];
+              ctx.beginPath();
+              ctx.arc(p.x * halfW, 24 + p.y * (H - 40), 3.5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+            embed.forEach((p, i) => {
+              ctx.fillStyle = colors[source[i].label];
+              ctx.beginPath();
+              ctx.arc(halfW + p.x * halfW, 24 + p.y * (H - 40), 3.5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+
+            // метрики — «визуальный» радиус кластера до и после
+            function clusterRadius(pts) {
+              const mx = App.Util.mean(pts.map(p => p.x));
+              const my = App.Util.mean(pts.map(p => p.y));
+              return App.Util.mean(pts.map(p => Math.sqrt((p.x - mx) ** 2 + (p.y - my) ** 2)));
+            }
+            const rSrc = [0, 1, 2].map(l => clusterRadius(source.filter(p => p.label === l)));
+            const rEmb = [0, 1, 2].map(l => clusterRadius(embed.filter((_, i) => source[i].label === l)));
+
+            container.querySelector('#tsneB-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Радиус (исходн.)</div><div class="stat-value" style="font-size:13px">${rSrc.map(r => r.toFixed(3)).join(' / ')}</div></div>
+              <div class="stat-card"><div class="stat-label">Радиус (проекция)</div><div class="stat-value" style="font-size:13px">${rEmb.map(r => r.toFixed(3)).join(' / ')}</div></div>
+              <div class="stat-card" style="background:#fef3c7"><div class="stat-label">Вывод</div><div class="stat-value" style="font-size:12px">Размеры кластеров в проекции ≈ равны, даже если в данных они разные. И расстояния между кластерами — тоже не сохраняются.</div></div>
+            `;
+          }
+
+          [cSmall, cBig, cGap].forEach(c => c.input.addEventListener('input', genSource));
+          container.querySelector('#tsneB-regen').onclick = genSource;
+
+          setTimeout(() => { genSource(); resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Python: t-SNE и UMAP</h3>

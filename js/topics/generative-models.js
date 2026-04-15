@@ -537,6 +537,428 @@ App.registerTopic({
       }
     ],
 
+    simulation: [
+      {
+        title: 'VAE latent space',
+        html: `
+          <h3>Навигация по латентному пространству VAE</h3>
+          <p>Обучаем упрощённый VAE на наборе «цифр» (2D-векторов формы). Каждый объект кодируется в точку $z \\in \\mathbb{R}^2$. Двигай слайдеры — смотри, как меняется декодированная форма. Непрерывность латента — ключевое свойство VAE.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="gm-controls"></div>
+            <div class="sim-output">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Латентное пространство</p>
+                  <div style="height:320px;"><canvas id="gm-latent" class="sim-canvas"></canvas></div>
+                </div>
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Декодированная форма</p>
+                  <div style="height:320px;"><canvas id="gm-decode" class="sim-canvas"></canvas></div>
+                </div>
+              </div>
+              <div class="sim-stats" id="gm-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#gm-controls');
+          const cZ1 = App.makeControl('range', 'gm-z1', 'z₁', { min: -3, max: 3, step: 0.05, value: 0 });
+          const cZ2 = App.makeControl('range', 'gm-z2', 'z₂', { min: -3, max: 3, step: 0.05, value: 0 });
+          [cZ1, cZ2].forEach(c => controls.appendChild(c.wrap));
+
+          // Prototype shapes — каждая форма = набор точек на единичной окружности с искажениями
+          // Представляем 4 «класса» объектов, расположенных в квадрате латента
+          // Декодер: интерполирует между прототипами весами по расстоянию (мягкий RBF)
+          const prototypes = [
+            // "О" — круг
+            { z: [-1.5, 1.5], shape: Array.from({ length: 24 }, (_, i) => {
+              const t = (i / 24) * 2 * Math.PI; return [Math.cos(t), Math.sin(t)];
+            }) },
+            // "▢" — квадрат
+            { z: [1.5, 1.5], shape: Array.from({ length: 24 }, (_, i) => {
+              const t = i / 24; const s = 4 * t;
+              if (s < 1) return [s - 0.5, -0.5];
+              if (s < 2) return [0.5, s - 1.5];
+              if (s < 3) return [0.5 - (s - 2), 0.5];
+              return [-0.5, 0.5 - (s - 3)];
+            }).map(([x, y]) => [x * 1.5, y * 1.5]) },
+            // "△" — треугольник
+            { z: [1.5, -1.5], shape: Array.from({ length: 24 }, (_, i) => {
+              const t = i / 24; const s = 3 * t;
+              if (s < 1) return [s - 0.5, -0.5];
+              if (s < 2) return [0.5 - (s - 1) * 0.5, -0.5 + (s - 1)];
+              return [-0.5 + (3 - s) * 0.5 * 0, -0.5 + (3 - s)];
+            }).map(([x, y]) => [x * 1.3, y * 1.3 - 0.2]) },
+            // "✦" — звезда
+            { z: [-1.5, -1.5], shape: Array.from({ length: 24 }, (_, i) => {
+              const t = (i / 24) * 2 * Math.PI;
+              const r = 1 + 0.5 * Math.cos(5 * t);
+              return [r * Math.cos(t), r * Math.sin(t)];
+            }) },
+          ];
+
+          function decode(z) {
+            // soft mixing through Gaussian weights in latent space
+            const weights = prototypes.map(p => Math.exp(-0.8 * ((p.z[0] - z[0]) ** 2 + (p.z[1] - z[1]) ** 2)));
+            const W = weights.reduce((a, b) => a + b, 0);
+            const nW = weights.map(w => w / W);
+            const n = prototypes[0].shape.length;
+            const out = [];
+            for (let i = 0; i < n; i++) {
+              let x = 0, y = 0;
+              prototypes.forEach((p, k) => {
+                x += nW[k] * p.shape[i][0];
+                y += nW[k] * p.shape[i][1];
+              });
+              out.push([x, y]);
+            }
+            return { shape: out, weights: nW };
+          }
+
+          const canvasL = container.querySelector('#gm-latent');
+          const ctxL = canvasL.getContext('2d');
+          const canvasD = container.querySelector('#gm-decode');
+          const ctxD = canvasD.getContext('2d');
+
+          function resize() {
+            [canvasL, canvasD].forEach(c => {
+              const r = c.getBoundingClientRect();
+              c.width = r.width; c.height = r.height;
+            });
+            draw();
+          }
+
+          function draw() {
+            const z = [+cZ1.input.value, +cZ2.input.value];
+            // Latent
+            const W = canvasL.width, H = canvasL.height;
+            ctxL.clearRect(0, 0, W, H);
+            const toCL = (x, y) => [W / 2 + x * W / 8, H / 2 - y * H / 8];
+            // axes
+            ctxL.strokeStyle = '#e5e7eb'; ctxL.lineWidth = 1;
+            for (let g = -3; g <= 3; g++) {
+              const [x1, y1] = toCL(g, -3);
+              const [x2, y2] = toCL(g, 3);
+              ctxL.beginPath(); ctxL.moveTo(x1, y1); ctxL.lineTo(x2, y2); ctxL.stroke();
+              const [x3, y3] = toCL(-3, g);
+              const [x4, y4] = toCL(3, g);
+              ctxL.beginPath(); ctxL.moveTo(x3, y3); ctxL.lineTo(x4, y4); ctxL.stroke();
+            }
+            // prototypes
+            const labels = ['О', '▢', '△', '✦'];
+            const colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b'];
+            prototypes.forEach((p, i) => {
+              const [cx, cy] = toCL(p.z[0], p.z[1]);
+              ctxL.fillStyle = colors[i];
+              ctxL.beginPath(); ctxL.arc(cx, cy, 10, 0, 2 * Math.PI); ctxL.fill();
+              ctxL.fillStyle = '#fff';
+              ctxL.font = 'bold 13px sans-serif';
+              ctxL.textAlign = 'center'; ctxL.textBaseline = 'middle';
+              ctxL.fillText(labels[i], cx, cy);
+            });
+            // current z
+            const [cx, cy] = toCL(z[0], z[1]);
+            ctxL.strokeStyle = '#dc2626'; ctxL.lineWidth = 3;
+            ctxL.beginPath(); ctxL.arc(cx, cy, 14, 0, 2 * Math.PI); ctxL.stroke();
+            ctxL.fillStyle = '#dc2626';
+            ctxL.beginPath(); ctxL.arc(cx, cy, 4, 0, 2 * Math.PI); ctxL.fill();
+
+            // Decoder output
+            const Wd = canvasD.width, Hd = canvasD.height;
+            ctxD.clearRect(0, 0, Wd, Hd);
+            const { shape, weights } = decode(z);
+            const scale = Math.min(Wd, Hd) * 0.35;
+            const cxd = Wd / 2, cyd = Hd / 2;
+            // blended color
+            let rC = 0, gC = 0, bC = 0;
+            const pal = [[239, 68, 68], [16, 185, 129], [59, 130, 246], [245, 158, 11]];
+            weights.forEach((w, i) => { rC += w * pal[i][0]; gC += w * pal[i][1]; bC += w * pal[i][2]; });
+            ctxD.strokeStyle = `rgb(${Math.round(rC)},${Math.round(gC)},${Math.round(bC)})`;
+            ctxD.fillStyle = `rgba(${Math.round(rC)},${Math.round(gC)},${Math.round(bC)},0.25)`;
+            ctxD.lineWidth = 4;
+            ctxD.beginPath();
+            shape.forEach(([x, y], i) => {
+              const px = cxd + x * scale, py = cyd - y * scale;
+              if (i === 0) ctxD.moveTo(px, py); else ctxD.lineTo(px, py);
+            });
+            ctxD.closePath();
+            ctxD.fill();
+            ctxD.stroke();
+
+            container.querySelector('#gm-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">z₁</div><div class="stat-value">${z[0].toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">z₂</div><div class="stat-value">${z[1].toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">Ближайший прототип</div><div class="stat-value">${labels[weights.indexOf(Math.max(...weights))]}</div></div>
+              <div class="stat-card"><div class="stat-label">Уверенность</div><div class="stat-value">${(Math.max(...weights) * 100).toFixed(0)}%</div></div>
+            `;
+          }
+
+          [cZ1, cZ2].forEach(c => c.input.addEventListener('input', draw));
+          setTimeout(resize, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+      {
+        title: 'GAN: генератор vs дискриминатор',
+        html: `
+          <h3>Динамика обучения GAN (упрощённо, 1D)</h3>
+          <p>Реальные данные — смесь двух гауссов. Генератор $G(z)$ преобразует шум $z \\sim \\mathcal{N}(0,1)$ в точку. Дискриминатор $D(x)$ пытается отличить реальные от сгенерированных. На каждом шаге показаны плотность реального распределения, fake-распределения и решение дискриминатора.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="gng-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="gng-run">▶ +100 шагов</button>
+              <button class="btn secondary" id="gng-reset">↺ Сброс</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:320px;"><canvas id="gng-chart"></canvas></div>
+              <div class="sim-stats" id="gng-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#gng-controls');
+          const cLR = App.makeControl('range', 'gng-lr', 'Learning rate', { min: 0.005, max: 0.1, step: 0.005, value: 0.03 });
+          const cDsteps = App.makeControl('range', 'gng-d', 'D обновлений на шаг', { min: 1, max: 5, step: 1, value: 1 });
+          [cLR, cDsteps].forEach(c => controls.appendChild(c.wrap));
+
+          // Simple 1D model
+          // G: z ~ N(0,1) → x = a*z + b (learnable a, b) — по сути сеть учит среднее и дисперсию fake-распределения
+          // D: logistic regression over single feature x, parameters (w, c)
+          let a = 0.5, b = 0, Dw = 0.1, Dc = 0;
+          let iter = 0;
+          let chart = null;
+
+          function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+          // Real distribution: mixture of two Gaussians
+          function sampleReal() {
+            if (Math.random() < 0.5) return App.Util.randn(0, 0.4) + (-1.5);
+            return App.Util.randn(0, 0.4) + 1.5;
+          }
+          function realPdf(x) {
+            const g = (mu, s) => Math.exp(-((x - mu) ** 2) / (2 * s * s)) / (s * Math.sqrt(2 * Math.PI));
+            return 0.5 * g(-1.5, 0.4) + 0.5 * g(1.5, 0.4);
+          }
+          function fakePdf(x) {
+            // x = a*z + b, z ~ N(0,1) → fake ~ N(b, a²)
+            if (Math.abs(a) < 1e-6) return 0;
+            return Math.exp(-((x - b) ** 2) / (2 * a * a)) / (Math.abs(a) * Math.sqrt(2 * Math.PI));
+          }
+
+          function trainStep() {
+            const lr = +cLR.input.value;
+            const dSteps = +cDsteps.input.value;
+            const batch = 32;
+            // Train D
+            for (let k = 0; k < dSteps; k++) {
+              let dw = 0, dc = 0;
+              for (let i = 0; i < batch; i++) {
+                const xr = sampleReal();
+                const z = App.Util.randn(0, 1);
+                const xf = a * z + b;
+                // loss = -log D(xr) - log(1 - D(xf))
+                const Dr = sigmoid(Dw * xr + Dc);
+                const Df = sigmoid(Dw * xf + Dc);
+                // gradient of -log D(xr) wrt (Dw,Dc): -(1-Dr)*xr
+                dw += -(1 - Dr) * xr + Df * xf;
+                dc += -(1 - Dr) + Df;
+              }
+              Dw -= lr * dw / batch;
+              Dc -= lr * dc / batch;
+            }
+            // Train G — maximize log D(G(z)) → minimize -log D(xf)
+            let ga = 0, gb = 0;
+            for (let i = 0; i < batch; i++) {
+              const z = App.Util.randn(0, 1);
+              const xf = a * z + b;
+              const Df = sigmoid(Dw * xf + Dc);
+              // d(-log Df)/d xf = -(1 - Df) * Dw
+              const dxf = -(1 - Df) * Dw;
+              ga += dxf * z;
+              gb += dxf;
+            }
+            a -= lr * ga / batch;
+            b -= lr * gb / batch;
+            iter++;
+          }
+
+          function run(n) { for (let i = 0; i < n; i++) trainStep(); draw(); }
+
+          function reset() {
+            a = 0.3 + Math.random() * 0.4;
+            b = (Math.random() - 0.5) * 3;
+            Dw = 0.1; Dc = 0;
+            iter = 0;
+            draw();
+          }
+
+          function draw() {
+            const xs = [];
+            const real = [], fake = [], disc = [];
+            for (let x = -4; x <= 4; x += 0.1) {
+              xs.push(+x.toFixed(2));
+              real.push(realPdf(x));
+              fake.push(fakePdf(x));
+              disc.push(sigmoid(Dw * x + Dc));
+            }
+            const ctx = container.querySelector('#gng-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: xs,
+                datasets: [
+                  { label: 'Реальные p(x)', data: real, borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(16,185,129,0.15)' },
+                  { label: 'Fake q(x)', data: fake, borderColor: '#ef4444', borderWidth: 2.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(239,68,68,0.15)' },
+                  { label: 'D(x) (prob real)', data: disc, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y2' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: `Итерация ${iter}` } },
+                scales: {
+                  x: { title: { display: true, text: 'x' } },
+                  y: { title: { display: true, text: 'плотность' }, min: 0 },
+                  y2: { position: 'right', min: 0, max: 1, title: { display: true, text: 'D(x)' }, grid: { drawOnChartArea: false } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#gng-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Итерация</div><div class="stat-value">${iter}</div></div>
+              <div class="stat-card"><div class="stat-label">a (G std)</div><div class="stat-value">${a.toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">b (G mean)</div><div class="stat-value">${b.toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">D веса</div><div class="stat-value">w=${Dw.toFixed(2)}, c=${Dc.toFixed(2)}</div></div>
+            `;
+          }
+
+          container.querySelector('#gng-run').onclick = () => run(100);
+          container.querySelector('#gng-reset').onclick = reset;
+          reset();
+        },
+      },
+      {
+        title: 'Diffusion denoising',
+        html: `
+          <h3>Diffusion: пошаговое очищение от шума</h3>
+          <p>Стартуем с чистого шума и за $T$ шагов восстанавливаем целевой сигнал. На каждом шаге убираем небольшую часть предсказанного шума. Выбери целевую форму и число шагов.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="gmd-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="gmd-run">▶ Запустить денойзинг</button>
+              <button class="btn secondary" id="gmd-noise">↺ Новый шум</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:320px;"><canvas id="gmd-chart"></canvas></div>
+              <div class="sim-stats" id="gmd-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#gmd-controls');
+          const cTarget = App.makeControl('select', 'gmd-t', 'Цель', {
+            options: [
+              { value: 'sin', label: 'sin(x)' },
+              { value: 'step', label: 'Ступенька' },
+              { value: 'bump', label: 'Гауссов пик' },
+              { value: 'zigzag', label: 'Пила' },
+            ],
+            value: 'sin',
+          });
+          const cSteps = App.makeControl('range', 'gmd-steps', 'Шагов T', { min: 5, max: 60, step: 1, value: 20 });
+          const cSpeed = App.makeControl('range', 'gmd-speed', 'Интервал (мс)', { min: 20, max: 300, step: 10, value: 80 });
+          [cTarget, cSteps, cSpeed].forEach(c => controls.appendChild(c.wrap));
+
+          const N = 60;
+          let noiseVec = new Array(N).fill(0).map(() => App.Util.randn(0, 1));
+          let currentX = [...noiseVec];
+          let chart = null;
+          let timer = null;
+          let stepIdx = 0;
+
+          function target() {
+            const type = cTarget.input.value;
+            const out = new Array(N);
+            for (let i = 0; i < N; i++) {
+              const x = (i / (N - 1)) * 4 * Math.PI - 2 * Math.PI;
+              if (type === 'sin') out[i] = Math.sin(x) * 1.5;
+              else if (type === 'step') out[i] = x < 0 ? -1 : 1;
+              else if (type === 'bump') out[i] = 2 * Math.exp(-x * x / 2);
+              else out[i] = ((i % 10) / 10 - 0.5) * 2;
+            }
+            return out;
+          }
+
+          function regenNoise() {
+            noiseVec = new Array(N).fill(0).map(() => App.Util.randn(0, 1.5));
+            currentX = [...noiseVec];
+            stepIdx = 0;
+            draw();
+          }
+
+          function doStep() {
+            const T = +cSteps.input.value;
+            if (stepIdx >= T) { timer = null; return; }
+            const alpha = (stepIdx + 1) / T;
+            const tgt = target();
+            for (let i = 0; i < N; i++) {
+              const noise = currentX[i] - tgt[i];
+              currentX[i] -= noise * (1 / (T - stepIdx));
+              currentX[i] += App.Util.randn(0, 0.03 * (1 - alpha));
+            }
+            stepIdx++;
+            draw();
+            timer = setTimeout(doStep, +cSpeed.input.value);
+          }
+
+          function run() {
+            if (timer) { clearTimeout(timer); timer = null; }
+            currentX = [...noiseVec];
+            stepIdx = 0;
+            doStep();
+          }
+
+          function draw() {
+            const labels = Array.from({ length: N }, (_, i) => i);
+            const ctx = container.querySelector('#gmd-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'Цель', data: target(), borderColor: '#10b981', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false },
+                  { label: `Текущее (шаг ${stepIdx}/${cSteps.input.value})`, data: [...currentX], borderColor: '#3b82f6', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Reverse diffusion: шум → сигнал' } },
+                scales: { x: { title: { display: true, text: 'i' } }, y: { suggestedMin: -3, suggestedMax: 3 } },
+              },
+            });
+            App.registerChart(chart);
+
+            let mse = 0;
+            const tgt = target();
+            for (let i = 0; i < N; i++) mse += (currentX[i] - tgt[i]) ** 2;
+            mse /= N;
+            container.querySelector('#gmd-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Шаг</div><div class="stat-value">${stepIdx}/${cSteps.input.value}</div></div>
+              <div class="stat-card"><div class="stat-label">MSE к цели</div><div class="stat-value">${mse.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Точек</div><div class="stat-value">${N}</div></div>
+            `;
+          }
+
+          cTarget.input.addEventListener('change', () => { if (timer) { clearTimeout(timer); timer = null; } draw(); });
+          container.querySelector('#gmd-run').onclick = run;
+          container.querySelector('#gmd-noise').onclick = regenNoise;
+          regenNoise();
+        },
+      },
+    ],
+
     python: `
       <h3>Генеративные модели на Python</h3>
       <p>Три подхода: простой GAN на PyTorch, скетч VAE и генерация изображений через HuggingFace Diffusers.</p>

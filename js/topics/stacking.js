@@ -375,118 +375,296 @@ App.registerTopic({
       }
     ],
 
-    simulation: `
-      <div class="sim-container">
-        <div class="sim-controls">
-          <h3>Симуляция: Stacking vs одиночные модели</h3>
-          <p style="color:#64748b;font-size:13px;">Выберите базовые модели, нажмите запуск — увидите точность каждой и стека.</p>
-          <div class="control-group">
-            <label>Базовые модели (выберите минимум 2):</label><br>
-            <label><input type="checkbox" id="m-rf" checked> Random Forest</label>&nbsp;&nbsp;
-            <label><input type="checkbox" id="m-gb" checked> Gradient Boosting</label>&nbsp;&nbsp;
-            <label><input type="checkbox" id="m-svm"> SVM</label>&nbsp;&nbsp;
-            <label><input type="checkbox" id="m-lr"> Логистическая регрессия</label>&nbsp;&nbsp;
-            <label><input type="checkbox" id="m-knn"> KNN</label>
+    simulation: {
+      html: `
+        <h3>Симуляция: как мета-модель взвешивает базовые</h3>
+        <p>Три базовые модели работают на одних данных: <b>LR</b> (линейная граница), <b>Tree</b> (прямоугольники), <b>kNN</b> (локальная). Мета-модель (ridge logistic regression) обучается на их вероятностях и находит <b>веса</b> — сколько доверять каждой. Крути «порчу» каждой базовой модели: как только модель начинает предсказывать случайно, её вес в стеке падает почти до нуля.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="st-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="st-regen">🔄 Новые данные</button>
           </div>
-          <div class="control-group">
-            <label>Мета-модель:</label>
-            <select id="meta-model-type">
-              <option value="lr" selected>Логистическая регрессия (рекомендуется)</option>
-              <option value="ridge">Ridge</option>
-              <option value="rf">Random Forest (переобучение?)</option>
-            </select>
+          <div class="sim-output">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+              <div><div style="font-weight:600;margin-bottom:4px;">LR</div><div class="sim-chart-wrap" style="height:180px;padding:0;"><canvas id="st-lr" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">Tree (d=3)</div><div class="sim-chart-wrap" style="height:180px;padding:0;"><canvas id="st-tr" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">kNN (k=9)</div><div class="sim-chart-wrap" style="height:180px;padding:0;"><canvas id="st-kn" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">Stacking</div><div class="sim-chart-wrap" style="height:180px;padding:0;"><canvas id="st-meta" class="sim-canvas"></canvas></div></div>
+            </div>
+            <div class="sim-chart-wrap" style="height:160px;"><canvas id="st-weights"></canvas></div>
+            <div class="sim-stats" id="st-stats"></div>
           </div>
-          <div class="control-group">
-            <label>Тип данных:</label>
-            <select id="data-type">
-              <option value="balanced">Сбалансированный</option>
-              <option value="skewed">Несбалансированный (1:10)</option>
-              <option value="noisy">Зашумлённый</option>
-            </select>
-          </div>
-          <button class="btn-primary" onclick="runStackingSimulation()">Запустить симуляцию</button>
         </div>
-        <div id="stacking-sim-output" class="sim-output">
-          <p style="color:#64748b;">Выберите модели и нажмите «Запустить симуляцию».</p>
-        </div>
-      </div>
-      <script>
-      function runStackingSimulation() {
-        const models = [];
-        const baseAccuracies = {};
+      `,
+      init(container) {
+        const controls = container.querySelector('#st-controls');
+        const cShape = App.makeControl('select', 'st-shape', 'Данные', {
+          options: [
+            { value: 'linear', label: 'Линейная граница' },
+            { value: 'moons', label: 'Две луны' },
+            { value: 'circle', label: 'Круг' },
+            { value: 'xor', label: 'XOR' },
+          ],
+          value: 'moons',
+        });
+        const cCorruptLR = App.makeControl('range', 'st-cLR', 'Порча LR', { min: 0, max: 1, step: 0.05, value: 0 });
+        const cCorruptTR = App.makeControl('range', 'st-cTR', 'Порча Tree', { min: 0, max: 1, step: 0.05, value: 0 });
+        const cCorruptKN = App.makeControl('range', 'st-cKN', 'Порча kNN', { min: 0, max: 1, step: 0.05, value: 0 });
+        [cShape, cCorruptLR, cCorruptTR, cCorruptKN].forEach(c => controls.appendChild(c.wrap));
 
-        if (document.getElementById('m-rf').checked) { models.push('Random Forest'); baseAccuracies['Random Forest'] = 0.847; }
-        if (document.getElementById('m-gb').checked) { models.push('Gradient Boosting'); baseAccuracies['Gradient Boosting'] = 0.861; }
-        if (document.getElementById('m-svm').checked) { models.push('SVM'); baseAccuracies['SVM'] = 0.832; }
-        if (document.getElementById('m-lr').checked) { models.push('Логистическая регрессия'); baseAccuracies['Логистическая регрессия'] = 0.811; }
-        if (document.getElementById('m-knn').checked) { models.push('KNN'); baseAccuracies['KNN'] = 0.798; }
+        let points = [];
+        let weightsChart = null;
 
-        if (models.length < 2) {
-          document.getElementById('stacking-sim-output').innerHTML = '<p style="color:#ef4444;">Выберите минимум 2 модели.</p>';
-          return;
+        function genData() {
+          const shape = cShape.input.value;
+          points = [];
+          for (let i = 0; i < 180; i++) {
+            let x, y, cls;
+            if (shape === 'linear') {
+              x = Math.random(); y = Math.random();
+              cls = y > 0.5 + 0.3 * (x - 0.5) ? 0 : 1;
+              if (Math.random() < 0.05) cls = 1 - cls;
+            } else if (shape === 'moons') {
+              const t = Math.random() * Math.PI;
+              if (Math.random() < 0.5) {
+                x = 0.3 + 0.25 * Math.cos(t) + App.Util.randn(0, 0.03);
+                y = 0.45 + 0.25 * Math.sin(t) + App.Util.randn(0, 0.03);
+                cls = 0;
+              } else {
+                x = 0.55 + 0.25 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.03);
+                y = 0.55 - 0.25 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.03);
+                cls = 1;
+              }
+            } else if (shape === 'circle') {
+              x = Math.random(); y = Math.random();
+              const r = Math.sqrt((x - 0.5) ** 2 + (y - 0.5) ** 2);
+              cls = r < 0.25 ? 0 : 1;
+            } else {
+              x = Math.random(); y = Math.random();
+              cls = ((x > 0.5) ^ (y > 0.5)) ? 1 : 0;
+              if (Math.random() < 0.05) cls = 1 - cls;
+            }
+            points.push({ x, y, cls });
+          }
+          update();
         }
 
-        const dataType = document.getElementById('data-type').value;
-        const metaType = document.getElementById('meta-model-type').value;
+        function trainLR(pts) {
+          let w0 = 0, w1 = 0, b = 0;
+          const lr = 0.5;
+          for (let it = 0; it < 500; it++) {
+            let g0 = 0, g1 = 0, gb = 0;
+            for (const p of pts) {
+              const z = w0 * p.x + w1 * p.y + b;
+              const s = 1 / (1 + Math.exp(-z));
+              const err = s - p.cls;
+              g0 += err * p.x; g1 += err * p.y; gb += err;
+            }
+            g0 /= pts.length; g1 /= pts.length; gb /= pts.length;
+            w0 -= lr * g0; w1 -= lr * g1; b -= lr * gb;
+          }
+          return { w0, w1, b };
+        }
+        function predLR(m, x, y) { return 1 / (1 + Math.exp(-(m.w0 * x + m.w1 * y + m.b))); }
 
-        // Adjust for data type
-        const dataAdj = dataType === 'skewed' ? -0.015 : dataType === 'noisy' ? -0.025 : 0;
-        const metaAdj = metaType === 'rf' ? -0.005 : metaType === 'ridge' ? +0.002 : 0;
+        function gini(items) { if (items.length === 0) return 0; let c0 = 0; items.forEach(p => p.cls === 0 && c0++); const p0 = c0 / items.length; return 1 - p0 * p0 - (1 - p0) * (1 - p0); }
+        function leafProb(items) { if (items.length === 0) return 0.5; let c1 = 0; items.forEach(p => p.cls === 1 && c1++); return c1 / items.length; }
+        function buildTree(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2 || gini(items) < 1e-9) return { leaf: true, prob: leafProb(items) };
+          let best = null;
+          const base = gini(items);
+          ['x', 'y'].forEach(feat => {
+            const vals = items.map(p => p[feat]).sort((a, b) => a - b);
+            for (let i = 1; i < vals.length; i++) {
+              const thr = (vals[i - 1] + vals[i]) / 2;
+              const L = items.filter(p => p[feat] < thr);
+              const R = items.filter(p => p[feat] >= thr);
+              if (!L.length || !R.length) continue;
+              const w = (L.length * gini(L) + R.length * gini(R)) / items.length;
+              const gain = base - w;
+              if (!best || gain > best.gain) best = { feat, thr, gain, L, R };
+            }
+          });
+          if (!best || best.gain < 1e-6) return { leaf: true, prob: leafProb(items) };
+          return { leaf: false, feat: best.feat, thr: best.thr,
+            left: buildTree(best.L, depth + 1, maxDepth),
+            right: buildTree(best.R, depth + 1, maxDepth) };
+        }
+        function predTree(t, x, y) {
+          if (t.leaf) return t.prob;
+          const v = t.feat === 'x' ? x : y;
+          return v < t.thr ? predTree(t.left, x, y) : predTree(t.right, x, y);
+        }
 
-        // Diversity bonus
-        const diversityBonus = models.length >= 4 ? 0.022 : models.length === 3 ? 0.016 : 0.009;
+        function predKNN(pts, x, y, k) {
+          const dists = pts.map(p => ({ d: (p.x - x) ** 2 + (p.y - y) ** 2, cls: p.cls }));
+          dists.sort((a, b) => a.d - b.d);
+          let c1 = 0;
+          for (let i = 0; i < k; i++) if (dists[i].cls === 1) c1++;
+          return c1 / k;
+        }
 
-        // Best single model
-        const best = Math.max(...Object.values(baseAccuracies)) + dataAdj;
+        function oof() {
+          const n = points.length;
+          const idx = points.map((_, i) => i);
+          for (let i = idx.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [idx[i], idx[j]] = [idx[j], idx[i]];
+          }
+          const fold = idx.map((_, i) => i % 5);
+          const oofLR = new Array(n), oofTR = new Array(n), oofKN = new Array(n);
+          for (let f = 0; f < 5; f++) {
+            const tr = [], val = [];
+            idx.forEach((orig, pos) => { if (fold[pos] === f) val.push(orig); else tr.push(orig); });
+            const trPts = tr.map(i => points[i]);
+            const lrM = trainLR(trPts);
+            const tree = buildTree(trPts, 0, 3);
+            val.forEach(i => {
+              oofLR[i] = predLR(lrM, points[i].x, points[i].y);
+              oofTR[i] = predTree(tree, points[i].x, points[i].y);
+              oofKN[i] = predKNN(trPts, points[i].x, points[i].y, 9);
+            });
+          }
+          return { oofLR, oofTR, oofKN };
+        }
 
-        // Stacking result
-        const stackAcc = Math.min(best + diversityBonus + metaAdj, 0.97);
-        const votingAcc = best + diversityBonus * 0.45;
+        function corrupt(p, level) {
+          if (level < 1e-6) return p;
+          const noisy = 0.5 + (Math.random() - 0.5) * 0.8;
+          return (1 - level) * p + level * noisy;
+        }
 
-        const metaNames = {lr: 'Логистическая регрессия', ridge: 'Ridge', rf: 'Random Forest'};
-        const dataNames = {balanced: 'Сбалансированный', skewed: 'Несбалансированный', noisy: 'Зашумлённый'};
-        const out = document.getElementById('stacking-sim-output');
+        function trainMeta(feats, ys) {
+          const d = 3;
+          const w = [0, 0, 0];
+          let b = 0;
+          const lr = 0.8;
+          const lambda = 0.05;
+          for (let it = 0; it < 600; it++) {
+            const g = [0, 0, 0]; let gb = 0;
+            for (let i = 0; i < feats.length; i++) {
+              let z = b; for (let k = 0; k < d; k++) z += w[k] * feats[i][k];
+              const s = 1 / (1 + Math.exp(-z));
+              const err = s - ys[i];
+              for (let k = 0; k < d; k++) g[k] += err * feats[i][k];
+              gb += err;
+            }
+            for (let k = 0; k < d; k++) {
+              g[k] = g[k] / feats.length + lambda * w[k];
+              w[k] -= lr * g[k];
+            }
+            b -= lr * (gb / feats.length);
+          }
+          return { w, b };
+        }
+        function predMeta(m, feat) {
+          let z = m.b; for (let k = 0; k < 3; k++) z += m.w[k] * feat[k];
+          return 1 / (1 + Math.exp(-z));
+        }
 
-        const rows = models.map(m => {
-          const acc = (baseAccuracies[m] + dataAdj).toFixed(3);
-          const color = parseFloat(acc) === best ? '#059669' : '#374151';
-          return \`<tr>
-            <td>\${m}</td>
-            <td style="font-weight:600;color:\${color}">\${acc}</td>
-            <td>\${parseFloat(acc) === best ? '🏆 лучшая одиночная' : ''}</td>
-          </tr>\`;
-        }).join('');
+        function drawModel(canvasId, predictFn) {
+          const canvas = container.querySelector('#' + canvasId);
+          const r = canvas.getBoundingClientRect();
+          canvas.width = r.width; canvas.height = r.height;
+          const ctx = canvas.getContext('2d');
+          const W = canvas.width, H = canvas.height;
+          ctx.clearRect(0, 0, W, H);
+          const step = 6;
+          for (let px = 0; px < W; px += step) {
+            for (let py = 0; py < H; py += step) {
+              const p = predictFn(px / W, py / H);
+              ctx.fillStyle = `rgba(${Math.round(239 * (1 - p) + 59 * p)},${Math.round(68 * (1 - p) + 130 * p)},${Math.round(68 * (1 - p) + 246 * p)},0.28)`;
+              ctx.fillRect(px, py, step, step);
+            }
+          }
+          points.forEach(p => {
+            ctx.fillStyle = p.cls === 0 ? '#ef4444' : '#3b82f6';
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.arc(p.x * W, p.y * H, 2.2, 0, 2 * Math.PI);
+            ctx.fill(); ctx.stroke();
+          });
+          let correct = 0;
+          points.forEach(p => { if (Math.round(predictFn(p.x, p.y)) === p.cls) correct++; });
+          return correct / points.length;
+        }
 
-        out.innerHTML = \`
-          <h4>Результаты: \${dataNames[dataType]}, мета-модель: \${metaNames[metaType]}</h4>
-          <table class="data-table">
-            <thead><tr><th>Модель</th><th>ROC-AUC</th><th>Статус</th></tr></thead>
-            <tbody>
-              \${rows}
-              <tr style="background:#fef3c7;">
-                <td><b>VotingClassifier</b> (усреднение)</td>
-                <td style="font-weight:600;color:#ca8a04">\${votingAcc.toFixed(3)}</td>
-                <td>простой ансамбль</td>
-              </tr>
-              <tr style="background:#d1fae5;">
-                <td><b>Stacking (\${metaNames[metaType]})</b></td>
-                <td style="font-weight:700;color:#059669;font-size:1.05em">\${stackAcc.toFixed(3)}</td>
-                <td>🚀 <b>+\${(stackAcc - best).toFixed(3)} vs лучшей</b></td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="margin-top:12px;padding:10px;background:#f0fdf4;border-radius:6px;">
-            <b>Анализ:</b>
-            Выбрано моделей: \${models.length}.
-            Diversity bonus: +\${diversityBonus.toFixed(3)}.
-            \${metaType === 'rf' ? '<span style="color:#f97316;">⚠ Random Forest как мета-модель — риск переобучения!</span>' : ''}
-            \${dataType === 'skewed' ? '<span style="color:#ef4444;">⚠ Несбалансированные данные снижают точность всех моделей.</span>' : ''}
-            \${models.length < 3 ? '<span style="color:#ca8a04;">💡 Добавьте ещё модели для большего прироста.</span>' : ''}
-          </div>
-        \`;
-      }
-      </script>
-    `,
+        function update() {
+          const lrFull = trainLR(points);
+          const treeFull = buildTree(points, 0, 3);
+          const { oofLR, oofTR, oofKN } = oof();
+
+          const cLR = +cCorruptLR.input.value;
+          const cTR = +cCorruptTR.input.value;
+          const cKN = +cCorruptKN.input.value;
+
+          const feats = [];
+          const ys = [];
+          for (let i = 0; i < points.length; i++) {
+            feats.push([
+              corrupt(oofLR[i], cLR),
+              corrupt(oofTR[i], cTR),
+              corrupt(oofKN[i], cKN),
+            ]);
+            ys.push(points[i].cls);
+          }
+          const meta = trainMeta(feats, ys);
+
+          const rng = (seed => () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; })(42);
+          function cor(p, level) {
+            if (level < 1e-6) return p;
+            const r = 0.5 + (rng() - 0.5) * 0.8;
+            return (1 - level) * p + level * r;
+          }
+
+          const accLR = drawModel('st-lr', (x, y) => cor(predLR(lrFull, x, y), cLR));
+          const accTR = drawModel('st-tr', (x, y) => cor(predTree(treeFull, x, y), cTR));
+          const accKN = drawModel('st-kn', (x, y) => cor(predKNN(points, x, y, 9), cKN));
+          const accMeta = drawModel('st-meta', (x, y) => {
+            const f = [
+              cor(predLR(lrFull, x, y), cLR),
+              cor(predTree(treeFull, x, y), cTR),
+              cor(predKNN(points, x, y, 9), cKN),
+            ];
+            return predMeta(meta, f);
+          });
+
+          const ctx = container.querySelector('#st-weights').getContext('2d');
+          if (weightsChart) weightsChart.destroy();
+          weightsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['LR', 'Tree', 'kNN'],
+              datasets: [{
+                label: 'Вес мета-модели',
+                data: meta.w,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+              }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              indexAxis: 'y',
+              plugins: { title: { display: true, text: 'Веса базовых моделей в стеке (коэффициенты LR-мета)' }, legend: { display: false } },
+              scales: { x: { title: { display: true, text: 'коэффициент' } } },
+            },
+          });
+          App.registerChart(weightsChart);
+
+          container.querySelector('#st-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">LR acc</div><div class="stat-value">${(accLR * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Tree acc</div><div class="stat-value">${(accTR * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">kNN acc</div><div class="stat-value">${(accKN * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Stacking acc</div><div class="stat-value">${(accMeta * 100).toFixed(1)}%</div></div>
+          `;
+        }
+
+        cShape.input.addEventListener('change', genData);
+        [cCorruptLR, cCorruptTR, cCorruptKN].forEach(c => c.input.addEventListener('input', update));
+        container.querySelector('#st-regen').onclick = genData;
+        setTimeout(genData, 50);
+        window.addEventListener('resize', update);
+      },
+    },
 
     python: `
       <h3>🐍 Stacking и Blending в Python</h3>

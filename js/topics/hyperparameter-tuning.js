@@ -433,6 +433,206 @@ lr = 1.0 (слишком много):
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: Grid vs Random vs Bayesian search</h3>
+        <p>Функция качества на двух гиперпараметрах имеет узкий «хребет»: только один из них реально важен (по горизонтали), второй — почти нет. Смотри, где три стратегии находят максимум, и почему на «плоскости неважного признака» Grid тратит бюджет впустую.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="hpt-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="hpt-run">▶ Прогнать поиск</button>
+            <button class="btn secondary" id="hpt-regen">🔄 Новый ландшафт</button>
+          </div>
+          <div class="sim-output">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+              <div>
+                <div style="text-align:center;font-size:13px;font-weight:600;margin-bottom:4px;color:#334155;">Grid Search</div>
+                <div class="sim-chart-wrap" style="height:260px;padding:0;"><canvas id="hpt-grid" class="sim-canvas"></canvas></div>
+                <div id="hpt-grid-stat" style="text-align:center;font-size:12px;margin-top:6px;color:#475569;"></div>
+              </div>
+              <div>
+                <div style="text-align:center;font-size:13px;font-weight:600;margin-bottom:4px;color:#334155;">Random Search</div>
+                <div class="sim-chart-wrap" style="height:260px;padding:0;"><canvas id="hpt-rand" class="sim-canvas"></canvas></div>
+                <div id="hpt-rand-stat" style="text-align:center;font-size:12px;margin-top:6px;color:#475569;"></div>
+              </div>
+              <div>
+                <div style="text-align:center;font-size:13px;font-weight:600;margin-bottom:4px;color:#334155;">Bayesian (TPE-like)</div>
+                <div class="sim-chart-wrap" style="height:260px;padding:0;"><canvas id="hpt-bayes" class="sim-canvas"></canvas></div>
+                <div id="hpt-bayes-stat" style="text-align:center;font-size:12px;margin-top:6px;color:#475569;"></div>
+              </div>
+            </div>
+            <div class="sim-stats" id="hpt-stats"></div>
+            <div class="lesson-box" style="margin-top:10px;">
+              Истинный оптимум отмечен звездой. На «хребте» score почти не зависит от второго параметра — и Grid с фиксированной сеткой часто промахивается, тратя N точек на одно и то же «плохое» значение первого параметра. Random покрывает значимую ось лучше. Bayesian видит предыдущие результаты и стягивается к области оптимума.
+            </div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#hpt-controls');
+        const cBudget = App.makeControl('range', 'hpt-budget', 'Бюджет оценок', { min: 9, max: 49, step: 4, value: 25 });
+        const cRidge = App.makeControl('range', 'hpt-ridge', 'Ширина хребта', { min: 0.05, max: 0.35, step: 0.01, value: 0.12 });
+        [cBudget, cRidge].forEach(c => controls.appendChild(c.wrap));
+
+        let landscape = null;
+        // score(x, y) = bell around (optX, optY) — узкий по x, почти плоский по y
+        function makeLandscape() {
+          const optX = 0.2 + 0.6 * Math.random();
+          const optY = 0.2 + 0.6 * Math.random();
+          return { optX, optY };
+        }
+        function score(x, y, ridge) {
+          const { optX, optY } = landscape;
+          const dx = (x - optX) / ridge;
+          const dy = (y - optY) / 0.8; // second param: very wide
+          return Math.exp(-(dx * dx + dy * dy));
+        }
+
+        function drawLandscape(canvas, points, best) {
+          const ctx = canvas.getContext('2d');
+          const r = canvas.getBoundingClientRect();
+          canvas.width = r.width; canvas.height = r.height;
+          const W = canvas.width, H = canvas.height;
+          const ridge = +cRidge.input.value;
+          // heatmap
+          const step = 6;
+          for (let px = 0; px < W; px += step) {
+            for (let py = 0; py < H; py += step) {
+              const s = score(px / W, 1 - py / H, ridge);
+              const v = Math.floor(255 * (1 - s));
+              ctx.fillStyle = `rgb(${v},${Math.min(255, v + 30)},255)`;
+              ctx.fillRect(px, py, step, step);
+            }
+          }
+          // axes labels
+          ctx.fillStyle = '#334155';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('важный параметр →', W / 2, H - 4);
+          ctx.save();
+          ctx.translate(10, H / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText('неважный →', 0, 0);
+          ctx.restore();
+          // points
+          points.forEach(p => {
+            ctx.fillStyle = `rgba(30,41,59,${0.35 + 0.5 * p.s})`;
+            ctx.beginPath();
+            ctx.arc(p.x * W, (1 - p.y) * H, 3 + 4 * p.s, 0, 2 * Math.PI);
+            ctx.fill();
+          });
+          // optimum
+          const ox = landscape.optX * W, oy = (1 - landscape.optY) * H;
+          ctx.fillStyle = '#f59e0b';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          for (let k = 0; k < 10; k++) {
+            const a = -Math.PI / 2 + k * Math.PI / 5;
+            const rr = k % 2 === 0 ? 9 : 4;
+            const xx = ox + rr * Math.cos(a), yy = oy + rr * Math.sin(a);
+            if (k === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          // best found
+          if (best) {
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(best.x * W, (1 - best.y) * H, 10, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
+        }
+
+        function runGrid(budget, ridge) {
+          const side = Math.round(Math.sqrt(budget));
+          const pts = [];
+          for (let i = 0; i < side; i++) {
+            for (let j = 0; j < side; j++) {
+              const x = (i + 0.5) / side, y = (j + 0.5) / side;
+              pts.push({ x, y, s: score(x, y, ridge) });
+            }
+          }
+          return pts;
+        }
+        function runRandom(budget, ridge) {
+          const pts = [];
+          for (let i = 0; i < budget; i++) {
+            const x = Math.random(), y = Math.random();
+            pts.push({ x, y, s: score(x, y, ridge) });
+          }
+          return pts;
+        }
+        function runBayes(budget, ridge) {
+          // Поверхностная TPE-подобная стратегия: первые 25% — случайные, дальше выбираем из кандидатов,
+          // максимизируя «близость к лучшим − удалённость от худших».
+          const pts = [];
+          const warmup = Math.max(4, Math.floor(budget * 0.25));
+          for (let i = 0; i < warmup; i++) {
+            const x = Math.random(), y = Math.random();
+            pts.push({ x, y, s: score(x, y, ridge) });
+          }
+          for (let i = warmup; i < budget; i++) {
+            const sorted = [...pts].sort((a, b) => b.s - a.s);
+            const split = Math.max(1, Math.floor(sorted.length / 3));
+            const good = sorted.slice(0, split), bad = sorted.slice(split);
+            let best = null, bestAcq = -Infinity;
+            for (let k = 0; k < 80; k++) {
+              const cx = Math.random(), cy = Math.random();
+              let lg = 0, lb = 0;
+              good.forEach(p => { lg += Math.exp(-((cx - p.x) ** 2 + (cy - p.y) ** 2) / 0.03); });
+              bad.forEach(p => { lb += Math.exp(-((cx - p.x) ** 2 + (cy - p.y) ** 2) / 0.03); });
+              const acq = lg / (lb + 0.5);
+              if (acq > bestAcq) { bestAcq = acq; best = { x: cx, y: cy }; }
+            }
+            pts.push({ x: best.x, y: best.y, s: score(best.x, best.y, ridge) });
+          }
+          return pts;
+        }
+
+        function best(pts) { return pts.reduce((a, b) => (b.s > a.s ? b : a), pts[0]); }
+
+        function run() {
+          const budget = +cBudget.input.value;
+          const ridge = +cRidge.input.value;
+          const grid = runGrid(budget, ridge);
+          const rnd = runRandom(budget, ridge);
+          const bay = runBayes(budget, ridge);
+
+          const bG = best(grid), bR = best(rnd), bB = best(bay);
+          drawLandscape(container.querySelector('#hpt-grid'), grid, bG);
+          drawLandscape(container.querySelector('#hpt-rand'), rnd, bR);
+          drawLandscape(container.querySelector('#hpt-bayes'), bay, bB);
+
+          const gridEff = Math.round(Math.sqrt(budget));
+          container.querySelector('#hpt-grid-stat').innerHTML =
+            `${gridEff}×${gridEff} сетка · лучший score: <b>${bG.s.toFixed(3)}</b>`;
+          container.querySelector('#hpt-rand-stat').innerHTML =
+            `${budget} случайных точек · лучший score: <b>${bR.s.toFixed(3)}</b>`;
+          container.querySelector('#hpt-bayes-stat').innerHTML =
+            `${budget} оценок · лучший score: <b>${bB.s.toFixed(3)}</b>`;
+
+          container.querySelector('#hpt-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Бюджет</div><div class="stat-value">${budget}</div></div>
+            <div class="stat-card"><div class="stat-label">Grid</div><div class="stat-value">${bG.s.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Random</div><div class="stat-value">${bR.s.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Bayesian</div><div class="stat-value">${bB.s.toFixed(3)}</div></div>
+          `;
+        }
+
+        function regen() { landscape = makeLandscape(); run(); }
+
+        [cBudget, cRidge].forEach(c => c.input.addEventListener('input', run));
+        container.querySelector('#hpt-run').onclick = run;
+        container.querySelector('#hpt-regen').onclick = regen;
+        window.addEventListener('resize', run);
+
+        setTimeout(regen, 50);
+      },
+    },
+
     python: `
       <h3>Python: подбор гиперпараметров</h3>
       <p>Три основных подхода: GridSearchCV (полный перебор), RandomizedSearchCV (случайный) и Optuna (Bayesian Optimization).</p>

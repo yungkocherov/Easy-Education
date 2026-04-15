@@ -692,7 +692,9 @@ Max = 120 (выброс!)</div>
       }
     ],
 
-    simulation: {
+    simulation: [
+      {
+        title: 'Выбросы и статистики',
       html: `
         <h3>Симуляция: как выбросы влияют на статистики</h3>
         <p>Сгенерируй выборку и посмотри, как меняются среднее/медиана/std при добавлении выбросов.</p>
@@ -798,7 +800,141 @@ Max = 120 (выброс!)</div>
         container.querySelector('#dstat-regen').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Скошенность и эксцесс',
+        html: `
+          <h3>Skewness и Kurtosis: форма распределения в двух числах</h3>
+          <p>Skewness — асимметрия (0 = симметрично, > 0 — длинный правый хвост). Kurtosis — «тяжесть» хвостов относительно нормального (для нормального = 3, часто используется excess kurtosis = kurt − 3).</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="dstatK-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="dstatK-chart"></canvas></div>
+              <div class="sim-stats" id="dstatK-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#dstatK-controls');
+          const cType = App.makeControl('select', 'dstatK-type', 'Распределение', {
+            options: [
+              { value: 'normal', label: 'Нормальное' },
+              { value: 'lognorm', label: 'LogNormal (скошенное вправо)' },
+              { value: 'exp', label: 'Экспоненциальное' },
+              { value: 'laplace', label: 'Лаплас (тяжёлые хвосты)' },
+              { value: 'uniform', label: 'Равномерное' },
+              { value: 'bimodal', label: 'Бимодальное' },
+              { value: 'mix', label: 'Нормальное + выбросы' },
+            ],
+            value: 'lognorm',
+          });
+          const cN = App.makeControl('range', 'dstatK-n', 'Размер выборки', { min: 100, max: 5000, step: 100, value: 2000 });
+          const cSkew = App.makeControl('range', 'dstatK-skew', 'Параметр формы', { min: 0.2, max: 2.5, step: 0.1, value: 1 });
+          [cType, cN, cSkew].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function sampleFrom(type, n, s) {
+            const out = [];
+            for (let i = 0; i < n; i++) {
+              if (type === 'normal') out.push(App.Util.randn(0, 1));
+              else if (type === 'lognorm') out.push(Math.exp(App.Util.randn(0, s)));
+              else if (type === 'exp') out.push(-Math.log(1 - Math.random()) / (1 / s));
+              else if (type === 'laplace') {
+                const u = Math.random() - 0.5;
+                out.push(-s * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)));
+              } else if (type === 'uniform') out.push((Math.random() - 0.5) * 2 * s);
+              else if (type === 'bimodal') out.push(Math.random() < 0.5 ? App.Util.randn(-s, 0.4) : App.Util.randn(s, 0.4));
+              else {
+                out.push(Math.random() < 0.05 ? App.Util.randn(6 * s, 0.5) : App.Util.randn(0, 1));
+              }
+            }
+            return out;
+          }
+
+          function skewness(arr) {
+            const m = App.Util.mean(arr);
+            const sd = App.Util.std(arr, false);
+            if (sd === 0) return 0;
+            const n = arr.length;
+            let s = 0;
+            for (const x of arr) s += ((x - m) / sd) ** 3;
+            return s / n;
+          }
+          function kurtosis(arr) {
+            const m = App.Util.mean(arr);
+            const sd = App.Util.std(arr, false);
+            if (sd === 0) return 0;
+            const n = arr.length;
+            let s = 0;
+            for (const x of arr) s += ((x - m) / sd) ** 4;
+            return s / n;
+          }
+
+          function run() {
+            const type = cType.input.value;
+            const n = +cN.input.value;
+            const s = +cSkew.input.value;
+            const data = sampleFrom(type, n, s);
+
+            const lo = App.Util.quantile(data, 0.01);
+            const hi = App.Util.quantile(data, 0.99);
+            const hist = App.Util.histogram(data, 50, [lo, hi]);
+
+            const mean = App.Util.mean(data);
+            const median = App.Util.median(data);
+            const sk = skewness(data);
+            const kt = kurtosis(data);
+
+            const ctx = container.querySelector('#dstatK-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: hist.centers.map(c => App.Util.round(c, 2)),
+                datasets: [{
+                  label: 'Частота',
+                  data: hist.counts,
+                  backgroundColor: 'rgba(99,102,241,0.6)',
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { title: { display: true, text: 'Значение' }, ticks: { maxTicksLimit: 12 } },
+                  y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#dstatK-stats');
+            statsEl.innerHTML = '';
+            const skewLabel = sk > 0.5 ? '▶ правый скос' : (sk < -0.5 ? '◀ левый скос' : '≈ симметрично');
+            const kurtLabel = kt > 4 ? 'тяжёлые хвосты' : (kt < 2.5 ? 'плоские хвосты' : '≈ нормальные хвосты');
+            const cards = [
+              ['Skewness', sk.toFixed(2) + ' (' + skewLabel + ')'],
+              ['Kurtosis', kt.toFixed(2) + ' (' + kurtLabel + ')'],
+              ['Excess kurt', (kt - 3).toFixed(2)],
+              ['Mean', mean.toFixed(2)],
+              ['Median', median.toFixed(2)],
+              ['Mean − Median', (mean - median).toFixed(2)],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cN, cSkew].forEach(c => c.input.addEventListener('input', run));
+          cType.input.addEventListener('change', run);
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Описательная статистика в Python</h3>

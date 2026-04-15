@@ -471,8 +471,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Основная симуляция',
+        html: `
         <h3>Симуляция: DBSCAN в действии</h3>
         <p>Меняй eps и min_samples. Чёрные точки — шум.</p>
         <div class="sim-container">
@@ -615,7 +617,152 @@ App.registerTopic({
         setTimeout(() => { genData(); resize(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+      },
+      {
+        title: 'Слабость: разная плотность',
+        html: `
+          <h3>Почему DBSCAN ломается на кластерах разной плотности</h3>
+          <p>Два реальных кластера: один плотный, другой рыхлый. У DBSCAN <b>одно</b> значение eps на весь датасет. Подбирай eps:</p>
+          <ul>
+            <li>Маленький eps → плотный кластер находится, рыхлый распадается на шум.</li>
+            <li>Большой eps → рыхлый собирается, но плотный <i>сливается</i> с соседним кластером или шумом.</li>
+          </ul>
+          <p>«Золотого» eps не существует. Это известная дыра в DBSCAN — лечится HDBSCAN, который сам подбирает локальную плотность.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="dbsV-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn secondary" id="dbsV-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:400px;padding:0;"><canvas id="dbsV-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="dbsV-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#dbsV-controls');
+          const cEps = App.makeControl('range', 'dbsV-eps', 'eps (общий для всех)', { min: 0.02, max: 0.2, step: 0.005, value: 0.05 });
+          const cMin = App.makeControl('range', 'dbsV-min', 'min_samples', { min: 2, max: 12, step: 1, value: 4 });
+          const cDense = App.makeControl('range', 'dbsV-dense', 'Плотность плотного', { min: 0.01, max: 0.06, step: 0.005, value: 0.02 });
+          const cLoose = App.makeControl('range', 'dbsV-loose', 'Плотность рыхлого', { min: 0.04, max: 0.15, step: 0.005, value: 0.09 });
+          [cEps, cMin, cDense, cLoose].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#dbsV-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+          let points = [];
+          let labels = [];
+
+          function genData() {
+            const sDense = +cDense.input.value;
+            const sLoose = +cLoose.input.value;
+            points = [];
+            // плотный кластер слева
+            for (let i = 0; i < 80; i++) {
+              points.push({ x: 0.25 + App.Util.randn(0, sDense), y: 0.5 + App.Util.randn(0, sDense), truth: 0 });
+            }
+            // рыхлый кластер справа
+            for (let i = 0; i < 80; i++) {
+              points.push({ x: 0.7 + App.Util.randn(0, sLoose), y: 0.5 + App.Util.randn(0, sLoose), truth: 1 });
+            }
+            run();
+          }
+
+          function run() {
+            const eps = +cEps.input.value, minS = +cMin.input.value;
+            const NOISE = -2, UNVISITED = -1;
+            labels = new Array(points.length).fill(UNVISITED);
+            let cluster = 0;
+
+            function neighbors(i) {
+              const out = [];
+              for (let j = 0; j < points.length; j++) {
+                const d = Math.sqrt((points[i].x - points[j].x) ** 2 + (points[i].y - points[j].y) ** 2);
+                if (d <= eps) out.push(j);
+              }
+              return out;
+            }
+
+            for (let i = 0; i < points.length; i++) {
+              if (labels[i] !== UNVISITED) continue;
+              const N = neighbors(i);
+              if (N.length < minS) { labels[i] = NOISE; continue; }
+              labels[i] = cluster;
+              const queue = [...N];
+              while (queue.length) {
+                const q = queue.shift();
+                if (labels[q] === NOISE) labels[q] = cluster;
+                if (labels[q] !== UNVISITED) continue;
+                labels[q] = cluster;
+                const Nq = neighbors(q);
+                if (Nq.length >= minS) Nq.forEach(x => { if (labels[x] === UNVISITED || labels[x] === NOISE) queue.push(x); });
+              }
+              cluster++;
+            }
+            draw();
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            points.forEach((p, i) => {
+              ctx.fillStyle = labels[i] === -2 ? '#0f172a' : colors[labels[i] % colors.length];
+              ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.arc(p.x * W, p.y * H, labels[i] === -2 ? 3 : 5, 0, 2 * Math.PI);
+              ctx.fill();
+              if (labels[i] !== -2) ctx.stroke();
+            });
+
+            // diagnose: для каждого истинного кластера — сколько в шуме, сколько в «своём» кластере, сколько слито с другим
+            const truthGroups = [[], []];
+            points.forEach((p, i) => truthGroups[p.truth].push(labels[i]));
+            const stats = truthGroups.map(grp => {
+              const noise = grp.filter(l => l === -2).length;
+              const real = grp.filter(l => l >= 0);
+              const uniq = [...new Set(real)];
+              return { noise, clusters: uniq.length, total: grp.length };
+            });
+
+            const nClust = new Set(labels.filter(l => l >= 0)).size;
+            const nNoise = labels.filter(l => l === -2).length;
+
+            // diagnostic message
+            let msg = '', bg = '#dcfce7';
+            const allSame = new Set(labels.filter(l => l >= 0)).size === 1 && nNoise < 5;
+            if (stats[0].noise > 20 && stats[1].noise < 10) {
+              msg = 'Плотный кластер найден, рыхлый распался на шум.'; bg = '#fef3c7';
+            } else if (stats[0].noise < 10 && stats[1].noise > 20) {
+              msg = 'Рыхлый кластер найден, плотный слился с шумом.'; bg = '#fef3c7';
+            } else if (nClust === 1 || allSame) {
+              msg = 'Всё слилось в один кластер — eps слишком большой.'; bg = '#fee2e2';
+            } else if (nClust === 2 && nNoise < 15) {
+              msg = 'Оба кластера найдены! Редкий удачный eps.'; bg = '#dcfce7';
+            } else {
+              msg = `Результат: ${nClust} кластеров, ${nNoise} шумовых точек`; bg = '#fef3c7';
+            }
+
+            container.querySelector('#dbsV-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Кластеров найдено</div><div class="stat-value">${nClust}</div></div>
+              <div class="stat-card"><div class="stat-label">Шум</div><div class="stat-value">${nNoise}</div></div>
+              <div class="stat-card"><div class="stat-label">Плотный → шум</div><div class="stat-value">${stats[0].noise} / 80</div></div>
+              <div class="stat-card"><div class="stat-label">Рыхлый → шум</div><div class="stat-value">${stats[1].noise} / 80</div></div>
+              <div class="stat-card" style="background:${bg}"><div class="stat-label">Диагноз</div><div class="stat-value" style="font-size:12px">${msg}</div></div>
+            `;
+          }
+
+          [cEps, cMin].forEach(c => c.input.addEventListener('input', run));
+          [cDense, cLoose].forEach(c => c.input.addEventListener('change', genData));
+          container.querySelector('#dbsV-regen').onclick = genData;
+
+          setTimeout(() => { genData(); resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Python: DBSCAN</h3>

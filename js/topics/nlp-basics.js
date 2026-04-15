@@ -420,8 +420,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'BoW и TF-IDF',
+        html: `
         <h3>Симуляция: BoW и TF-IDF</h3>
         <p>Выбери набор предложений. Включай и выключай стоп-слова. Смотри на BoW и TF-IDF <a class="glossary-link" onclick="App.selectTopic('viz-histogram')">гистограммы</a>.</p>
         <div class="sim-container">
@@ -573,7 +575,199 @@ App.registerTopic({
         [cCorpus, cStopwords, cMinDf].forEach(c => c.input.addEventListener('change', update));
         update();
       },
-    },
+      },
+      {
+        title: 'Косинусная близость',
+        html: `
+          <h3>Косинусная близость документов</h3>
+          <p>Косинус между векторами документа — мера, насколько «в том же направлении» их TF-IDF представления. От 1 (идентичные темы) до 0 (полностью разные). Выбери два документа, посмотри на их пересечение слов и итоговый счёт.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="nlpc-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:340px;"><canvas id="nlpc-heat" class="sim-canvas"></canvas></div>
+              <div id="nlpc-pair" style="margin-top:14px;padding:14px;background:#f8fafc;border-radius:8px;font-size:14px;"></div>
+              <div class="sim-stats" id="nlpc-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const DOCS = [
+            'кот сидит на крыше',
+            'кот пьёт молоко и мурлычет',
+            'собака бежит по улице',
+            'модель обучается на данных',
+            'нейронная сеть обучается на примерах',
+            'кот мурлычет и пьёт молоко',
+          ];
+          const STOPWORDS = new Set(['и', 'на', 'в', 'по', 'что', 'это', 'а', 'но', 'не', 'к', 'с', 'из', 'о']);
+
+          const controls = container.querySelector('#nlpc-controls');
+          const cI = App.makeControl('range', 'nlpc-i', 'Документ A', { min: 1, max: DOCS.length, step: 1, value: 1 });
+          const cJ = App.makeControl('range', 'nlpc-j', 'Документ B', { min: 1, max: DOCS.length, step: 1, value: 2 });
+          const cMode = App.makeControl('select', 'nlpc-mode', 'Векторизация', {
+            options: [{ value: 'bow', label: 'Bag-of-Words' }, { value: 'tfidf', label: 'TF-IDF' }],
+            value: 'tfidf',
+          });
+          [cI, cJ, cMode].forEach(c => controls.appendChild(c.wrap));
+
+          function tokenize(t) {
+            return t.toLowerCase().replace(/[^а-яёa-z\s]/g, '').split(/\s+/).filter(Boolean).filter(w => !STOPWORDS.has(w));
+          }
+
+          function build() {
+            const toks = DOCS.map(tokenize);
+            const dfMap = {};
+            toks.forEach(ts => { [...new Set(ts)].forEach(t => { dfMap[t] = (dfMap[t] || 0) + 1; }); });
+            const vocab = Object.keys(dfMap).sort();
+            const N = DOCS.length;
+            const bow = toks.map(ts => {
+              const v = new Array(vocab.length).fill(0);
+              ts.forEach(t => { const k = vocab.indexOf(t); if (k >= 0) v[k]++; });
+              return v;
+            });
+            const idf = vocab.map(w => Math.log((N + 1) / (dfMap[w] + 1)) + 1);
+            const tfidf = bow.map((row, di) => {
+              const len = toks[di].length || 1;
+              return row.map((cnt, wi) => (cnt / len) * idf[wi]);
+            });
+            return { vocab, bow, tfidf };
+          }
+
+          function cosine(a, b) {
+            let dot = 0, na = 0, nb = 0;
+            for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+            const d = Math.sqrt(na) * Math.sqrt(nb);
+            return d ? dot / d : 0;
+          }
+
+          const canvas = container.querySelector('#nlpc-heat');
+          const ctx = canvas.getContext('2d');
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const mode = cMode.input.value;
+            const { vocab, bow, tfidf } = build();
+            const vecs = mode === 'bow' ? bow : tfidf;
+            const N = DOCS.length;
+            const M = Array.from({ length: N }, () => new Array(N).fill(0));
+            for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) M[i][j] = cosine(vecs[i], vecs[j]);
+
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const padL = 60, padT = 40, padR = 20, padB = 20;
+            const cs = Math.min((W - padL - padR) / N, (H - padT - padB) / N);
+            for (let i = 0; i < N; i++) {
+              for (let j = 0; j < N; j++) {
+                const v = M[i][j];
+                ctx.fillStyle = `rgba(59,130,246,${Math.min(1, v)})`;
+                ctx.fillRect(padL + j * cs, padT + i * cs, cs, cs);
+                ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
+                ctx.strokeRect(padL + j * cs, padT + i * cs, cs, cs);
+                ctx.fillStyle = v > 0.5 ? '#fff' : '#0f172a';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(v.toFixed(2), padL + (j + 0.5) * cs, padT + (i + 0.5) * cs);
+              }
+            }
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            for (let j = 0; j < N; j++) ctx.fillText('d' + (j + 1), padL + (j + 0.5) * cs, padT - 4);
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            for (let i = 0; i < N; i++) ctx.fillText('d' + (i + 1), padL - 6, padT + (i + 0.5) * cs);
+
+            // highlight selected pair
+            const ii = +cI.input.value - 1;
+            const jj = +cJ.input.value - 1;
+            ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
+            ctx.strokeRect(padL + jj * cs, padT + ii * cs, cs, cs);
+
+            const tI = tokenize(DOCS[ii]);
+            const tJ = tokenize(DOCS[jj]);
+            const common = tI.filter(t => tJ.includes(t));
+            container.querySelector('#nlpc-pair').innerHTML = `
+              <div><b>d${ii + 1}:</b> «${DOCS[ii]}»</div>
+              <div><b>d${jj + 1}:</b> «${DOCS[jj]}»</div>
+              <div style="margin-top:6px;"><b>Общие слова:</b> ${common.length ? common.map(w => `<code>${w}</code>`).join(' ') : '<i>нет</i>'}</div>
+            `;
+
+            container.querySelector('#nlpc-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Cos(d${ii + 1}, d${jj + 1})</div><div class="stat-value">${M[ii][jj].toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Словарь</div><div class="stat-value">${vocab.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Режим</div><div class="stat-value">${mode.toUpperCase()}</div></div>
+            `;
+          }
+
+          [cI, cJ, cMode].forEach(c => c.input.addEventListener('input', draw));
+          setTimeout(() => { resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+      {
+        title: 'Размер словаря',
+        html: `
+          <h3>Как растёт словарь с размером корпуса</h3>
+          <p>Закон Хипса: $|V| \\approx K \\cdot N^{\\beta}$, где $N$ — число токенов в корпусе, $|V|$ — размер словаря. Обычно $\\beta \\in [0.4, 0.6]$. Меняй $K$ и $\\beta$ — смотри на кривую. Это объясняет, почему словарь почти никогда не «насыщается» на больших корпусах и нужны BPE/subword-токенизаторы.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="nlph-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:340px;"><canvas id="nlph-chart"></canvas></div>
+              <div class="sim-stats" id="nlph-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#nlph-controls');
+          const cK = App.makeControl('range', 'nlph-k', 'K (константа)', { min: 5, max: 40, step: 1, value: 15 });
+          const cBeta = App.makeControl('range', 'nlph-b', 'β (показатель)', { min: 0.3, max: 0.75, step: 0.01, value: 0.5 });
+          const cMax = App.makeControl('range', 'nlph-m', 'log10(макс. N)', { min: 3, max: 9, step: 0.5, value: 7 });
+          [cK, cBeta, cMax].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function draw() {
+            const K = +cK.input.value;
+            const beta = +cBeta.input.value;
+            const Nmax = Math.pow(10, +cMax.input.value);
+            const pts = [];
+            for (let lx = 1; lx <= Math.log10(Nmax); lx += 0.1) {
+              const n = Math.pow(10, lx);
+              pts.push({ x: n, y: K * Math.pow(n, beta) });
+            }
+            const ctx = container.querySelector('#nlph-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                datasets: [{ label: `|V| = ${K}·N^${beta.toFixed(2)}`, data: pts, borderColor: '#3b82f6', borderWidth: 2.5, pointRadius: 0, fill: false }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Закон Хипса (log-log)' } },
+                scales: {
+                  x: { type: 'logarithmic', title: { display: true, text: 'N (токенов в корпусе)' } },
+                  y: { type: 'logarithmic', title: { display: true, text: '|V| (размер словаря)' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const vAt6 = K * Math.pow(1e6, beta);
+            const vAt9 = K * Math.pow(1e9, beta);
+            container.querySelector('#nlph-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">|V| при N=1M</div><div class="stat-value">${Math.round(vAt6).toLocaleString('ru-RU')}</div></div>
+              <div class="stat-card"><div class="stat-label">|V| при N=1B</div><div class="stat-value">${Math.round(vAt9).toLocaleString('ru-RU')}</div></div>
+              <div class="stat-card"><div class="stat-label">Рост ×1000 в N</div><div class="stat-value">×${Math.pow(1000, beta).toFixed(1)}</div></div>
+            `;
+          }
+
+          [cK, cBeta, cMax].forEach(c => c.input.addEventListener('input', draw));
+          setTimeout(draw, 50);
+        },
+      },
+    ],
 
     python: `
       <h3>Python: NLP от BoW до BERT</h3>

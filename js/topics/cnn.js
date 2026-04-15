@@ -790,8 +790,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Фильтры свёртки',
+        html: `
         <h3>Симуляция: фильтры свёртки в действии</h3>
         <p>Выбери фильтр и посмотри, что он извлекает из тестового изображения.</p>
         <div class="sim-container">
@@ -961,7 +963,154 @@ App.registerTopic({
         setTimeout(run, 50);
         window.addEventListener('resize', run);
       },
-    },
+      },
+      {
+        title: 'Пулинг и инвариантность',
+        html: `
+          <h3>Max-pooling и трансляционная инвариантность</h3>
+          <p>Пулинг уменьшает карту признаков, беря максимум (или среднее) по небольшому окну. Побочный эффект — небольшой сдвиг входа почти не влияет на выход. Двигай объект слайдером — посмотри, как меняются карты признаков и результат пулинга.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="cnnp-controls"></div>
+            <div class="sim-output">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Вход (сдвиг)</p>
+                  <div style="height:180px;"><canvas id="cnnp-in" class="sim-canvas"></canvas></div>
+                </div>
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">После свёртки</p>
+                  <div style="height:180px;"><canvas id="cnnp-conv" class="sim-canvas"></canvas></div>
+                </div>
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">После пулинга 2×2</p>
+                  <div style="height:180px;"><canvas id="cnnp-pool" class="sim-canvas"></canvas></div>
+                </div>
+                <div>
+                  <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">2 пулинга подряд</p>
+                  <div style="height:180px;"><canvas id="cnnp-pool2" class="sim-canvas"></canvas></div>
+                </div>
+              </div>
+              <div class="sim-stats" id="cnnp-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#cnnp-controls');
+          const cShift = App.makeControl('range', 'cnnp-shift', 'Сдвиг объекта по X', { min: -8, max: 8, step: 1, value: 0 });
+          const cPool = App.makeControl('select', 'cnnp-type', 'Тип пулинга', {
+            options: [{ value: 'max', label: 'Max' }, { value: 'avg', label: 'Average' }],
+            value: 'max',
+          });
+          [cShift, cPool].forEach(c => controls.appendChild(c.wrap));
+
+          const size = 24;
+          const kernel = [[0, -1, 0], [-1, 4, -1], [0, -1, 0]]; // Laplacian edge
+          let prevFlat = null;
+
+          function genImage(shift) {
+            const img = Array.from({ length: size }, () => new Array(size).fill(0));
+            const cx = size / 2 + shift, cy = size / 2;
+            for (let i = 0; i < size; i++) {
+              for (let j = 0; j < size; j++) {
+                const d = Math.sqrt((i - cy) ** 2 + (j - cx) ** 2);
+                if (d < 5) img[i][j] = 1;
+                if (d >= 5 && d < 6) img[i][j] = 0.5;
+              }
+            }
+            return img;
+          }
+
+          function conv2d(img, k) {
+            const n = img.length;
+            const out = Array.from({ length: n }, () => new Array(n).fill(0));
+            for (let i = 1; i < n - 1; i++) {
+              for (let j = 1; j < n - 1; j++) {
+                let s = 0;
+                for (let ki = 0; ki < 3; ki++) for (let kj = 0; kj < 3; kj++) s += img[i + ki - 1][j + kj - 1] * k[ki][kj];
+                out[i][j] = Math.abs(s);
+              }
+            }
+            return out;
+          }
+
+          function pool2x2(mat, type) {
+            const n = mat.length;
+            const m = Math.floor(n / 2);
+            const out = Array.from({ length: m }, () => new Array(m).fill(0));
+            for (let i = 0; i < m; i++) {
+              for (let j = 0; j < m; j++) {
+                const a = mat[2 * i][2 * j], b = mat[2 * i][2 * j + 1];
+                const c = mat[2 * i + 1][2 * j], d = mat[2 * i + 1][2 * j + 1];
+                out[i][j] = type === 'max' ? Math.max(a, b, c, d) : (a + b + c + d) / 4;
+              }
+            }
+            return out;
+          }
+
+          function drawMat(canvasId, mat, auto) {
+            const canvas = container.querySelector(canvasId);
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width; canvas.height = rect.height;
+            const n = mat.length;
+            const cs = Math.min(canvas.width, canvas.height) / n;
+            const off = (canvas.width - cs * n) / 2;
+            const offY = (canvas.height - cs * n) / 2;
+            let mn = 0, mx = 1;
+            if (auto) {
+              mn = Infinity; mx = -Infinity;
+              for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+                if (mat[i][j] < mn) mn = mat[i][j];
+                if (mat[i][j] > mx) mx = mat[i][j];
+              }
+            }
+            const range = mx - mn || 1;
+            for (let i = 0; i < n; i++) {
+              for (let j = 0; j < n; j++) {
+                const v = (mat[i][j] - mn) / range;
+                const c = Math.round(v * 255);
+                ctx.fillStyle = `rgb(${c},${c},${c})`;
+                ctx.fillRect(off + j * cs, offY + i * cs, cs + 1, cs + 1);
+              }
+            }
+          }
+
+          function run() {
+            const shift = +cShift.input.value;
+            const type = cPool.input.value;
+            const img = genImage(shift);
+            const conv = conv2d(img, kernel);
+            const p1 = pool2x2(conv, type);
+            const p2 = pool2x2(p1, type);
+            drawMat('#cnnp-in', img, false);
+            drawMat('#cnnp-conv', conv, true);
+            drawMat('#cnnp-pool', p1, true);
+            drawMat('#cnnp-pool2', p2, true);
+
+            const flat = p2.flat();
+            let diff = '—';
+            if (prevFlat && prevFlat.length === flat.length) {
+              let s = 0, n = 0;
+              for (let i = 0; i < flat.length; i++) { s += Math.abs(flat[i] - prevFlat[i]); n++; }
+              diff = (s / n).toFixed(3);
+            }
+            prevFlat = flat;
+
+            container.querySelector('#cnnp-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Вход</div><div class="stat-value">${size}×${size}</div></div>
+              <div class="stat-card"><div class="stat-label">После 2 пулингов</div><div class="stat-value">${p2.length}×${p2.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Сжатие</div><div class="stat-value">${Math.round((1 - (p2.length ** 2) / (size * size)) * 100)}%</div></div>
+              <div class="stat-card"><div class="stat-label">Изм. выхода vs предыдущий</div><div class="stat-value">${diff}</div></div>
+            `;
+          }
+
+          cShift.input.addEventListener('input', run);
+          cPool.input.addEventListener('change', () => { prevFlat = null; run(); });
+          setTimeout(run, 50);
+          window.addEventListener('resize', run);
+        },
+      },
+    ],
 
     python: `
       <h3>CNN на Python (PyTorch)</h3>

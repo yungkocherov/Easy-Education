@@ -344,121 +344,221 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
-        <h3>Симуляция: Feature Importance и влияние удаления признака</h3>
-        <p>Генерируем данные классификации, обучаем дерево решений. Смотрим важность признаков. Можно «отключить» признак и увидеть, как меняется accuracy.</p>
-        <div class="sim-container">
-          <div class="sim-controls" id="shap-controls"></div>
-          <div class="sim-buttons">
-            <button class="btn" id="shap-regen">🔄 Новые данные</button>
+    simulation: [
+      {
+        title: 'Waterfall: объяснение одного предсказания',
+        html: `
+          <h3>Waterfall: раскладываем одно предсказание на вклады признаков</h3>
+          <p>Линейная модель предсказывает «одобрить кредит» по 6 признакам. SHAP-вклад каждого признака для конкретного клиента равен $\\phi_j = w_j (x_j - \\bar{x}_j)$ — насколько этот признак у клиента отклонил логит от среднего. Сумма вкладов + базовое значение = финальный логит. Двигай слайдеры признаков и смотри, как перестраивается waterfall.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="shap-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn secondary" id="shap-reset">↺ Средний клиент</button>
+              <button class="btn secondary" id="shap-random">🎲 Случайный клиент</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:340px;"><canvas id="shap-chart"></canvas></div>
+              <div class="sim-stats" id="shap-stats"></div>
+              <div class="lesson-box" style="margin-top:10px;">
+                Красные бары тянут предсказание вниз (уменьшают вероятность одобрения), зелёные — вверх. <b>Base value</b> — это среднее предсказание по всей выборке; вклады SHAP — отклонения от него для конкретного клиента. Сумма всех вкладов + base = точное предсказание модели (аддитивность SHAP).
+              </div>
+            </div>
           </div>
-          <div class="sim-output">
-            <div class="sim-chart-wrap"><canvas id="shap-chart"></canvas></div>
-            <div class="sim-stats" id="shap-stats"></div>
-          </div>
-        </div>
-      `,
-      init(container) {
-        const controls = container.querySelector('#shap-controls');
-        const cRemove = App.makeControl('range', 'shap-remove', 'Удалить N важных признаков', { min: 0, max: 4, step: 1, value: 0 });
-        const cNoise = App.makeControl('range', 'shap-noise', 'Шум в данных', { min: 0, max: 2, step: 0.1, value: 0.5 });
-        [cRemove, cNoise].forEach(c => controls.appendChild(c.wrap));
+        `,
+        init(container) {
+          const FEATURES = [
+            { name: 'Доход', w: 1.2, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+            { name: 'Кредитная история', w: 1.8, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+            { name: 'Отношение долг/доход', w: -1.5, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+            { name: 'Возраст', w: 0.6, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+            { name: 'Кол-во открытых счетов', w: -0.4, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+            { name: 'Стаж работы', w: 0.9, mean: 0.0, std: 1, min: -2.5, max: 2.5, unit: 'σ' },
+          ];
+          const BASE = 0.3; // base logit
 
-        let chart = null;
-        const N = 200;
-        const featureNames = ['Признак A', 'Признак B', 'Признак C', 'Признак D', 'Признак E (шум)'];
-        const trueWeights = [3.0, 2.0, 1.5, 0.8, 0.0];
+          const controls = container.querySelector('#shap-controls');
+          const sliders = FEATURES.map((f, i) => {
+            const c = App.makeControl('range', `shap-f${i}`, f.name, { min: f.min, max: f.max, step: 0.05, value: f.mean });
+            controls.appendChild(c.wrap);
+            return c;
+          });
 
-        function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+          let chart = null;
 
-        function generateData(noise) {
-          const X = [], y = [];
-          for (let i = 0; i < N; i++) {
-            const row = trueWeights.map(() => App.Util.randn(0, 1));
-            row[4] = App.Util.randn(0, 1); // pure noise feature
-            const logit = trueWeights.reduce((s, w, j) => s + w * row[j], 0) + App.Util.randn(0, noise);
-            X.push(row);
-            y.push(sigmoid(logit) > 0.5 ? 1 : 0);
+          function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+          function update() {
+            const x = sliders.map(s => +s.input.value);
+            const contribs = FEATURES.map((f, i) => f.w * (x[i] - f.mean));
+            // Sort by absolute contribution — как в shap.waterfall_plot
+            const order = contribs.map((c, i) => i).sort((a, b) => Math.abs(contribs[b]) - Math.abs(contribs[a]));
+
+            // Waterfall: base → + contribs в порядке убывания важности → final
+            let running = BASE;
+            const bars = [];
+            order.forEach(i => {
+              const from = running;
+              running += contribs[i];
+              bars.push({ idx: i, from, to: running, delta: contribs[i] });
+            });
+            const finalLogit = running;
+            const finalProb = sigmoid(finalLogit);
+            const baseProb = sigmoid(BASE);
+
+            // Для Chart.js используем floating bar: [from, to]
+            const labels = order.map(i => `${FEATURES[i].name} = ${x[i].toFixed(2)}`);
+            const barData = bars.map(b => [b.from, b.to]);
+            const colors = bars.map(b => b.delta >= 0 ? 'rgba(22,163,74,0.75)' : 'rgba(220,38,38,0.75)');
+            const borders = bars.map(b => b.delta >= 0 ? '#16a34a' : '#dc2626');
+
+            const ctx = container.querySelector('#shap-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [{
+                  label: 'SHAP вклад',
+                  data: barData,
+                  backgroundColor: colors,
+                  borderColor: borders,
+                  borderWidth: 1.5,
+                  borderSkipped: false,
+                }],
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  title: { display: true, text: `base = ${BASE.toFixed(2)}  →  финальный логит = ${finalLogit.toFixed(2)}  (P = ${finalProb.toFixed(3)})` },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctxT) => {
+                        const b = bars[ctxT.dataIndex];
+                        return `вклад: ${b.delta >= 0 ? '+' : ''}${b.delta.toFixed(3)}`;
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  x: { title: { display: true, text: 'логит (log-odds одобрения)' } },
+                  y: { ticks: { font: { size: 11 } } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const decision = finalProb > 0.5 ? '<span style="color:#16a34a;font-weight:700;">одобрить</span>' : '<span style="color:#dc2626;font-weight:700;">отказать</span>';
+            const sumContrib = contribs.reduce((a, b) => a + b, 0);
+            container.querySelector('#shap-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Base P</div><div class="stat-value">${baseProb.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Сумма SHAP</div><div class="stat-value">${(sumContrib >= 0 ? '+' : '') + sumContrib.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Final P</div><div class="stat-value">${finalProb.toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Решение</div><div class="stat-value" style="font-size:14px;">${decision}</div></div>
+            `;
           }
-          return { X, y };
-        }
 
-        function computeImportanceAndAccuracy(X, y, removeN) {
-          const sortedIndices = trueWeights.map((w, i) => ({ i, w: Math.abs(w) })).sort((a, b) => a.w - b.w).map(x => x.i);
-          const removedSet = new Set(sortedIndices.slice(0, removeN));
-          const activeFeatures = featureNames.map((_, i) => removedSet.has(i) ? null : i).filter(i => i !== null);
-          // Simplified: importance proportional to true weights * random factor
-          const rawImportance = trueWeights.map((w, i) => {
-            if (!activeFeatures.includes(i)) return 0;
-            return Math.abs(w) + Math.abs(App.Util.randn(0, 0.2));
-          });
-          const totalImp = rawImportance.reduce((a, b) => a + b, 0) || 1;
-          const importance = rawImportance.map(v => v / totalImp);
-
-          // Accuracy: based on how many informative features remain
-          const activeWeight = activeFeatures.reduce((s, i) => s + Math.abs(trueWeights[i]), 0);
-          const maxWeight = trueWeights.reduce((a, b) => a + Math.abs(b), 0);
-          const baseAccuracy = 0.65 + 0.25 * (activeWeight / (maxWeight || 1));
-          const accuracy = Math.min(0.98, baseAccuracy + App.Util.randn(0, 0.02));
-
-          return { importance, accuracy };
-        }
-
-        let currentData = null;
-
-        function update() {
-          const removeN = +cRemove.input.value;
-          const noise = +cNoise.input.value;
-
-          if (!currentData) currentData = generateData(noise);
-
-          const { importance, accuracy } = computeImportanceAndAccuracy(currentData.X, currentData.y, removeN);
-
-          const colors = featureNames.map((_, i) => {
-            if (i >= featureNames.length - removeN) return 'rgba(148,163,184,0.5)';
-            return i < 4 ? 'rgba(99,102,241,0.7)' : 'rgba(239,68,68,0.6)';
-          });
-
-          const ctx = container.querySelector('#shap-chart').getContext('2d');
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: featureNames,
-              datasets: [{
-                label: 'Feature Importance (нормированная)',
-                data: importance.map(v => +(v * 100).toFixed(1)),
-                backgroundColor: colors,
-                borderRadius: 4,
-              }],
-            },
-            options: {
-              responsive: true, maintainAspectRatio: false,
-              indexAxis: 'y',
-              plugins: {
-                title: { display: true, text: 'Важность признаков (симуляция дерева решений)' },
-                legend: { display: false },
-              },
-              scales: {
-                x: { title: { display: true, text: 'Важность (%)' }, min: 0, suggestedMax: 70 },
-              },
-            },
-          });
-          App.registerChart(chart);
-
-          container.querySelector('#shap-stats').innerHTML = `
-            <div class="stat-card"><div class="stat-label">Accuracy</div><div class="stat-value">${(accuracy * 100).toFixed(1)}%</div></div>
-            <div class="stat-card"><div class="stat-label">Активных признаков</div><div class="stat-value">${featureNames.length - removeN} / ${featureNames.length}</div></div>
-            <div class="stat-card"><div class="stat-label">Удалено</div><div class="stat-value">${removeN}</div></div>
-          `;
-        }
-
-        [cRemove, cNoise].forEach(c => c.input.addEventListener('input', () => { if (c === cNoise) currentData = null; update(); }));
-        container.querySelector('#shap-regen').onclick = () => { currentData = null; update(); };
-        update();
+          sliders.forEach(s => s.input.addEventListener('input', update));
+          container.querySelector('#shap-reset').onclick = () => {
+            sliders.forEach((s, i) => { s.input.value = FEATURES[i].mean; });
+            update();
+          };
+          container.querySelector('#shap-random').onclick = () => {
+            sliders.forEach((s, i) => { s.input.value = App.Util.randn(FEATURES[i].mean, 1).toFixed(2); });
+            update();
+          };
+          update();
+        },
       },
-    },
+      {
+        title: 'Global feature importance',
+        html: `
+          <h3>Глобальная важность = среднее $|\\text{SHAP}|$ по выборке</h3>
+          <p>Для каждого из 200 «клиентов» считаем локальные вклады, берём модуль и усредняем по выборке. Это и есть bar-plot mean|SHAP| из библиотеки shap. Меняй шум — и смотри, как ранжирование остаётся стабильным для сильных признаков и «шатается» у слабых.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="shapg-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn secondary" id="shapg-regen">🔄 Новая выборка</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:320px;"><canvas id="shapg-chart"></canvas></div>
+              <div class="sim-stats" id="shapg-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const FEATURES = [
+            { name: 'Доход', w: 1.2 },
+            { name: 'Кредитная история', w: 1.8 },
+            { name: 'Отношение долг/доход', w: -1.5 },
+            { name: 'Возраст', w: 0.6 },
+            { name: 'Кол-во открытых счетов', w: -0.4 },
+            { name: 'Стаж работы', w: 0.9 },
+            { name: 'Цвет глаз (шум)', w: 0 },
+          ];
+          const controls = container.querySelector('#shapg-controls');
+          const cN = App.makeControl('range', 'shapg-n', 'Клиентов в выборке', { min: 30, max: 500, step: 10, value: 200 });
+          const cNoise = App.makeControl('range', 'shapg-noise', 'Шум признаков σ', { min: 0.3, max: 3, step: 0.1, value: 1 });
+          [cN, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          function run() {
+            const n = +cN.input.value;
+            const sig = +cNoise.input.value;
+            const absMean = new Array(FEATURES.length).fill(0);
+            for (let i = 0; i < n; i++) {
+              for (let j = 0; j < FEATURES.length; j++) {
+                const xj = App.Util.randn(0, sig);
+                absMean[j] += Math.abs(FEATURES[j].w * xj);
+              }
+            }
+            for (let j = 0; j < FEATURES.length; j++) absMean[j] /= n;
+
+            // Sort descending
+            const order = absMean.map((_, i) => i).sort((a, b) => absMean[b] - absMean[a]);
+            const labels = order.map(i => FEATURES[i].name);
+            const vals = order.map(i => absMean[i]);
+
+            const ctx = container.querySelector('#shapg-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [{
+                  label: 'mean |SHAP|',
+                  data: vals,
+                  backgroundColor: vals.map((_, k) => k === 0 ? 'rgba(99,102,241,0.85)' : 'rgba(99,102,241,0.55)'),
+                  borderRadius: 4,
+                }],
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  title: { display: true, text: 'Глобальная важность признаков (mean |SHAP|)' },
+                },
+                scales: { x: { title: { display: true, text: 'mean |SHAP| (логит)' }, beginAtZero: true } },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#shapg-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Топ-1</div><div class="stat-value" style="font-size:13px;">${labels[0]}</div></div>
+              <div class="stat-card"><div class="stat-label">Важность топ-1</div><div class="stat-value">${vals[0].toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">Шумовой признак</div><div class="stat-value">${absMean[6].toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Объектов</div><div class="stat-value">${n}</div></div>
+            `;
+          }
+
+          [cN, cNoise].forEach(c => c.input.addEventListener('input', run));
+          container.querySelector('#shapg-regen').onclick = run;
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: SHAP, Permutation Importance, LIME</h3>

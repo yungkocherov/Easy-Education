@@ -333,6 +333,335 @@ App.registerTopic({
       }
     ],
 
+    simulation: [
+      {
+        title: 'Frozen vs Fine-tune vs Scratch',
+        html: `
+          <h3>Три стратегии на маленьком датасете</h3>
+          <p>Симулируем три сценария обучения на задаче из 2D-точек (представляй — у тебя 60 картинок из нового класса):</p>
+          <ul style="font-size:14px;">
+            <li><b>Scratch</b> — обучаем с нуля.</li>
+            <li><b>Frozen features</b> — «предобученные» веса в скрытых слоях замораживаем, учим только последний линейный слой.</li>
+            <li><b>Fine-tune</b> — стартуем с предобученных весов и дообучаем всё с малым LR.</li>
+          </ul>
+          <p>Предобученные веса имитируются тем, что сеть сначала обучается на похожей «большой» задаче (moons), затем переносится на новую (rotated moons).</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tl-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="tl-run">▶ Запустить</button>
+              <button class="btn secondary" id="tl-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:280px;"><canvas id="tl-loss"></canvas></div>
+              <div class="sim-stats" id="tl-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#tl-controls');
+          const cN = App.makeControl('range', 'tl-n', 'Размер нового датасета', { min: 10, max: 200, step: 10, value: 40 });
+          const cEp = App.makeControl('range', 'tl-ep', 'Эпох', { min: 20, max: 200, step: 10, value: 80 });
+          const cRot = App.makeControl('range', 'tl-rot', 'Поворот новой задачи (°)', { min: 0, max: 90, step: 5, value: 30 });
+          [cN, cEp, cRot].forEach(c => controls.appendChild(c.wrap));
+
+          let pretrainedNet = null;
+          let bigData = null, newData = null, testData = null;
+          let chart = null;
+
+          function genMoons(n, rot = 0) {
+            const pts = [];
+            const theta = rot * Math.PI / 180;
+            for (let i = 0; i < n; i++) {
+              const t = Math.random() * Math.PI;
+              let x, y, cls;
+              if (Math.random() < 0.5) {
+                x = -0.4 + 0.6 * Math.cos(t) + App.Util.randn(0, 0.08);
+                y = -0.2 + 0.6 * Math.sin(t) + App.Util.randn(0, 0.08);
+                cls = 0;
+              } else {
+                x = 0.2 + 0.6 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.08);
+                y = 0.2 - 0.6 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.08);
+                cls = 1;
+              }
+              const xr = x * Math.cos(theta) - y * Math.sin(theta);
+              const yr = x * Math.sin(theta) + y * Math.cos(theta);
+              pts.push({ x: xr, y: yr, cls });
+            }
+            return pts;
+          }
+
+          // Minimal MLP: 2 → 8 → 8 → 1
+          function createNet() {
+            const randn = () => App.Util.randn(0, 0.5);
+            const W1 = Array.from({ length: 8 }, () => [randn(), randn()]);
+            const b1 = new Array(8).fill(0);
+            const W2 = Array.from({ length: 8 }, () => new Array(8).fill(0).map(randn));
+            const b2 = new Array(8).fill(0);
+            const W3 = [new Array(8).fill(0).map(randn)];
+            const b3 = [0];
+            return { W1, b1, W2, b2, W3, b3 };
+          }
+
+          function cloneNet(n) {
+            return JSON.parse(JSON.stringify(n));
+          }
+
+          function forward(net, x) {
+            const { W1, b1, W2, b2, W3, b3 } = net;
+            const h1 = new Array(8);
+            for (let i = 0; i < 8; i++) {
+              let s = b1[i];
+              for (let j = 0; j < 2; j++) s += W1[i][j] * x[j];
+              h1[i] = Math.max(0, s); // ReLU
+            }
+            const h2 = new Array(8);
+            for (let i = 0; i < 8; i++) {
+              let s = b2[i];
+              for (let j = 0; j < 8; j++) s += W2[i][j] * h1[j];
+              h2[i] = Math.max(0, s);
+            }
+            let z = b3[0];
+            for (let i = 0; i < 8; i++) z += W3[0][i] * h2[i];
+            const o = 1 / (1 + Math.exp(-z));
+            return { h1, h2, o };
+          }
+
+          function trainStep(net, x, y, lr, freezeHidden) {
+            const { h1, h2, o } = forward(net, x);
+            const dz = o - y;
+            // output layer
+            for (let i = 0; i < 8; i++) net.W3[0][i] -= lr * dz * h2[i];
+            net.b3[0] -= lr * dz;
+            if (freezeHidden) return -(y * Math.log(Math.max(1e-9, o)) + (1 - y) * Math.log(Math.max(1e-9, 1 - o)));
+            // backprop through W2
+            const dh2 = new Array(8).fill(0);
+            for (let i = 0; i < 8; i++) dh2[i] = net.W3[0][i] * dz * (h2[i] > 0 ? 1 : 0);
+            for (let i = 0; i < 8; i++) {
+              for (let j = 0; j < 8; j++) net.W2[i][j] -= lr * dh2[i] * h1[j];
+              net.b2[i] -= lr * dh2[i];
+            }
+            const dh1 = new Array(8).fill(0);
+            for (let j = 0; j < 8; j++) {
+              let s = 0;
+              for (let i = 0; i < 8; i++) s += net.W2[i][j] * dh2[i];
+              dh1[j] = s * (h1[j] > 0 ? 1 : 0);
+            }
+            for (let i = 0; i < 8; i++) {
+              for (let j = 0; j < 2; j++) net.W1[i][j] -= lr * dh1[i] * x[j];
+              net.b1[i] -= lr * dh1[i];
+            }
+            return -(y * Math.log(Math.max(1e-9, o)) + (1 - y) * Math.log(Math.max(1e-9, 1 - o)));
+          }
+
+          function trainEpochs(net, data, epochs, lr, freeze) {
+            const history = [];
+            for (let e = 0; e < epochs; e++) {
+              let L = 0;
+              const shuf = App.Util.shuffle(data);
+              shuf.forEach(p => { L += trainStep(net, [p.x, p.y], p.cls, lr, freeze); });
+              history.push(L / data.length);
+            }
+            return history;
+          }
+
+          function accuracy(net, data) {
+            let c = 0;
+            data.forEach(p => { if (Math.round(forward(net, [p.x, p.y]).o) === p.cls) c++; });
+            return c / data.length;
+          }
+
+          function regen() {
+            const rot = +cRot.input.value;
+            bigData = genMoons(400, 0);
+            newData = genMoons(+cN.input.value, rot);
+            testData = genMoons(200, rot);
+            // Pretrain "large" net
+            pretrainedNet = createNet();
+            trainEpochs(pretrainedNet, bigData, 80, 0.05, false);
+          }
+
+          function run() {
+            if (!pretrainedNet) regen();
+            const epochs = +cEp.input.value;
+            // Scratch
+            const scratch = createNet();
+            const hs = trainEpochs(scratch, newData, epochs, 0.05, false);
+            // Frozen: copy pretrained, train only last layer
+            const frozen = cloneNet(pretrainedNet);
+            const hf = trainEpochs(frozen, newData, epochs, 0.05, true);
+            // Fine-tune: copy pretrained, train all with smaller lr
+            const ft = cloneNet(pretrainedNet);
+            const hft = trainEpochs(ft, newData, epochs, 0.02, false);
+
+            const ctx = container.querySelector('#tl-loss').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: hs.map((_, i) => i),
+                datasets: [
+                  { label: 'Scratch', data: hs, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'Frozen features', data: hf, borderColor: '#10b981', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'Fine-tune', data: hft, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Train loss по эпохам' } },
+                scales: { x: { title: { display: true, text: 'эпоха' } }, y: { beginAtZero: true } },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#tl-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Scratch test acc</div><div class="stat-value">${(accuracy(scratch, testData) * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">Frozen test acc</div><div class="stat-value">${(accuracy(frozen, testData) * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">Fine-tune test acc</div><div class="stat-value">${(accuracy(ft, testData) * 100).toFixed(1)}%</div></div>
+              <div class="stat-card"><div class="stat-label">Новый датасет</div><div class="stat-value">${newData.length}</div></div>
+            `;
+          }
+
+          container.querySelector('#tl-run').onclick = run;
+          container.querySelector('#tl-regen').onclick = () => { regen(); run(); };
+          cRot.input.addEventListener('change', () => { regen(); });
+          cN.input.addEventListener('change', () => { regen(); });
+          setTimeout(() => { regen(); run(); }, 50);
+        },
+      },
+      {
+        title: 'Catastrophic forgetting',
+        html: `
+          <h3>Катастрофическое забывание</h3>
+          <p>Берём сеть, обученную на задаче A. Продолжаем обучать её на задаче B без повторения A. Смотрим, как точность на A падает по мере обучения на B — сеть «забывает», потому что веса уходят в новое решение.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="tlf-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="tlf-run">▶ Запустить</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:320px;"><canvas id="tlf-chart"></canvas></div>
+              <div class="sim-stats" id="tlf-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#tlf-controls');
+          const cLR = App.makeControl('range', 'tlf-lr', 'Learning rate на B', { min: 0.005, max: 0.2, step: 0.005, value: 0.05 });
+          const cEp = App.makeControl('range', 'tlf-ep', 'Эпох на B', { min: 20, max: 200, step: 10, value: 80 });
+          const cRehearsal = App.makeControl('checkbox', 'tlf-reh', 'Перемешивать с A (rehearsal)', { value: false });
+          [cLR, cEp, cRehearsal].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function genBlobs(n, cx1, cy1, cx2, cy2, spread = 0.25) {
+            const pts = [];
+            for (let i = 0; i < n; i++) {
+              if (Math.random() < 0.5) {
+                pts.push({ x: cx1 + App.Util.randn(0, spread), y: cy1 + App.Util.randn(0, spread), cls: 0 });
+              } else {
+                pts.push({ x: cx2 + App.Util.randn(0, spread), y: cy2 + App.Util.randn(0, spread), cls: 1 });
+              }
+            }
+            return pts;
+          }
+
+          function createNet() {
+            const randn = () => App.Util.randn(0, 0.5);
+            return {
+              W1: Array.from({ length: 8 }, () => [randn(), randn()]),
+              b1: new Array(8).fill(0),
+              W2: [new Array(8).fill(0).map(randn)],
+              b2: [0],
+            };
+          }
+
+          function forward(net, x) {
+            const h = new Array(8);
+            for (let i = 0; i < 8; i++) {
+              let s = net.b1[i];
+              for (let j = 0; j < 2; j++) s += net.W1[i][j] * x[j];
+              h[i] = Math.max(0, s);
+            }
+            let z = net.b2[0];
+            for (let i = 0; i < 8; i++) z += net.W2[0][i] * h[i];
+            const o = 1 / (1 + Math.exp(-z));
+            return { h, o };
+          }
+
+          function trainStep(net, x, y, lr) {
+            const { h, o } = forward(net, x);
+            const dz = o - y;
+            for (let i = 0; i < 8; i++) net.W2[0][i] -= lr * dz * h[i];
+            net.b2[0] -= lr * dz;
+            const dh = new Array(8).fill(0);
+            for (let i = 0; i < 8; i++) dh[i] = net.W2[0][i] * dz * (h[i] > 0 ? 1 : 0);
+            for (let i = 0; i < 8; i++) {
+              for (let j = 0; j < 2; j++) net.W1[i][j] -= lr * dh[i] * x[j];
+              net.b1[i] -= lr * dh[i];
+            }
+          }
+
+          function acc(net, data) {
+            let c = 0;
+            data.forEach(p => { if (Math.round(forward(net, [p.x, p.y]).o) === p.cls) c++; });
+            return c / data.length;
+          }
+
+          function run() {
+            // Task A: blobs vertical
+            const A = genBlobs(200, -0.7, 0, 0.7, 0);
+            // Task B: blobs horizontal (opposite orientation)
+            const B = genBlobs(200, 0, -0.7, 0, 0.7);
+
+            // Pretrain on A
+            const net = createNet();
+            for (let e = 0; e < 80; e++) App.Util.shuffle(A).forEach(p => trainStep(net, [p.x, p.y], p.cls, 0.05));
+
+            const accA = [], accB = [];
+            const epochs = +cEp.input.value;
+            const lr = +cLR.input.value;
+            const rehearsal = cRehearsal.input.checked;
+            accA.push(acc(net, A)); accB.push(acc(net, B));
+            for (let e = 0; e < epochs; e++) {
+              const batch = rehearsal ? App.Util.shuffle([...A, ...B]) : App.Util.shuffle(B);
+              batch.forEach(p => trainStep(net, [p.x, p.y], p.cls, lr));
+              accA.push(acc(net, A));
+              accB.push(acc(net, B));
+            }
+
+            const ctx = container.querySelector('#tlf-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: accA.map((_, i) => i),
+                datasets: [
+                  { label: 'Точность на A (старая задача)', data: accA, borderColor: '#ef4444', borderWidth: 2.5, pointRadius: 0, fill: false },
+                  { label: 'Точность на B (новая)', data: accB, borderColor: '#3b82f6', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: rehearsal ? 'Rehearsal включён' : 'Только обучение на B — забывание A' } },
+                scales: { x: { title: { display: true, text: 'эпоха на B' } }, y: { min: 0, max: 1.05, title: { display: true, text: 'accuracy' } } },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#tlf-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">A в конце</div><div class="stat-value">${(accA.slice(-1)[0] * 100).toFixed(0)}%</div></div>
+              <div class="stat-card"><div class="stat-label">A в начале</div><div class="stat-value">${(accA[0] * 100).toFixed(0)}%</div></div>
+              <div class="stat-card"><div class="stat-label">Падение A</div><div class="stat-value">${((accA[0] - accA.slice(-1)[0]) * 100).toFixed(0)}%</div></div>
+              <div class="stat-card"><div class="stat-label">B в конце</div><div class="stat-value">${(accB.slice(-1)[0] * 100).toFixed(0)}%</div></div>
+            `;
+          }
+
+          container.querySelector('#tlf-run').onclick = run;
+          setTimeout(run, 50);
+        },
+      },
+    ],
+
     python: `
       <h3>Transfer Learning на Python</h3>
       <p>Два основных фреймворка: <b>PyTorch + torchvision</b> для Computer Vision и <b>HuggingFace Transformers</b> для NLP.</p>

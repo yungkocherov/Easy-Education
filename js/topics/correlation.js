@@ -598,7 +598,9 @@ r = −275 / (√700 × √7635.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
       }
     ],
 
-    simulation: {
+    simulation: [
+      {
+        title: 'Управляй ρ',
       html: `
         <h3>Симуляция: управляй корреляцией</h3>
         <p>Меняй истинную корреляцию ρ и количество точек. Наблюдай scatter и смотри на выборочный r.</p>
@@ -698,7 +700,242 @@ r = −275 / (√700 × √7635.7) ≈ −275 / 2309 ≈ <b>−0.12</b></div>
         container.querySelector('#corr-regen').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Pearson vs Spearman vs Kendall',
+        html: `
+          <h3>Сравнение трёх коэффициентов на одних данных</h3>
+          <p>Линейная, монотонная (но нелинейная), зашумлённая с выбросами — посмотри, как три метрики реагируют по-разному.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="corrC-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="corrC-chart"></canvas></div>
+              <div class="sim-stats" id="corrC-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#corrC-controls');
+          const cType = App.makeControl('select', 'corrC-type', 'Тип зависимости', {
+            options: [
+              { value: 'linear', label: 'Линейная y = x' },
+              { value: 'mono', label: 'Монотонная y = exp(x)' },
+              { value: 'cubic', label: 'Кубическая y = x³' },
+              { value: 'quad', label: 'U-образная y = x²' },
+              { value: 'none', label: 'Независимые' },
+            ],
+            value: 'mono',
+          });
+          const cN = App.makeControl('range', 'corrC-n', 'Число точек', { min: 20, max: 300, step: 10, value: 80 });
+          const cNoise = App.makeControl('range', 'corrC-noise', 'Шум σ', { min: 0, max: 1.5, step: 0.05, value: 0.3 });
+          const cOut = App.makeControl('range', 'corrC-out', 'Выбросов', { min: 0, max: 10, step: 1, value: 0 });
+          [cType, cN, cNoise, cOut].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          // ранги
+          function ranks(arr) {
+            const idx = arr.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+            const r = new Array(arr.length);
+            for (let i = 0; i < idx.length; i++) r[idx[i][1]] = i + 1;
+            return r;
+          }
+          function pearson(xs, ys) {
+            const mx = App.Util.mean(xs), my = App.Util.mean(ys);
+            let c = 0, sx = 0, sy = 0;
+            for (let i = 0; i < xs.length; i++) {
+              c += (xs[i] - mx) * (ys[i] - my);
+              sx += (xs[i] - mx) ** 2;
+              sy += (ys[i] - my) ** 2;
+            }
+            return c / Math.sqrt(sx * sy || 1e-12);
+          }
+          function spearman(xs, ys) { return pearson(ranks(xs), ranks(ys)); }
+          function kendall(xs, ys) {
+            let conc = 0, disc = 0;
+            const n = xs.length;
+            for (let i = 0; i < n; i++) {
+              for (let j = i + 1; j < n; j++) {
+                const a = Math.sign(xs[i] - xs[j]);
+                const b = Math.sign(ys[i] - ys[j]);
+                if (a * b > 0) conc++;
+                else if (a * b < 0) disc++;
+              }
+            }
+            return (conc - disc) / (0.5 * n * (n - 1) || 1);
+          }
+
+          function run() {
+            const type = cType.input.value;
+            const n = +cN.input.value;
+            const noise = +cNoise.input.value;
+            const nOut = +cOut.input.value;
+            const xs = [], ys = [];
+            for (let i = 0; i < n; i++) {
+              const x = -2 + 4 * (i / (n - 1)) + App.Util.randn(0, 0.05);
+              let y;
+              if (type === 'linear') y = x;
+              else if (type === 'mono') y = Math.exp(x);
+              else if (type === 'cubic') y = x * x * x;
+              else if (type === 'quad') y = x * x;
+              else y = App.Util.randn(0, 1);
+              ys.push(y + App.Util.randn(0, noise));
+              xs.push(x);
+            }
+            for (let i = 0; i < nOut; i++) {
+              xs.push(2 + Math.random() * 1.5);
+              ys.push(-3 - Math.random() * 2);
+            }
+
+            const rP = pearson(xs, ys);
+            const rS = spearman(xs, ys);
+            const rK = kendall(xs, ys);
+
+            const ctx = container.querySelector('#corrC-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: {
+                datasets: [{
+                  data: xs.map((x, i) => ({ x, y: ys[i] })),
+                  backgroundColor: 'rgba(59,130,246,0.5)',
+                  borderColor: 'rgba(59,130,246,0.9)',
+                  pointRadius: 4,
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { title: { display: true, text: 'X' } },
+                  y: { title: { display: true, text: 'Y' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#corrC-stats');
+            statsEl.innerHTML = '';
+            const cards = [
+              ['Pearson r', rP.toFixed(3)],
+              ['Spearman ρ', rS.toFixed(3)],
+              ['Kendall τ', rK.toFixed(3)],
+              ['|τ − ρ|', Math.abs(rK - rS).toFixed(3)],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cType, cN, cNoise, cOut].forEach(c => c.input.addEventListener('input', run));
+          cType.input.addEventListener('change', run);
+          run();
+        },
+      },
+      {
+        title: 'Квартет Анскомба',
+        html: `
+          <h3>Четыре датасета — одинаковые числа, разные картинки</h3>
+          <p>У всех четырёх выборок $\\bar x \\approx 9$, $\\bar y \\approx 7.5$, $r \\approx 0.816$, регрессия $y = 3 + 0.5 x$. А формы — совершенно разные. Урок: никогда не доверяй одному числу без графика.</p>
+          <div class="sim-container">
+            <div class="sim-output">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div><p style="font-size:12px;font-weight:600;color:#475569;margin:0 0 4px;">I — линейная</p><div class="sim-chart-wrap" style="height:220px;"><canvas id="ans-1"></canvas></div></div>
+                <div><p style="font-size:12px;font-weight:600;color:#475569;margin:0 0 4px;">II — кривая</p><div class="sim-chart-wrap" style="height:220px;"><canvas id="ans-2"></canvas></div></div>
+                <div><p style="font-size:12px;font-weight:600;color:#475569;margin:0 0 4px;">III — один выброс по Y</p><div class="sim-chart-wrap" style="height:220px;"><canvas id="ans-3"></canvas></div></div>
+                <div><p style="font-size:12px;font-weight:600;color:#475569;margin:0 0 4px;">IV — один выброс по X</p><div class="sim-chart-wrap" style="height:220px;"><canvas id="ans-4"></canvas></div></div>
+              </div>
+              <div class="sim-stats" id="ans-stats" style="margin-top:12px;"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const sets = {
+            I: {
+              x: [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],
+              y: [8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68],
+            },
+            II: {
+              x: [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],
+              y: [9.14, 8.14, 8.74, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74],
+            },
+            III: {
+              x: [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],
+              y: [7.46, 6.77, 12.74, 7.11, 7.81, 8.84, 6.08, 5.39, 8.15, 6.42, 5.73],
+            },
+            IV: {
+              x: [8, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8],
+              y: [6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 12.50, 5.56, 7.91, 6.89],
+            },
+          };
+          const keys = ['I', 'II', 'III', 'IV'];
+          const ids = ['ans-1', 'ans-2', 'ans-3', 'ans-4'];
+
+          function pearson(xs, ys) {
+            const mx = App.Util.mean(xs), my = App.Util.mean(ys);
+            let c = 0, sx = 0, sy = 0;
+            for (let i = 0; i < xs.length; i++) {
+              c += (xs[i] - mx) * (ys[i] - my);
+              sx += (xs[i] - mx) ** 2;
+              sy += (ys[i] - my) ** 2;
+            }
+            return c / Math.sqrt(sx * sy);
+          }
+
+          keys.forEach((k, i) => {
+            const { x, y } = sets[k];
+            // линия регрессии y ≈ 3 + 0.5 x
+            const line = [
+              { x: 3, y: 3 + 0.5 * 3 },
+              { x: 20, y: 3 + 0.5 * 20 },
+            ];
+            const chart = new Chart(container.querySelector('#' + ids[i]).getContext('2d'), {
+              type: 'scatter',
+              data: {
+                datasets: [
+                  {
+                    data: x.map((xv, j) => ({ x: xv, y: y[j] })),
+                    backgroundColor: 'rgba(239,68,68,0.6)',
+                    pointRadius: 5,
+                  },
+                  {
+                    type: 'line',
+                    data: line,
+                    borderColor: 'rgba(59,130,246,0.8)',
+                    borderWidth: 2,
+                    borderDash: [6, 3],
+                    pointRadius: 0,
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { min: 2, max: 20 },
+                  y: { min: 2, max: 14 },
+                },
+              },
+            });
+            App.registerChart(chart);
+          });
+
+          const statsEl = container.querySelector('#ans-stats');
+          statsEl.innerHTML = '';
+          keys.forEach(k => {
+            const { x, y } = sets[k];
+            const card = document.createElement('div');
+            card.className = 'stat-card';
+            card.innerHTML = `<div class="stat-label">Набор ${k}</div><div class="stat-value">r = ${pearson(x, y).toFixed(3)}</div>`;
+            statsEl.appendChild(card);
+          });
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Корреляция в NumPy и SciPy</h3>

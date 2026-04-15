@@ -445,7 +445,9 @@ s = √30.89 ≈ <b>5.56 г</b></div>
       }
     ],
 
-    simulation: {
+    simulation: [
+      {
+        title: 'p-значения и мощность',
       html: `
         <h3>Симуляция: когда мы отвергаем $H_0$</h3>
         <p>Сравним две группы. Первая имеет среднее 0, вторая — μ₂. Посмотрим, как часто тест находит разницу в зависимости от размера выборки и эффекта.</p>
@@ -541,7 +543,137 @@ s = √30.89 ≈ <b>5.56 г</b></div>
         container.querySelector('#ht-run').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Кривая мощности',
+        html: `
+          <h3>Power curve: как мощность растёт с n и размером эффекта</h3>
+          <p>Мощность (1 − β) — вероятность детектить реальный эффект при заданном $\\alpha$. Зависит от размера эффекта $d$, $\\sigma$, $n$ и $\\alpha$. Двигай слайдеры — смотри, при каком $n$ у тебя будет стандартная мощность 0.8.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="htP-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="htP-chart"></canvas></div>
+              <div class="sim-stats" id="htP-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#htP-controls');
+          const cEff = App.makeControl('range', 'htP-eff', 'Размер эффекта d (Cohen)', { min: 0.05, max: 1.5, step: 0.05, value: 0.3 });
+          const cAlpha = App.makeControl('range', 'htP-alpha', 'α', { min: 0.01, max: 0.1, step: 0.005, value: 0.05 });
+          const cNmax = App.makeControl('range', 'htP-nmax', 'Максимум n (на группу)', { min: 50, max: 1000, step: 50, value: 500 });
+          [cEff, cAlpha, cNmax].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          // z-approximation of two-sample t-test power
+          // Power = P(|Z + d*sqrt(n/2)| > z_{1-alpha/2}) ≈ Φ(d*sqrt(n/2) - z_crit) + Φ(-d*sqrt(n/2) - z_crit)
+          function invNorm(p) {
+            // Beasley-Springer-Moro approximation for quantile of N(0,1)
+            const a = [-39.696830, 220.946098, -275.928510, 138.357751, -30.664798, 2.506628];
+            const b = [-54.476098, 161.585836, -155.698979, 66.801311, -13.280681];
+            const c = [-0.007784894, -0.322396458, -2.400758278, -2.549732539, 4.374664141, 2.938163983];
+            const d = [0.007784695, 0.322467565, 2.445134137, 3.754408661];
+            const pL = 0.02425, pH = 1 - pL;
+            let q, r, x;
+            if (p < pL) {
+              q = Math.sqrt(-2 * Math.log(p));
+              x = (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+                  ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+            } else if (p <= pH) {
+              q = p - 0.5; r = q * q;
+              x = (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+                  (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+            } else {
+              q = Math.sqrt(-2 * Math.log(1 - p));
+              x = -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+                   ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+            }
+            return x;
+          }
+
+          function run() {
+            const d = +cEff.input.value;
+            const alpha = +cAlpha.input.value;
+            const nMax = +cNmax.input.value;
+            const zCrit = invNorm(1 - alpha / 2);
+
+            const xs = [], powers = [];
+            for (let n = 5; n <= nMax; n += Math.max(1, Math.floor(nMax / 60))) {
+              const ncp = d * Math.sqrt(n / 2);
+              const power = (1 - App.Util.normalCDF(zCrit - ncp)) + App.Util.normalCDF(-zCrit - ncp);
+              xs.push(n);
+              powers.push(power);
+            }
+
+            // требуемое n для power=0.8
+            let nFor80 = null;
+            for (let n = 3; n <= 5000; n++) {
+              const ncp = d * Math.sqrt(n / 2);
+              const power = (1 - App.Util.normalCDF(zCrit - ncp)) + App.Util.normalCDF(-zCrit - ncp);
+              if (power >= 0.8) { nFor80 = n; break; }
+            }
+
+            const ctx = container.querySelector('#htP-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: xs,
+                datasets: [
+                  {
+                    label: 'Мощность (1 − β)',
+                    data: powers,
+                    borderColor: 'rgba(59,130,246,0.9)',
+                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.2,
+                  },
+                  {
+                    label: 'Цель 0.8',
+                    data: xs.map(() => 0.8),
+                    borderColor: 'rgba(239,68,68,0.8)',
+                    borderWidth: 1.5,
+                    borderDash: [6, 3],
+                    pointRadius: 0,
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Power curve: двухвыборочный t-тест (z-аппроксимация)' } },
+                scales: {
+                  x: { title: { display: true, text: 'n на группу' }, ticks: { maxTicksLimit: 12 } },
+                  y: { min: 0, max: 1, title: { display: true, text: '1 − β' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#htP-stats');
+            statsEl.innerHTML = '';
+            const cards = [
+              ['Эффект d', d.toFixed(2)],
+              ['α', alpha.toFixed(3)],
+              ['n для мощности 0.8', nFor80 !== null ? nFor80 : '> 5000'],
+              ['Мощность при n = ' + nMax, ((powers[powers.length - 1]) * 100).toFixed(1) + '%'],
+            ];
+            cards.forEach(([l, v]) => {
+              const c = document.createElement('div');
+              c.className = 'stat-card';
+              c.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(c);
+            });
+          }
+
+          [cEff, cAlpha, cNmax].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Одновыборочный t-тест</h3>

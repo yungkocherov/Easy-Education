@@ -302,6 +302,344 @@ App.registerTopic({
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Симуляция: четыре ансамбля на одних данных</h3>
+        <p>Один и тот же датасет — четыре модели: <b>Random Forest</b>, <b>XGBoost</b> (level-wise, depth-limited), <b>LightGBM</b> (leaf-wise, асимметричный рост), <b>CatBoost</b> (oblivious / симметричные деревья). Сравни границы решений: RF более гладкий, LightGBM тянется глубже в сложные зоны, CatBoost симметричный и аккуратный. <i>Симуляция концептуальная — имитирует философию библиотек, а не их реальный код.</i></p>
+        <div class="sim-container">
+          <div class="sim-controls" id="bc-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="bc-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><div style="font-weight:600;margin-bottom:4px;">Random Forest</div><div class="sim-chart-wrap" style="height:230px;padding:0;"><canvas id="bc-rf" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">XGBoost (level-wise)</div><div class="sim-chart-wrap" style="height:230px;padding:0;"><canvas id="bc-xgb" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">LightGBM (leaf-wise)</div><div class="sim-chart-wrap" style="height:230px;padding:0;"><canvas id="bc-lgb" class="sim-canvas"></canvas></div></div>
+              <div><div style="font-weight:600;margin-bottom:4px;">CatBoost (oblivious)</div><div class="sim-chart-wrap" style="height:230px;padding:0;"><canvas id="bc-cat" class="sim-canvas"></canvas></div></div>
+            </div>
+            <div class="sim-stats" id="bc-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#bc-controls');
+        const cShape = App.makeControl('select', 'bc-shape', 'Форма данных', {
+          options: [
+            { value: 'moons', label: 'Две луны' },
+            { value: 'xor', label: 'XOR' },
+            { value: 'circle', label: 'Круг' },
+            { value: 'spiral', label: 'Спираль' },
+          ],
+          value: 'moons',
+        });
+        const cN = App.makeControl('range', 'bc-n', 'Точек', { min: 60, max: 300, step: 10, value: 140 });
+        const cNoise = App.makeControl('range', 'bc-noise', 'Шум меток %', { min: 0, max: 20, step: 1, value: 5 });
+        const cTrees = App.makeControl('range', 'bc-trees', 'Число деревьев', { min: 10, max: 100, step: 5, value: 40 });
+        [cShape, cN, cNoise, cTrees].forEach(c => controls.appendChild(c.wrap));
+
+        let points = [];
+
+        function genPoint(shape, noise) {
+          let x, y, cls;
+          if (shape === 'moons') {
+            const t = Math.random() * Math.PI;
+            if (Math.random() < 0.5) {
+              x = 0.3 + 0.25 * Math.cos(t) + App.Util.randn(0, 0.03);
+              y = 0.45 + 0.25 * Math.sin(t) + App.Util.randn(0, 0.03);
+              cls = 0;
+            } else {
+              x = 0.55 + 0.25 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.03);
+              y = 0.55 - 0.25 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.03);
+              cls = 1;
+            }
+          } else if (shape === 'xor') {
+            x = Math.random(); y = Math.random();
+            cls = ((x > 0.5) ^ (y > 0.5)) ? 1 : 0;
+          } else if (shape === 'circle') {
+            x = Math.random(); y = Math.random();
+            const r = Math.sqrt((x - 0.5) ** 2 + (y - 0.5) ** 2);
+            cls = r < 0.25 ? 0 : 1;
+          } else {
+            const t = Math.random() * 4 * Math.PI;
+            const r = t / (4 * Math.PI) * 0.3;
+            if (Math.random() < 0.5) {
+              x = 0.5 + r * Math.cos(t) + App.Util.randn(0, 0.015);
+              y = 0.5 + r * Math.sin(t) + App.Util.randn(0, 0.015);
+              cls = 0;
+            } else {
+              x = 0.5 - r * Math.cos(t) + App.Util.randn(0, 0.015);
+              y = 0.5 - r * Math.sin(t) + App.Util.randn(0, 0.015);
+              cls = 1;
+            }
+          }
+          if (Math.random() < noise) cls = 1 - cls;
+          return { x, y, cls };
+        }
+
+        function genData() {
+          const shape = cShape.input.value;
+          const noise = +cNoise.input.value / 100;
+          const n = +cN.input.value;
+          points = [];
+          for (let i = 0; i < n; i++) points.push(genPoint(shape, noise));
+          rebuildAll();
+        }
+
+        // --- generic helpers ---
+        function gini(items) {
+          if (items.length === 0) return 0;
+          let c0 = 0; items.forEach(p => p.cls === 0 && c0++);
+          const p0 = c0 / items.length, p1 = 1 - p0;
+          return 1 - p0 * p0 - p1 * p1;
+        }
+        function majority(items) { let c0 = 0; items.forEach(p => p.cls === 0 && c0++); return c0 >= items.length - c0 ? 0 : 1; }
+        function leafProb(items) {
+          if (items.length === 0) return 0.5;
+          let c1 = 0; items.forEach(p => p.cls === 1 && c1++);
+          return c1 / items.length;
+        }
+        function bestSplit(items, forcedFeat) {
+          const feats = forcedFeat ? [forcedFeat] : ['x', 'y'];
+          let best = null;
+          const base = gini(items);
+          feats.forEach(feat => {
+            const vals = items.map(p => p[feat]).sort((a, b) => a - b);
+            for (let i = 1; i < vals.length; i++) {
+              const thr = (vals[i - 1] + vals[i]) / 2;
+              const L = items.filter(p => p[feat] < thr);
+              const R = items.filter(p => p[feat] >= thr);
+              if (L.length === 0 || R.length === 0) continue;
+              const w = (L.length * gini(L) + R.length * gini(R)) / items.length;
+              const gain = base - w;
+              if (!best || gain > best.gain) best = { feat, thr, gain, L, R };
+            }
+          });
+          return best;
+        }
+
+        // --- RF: level-wise, bagging, random feat subset ---
+        function buildRFTree(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2 || gini(items) < 1e-9) {
+            return { leaf: true, prob: leafProb(items) };
+          }
+          const feat = Math.random() < 0.5 ? 'x' : 'y';
+          const best = bestSplit(items, feat);
+          if (!best || best.gain < 1e-6) return { leaf: true, prob: leafProb(items) };
+          return { leaf: false, feat: best.feat, thr: best.thr,
+            left: buildRFTree(best.L, depth + 1, maxDepth),
+            right: buildRFTree(best.R, depth + 1, maxDepth) };
+        }
+
+        // --- XGBoost: level-wise, strict max_depth, both feats ---
+        function buildXGBTree(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2 || gini(items) < 1e-9) {
+            return { leaf: true, prob: leafProb(items) };
+          }
+          const best = bestSplit(items);
+          if (!best || best.gain < 1e-6) return { leaf: true, prob: leafProb(items) };
+          return { leaf: false, feat: best.feat, thr: best.thr,
+            left: buildXGBTree(best.L, depth + 1, maxDepth),
+            right: buildXGBTree(best.R, depth + 1, maxDepth) };
+        }
+
+        // --- LightGBM: leaf-wise, max_leaves ---
+        function buildLGBTree(items, maxLeaves) {
+          const root = { leaf: true, items, prob: leafProb(items), depth: 0 };
+          const leaves = [root];
+          while (leaves.length < maxLeaves) {
+            // выбрать лист с макс. gain
+            let bestLeaf = null, bestData = null;
+            for (const lf of leaves) {
+              if (lf.items.length < 4) continue;
+              const split = bestSplit(lf.items);
+              if (!split || split.gain < 1e-6) continue;
+              if (!bestData || split.gain > bestData.gain) { bestLeaf = lf; bestData = split; }
+            }
+            if (!bestLeaf) break;
+            // разделить
+            bestLeaf.leaf = false;
+            bestLeaf.feat = bestData.feat;
+            bestLeaf.thr = bestData.thr;
+            const L = { leaf: true, items: bestData.L, prob: leafProb(bestData.L), depth: bestLeaf.depth + 1 };
+            const R = { leaf: true, items: bestData.R, prob: leafProb(bestData.R), depth: bestLeaf.depth + 1 };
+            bestLeaf.left = L; bestLeaf.right = R;
+            const idx = leaves.indexOf(bestLeaf);
+            leaves.splice(idx, 1, L, R);
+          }
+          // очистка items
+          (function strip(n) { delete n.items; if (!n.leaf) { strip(n.left); strip(n.right); } })(root);
+          return root;
+        }
+
+        // --- CatBoost: oblivious / symmetric — все узлы одного уровня имеют одинаковый сплит ---
+        function buildOblivious(items, depth) {
+          // на каждом уровне один и тот же (feat, thr) для ВСЕХ узлов
+          // жадно: перебираем сплит, максимизируя средний gain по всем текущим leaf-bucket-ам
+          let buckets = [items];
+          const splits = [];
+          for (let d = 0; d < depth; d++) {
+            let best = null;
+            ['x', 'y'].forEach(feat => {
+              const allVals = items.map(p => p[feat]).sort((a, b) => a - b);
+              const step = Math.max(1, Math.floor(allVals.length / 12));
+              for (let i = step; i < allVals.length; i += step) {
+                const thr = (allVals[i - 1] + allVals[i]) / 2;
+                let totalGain = 0, totalItems = 0;
+                buckets.forEach(b => {
+                  if (b.length === 0) return;
+                  const baseG = gini(b) * b.length;
+                  const L = b.filter(p => p[feat] < thr);
+                  const R = b.filter(p => p[feat] >= thr);
+                  if (L.length === 0 || R.length === 0) { totalGain += 0; totalItems += b.length; return; }
+                  const gainW = baseG - (L.length * gini(L) + R.length * gini(R));
+                  totalGain += gainW;
+                  totalItems += b.length;
+                });
+                const avg = totalItems > 0 ? totalGain / totalItems : 0;
+                if (!best || avg > best.gain) best = { feat, thr, gain: avg };
+              }
+            });
+            if (!best || best.gain < 1e-6) break;
+            splits.push({ feat: best.feat, thr: best.thr });
+            const newBuckets = [];
+            buckets.forEach(b => {
+              newBuckets.push(b.filter(p => p[best.feat] < best.thr));
+              newBuckets.push(b.filter(p => p[best.feat] >= best.thr));
+            });
+            buckets = newBuckets;
+          }
+          const leafProbs = buckets.map(b => leafProb(b));
+          return { splits, leafProbs };
+        }
+        function predictOblivious(tree, x, y) {
+          let idx = 0;
+          tree.splits.forEach(s => {
+            const v = s.feat === 'x' ? x : y;
+            idx = idx * 2 + (v < s.thr ? 0 : 1);
+          });
+          return tree.leafProbs[idx] ?? 0.5;
+        }
+
+        function predictBinary(tree, x, y) {
+          if (tree.leaf) return tree.prob;
+          const v = tree.feat === 'x' ? x : y;
+          return v < tree.thr ? predictBinary(tree.left, x, y) : predictBinary(tree.right, x, y);
+        }
+
+        // ансамбли
+        let rfModel = null, xgbModel = null, lgbModel = null, catModel = null;
+
+        function bootstrap() {
+          const sample = [];
+          for (let i = 0; i < points.length; i++) sample.push(points[Math.floor(Math.random() * points.length)]);
+          return sample;
+        }
+
+        function rebuildAll() {
+          const T = +cTrees.input.value;
+          // RF: bagging, depth 5, majority vote — среднее вероятностей
+          rfModel = [];
+          for (let t = 0; t < T; t++) rfModel.push(buildRFTree(bootstrap(), 0, 5));
+          // XGBoost: depth 4, boosting по градиенту (сводим к residuals, но для классификации — упрощённо: каждое дерево берёт текущие остатки как (cls - pred))
+          xgbModel = [];
+          let probs = new Array(points.length).fill(0.5);
+          for (let t = 0; t < T; t++) {
+            const items = points.map((p, i) => ({ x: p.x, y: p.y, cls: p.cls - probs[i] > 0 ? 1 : 0 }));
+            const tree = buildXGBTree(items, 0, 4);
+            xgbModel.push(tree);
+            for (let i = 0; i < points.length; i++) {
+              probs[i] += 0.3 * (predictBinary(tree, points[i].x, points[i].y) - 0.5);
+            }
+          }
+          // LightGBM: leaf-wise, max_leaves=16, boosting
+          lgbModel = [];
+          probs = new Array(points.length).fill(0.5);
+          for (let t = 0; t < T; t++) {
+            const items = points.map((p, i) => ({ x: p.x, y: p.y, cls: p.cls - probs[i] > 0 ? 1 : 0 }));
+            const tree = buildLGBTree(items, 16);
+            lgbModel.push(tree);
+            for (let i = 0; i < points.length; i++) {
+              probs[i] += 0.3 * (predictBinary(tree, points[i].x, points[i].y) - 0.5);
+            }
+          }
+          // CatBoost: oblivious depth 5, boosting
+          catModel = [];
+          probs = new Array(points.length).fill(0.5);
+          for (let t = 0; t < T; t++) {
+            const items = points.map((p, i) => ({ x: p.x, y: p.y, cls: p.cls - probs[i] > 0 ? 1 : 0 }));
+            const tree = buildOblivious(items, 5);
+            catModel.push(tree);
+            for (let i = 0; i < points.length; i++) {
+              probs[i] += 0.3 * (predictOblivious(tree, points[i].x, points[i].y) - 0.5);
+            }
+          }
+          drawAll();
+        }
+
+        function predictModel(model, type, x, y) {
+          if (type === 'rf') {
+            let s = 0; model.forEach(t => s += predictBinary(t, x, y));
+            return s / model.length;
+          }
+          let v = 0.5;
+          model.forEach(t => {
+            const p = type === 'cat' ? predictOblivious(t, x, y) : predictBinary(t, x, y);
+            v += 0.3 * (p - 0.5);
+          });
+          return Math.max(0, Math.min(1, v));
+        }
+
+        function drawModel(canvasId, model, type) {
+          const canvas = container.querySelector('#' + canvasId);
+          const r = canvas.getBoundingClientRect();
+          canvas.width = r.width;
+          canvas.height = r.height;
+          const ctx = canvas.getContext('2d');
+          const W = canvas.width, H = canvas.height;
+          ctx.clearRect(0, 0, W, H);
+          const step = 6;
+          for (let px = 0; px < W; px += step) {
+            for (let py = 0; py < H; py += step) {
+              const p = predictModel(model, type, px / W, py / H);
+              ctx.fillStyle = `rgba(${Math.round(239 * (1 - p) + 59 * p)},${Math.round(68 * (1 - p) + 130 * p)},${Math.round(68 * (1 - p) + 246 * p)},0.25)`;
+              ctx.fillRect(px, py, step, step);
+            }
+          }
+          points.forEach(p => {
+            ctx.fillStyle = p.cls === 0 ? '#ef4444' : '#3b82f6';
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(p.x * W, p.y * H, 3, 0, 2 * Math.PI);
+            ctx.fill(); ctx.stroke();
+          });
+          // accuracy
+          let correct = 0;
+          points.forEach(p => { if (Math.round(predictModel(model, type, p.x, p.y)) === p.cls) correct++; });
+          return correct / points.length;
+        }
+
+        function drawAll() {
+          const accRF = drawModel('bc-rf', rfModel, 'rf');
+          const accXGB = drawModel('bc-xgb', xgbModel, 'xgb');
+          const accLGB = drawModel('bc-lgb', lgbModel, 'lgb');
+          const accCAT = drawModel('bc-cat', catModel, 'cat');
+          container.querySelector('#bc-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">RF acc</div><div class="stat-value">${(accRF * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">XGB acc</div><div class="stat-value">${(accXGB * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">LGB acc</div><div class="stat-value">${(accLGB * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">CAT acc</div><div class="stat-value">${(accCAT * 100).toFixed(1)}%</div></div>
+          `;
+        }
+
+        [cShape, cN, cNoise].forEach(c => c.input.addEventListener('change', genData));
+        cTrees.input.addEventListener('change', rebuildAll);
+        container.querySelector('#bc-regen').onclick = genData;
+        setTimeout(genData, 50);
+        window.addEventListener('resize', () => drawAll());
+      },
+    },
+
     python: `
 <h3>Единый API для трёх библиотек</h3>
 <pre><code>import numpy as np

@@ -488,8 +488,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Шаги алгоритма',
+        html: `
         <h3>Симуляция: шаги K-Means</h3>
         <p>Нажимай "Шаг" и смотри, как центроиды двигаются. Меняй k и перегенерируй.</p>
         <div class="sim-container">
@@ -674,7 +676,330 @@ App.registerTopic({
         setTimeout(() => { regen(); resize(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+      },
+      {
+        title: 'Метод локтя',
+        html: `
+          <h3>Метод локтя: как выбрать k</h3>
+          <p>Строим inertia (сумма квадратов расстояний до ближайшего центроида) для разных $k$. Idea: где кривая резко перегибается — там оптимум. Увеличивай истинное число кластеров в данных и смотри, как двигается локоть.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="kmE-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;"><canvas id="kmE-chart"></canvas></div>
+              <div class="sim-stats" id="kmE-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#kmE-controls');
+          const cTrue = App.makeControl('range', 'kmE-true', 'Истинных кластеров', { min: 2, max: 8, step: 1, value: 4 });
+          const cSpread = App.makeControl('range', 'kmE-spread', 'Разброс', { min: 0.03, max: 0.18, step: 0.01, value: 0.07 });
+          const cN = App.makeControl('range', 'kmE-n', 'Точек на кластер', { min: 20, max: 120, step: 10, value: 50 });
+          [cTrue, cSpread, cN].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          let points = [];
+
+          function regen() {
+            const nc = +cTrue.input.value;
+            const nPer = +cN.input.value;
+            const spread = +cSpread.input.value;
+            points = [];
+            const centers = [];
+            for (let c = 0; c < nc; c++) centers.push([0.2 + 0.6 * Math.random(), 0.2 + 0.6 * Math.random()]);
+            centers.forEach(ctr => {
+              for (let i = 0; i < nPer; i++) {
+                points.push({ x: ctr[0] + App.Util.randn(0, spread), y: ctr[1] + App.Util.randn(0, spread) });
+              }
+            });
+            run();
+          }
+
+          function fitKMeans(k) {
+            // простая инициализация: случайные точки как центры
+            let centroids = [];
+            const used = new Set();
+            while (centroids.length < k) {
+              const idx = Math.floor(Math.random() * points.length);
+              if (used.has(idx)) continue;
+              used.add(idx);
+              centroids.push({ x: points[idx].x, y: points[idx].y });
+            }
+            const labels = new Array(points.length).fill(0);
+            for (let it = 0; it < 30; it++) {
+              let moved = 0;
+              for (let i = 0; i < points.length; i++) {
+                let best = 0, bestD = Infinity;
+                for (let c = 0; c < k; c++) {
+                  const d = (points[i].x - centroids[c].x) ** 2 + (points[i].y - centroids[c].y) ** 2;
+                  if (d < bestD) { bestD = d; best = c; }
+                }
+                labels[i] = best;
+              }
+              const sums = Array.from({ length: k }, () => ({ x: 0, y: 0, n: 0 }));
+              for (let i = 0; i < points.length; i++) {
+                sums[labels[i]].x += points[i].x;
+                sums[labels[i]].y += points[i].y;
+                sums[labels[i]].n++;
+              }
+              for (let c = 0; c < k; c++) {
+                if (sums[c].n === 0) continue;
+                const nx = sums[c].x / sums[c].n, ny = sums[c].y / sums[c].n;
+                moved += Math.abs(nx - centroids[c].x) + Math.abs(ny - centroids[c].y);
+                centroids[c].x = nx; centroids[c].y = ny;
+              }
+              if (moved < 1e-5) break;
+            }
+            let inertia = 0;
+            for (let i = 0; i < points.length; i++) {
+              const c = centroids[labels[i]];
+              inertia += (points[i].x - c.x) ** 2 + (points[i].y - c.y) ** 2;
+            }
+            return inertia;
+          }
+
+          function run() {
+            const kMax = 10;
+            const inertias = [];
+            for (let k = 1; k <= kMax; k++) {
+              // усредняем по нескольким запускам для стабильности
+              let best = Infinity;
+              for (let r = 0; r < 5; r++) best = Math.min(best, fitKMeans(k));
+              inertias.push(best);
+            }
+
+            // находим «локоть» через максимум второго разностного ряда
+            let elbow = 1;
+            let maxDrop = -Infinity;
+            for (let k = 2; k < kMax; k++) {
+              const drop = (inertias[k - 1] - inertias[k]) - (inertias[k] - inertias[k + 1]);
+              if (drop > maxDrop) { maxDrop = drop; elbow = k + 1; }
+            }
+
+            const trueK = +cTrue.input.value;
+            const ctx = container.querySelector('#kmE-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: Array.from({ length: kMax }, (_, i) => i + 1),
+                datasets: [
+                  { label: 'Inertia', data: inertias, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', borderWidth: 3, tension: 0.1, pointRadius: 5, fill: true },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'top' },
+                  annotation: undefined,
+                },
+                scales: {
+                  x: { title: { display: true, text: 'k' } },
+                  y: { title: { display: true, text: 'Inertia (сумма квадратов)' }, beginAtZero: true },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#kmE-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Истинных кластеров</div><div class="stat-value">${trueK}</div></div>
+              <div class="stat-card"><div class="stat-label">Локоть (автодетект)</div><div class="stat-value">${elbow}</div></div>
+              <div class="stat-card" style="background:${elbow === trueK ? '#dcfce7' : '#fef3c7'}"><div class="stat-label">Совпадение</div><div class="stat-value" style="font-size:12px">${elbow === trueK ? 'Локоть указывает точно на истинное k' : 'Локоть размывается при большом разбросе — подбери spread поменьше'}</div></div>
+              <div class="stat-card"><div class="stat-label">Inertia при истинном k</div><div class="stat-value">${App.Util.round(inertias[trueK - 1], 3)}</div></div>
+            `;
+          }
+
+          [cTrue, cSpread, cN].forEach(c => c.input.addEventListener('change', regen));
+          regen();
+        },
+      },
+      {
+        title: 'Плохой init: локальный минимум',
+        html: `
+          <h3>Почему n_init &gt; 1: ловушка локального минимума</h3>
+          <p>K-Means гарантирует сходимость, но не к <b>глобальному</b> минимуму. При неудачной инициализации алгоритм застрянет в локальном и отдаст бессмысленную разбивку. Нажимай «Новый запуск» — при одних и тех же данных результат будет разным. Сравни inertia и смотри, какие раскладки лучше.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="kmI-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="kmI-rerun">🎲 Новый запуск</button>
+              <button class="btn secondary" id="kmI-best">✨ Лучший из 20</button>
+              <button class="btn secondary" id="kmI-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:400px;padding:0;"><canvas id="kmI-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="kmI-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#kmI-controls');
+          const cK = App.makeControl('range', 'kmI-k', 'k', { min: 2, max: 6, step: 1, value: 4 });
+          const cInit = App.makeControl('select', 'kmI-init', 'Инициализация', {
+            options: [
+              { value: 'random', label: 'Случайная (наивная)' },
+              { value: 'kpp', label: 'K-Means++' },
+            ],
+            value: 'random',
+          });
+          [cK, cInit].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#kmI-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+          let points = [];
+          let centroids = [];
+          let labels = [];
+          let lastInertia = 0;
+          let bestEverInertia = Infinity;
+
+          function regen() {
+            // 4 четких кластера по углам — чтобы легче было увидеть плохую раскладку
+            const centers = [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
+            points = [];
+            centers.forEach(c => {
+              for (let i = 0; i < 50; i++) {
+                points.push({ x: c[0] + App.Util.randn(0, 0.05), y: c[1] + App.Util.randn(0, 0.05) });
+              }
+            });
+            bestEverInertia = Infinity;
+            runOnce();
+          }
+
+          function initCentroids(method, k) {
+            if (method === 'random') {
+              const used = new Set();
+              const out = [];
+              while (out.length < k) {
+                const idx = Math.floor(Math.random() * points.length);
+                if (used.has(idx)) continue;
+                used.add(idx);
+                out.push({ x: points[idx].x, y: points[idx].y });
+              }
+              return out;
+            }
+            // k-means++
+            const out = [{ ...points[Math.floor(Math.random() * points.length)] }];
+            for (let c = 1; c < k; c++) {
+              const dists = points.map(p => {
+                let m = Infinity;
+                out.forEach(ctr => {
+                  const d = (p.x - ctr.x) ** 2 + (p.y - ctr.y) ** 2;
+                  if (d < m) m = d;
+                });
+                return m;
+              });
+              const sum = dists.reduce((a, b) => a + b, 0);
+              let r = Math.random() * sum;
+              for (let i = 0; i < dists.length; i++) {
+                r -= dists[i];
+                if (r <= 0) { out.push({ x: points[i].x, y: points[i].y }); break; }
+              }
+            }
+            return out;
+          }
+
+          function fit(k, method) {
+            let c = initCentroids(method, k);
+            const lab = new Array(points.length).fill(0);
+            for (let it = 0; it < 50; it++) {
+              let moved = 0;
+              for (let i = 0; i < points.length; i++) {
+                let best = 0, bestD = Infinity;
+                for (let j = 0; j < k; j++) {
+                  const d = (points[i].x - c[j].x) ** 2 + (points[i].y - c[j].y) ** 2;
+                  if (d < bestD) { bestD = d; best = j; }
+                }
+                lab[i] = best;
+              }
+              const sums = Array.from({ length: k }, () => ({ x: 0, y: 0, n: 0 }));
+              for (let i = 0; i < points.length; i++) {
+                sums[lab[i]].x += points[i].x;
+                sums[lab[i]].y += points[i].y;
+                sums[lab[i]].n++;
+              }
+              for (let j = 0; j < k; j++) {
+                if (sums[j].n === 0) continue;
+                const nx = sums[j].x / sums[j].n, ny = sums[j].y / sums[j].n;
+                moved += Math.abs(nx - c[j].x) + Math.abs(ny - c[j].y);
+                c[j].x = nx; c[j].y = ny;
+              }
+              if (moved < 1e-5) break;
+            }
+            let inertia = 0;
+            for (let i = 0; i < points.length; i++) {
+              inertia += (points[i].x - c[lab[i]].x) ** 2 + (points[i].y - c[lab[i]].y) ** 2;
+            }
+            return { centroids: c, labels: lab, inertia };
+          }
+
+          function runOnce() {
+            const k = +cK.input.value;
+            const method = cInit.input.value;
+            const res = fit(k, method);
+            centroids = res.centroids;
+            labels = res.labels;
+            lastInertia = res.inertia;
+            if (lastInertia < bestEverInertia) bestEverInertia = lastInertia;
+            draw();
+          }
+
+          function runBest() {
+            const k = +cK.input.value;
+            const method = cInit.input.value;
+            let best = null;
+            for (let r = 0; r < 20; r++) {
+              const res = fit(k, method);
+              if (!best || res.inertia < best.inertia) best = res;
+            }
+            centroids = best.centroids;
+            labels = best.labels;
+            lastInertia = best.inertia;
+            if (lastInertia < bestEverInertia) bestEverInertia = lastInertia;
+            draw();
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            points.forEach((p, i) => {
+              ctx.fillStyle = colors[labels[i]] || '#94a3b8';
+              ctx.beginPath();
+              ctx.arc(p.x * W, p.y * H, 3.5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+            centroids.forEach((c, i) => {
+              ctx.fillStyle = colors[i];
+              ctx.strokeStyle = '#0f172a';
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.arc(c.x * W, c.y * H, 11, 0, 2 * Math.PI);
+              ctx.fill();
+              ctx.stroke();
+            });
+
+            const isBad = lastInertia > bestEverInertia * 1.15;
+            container.querySelector('#kmI-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Inertia (этот запуск)</div><div class="stat-value">${App.Util.round(lastInertia, 3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Лучшая за сессию</div><div class="stat-value">${App.Util.round(bestEverInertia, 3)}</div></div>
+              <div class="stat-card" style="background:${isBad ? '#fee2e2' : '#dcfce7'}"><div class="stat-label">Статус</div><div class="stat-value" style="font-size:12px">${isBad ? 'Локальный минимум! Inertia хуже лучшего на >15%' : 'Близко к глобальному минимуму'}</div></div>
+              <div class="stat-card"><div class="stat-label">Метод init</div><div class="stat-value" style="font-size:13px">${cInit.input.value === 'random' ? 'random (нестабильно)' : 'k-means++ (лучше)'}</div></div>
+            `;
+          }
+
+          cK.input.addEventListener('input', () => { bestEverInertia = Infinity; runOnce(); });
+          cInit.input.addEventListener('change', () => { bestEverInertia = Infinity; runOnce(); });
+          container.querySelector('#kmI-rerun').onclick = runOnce;
+          container.querySelector('#kmI-best').onclick = runBest;
+          container.querySelector('#kmI-regen').onclick = regen;
+
+          setTimeout(() => { regen(); resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Python: K-Means кластеризация</h3>

@@ -375,7 +375,9 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+      {
+        title: 'DiD',
       html: `
         <h3>Симуляция: DiD — две группы, до и после</h3>
         <p>Визуализируем DiD для двух линий тренда. Двигай слайдер «Эффект воздействия» и наблюдай, как DiD его корректно выделяет даже при наличии фонового тренда.</p>
@@ -514,7 +516,119 @@ App.registerTopic({
         container.querySelector('#did-regen').onclick = update;
         update();
       },
-    },
+      },
+      {
+        title: 'Парадокс Симпсона',
+        html: `
+          <h3>Парадокс Симпсона: тренд переворачивается в подгруппах</h3>
+          <p>Две группы (например, «молодые» и «старые»). Внутри каждой группы эффект воздействия <b>отрицательный</b>. А в агрегате — <b>положительный</b>. Причина: конфаундер (возраст) неравномерно распределён между уровнями воздействия. Двигай «Дисбаланс групп» и смотри, как агрегированная линия меняет знак.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="sp-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="sp-chart"></canvas></div>
+              <div class="sim-stats" id="sp-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#sp-controls');
+          const cImbalance = App.makeControl('range', 'sp-imb', 'Дисбаланс групп', { min: 0, max: 1, step: 0.05, value: 0.85 });
+          const cGroupEffect = App.makeControl('range', 'sp-ge', 'Наклон внутри групп', { min: -3, max: 3, step: 0.1, value: -1 });
+          const cGap = App.makeControl('range', 'sp-gap', 'Разрыв Y между группами', { min: 0, max: 40, step: 1, value: 20 });
+          const cN = App.makeControl('range', 'sp-n', 'Точек на группу', { min: 20, max: 200, step: 10, value: 60 });
+          [cImbalance, cGroupEffect, cGap, cN].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function linreg(xs, ys) {
+            const mx = App.Util.mean(xs), my = App.Util.mean(ys);
+            let num = 0, den = 0;
+            for (let i = 0; i < xs.length; i++) {
+              num += (xs[i] - mx) * (ys[i] - my);
+              den += (xs[i] - mx) ** 2;
+            }
+            const slope = num / (den || 1e-12);
+            const intercept = my - slope * mx;
+            return { slope, intercept };
+          }
+
+          function run() {
+            const imb = +cImbalance.input.value;
+            const gs = +cGroupEffect.input.value; // slope внутри групп
+            const gap = +cGap.input.value;
+            const n = +cN.input.value;
+
+            // Группа A (молодые) — низкое X (малая доза), низкий Y
+            // Группа B (старые) — высокое X (большая доза), высокий Y (из-за gap)
+            // При imb = 0: обе группы имеют одинаковый разброс X; при imb = 1: полностью разделены
+            const xA = [], yA = [], xB = [], yB = [];
+            for (let i = 0; i < n; i++) {
+              const xa = 2 + (1 - imb) * (Math.random() * 8) + imb * (Math.random() * 3);
+              xA.push(xa);
+              yA.push(5 + gs * xa + App.Util.randn(0, 2));
+            }
+            for (let i = 0; i < n; i++) {
+              const xb = 5 + (1 - imb) * (Math.random() * 8) + imb * (4 + Math.random() * 4);
+              xB.push(xb);
+              yB.push(5 + gap + gs * xb + App.Util.randn(0, 2));
+            }
+
+            const lrA = linreg(xA, yA);
+            const lrB = linreg(xB, yB);
+            const lrAll = linreg([...xA, ...xB], [...yA, ...yB]);
+
+            // точки линии
+            const xMin = Math.min(...xA, ...xB), xMax = Math.max(...xA, ...xB);
+            const lineA = [{ x: xMin, y: lrA.intercept + lrA.slope * xMin }, { x: xMax, y: lrA.intercept + lrA.slope * xMax }];
+            const lineB = [{ x: xMin, y: lrB.intercept + lrB.slope * xMin }, { x: xMax, y: lrB.intercept + lrB.slope * xMax }];
+            const lineAll = [{ x: xMin, y: lrAll.intercept + lrAll.slope * xMin }, { x: xMax, y: lrAll.intercept + lrAll.slope * xMax }];
+
+            const ctx = container.querySelector('#sp-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: {
+                datasets: [
+                  { label: 'Группа A (молодые)', data: xA.map((x, i) => ({ x, y: yA[i] })), backgroundColor: 'rgba(59,130,246,0.55)', pointRadius: 4 },
+                  { label: 'Группа B (старые)', data: xB.map((x, i) => ({ x, y: yB[i] })), backgroundColor: 'rgba(239,68,68,0.55)', pointRadius: 4 },
+                  { type: 'line', label: 'Линия A', data: lineA, borderColor: 'rgba(59,130,246,0.9)', borderWidth: 2, pointRadius: 0, fill: false },
+                  { type: 'line', label: 'Линия B', data: lineB, borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2, pointRadius: 0, fill: false },
+                  { type: 'line', label: 'Общая регрессия', data: lineAll, borderColor: 'rgba(16,185,129,0.95)', borderWidth: 3, borderDash: [8, 4], pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Внутри групп — один знак, в агрегате — другой' } },
+                scales: {
+                  x: { title: { display: true, text: 'X (доза воздействия)' } },
+                  y: { title: { display: true, text: 'Y (отклик)' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const flip = Math.sign(lrAll.slope) !== Math.sign(lrA.slope) && Math.sign(lrA.slope) !== 0;
+            const statsEl = container.querySelector('#sp-stats');
+            statsEl.innerHTML = '';
+            const cards = [
+              ['Наклон в A', lrA.slope.toFixed(2)],
+              ['Наклон в B', lrB.slope.toFixed(2)],
+              ['Наклон общий', lrAll.slope.toFixed(2)],
+              ['Парадокс?', flip ? '⚠ ДА' : 'нет'],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cImbalance, cGroupEffect, cGap, cN].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: DiD, Propensity Score Matching, DoWhy</h3>

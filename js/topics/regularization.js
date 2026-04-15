@@ -556,8 +556,10 @@ Std важен тоже: меньше std = стабильнее результ�
       }
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Фит и веса',
+        html: `
         <h3>Симуляция: как λ влияет на веса</h3>
         <p>Полиномиальная регрессия с регуляризацией. Увеличивай λ и смотри, как сжимаются веса.</p>
         <div class="sim-container">
@@ -740,7 +742,178 @@ Std важен тоже: меньше std = стабильнее результ�
         container.querySelector('#reg-regen').onclick = regen;
         regen();
       },
-    },
+      },
+      {
+        title: 'Coefficient paths (L1 vs L2)',
+        html: `
+          <h3>Coefficient paths: как коэффициенты зависят от λ</h3>
+          <p>Классическая картинка из учебников по регуляризации. 8 признаков: 3 настоящих (A, B, C) и 5 «шумовых» (D–H). Смотри, как с ростом λ коэффициенты стремятся к нулю. Ridge уводит их плавно, Lasso <b>точно обнуляет</b> — и обычно в первую очередь зануляет шумовые.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="regp-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn secondary" id="regp-regen">🔄 Новые данные</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;"><canvas id="regp-chart"></canvas></div>
+              <div class="sim-stats" id="regp-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#regp-controls');
+          const cType = App.makeControl('select', 'regp-type', 'Регуляризация', {
+            options: [{ value: 'l2', label: 'L2 (Ridge)' }, { value: 'l1', label: 'L1 (Lasso)' }],
+            value: 'l1',
+          });
+          const cLamMark = App.makeControl('range', 'regp-lam', 'Маркер log₁₀(λ)', { min: -3, max: 3, step: 0.1, value: 0 });
+          const cN = App.makeControl('range', 'regp-n', 'Точек', { min: 30, max: 200, step: 10, value: 80 });
+          const cNoise = App.makeControl('range', 'regp-noise', 'Шум σ', { min: 0.1, max: 2, step: 0.1, value: 0.8 });
+          [cType, cLamMark, cN, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          const NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+          const TRUE = [2.5, -1.8, 1.2, 0, 0, 0, 0, 0];
+          const P = NAMES.length;
+
+          let X = [], y = [];
+          let chart = null;
+
+          function regen() {
+            const n = +cN.input.value, noise = +cNoise.input.value;
+            X = []; y = [];
+            for (let i = 0; i < n; i++) {
+              const row = [];
+              for (let j = 0; j < P; j++) row.push(App.Util.randn(0, 1));
+              X.push(row);
+              let s = 0;
+              for (let j = 0; j < P; j++) s += TRUE[j] * row[j];
+              y.push(s + App.Util.randn(0, noise));
+            }
+            update();
+          }
+
+          function fitRidge(lam) {
+            const n = X.length;
+            const A = Array.from({ length: P }, () => new Array(P).fill(0));
+            const b = new Array(P).fill(0);
+            for (let i = 0; i < n; i++) {
+              for (let r = 0; r < P; r++) {
+                for (let c = 0; c < P; c++) A[r][c] += X[i][r] * X[i][c];
+                b[r] += X[i][r] * y[i];
+              }
+            }
+            for (let r = 0; r < P; r++) A[r][r] += lam;
+            // Gauss
+            for (let i = 0; i < P; i++) {
+              let mx = i;
+              for (let k = i + 1; k < P; k++) if (Math.abs(A[k][i]) > Math.abs(A[mx][i])) mx = k;
+              [A[i], A[mx]] = [A[mx], A[i]]; [b[i], b[mx]] = [b[mx], b[i]];
+              for (let k = i + 1; k < P; k++) {
+                const f = A[k][i] / A[i][i];
+                for (let j = i; j < P; j++) A[k][j] -= f * A[i][j];
+                b[k] -= f * b[i];
+              }
+            }
+            const w = new Array(P).fill(0);
+            for (let i = P - 1; i >= 0; i--) {
+              let s = b[i];
+              for (let j = i + 1; j < P; j++) s -= A[i][j] * w[j];
+              w[i] = s / A[i][i];
+            }
+            return w;
+          }
+
+          function fitLasso(lam) {
+            // Coordinate descent (признаки уже ~N(0,1), так что не нормируем повторно)
+            const n = X.length;
+            const w = new Array(P).fill(0);
+            const r = y.slice();
+            for (let it = 0; it < 400; it++) {
+              let maxDiff = 0;
+              for (let j = 0; j < P; j++) {
+                let num = 0, den = 0;
+                for (let i = 0; i < n; i++) {
+                  const rij = r[i] + w[j] * X[i][j];
+                  num += X[i][j] * rij;
+                  den += X[i][j] * X[i][j];
+                }
+                num /= n; den /= n;
+                const old = w[j];
+                const thr = lam;
+                let nw;
+                if (num > thr) nw = (num - thr) / den;
+                else if (num < -thr) nw = (num + thr) / den;
+                else nw = 0;
+                const d = nw - old;
+                if (Math.abs(d) > maxDiff) maxDiff = Math.abs(d);
+                for (let i = 0; i < n; i++) r[i] -= d * X[i][j];
+                w[j] = nw;
+              }
+              if (maxDiff < 1e-6) break;
+            }
+            return w;
+          }
+
+          function update() {
+            const type = cType.input.value;
+            // λ logspace от 10^-3 до 10^3
+            const lams = [];
+            for (let k = 0; k <= 60; k++) lams.push(Math.pow(10, -3 + 6 * k / 60));
+            const paths = Array.from({ length: P }, () => []);
+            lams.forEach(lam => {
+              const w = (type === 'l1') ? fitLasso(lam) : fitRidge(lam);
+              for (let j = 0; j < P; j++) paths[j].push(w[j]);
+            });
+
+            const markerLam = Math.pow(10, +cLamMark.input.value);
+            const wMarker = (type === 'l1') ? fitLasso(markerLam) : fitRidge(markerLam);
+
+            const palette = ['#dc2626', '#2563eb', '#16a34a', '#94a3b8', '#94a3b8', '#94a3b8', '#94a3b8', '#94a3b8'];
+            const datasets = paths.map((path, j) => ({
+              label: j < 3 ? `${NAMES[j]} (истинный)` : `${NAMES[j]} (шум)`,
+              data: lams.map((lam, i) => ({ x: lam, y: path[i] })),
+              borderColor: palette[j],
+              borderWidth: j < 3 ? 2.5 : 1.5,
+              borderDash: j < 3 ? [] : [4, 3],
+              pointRadius: 0,
+              fill: false,
+            }));
+
+            const ctx = container.querySelector('#regp-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: { datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+                  title: { display: true, text: `Coefficient paths — ${type === 'l1' ? 'Lasso (L1)' : 'Ridge (L2)'}` },
+                  annotation: undefined,
+                },
+                scales: {
+                  x: { type: 'logarithmic', title: { display: true, text: 'λ (log scale)' }, min: 0.001, max: 1000 },
+                  y: { title: { display: true, text: 'Коэффициент' }, suggestedMin: -3, suggestedMax: 3 },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const nonZero = wMarker.filter(v => Math.abs(v) > 1e-5).length;
+            const rowsStr = wMarker.map((v, j) => `<span style="color:${palette[j]};font-weight:${j < 3 ? 700 : 400};">${NAMES[j]}=${v.toFixed(2)}</span>`).join(' &nbsp; ');
+            container.querySelector('#regp-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">λ (маркер)</div><div class="stat-value">${markerLam.toExponential(1)}</div></div>
+              <div class="stat-card"><div class="stat-label">Ненулевых</div><div class="stat-value">${nonZero}/${P}</div></div>
+              <div class="stat-card" style="flex:1;min-width:100%;"><div class="stat-label">Коэффициенты при выбранной λ</div><div class="stat-value" style="font-size:12px;font-weight:400;">${rowsStr}</div></div>
+            `;
+          }
+
+          [cType, cLamMark].forEach(c => c.input.addEventListener('input', update));
+          [cN, cNoise].forEach(c => c.input.addEventListener('change', regen));
+          container.querySelector('#regp-regen').onclick = regen;
+          regen();
+        },
+      },
+    ],
 
     python: `
       <h3>Python: Ridge, Lasso и выбор λ</h3>

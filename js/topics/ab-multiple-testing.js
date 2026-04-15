@@ -443,8 +443,10 @@ BH (FDR=0.05):
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Инфляция FWER',
+        html: `
         <h3>Инфляция ложных срабатываний</h3>
         <p>Чем больше тестов проводим — тем чаще «находим» несуществующий эффект.</p>
         <div class="sim-container">
@@ -497,7 +499,105 @@ BH (FDR=0.05):
         container.querySelector('#abmult-run').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Bonferroni vs BH-FDR',
+        html: `
+          <h3>Строгость vs мощность: две философии</h3>
+          <p>Бонферрони контролирует FWER (вероятность хоть одного ложного срабатывания). BH-FDR контролирует долю ложных среди значимых. На графике — $m$ p-значений, отсортированные. Бонферрони просто делит $\\alpha$ на $m$. BH — ступенчатая линия $\\alpha \\cdot k / m$. Двигай долю реально ненулевых эффектов и смотри, кто сколько находит.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abmult2-controls"></div>
+            <div class="sim-buttons"><button class="btn" id="abmult2-run">🔄 Новые p-значения</button></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abmult2-chart"></canvas></div>
+              <div class="sim-stats" id="abmult2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abmult2-controls');
+          const cM = App.makeControl('range', 'abmult2-m', 'Тестов m', { min: 10, max: 200, step: 5, value: 50 });
+          const cPi = App.makeControl('range', 'abmult2-pi', 'Доля истинно ненулевых %', { min: 0, max: 100, step: 5, value: 30 });
+          const cEff = App.makeControl('range', 'abmult2-eff', 'Сила эффекта (z₁)', { min: 1, max: 5, step: 0.1, value: 3 });
+          const cAlpha = App.makeControl('range', 'abmult2-alpha', 'α', { min: 0.01, max: 0.2, step: 0.01, value: 0.05 });
+          [cM, cPi, cEff, cAlpha].forEach(c => controls.appendChild(c.wrap));
+          let chart = null;
+          function run() {
+            const m = +cM.input.value;
+            const pi = +cPi.input.value / 100;
+            const eff = +cEff.input.value;
+            const alpha = +cAlpha.input.value;
+            // Generate p-values: null → Uniform(0,1); non-null → z ~ N(eff, 1), p = 2*(1-Φ(|z|))
+            const pvals = [];
+            const truth = [];
+            for (let i = 0; i < m; i++) {
+              if (Math.random() < pi) {
+                const z = App.Util.randn(eff, 1);
+                pvals.push(2 * (1 - App.Util.normalCDF(Math.abs(z))));
+                truth.push(1);
+              } else {
+                pvals.push(Math.random());
+                truth.push(0);
+              }
+            }
+            // Sort ascending with truth labels
+            const idx = pvals.map((_, i) => i).sort((a, b) => pvals[a] - pvals[b]);
+            const sortedP = idx.map(i => pvals[i]);
+            const sortedTruth = idx.map(i => truth[i]);
+            const bonfThresh = alpha / m;
+            // BH: find largest k such that p_(k) ≤ k/m * α
+            let bhK = 0;
+            for (let k = m; k >= 1; k--) {
+              if (sortedP[k - 1] <= k / m * alpha) { bhK = k; break; }
+            }
+            const bhThresh = bhK > 0 ? bhK / m * alpha : 0;
+            // Results: counts
+            let bonfTP = 0, bonfFP = 0, bhTP = 0, bhFP = 0, unTP = 0, unFP = 0;
+            for (let i = 0; i < m; i++) {
+              const rejBonf = sortedP[i] <= bonfThresh;
+              const rejBh = i < bhK;
+              const rejUn = sortedP[i] <= alpha;
+              if (sortedTruth[i] === 1) { if (rejBonf) bonfTP++; if (rejBh) bhTP++; if (rejUn) unTP++; }
+              else { if (rejBonf) bonfFP++; if (rejBh) bhFP++; if (rejUn) unFP++; }
+            }
+            // Chart: p-values vs rank, with Bonferroni line (flat) and BH line
+            const ranks = Array.from({ length: m }, (_, i) => i + 1);
+            const bhLine = ranks.map(k => k / m * alpha);
+            const bonfLine = ranks.map(() => bonfThresh);
+            const alphaLine = ranks.map(() => alpha);
+            // Color points: true effect = green, null = red
+            const pointColors = sortedTruth.map(t => t === 1 ? '#10b981' : '#ef4444');
+            const ctx = container.querySelector('#abmult2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ranks,
+                datasets: [
+                  { label: 'p-value', data: sortedP, borderColor: '#3b82f6', backgroundColor: pointColors, borderWidth: 1, pointRadius: 4, pointBackgroundColor: pointColors, showLine: true, fill: false },
+                  { label: 'Bonferroni α/m', data: bonfLine, borderColor: '#ef4444', borderWidth: 2, borderDash: [4,4], pointRadius: 0, fill: false },
+                  { label: 'BH-FDR k/m·α', data: bhLine, borderColor: '#f59e0b', borderWidth: 2, borderDash: [8,4], pointRadius: 0, fill: false },
+                  { label: 'Uncorrected α', data: alphaLine, borderColor: '#94a3b8', borderWidth: 1, borderDash: [2,3], pointRadius: 0, fill: false },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Отсортированные p-значения (зелёные = истинно ненулевые)' } }, scales: { x: { title: { display: true, text: 'Ранг k' } }, y: { min: 0, max: Math.min(1, alpha * 3), title: { display: true, text: 'p-value' } } } },
+            });
+            App.registerChart(chart);
+            const bhTotal = bhTP + bhFP;
+            const bonfTotal = bonfTP + bonfFP;
+            const unTotal = unTP + unFP;
+            container.querySelector('#abmult2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Без коррекции</div><div class="stat-value">' + unTP + '/' + unTotal + ' (FP: ' + unFP + ')</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Bonferroni</div><div class="stat-value">' + bonfTP + '/' + bonfTotal + ' (FP: ' + bonfFP + ')</div></div>' +
+              '<div class="stat-card"><div class="stat-label">BH-FDR</div><div class="stat-value">' + bhTP + '/' + bhTotal + ' (FP: ' + bhFP + ')</div></div>' +
+              '<div class="stat-card"><div class="stat-label">BH FDR факт.</div><div class="stat-value">' + (bhTotal > 0 ? (bhFP / bhTotal * 100).toFixed(0) + '%' : '—') + '</div></div>';
+          }
+          [cM, cPi, cEff, cAlpha].forEach(c => c.input.addEventListener('input', run));
+          container.querySelector('#abmult2-run').onclick = run;
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Коррекция множественных сравнений</h3>

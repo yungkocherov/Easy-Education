@@ -358,10 +358,12 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Глубина и ступеньки',
       html: `
         <h3>Симуляция: дерево регрессии — глубина</h3>
-        <p>Меняй глубину дерева и шум. Наблюдай переобучение при большой глубине.</p>
+        <p>Меняй глубину дерева и шум. Обрати внимание: предсказание дерева — это <b>кусочно-постоянная</b> (ступенчатая) функция, а не гладкая кривая. Увеличение глубины добавляет ступенек — и при большой глубине дерево начинает гнаться за шумом (переобучение).</p>
         <div class="sim-container">
           <div class="sim-controls" id="dtr-controls"></div>
           <div class="sim-buttons">
@@ -487,6 +489,172 @@ App.registerTopic({
         generate();
       },
     },
+    {
+      title: 'Экстраполяция: плоско за пределами',
+      html: `
+        <h3>Дерево не умеет экстраполировать</h3>
+        <p>Обучаем дерево на данных из диапазона <b>[0, 2π]</b>, но показываем предсказание на расширенном диапазоне <b>[-3, 10]</b>. За пределами train-области дерево выдаёт <b>константу</b> — значение крайнего листа. Линейная регрессия бы продолжила тренд, дерево — нет. Это критично для прогноза временных рядов: тренд вверх за окно обучения дерево не догонит.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="dtr2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="dtr2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="dtr2-chart"></canvas></div>
+            <div class="sim-stats" id="dtr2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#dtr2-controls');
+        const cShape = App.makeControl('select', 'dtr2-shape', 'Истинная функция', {
+          options: [
+            { value: 'linear', label: 'Линейная (тренд)' },
+            { value: 'sin', label: 'Синус' },
+            { value: 'quad', label: 'Квадратичная' },
+          ],
+          value: 'linear',
+        });
+        const cDepth = App.makeControl('range', 'dtr2-depth', 'Макс. глубина', { min: 1, max: 8, step: 1, value: 4 });
+        const cNoise = App.makeControl('range', 'dtr2-noise', 'Шум σ', { min: 0, max: 1, step: 0.05, value: 0.2 });
+        [cShape, cDepth, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+        const N = 80;
+        const xMinTrain = 0, xMaxTrain = 2 * Math.PI;
+        const xMinView = -3, xMaxView = 10;
+
+        function trueFn(x) {
+          const s = cShape.input.value;
+          if (s === 'linear') return 0.5 * x;
+          if (s === 'sin') return Math.sin(x);
+          return 0.1 * x * x - 0.3;
+        }
+
+        function generate() {
+          const sigma = +cNoise.input.value;
+          dataX = []; dataY = [];
+          for (let i = 0; i < N; i++) {
+            const x = xMinTrain + Math.random() * (xMaxTrain - xMinTrain);
+            dataX.push(x);
+            dataY.push(trueFn(x) + App.Util.randn(0, sigma));
+          }
+          update();
+        }
+
+        function buildTree(xs, ys, depth, maxDepth) {
+          if (depth >= maxDepth || xs.length < 4) {
+            return { val: App.Util.mean(ys) };
+          }
+          let bestMSE = Infinity, bestThr = 0;
+          const sorted = xs.map((x, i) => ({ x, y: ys[i] })).sort((a, b) => a.x - b.x);
+          for (let i = 1; i < sorted.length; i++) {
+            const thr = (sorted[i - 1].x + sorted[i].x) / 2;
+            const leftY = [], rightY = [];
+            for (let j = 0; j < sorted.length; j++) {
+              if (sorted[j].x <= thr) leftY.push(sorted[j].y);
+              else rightY.push(sorted[j].y);
+            }
+            if (leftY.length === 0 || rightY.length === 0) continue;
+            const mL = App.Util.mean(leftY), mR = App.Util.mean(rightY);
+            let mse = 0;
+            for (const v of leftY) mse += (v - mL) ** 2;
+            for (const v of rightY) mse += (v - mR) ** 2;
+            if (mse < bestMSE) { bestMSE = mse; bestThr = thr; }
+          }
+          const lxs = [], lys = [], rxs = [], rys = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] <= bestThr) { lxs.push(xs[i]); lys.push(ys[i]); }
+            else { rxs.push(xs[i]); rys.push(ys[i]); }
+          }
+          if (lxs.length === 0 || rxs.length === 0) return { val: App.Util.mean(ys) };
+          return {
+            thr: bestThr,
+            left: buildTree(lxs, lys, depth + 1, maxDepth),
+            right: buildTree(rxs, rys, depth + 1, maxDepth),
+          };
+        }
+
+        function predict(tree, x) {
+          if (tree.val !== undefined) return tree.val;
+          return x <= tree.thr ? predict(tree.left, x) : predict(tree.right, x);
+        }
+
+        function update() {
+          const maxDepth = +cDepth.input.value;
+          const tree = buildTree(dataX, dataY, 0, maxDepth);
+          const gridX = App.Util.linspace(xMinView, xMaxView, 400);
+          const predY = gridX.map(x => predict(tree, x));
+          const trueY = gridX.map(x => trueFn(x));
+
+          // линейная модель для контраста
+          const mx = App.Util.mean(dataX), my = App.Util.mean(dataY);
+          let num = 0, den = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            num += (dataX[i] - mx) * (dataY[i] - my);
+            den += (dataX[i] - mx) ** 2;
+          }
+          const slope = den > 0 ? num / den : 0;
+          const intercept = my - slope * mx;
+          const linY = gridX.map(x => intercept + slope * x);
+
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const curve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map((x, i) => ({ x, y: trueY[i] }));
+          const linCurve = gridX.map((x, i) => ({ x, y: linY[i] }));
+
+          // ошибка за пределами train
+          let outMSE = 0, outN = 0;
+          for (let i = 0; i < gridX.length; i++) {
+            if (gridX[i] < xMinTrain || gridX[i] > xMaxTrain) {
+              outMSE += (predY[i] - trueY[i]) ** 2;
+              outN++;
+            }
+          }
+          outMSE = outN > 0 ? outMSE / outN : 0;
+
+          const ctx = container.querySelector('#dtr2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Train (0..2π)', data: scatter, backgroundColor: 'rgba(99,102,241,0.5)', pointRadius: 4 },
+                { label: 'Дерево', data: curve, type: 'line', borderColor: 'rgba(239,68,68,0.95)', borderWidth: 2.5, pointRadius: 0, fill: false, showLine: true, stepped: true },
+                { label: 'Линейная (для контраста)', data: linCurve, type: 'line', borderColor: 'rgba(245,158,11,0.8)', borderWidth: 1.8, pointRadius: 0, fill: false, showLine: true, borderDash: [2, 2] },
+                { label: 'Истинная функция', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.7)', borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                title: { display: true, text: 'Train на [0, 2π], предсказание на [-3, 10]' },
+                annotation: {},
+              },
+              scales: {
+                x: { type: 'linear', min: xMinView, max: xMaxView, title: { display: true, text: 'x (серые зоны = вне train)' } },
+                y: { suggestedMin: -3, suggestedMax: 6 },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#dtr2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Train диапазон</div><div class="stat-value">[0, 2π]</div></div>
+            <div class="stat-card"><div class="stat-label">MSE вне train</div><div class="stat-value">${outMSE.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">Глубина</div><div class="stat-value">${maxDepth}</div></div>
+          `;
+        }
+
+        cShape.input.addEventListener('change', generate);
+        cDepth.input.addEventListener('input', update);
+        cNoise.input.addEventListener('input', generate);
+        container.querySelector('#dtr2-regen').onclick = generate;
+        generate();
+      },
+    },
+    ],
 
     python: `
       <h4>1. Базовый DecisionTreeRegressor</h4>

@@ -435,10 +435,11 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [{
+      title: 'k и метрика расстояния',
       html: `
         <h3>Симуляция: граница решения kNN</h3>
-        <p>Меняй k и наблюдай, как меняется граница. Кликай на поле, чтобы добавлять точки.</p>
+        <p>Меняй <b>k</b> и смотри bias-variance: при $k=1$ граница извилистая (переобучение), при $k \\to n$ — сглаживается до одной цветовой зоны (недообучение). Переключи <b>метрику</b> — заметишь, что граница Manhattan имеет «ступеньки» вдоль осей, а евклидова — гладкие кривые. Кликай по полю — добавляй точки.</p>
         <div class="sim-container">
           <div class="sim-controls" id="knn-controls"></div>
           <div class="sim-buttons">
@@ -453,13 +454,25 @@ App.registerTopic({
       `,
       init(container) {
         const controls = container.querySelector('#knn-controls');
-        const cK = App.makeControl('range', 'knn-k', 'k (соседей)', { min: 1, max: 25, step: 1, value: 5 });
+        const cK = App.makeControl('range', 'knn-k', 'k (соседей)', { min: 1, max: 49, step: 1, value: 5 });
         const cN = App.makeControl('range', 'knn-n', 'Точек на класс', { min: 10, max: 60, step: 5, value: 25 });
-        const cClass = App.makeControl('select', 'knn-class', 'Добавлять класс', {
+        const cMetric = App.makeControl('select', 'knn-metric', 'Метрика', {
+          options: [
+            { value: 'l2', label: 'Евклидова (L2)' },
+            { value: 'l1', label: 'Манхэттен (L1)' },
+            { value: 'linf', label: 'Чебышёв (L∞)' },
+          ],
+          value: 'l2',
+        });
+        const cWeight = App.makeControl('select', 'knn-weight', 'Голосование', {
+          options: [{ value: 'uniform', label: 'Uniform' }, { value: 'distance', label: 'Weighted (1/d)' }],
+          value: 'uniform',
+        });
+        const cClass = App.makeControl('select', 'knn-class', 'Клик добавляет', {
           options: [{ value: '0', label: 'Красный' }, { value: '1', label: 'Синий' }, { value: '2', label: 'Зелёный' }],
           value: '0',
         });
-        [cK, cN, cClass].forEach((c) => controls.appendChild(c.wrap));
+        [cK, cN, cMetric, cWeight, cClass].forEach((c) => controls.appendChild(c.wrap));
 
         const canvas = container.querySelector('#knn-canvas');
         const ctx = canvas.getContext('2d');
@@ -477,12 +490,15 @@ App.registerTopic({
         function regenerate() {
           const n = +cN.input.value;
           points = [];
-          const centers = [[0.25, 0.3], [0.7, 0.35], [0.5, 0.75]];
+          // Non-trivial layout: two tight clusters + one elongated strip → metric effect visible
+          const centers = [[0.25, 0.3], [0.7, 0.35], [0.5, 0.78]];
           centers.forEach((c, cls) => {
+            const sx = cls === 2 ? 0.14 : 0.07;
+            const sy = cls === 2 ? 0.04 : 0.07;
             for (let i = 0; i < n; i++) {
               points.push({
-                x: c[0] + App.Util.randn(0, 0.08),
-                y: c[1] + App.Util.randn(0, 0.08),
+                x: c[0] + App.Util.randn(0, sx),
+                y: c[1] + App.Util.randn(0, sy),
                 cls,
               });
             }
@@ -490,11 +506,23 @@ App.registerTopic({
           draw();
         }
 
+        function dist(px, py, qx, qy) {
+          const m = cMetric.input.value;
+          const dx = Math.abs(px - qx), dy = Math.abs(py - qy);
+          if (m === 'l1') return dx + dy;
+          if (m === 'linf') return Math.max(dx, dy);
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+
         function knnPredict(px, py, k) {
-          const dists = points.map(p => ({ d: (p.x - px) ** 2 + (p.y - py) ** 2, cls: p.cls }));
+          const dists = points.map(p => ({ d: dist(px, py, p.x, p.y), cls: p.cls }));
           dists.sort((a, b) => a.d - b.d);
           const counts = [0, 0, 0];
-          for (let i = 0; i < Math.min(k, dists.length); i++) counts[dists[i].cls]++;
+          const weighted = cWeight.input.value === 'distance';
+          for (let i = 0; i < Math.min(k, dists.length); i++) {
+            const w = weighted ? 1 / (dists[i].d + 1e-6) : 1;
+            counts[dists[i].cls] += w;
+          }
           let best = 0;
           for (let i = 1; i < 3; i++) if (counts[i] > counts[best]) best = i;
           return best;
@@ -507,7 +535,6 @@ App.registerTopic({
           if (points.length === 0) return;
 
           const k = +cK.input.value;
-          // заливка по сетке
           const step = 8;
           for (let px = 0; px < W; px += step) {
             for (let py = 0; py < H; py += step) {
@@ -516,7 +543,6 @@ App.registerTopic({
               ctx.fillRect(px, py, step, step);
             }
           }
-          // точки
           points.forEach(p => {
             ctx.fillStyle = colors[p.cls];
             ctx.strokeStyle = '#fff';
@@ -529,8 +555,9 @@ App.registerTopic({
 
           container.querySelector('#knn-stats').innerHTML = `
             <div class="stat-card"><div class="stat-label">k</div><div class="stat-value">${k}</div></div>
+            <div class="stat-card"><div class="stat-label">Метрика</div><div class="stat-value" style="font-size:13px;">${cMetric.input.value.toUpperCase()}</div></div>
+            <div class="stat-card"><div class="stat-label">Голосование</div><div class="stat-value" style="font-size:13px;">${cWeight.input.value}</div></div>
             <div class="stat-card"><div class="stat-label">Всего точек</div><div class="stat-value">${points.length}</div></div>
-            <div class="stat-card"><div class="stat-label">Классов</div><div class="stat-value">3</div></div>
           `;
         }
 
@@ -542,7 +569,7 @@ App.registerTopic({
           draw();
         });
 
-        cK.input.addEventListener('input', draw);
+        [cK, cMetric, cWeight].forEach(c => c.input.addEventListener('input', draw));
         cN.input.addEventListener('change', regenerate);
         container.querySelector('#knn-regen').onclick = regenerate;
         container.querySelector('#knn-clear').onclick = () => { points = []; draw(); };
@@ -550,7 +577,130 @@ App.registerTopic({
         setTimeout(() => { resize(); regenerate(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+    }, {
+      title: 'Проклятие размерности',
+      html: `
+        <h3>Почему в высокой размерности «ближайший» теряет смысл</h3>
+        <p>Генерируем $n$ случайных точек в $[0,1]^d$ и считаем расстояния от фиксированной точки до остальных. С ростом $d$ <b>отношение $d_{\\min}/d_{\\max}$ стремится к 1</b> — все точки становятся почти одинаково далёкими. Понятие «самый близкий сосед» перестаёт быть информативным: левая гистограмма из разбросанной становится узкой полосой.</p>
+        <p>Следствие: kNN в сырых высокоразмерных данных (пиксели, длинные тексты) работает только после снижения размерности (PCA, эмбеддинги). <b>Подвинь слайдер $d$</b> от 2 до 200 и смотри, как ratio ползёт к единице.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="knn-cod-controls"></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="knn-cod-hist"></canvas></div>
+            <div class="sim-chart-wrap"><canvas id="knn-cod-ratio"></canvas></div>
+            <div class="sim-stats" id="knn-cod-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#knn-cod-controls');
+        const cD = App.makeControl('range', 'knn-cod-d', 'd (размерность)', { min: 1, max: 200, step: 1, value: 2 });
+        const cN = App.makeControl('range', 'knn-cod-n', 'n (точек)', { min: 50, max: 1000, step: 50, value: 300 });
+        [cD, cN].forEach(c => controls.appendChild(c.wrap));
+
+        let histChart = null, ratioChart = null;
+
+        // Deterministic PRNG so sliding d re-uses the same seed — smoother animation
+        function mulberry32(a) { return function() { let t = a += 0x6D2B79F5; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+        // Pre-compute ratio curve for d=1..200 once (smooth curve in the second chart)
+        const ratioCurve = (() => {
+          const curve = [];
+          for (let dd = 1; dd <= 200; dd++) {
+            const rand = mulberry32(42);
+            const nn = 200;
+            // query point
+            const q = []; for (let i = 0; i < dd; i++) q.push(rand());
+            let mn = Infinity, mx = 0;
+            for (let j = 0; j < nn; j++) {
+              let s = 0;
+              for (let i = 0; i < dd; i++) { const v = rand() - q[i]; s += v * v; }
+              s = Math.sqrt(s);
+              if (s < mn) mn = s;
+              if (s > mx) mx = s;
+            }
+            curve.push({ x: dd, y: mn / mx });
+          }
+          return curve;
+        })();
+
+        function compute() {
+          const d = +cD.input.value;
+          const n = +cN.input.value;
+          const rand = mulberry32(123);
+          const q = []; for (let i = 0; i < d; i++) q.push(rand());
+          const dists = [];
+          for (let j = 0; j < n; j++) {
+            let s = 0;
+            for (let i = 0; i < d; i++) { const v = rand() - q[i]; s += v * v; }
+            dists.push(Math.sqrt(s));
+          }
+          dists.sort((a, b) => a - b);
+          const mn = dists[0], mx = dists[dists.length - 1], avg = App.Util.mean(dists);
+          // histogram
+          const bins = 30;
+          const hist = new Array(bins).fill(0);
+          const lo = mn, hi = mx + 1e-9;
+          dists.forEach(x => {
+            const k = Math.min(bins - 1, Math.floor((x - lo) / (hi - lo) * bins));
+            hist[k]++;
+          });
+          const binCenters = [];
+          for (let i = 0; i < bins; i++) binCenters.push(lo + (i + 0.5) * (hi - lo) / bins);
+
+          // --- Histogram chart
+          const hctx = container.querySelector('#knn-cod-hist').getContext('2d');
+          if (histChart) histChart.destroy();
+          histChart = new Chart(hctx, {
+            type: 'bar',
+            data: {
+              labels: binCenters.map(v => v.toFixed(2)),
+              datasets: [{ label: `Распределение расстояний (d=${d})`, data: hist, backgroundColor: 'rgba(99,102,241,0.7)' }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Гистограмма расстояний от query-точки' }, legend: { display: false } },
+              scales: { x: { title: { display: true, text: 'расстояние' } }, y: { title: { display: true, text: 'число точек' } } },
+            },
+          });
+          App.registerChart(histChart);
+
+          // --- Ratio vs d chart
+          const rctx = container.querySelector('#knn-cod-ratio').getContext('2d');
+          if (ratioChart) ratioChart.destroy();
+          ratioChart = new Chart(rctx, {
+            type: 'line',
+            data: {
+              datasets: [
+                { label: 'min/max (по сетке d)', data: ratioCurve, borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, pointRadius: 0, fill: false, showLine: true },
+                { label: 'текущая d', data: [{ x: d, y: mn / mx }], backgroundColor: '#dc2626', pointRadius: 7 },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Отношение d_min / d_max → 1 при росте d' } },
+              scales: {
+                x: { type: 'linear', min: 1, max: 200, title: { display: true, text: 'размерность d' } },
+                y: { min: 0, max: 1, title: { display: true, text: 'min / max' } },
+              },
+            },
+          });
+          App.registerChart(ratioChart);
+
+          container.querySelector('#knn-cod-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">d</div><div class="stat-value">${d}</div></div>
+            <div class="stat-card"><div class="stat-label">d_min</div><div class="stat-value">${mn.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">d_max</div><div class="stat-value">${mx.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">d_avg</div><div class="stat-value">${avg.toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">min / max</div><div class="stat-value">${(mn / mx).toFixed(3)}</div></div>
+            <div class="stat-card"><div class="stat-label">(max − min) / avg</div><div class="stat-value">${((mx - mn) / avg).toFixed(3)}</div></div>
+          `;
+        }
+
+        [cD, cN].forEach(c => c.input.addEventListener('input', compute));
+        compute();
+      },
+    }],
 
     python: `
       <h3>Python: k ближайших соседей</h3>

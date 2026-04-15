@@ -677,10 +677,12 @@ else:
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Границы решений',
       html: `
         <h3>Симуляция: построение дерева</h3>
-        <p>Меняй глубину и посмотри, как дерево разбивает пространство.</p>
+        <p>Меняй глубину и посмотри, как дерево разбивает пространство. Переключи Gini ↔ Entropy — граница почти не изменится (критерии почти всегда дают одинаковое дерево).</p>
         <div class="sim-container">
           <div class="sim-controls" id="dt-controls"></div>
           <div class="sim-buttons">
@@ -696,12 +698,16 @@ else:
         const controls = container.querySelector('#dt-controls');
         const cDepth = App.makeControl('range', 'dt-depth', 'Max depth', { min: 1, max: 10, step: 1, value: 3 });
         const cMinSplit = App.makeControl('range', 'dt-min', 'Min samples split', { min: 2, max: 30, step: 1, value: 2 });
+        const cCrit = App.makeControl('select', 'dt-crit', 'Критерий', {
+          options: [{ value: 'gini', label: 'Gini' }, { value: 'entropy', label: 'Entropy' }],
+          value: 'gini',
+        });
         const cShape = App.makeControl('select', 'dt-shape', 'Форма данных', {
           options: [{ value: 'blobs', label: 'Кластеры' }, { value: 'xor', label: 'XOR' }, { value: 'moons', label: 'Две луны' }, { value: 'circle', label: 'Круг' }],
           value: 'moons',
         });
         const cN = App.makeControl('range', 'dt-n', 'Точек', { min: 20, max: 300, step: 10, value: 100 });
-        [cDepth, cMinSplit, cShape, cN].forEach((c) => controls.appendChild(c.wrap));
+        [cDepth, cMinSplit, cCrit, cShape, cN].forEach((c) => controls.appendChild(c.wrap));
 
         const canvas = container.querySelector('#dt-canvas');
         const ctx = canvas.getContext('2d');
@@ -741,11 +747,17 @@ else:
           }
         }
 
-        function gini(items) {
+        function impurity(items) {
           if (items.length === 0) return 0;
           const counts = [0, 0];
           items.forEach(p => counts[p.cls]++);
           const p0 = counts[0] / items.length, p1 = counts[1] / items.length;
+          if (cCrit.input.value === 'entropy') {
+            let h = 0;
+            if (p0 > 0) h -= p0 * Math.log2(p0);
+            if (p1 > 0) h -= p1 * Math.log2(p1);
+            return h;
+          }
           return 1 - p0 * p0 - p1 * p1;
         }
 
@@ -756,12 +768,12 @@ else:
         }
 
         function buildTree(items, depth, maxDepth, minSplit) {
-          if (depth >= maxDepth || items.length < minSplit || gini(items) < 1e-9) {
+          if (depth >= maxDepth || items.length < minSplit || impurity(items) < 1e-9) {
             return { leaf: true, cls: majority(items), n: items.length };
           }
           // перебор
           let best = null;
-          const baseGini = gini(items);
+          const baseImp = impurity(items);
           ['x', 'y'].forEach(feat => {
             const vals = items.map(p => p[feat]).sort((a, b) => a - b);
             for (let i = 1; i < vals.length; i++) {
@@ -769,8 +781,8 @@ else:
               const L = items.filter(p => p[feat] < thr);
               const R = items.filter(p => p[feat] >= thr);
               if (L.length === 0 || R.length === 0) continue;
-              const w = (L.length * gini(L) + R.length * gini(R)) / items.length;
-              const gain = baseGini - w;
+              const w = (L.length * impurity(L) + R.length * impurity(R)) / items.length;
+              const gain = baseImp - w;
               if (!best || gain > best.gain) best = { feat, thr, gain, L, R };
             }
           });
@@ -837,6 +849,7 @@ else:
         }
 
         [cDepth, cMinSplit].forEach(c => c.input.addEventListener('input', draw));
+        cCrit.input.addEventListener('change', draw);
         [cShape, cN].forEach(c => c.input.addEventListener('change', () => { genData(); draw(); }));
         container.querySelector('#dt-regen').onclick = () => { genData(); draw(); };
 
@@ -844,6 +857,167 @@ else:
         window.addEventListener('resize', resize);
       },
     },
+    {
+      title: 'Глубина: train vs test',
+      html: `
+        <h3>Переобучение: train vs test accuracy от глубины</h3>
+        <p>Наращивай глубину дерева и смотри, как train accuracy уходит в 1.0, а test перестаёт расти (или падает). Это визуальное доказательство, что у дерева без ограничений — хроническое переобучение.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="dt2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="dt2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="dt2-chart"></canvas></div>
+            <div class="sim-stats" id="dt2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#dt2-controls');
+        const cShape = App.makeControl('select', 'dt2-shape', 'Форма данных', {
+          options: [{ value: 'moons', label: 'Две луны' }, { value: 'xor', label: 'XOR' }, { value: 'circle', label: 'Круг' }],
+          value: 'moons',
+        });
+        const cNoise = App.makeControl('range', 'dt2-noise', 'Шум (% меток)', { min: 0, max: 30, step: 1, value: 10 });
+        const cN = App.makeControl('range', 'dt2-n', 'Точек на train', { min: 40, max: 400, step: 20, value: 120 });
+        [cShape, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
+
+        let train = [], test = [];
+        let chart = null;
+
+        function genPoint(shape, noise) {
+          let x, y, cls;
+          if (shape === 'moons') {
+            const t = Math.random() * Math.PI;
+            if (Math.random() < 0.5) {
+              x = 0.3 + 0.25 * Math.cos(t) + App.Util.randn(0, 0.03);
+              y = 0.45 + 0.25 * Math.sin(t) + App.Util.randn(0, 0.03);
+              cls = 0;
+            } else {
+              x = 0.55 + 0.25 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.03);
+              y = 0.55 - 0.25 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.03);
+              cls = 1;
+            }
+          } else if (shape === 'xor') {
+            x = Math.random(); y = Math.random();
+            cls = ((x > 0.5) ^ (y > 0.5)) ? 1 : 0;
+          } else {
+            x = Math.random(); y = Math.random();
+            const r = Math.sqrt((x - 0.5) ** 2 + (y - 0.5) ** 2);
+            cls = r < 0.25 ? 0 : 1;
+          }
+          if (Math.random() < noise) cls = 1 - cls;
+          return { x, y, cls };
+        }
+
+        function genData() {
+          const shape = cShape.input.value;
+          const noise = +cNoise.input.value / 100;
+          const n = +cN.input.value;
+          train = []; test = [];
+          for (let i = 0; i < n; i++) train.push(genPoint(shape, noise));
+          for (let i = 0; i < 500; i++) test.push(genPoint(shape, 0)); // чистый test
+          update();
+        }
+
+        function gini(items) {
+          if (items.length === 0) return 0;
+          let c0 = 0, c1 = 0;
+          items.forEach(p => p.cls === 0 ? c0++ : c1++);
+          const p0 = c0 / items.length, p1 = c1 / items.length;
+          return 1 - p0 * p0 - p1 * p1;
+        }
+        function majority(items) { let c0 = 0; items.forEach(p => p.cls === 0 && c0++); return c0 >= items.length - c0 ? 0 : 1; }
+
+        function buildTree(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2 || gini(items) < 1e-9) {
+            return { leaf: true, cls: majority(items) };
+          }
+          let best = null;
+          const base = gini(items);
+          ['x', 'y'].forEach(feat => {
+            const vals = items.map(p => p[feat]).sort((a, b) => a - b);
+            for (let i = 1; i < vals.length; i++) {
+              const thr = (vals[i - 1] + vals[i]) / 2;
+              const L = items.filter(p => p[feat] < thr);
+              const R = items.filter(p => p[feat] >= thr);
+              if (L.length === 0 || R.length === 0) continue;
+              const w = (L.length * gini(L) + R.length * gini(R)) / items.length;
+              const gain = base - w;
+              if (!best || gain > best.gain) best = { feat, thr, gain, L, R };
+            }
+          });
+          if (!best || best.gain < 1e-6) return { leaf: true, cls: majority(items) };
+          return {
+            leaf: false, feat: best.feat, thr: best.thr,
+            left: buildTree(best.L, depth + 1, maxDepth),
+            right: buildTree(best.R, depth + 1, maxDepth),
+          };
+        }
+
+        function predict(tree, x, y) {
+          if (tree.leaf) return tree.cls;
+          const v = tree.feat === 'x' ? x : y;
+          return v < tree.thr ? predict(tree.left, x, y) : predict(tree.right, x, y);
+        }
+
+        function acc(tree, items) {
+          let c = 0;
+          items.forEach(p => { if (predict(tree, p.x, p.y) === p.cls) c++; });
+          return c / items.length;
+        }
+
+        function update() {
+          const depths = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20];
+          const trainAcc = [];
+          const testAcc = [];
+          let bestTest = 0, bestDepth = 1;
+          depths.forEach(d => {
+            const tree = buildTree(train, 0, d);
+            const ta = acc(tree, train);
+            const te = acc(tree, test);
+            trainAcc.push(ta);
+            testAcc.push(te);
+            if (te > bestTest) { bestTest = te; bestDepth = d; }
+          });
+
+          const ctx = container.querySelector('#dt2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: depths,
+              datasets: [
+                { label: 'Train accuracy', data: trainAcc, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 2.5, pointRadius: 4, fill: false, tension: 0.2 },
+                { label: 'Test accuracy',  data: testAcc,  borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', borderWidth: 2.5, pointRadius: 4, fill: false, tension: 0.2 },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Accuracy vs max_depth' }, legend: { position: 'top' } },
+              scales: {
+                x: { title: { display: true, text: 'max_depth' } },
+                y: { suggestedMin: 0.5, suggestedMax: 1.02, title: { display: true, text: 'Accuracy' } },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#dt2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Лучшая глубина</div><div class="stat-value">${bestDepth}</div></div>
+            <div class="stat-card"><div class="stat-label">Max test acc</div><div class="stat-value">${(bestTest * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Train@depth=20</div><div class="stat-value">${(trainAcc[trainAcc.length - 1] * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Gap train-test</div><div class="stat-value">${((trainAcc[trainAcc.length - 1] - testAcc[testAcc.length - 1]) * 100).toFixed(1)}%</div></div>
+          `;
+        }
+
+        [cShape, cNoise, cN].forEach(c => c.input.addEventListener('change', genData));
+        container.querySelector('#dt2-regen').onclick = genData;
+        genData();
+      },
+    },
+    ],
 
     python: `
       <h3>Python: дерево решений</h3>

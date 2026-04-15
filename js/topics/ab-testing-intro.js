@@ -561,8 +561,10 @@ P(хотя бы одно ложное срабатывание) = 1 − (1 − 0
       }
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Калькулятор n',
+        html: `
         <h3>Калькулятор размера выборки</h3>
         <p>Меняй параметры и смотри, сколько пользователей нужно для обнаружения эффекта.</p>
         <div class="sim-container">
@@ -630,7 +632,111 @@ P(хотя бы одно ложное срабатывание) = 1 − (1 − 0
         [cBase, cMDE, cAlpha, cPower].forEach(c => c.input.addEventListener('input', run));
         run();
       },
-    },
+      },
+      {
+        title: 'p-value: null vs alt',
+        html: `
+          <h3>Распределение p-value при H₀ и H₁</h3>
+          <p>Симулируем 2000 A/B тестов. Под нулевой гипотезой (нет эффекта) p-value равномерны на [0,1] — это и значит «α=5% срабатываний ложно». Под альтернативной (есть реальный эффект) p-value сдвигаются влево — доля $p &lt; 0.05$ и есть мощность теста. Увеличь n или эффект — горка «сплющится» к нулю.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abintro2-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="abintro2-run">🔄 Пересимулировать</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abintro2-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="abintro2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abintro2-controls');
+          const cN = App.makeControl('range', 'abintro2-n', 'n на группу', { min: 30, max: 2000, step: 10, value: 300 });
+          const cBase = App.makeControl('range', 'abintro2-base', 'Базовая конверсия %', { min: 2, max: 30, step: 1, value: 10 });
+          const cEffect = App.makeControl('range', 'abintro2-eff', 'Истинный эффект (п.п.)', { min: 0, max: 10, step: 0.5, value: 2 });
+          [cN, cBase, cEffect].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          const SIMS = 2000;
+
+          function pOneTest(n, pA, pB) {
+            // бинарный A/B → z для пропорций
+            let sA = 0, sB = 0;
+            // Быстро: нормальное приближение биномиального
+            sA = App.Util.randn(pA * n, Math.sqrt(n * pA * (1 - pA)));
+            sB = App.Util.randn(pB * n, Math.sqrt(n * pB * (1 - pB)));
+            const crA = sA / n, crB = sB / n;
+            const pPool = (sA + sB) / (2 * n);
+            const se = Math.sqrt(pPool * (1 - pPool) * (2 / n));
+            if (se <= 0) return 1;
+            const z = (crB - crA) / se;
+            return 2 * (1 - App.Util.normalCDF(Math.abs(z)));
+          }
+
+          function run() {
+            const n = +cN.input.value;
+            const p = +cBase.input.value / 100;
+            const eff = +cEffect.input.value / 100;
+
+            const pvalsNull = [];
+            const pvalsAlt = [];
+            for (let i = 0; i < SIMS; i++) {
+              pvalsNull.push(pOneTest(n, p, p));
+              pvalsAlt.push(pOneTest(n, p, p + eff));
+            }
+
+            const bins = 20;
+            const edges = [];
+            for (let i = 0; i <= bins; i++) edges.push(i / bins);
+            const histN = new Array(bins).fill(0);
+            const histA = new Array(bins).fill(0);
+            pvalsNull.forEach(v => { const b = Math.min(bins - 1, Math.floor(v * bins)); histN[b]++; });
+            pvalsAlt.forEach(v => { const b = Math.min(bins - 1, Math.floor(v * bins)); histA[b]++; });
+            // Доля
+            const fN = histN.map(v => v / SIMS * 100);
+            const fA = histA.map(v => v / SIMS * 100);
+
+            const labels = [];
+            for (let i = 0; i < bins; i++) labels.push(((i + 0.5) / bins).toFixed(2));
+
+            const typeI = pvalsNull.filter(p => p < 0.05).length / SIMS;
+            const power = pvalsAlt.filter(p => p < 0.05).length / SIMS;
+
+            const ctx = container.querySelector('#abintro2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'H₀ (эффекта нет)', data: fN, backgroundColor: 'rgba(148,163,184,0.65)' },
+                  { label: 'H₁ (эффект есть)', data: fA, backgroundColor: 'rgba(16,185,129,0.7)' },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Распределение p-value по ' + SIMS + ' симуляциям' }, legend: { position: 'top' } },
+                scales: {
+                  x: { title: { display: true, text: 'p-value' }, stacked: false },
+                  y: { title: { display: true, text: '% тестов' }, beginAtZero: true },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#abintro2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Type I (α-факт)</div><div class="stat-value">' + (typeI * 100).toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Мощность (1−β)</div><div class="stat-value">' + (power * 100).toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">n / группу</div><div class="stat-value">' + n + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Δ (п.п.)</div><div class="stat-value">' + (eff * 100).toFixed(1) + '</div></div>';
+          }
+
+          [cN, cBase, cEffect].forEach(c => c.input.addEventListener('input', run));
+          container.querySelector('#abintro2-run').onclick = run;
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 Расчёт размера выборки</h3>

@@ -507,10 +507,12 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Усреднение сглаживает',
       html: `
         <h3>Симуляция: RF регрессия</h3>
-        <p>Увеличивай число деревьев и глубину. Наблюдай, как усреднение сглаживает предсказание.</p>
+        <p>Увеличивай число деревьев и глубину. Наблюдай, как усреднение bootstrap-деревьев сглаживает ступенчатый предикт одного дерева: <b>дисперсия падает</b> (формула Var ≈ σ²·(ρ + (1−ρ)/n_trees)), а общий уровень почти не меняется.</p>
         <div class="sim-container">
           <div class="sim-controls" id="rfr-controls"></div>
           <div class="sim-buttons">
@@ -646,6 +648,180 @@ App.registerTopic({
         generate();
       },
     },
+    {
+      title: 'Экстраполяция: лес тоже не умеет',
+      html: `
+        <h3>Почему "умный" лес плоско продолжает тренд</h3>
+        <p>Многие думают, что Random Forest — это "улучшенное дерево", и за пределами train-диапазона он как-то сгладит. <b>Нет.</b> Каждое отдельное дерево за пределами выборки возвращает константу своего крайнего листа. Усреднение констант — тоже константа. Лес за границами train-области плоский, как одинокое дерево. Для сравнения — линейная модель и истинный тренд.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="rfr2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="rfr2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="rfr2-chart"></canvas></div>
+            <div class="sim-stats" id="rfr2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#rfr2-controls');
+        const cTrees = App.makeControl('range', 'rfr2-trees', 'Число деревьев', { min: 1, max: 100, step: 1, value: 30 });
+        const cDepth = App.makeControl('range', 'rfr2-depth', 'Глубина', { min: 1, max: 10, step: 1, value: 5 });
+        const cShape = App.makeControl('select', 'rfr2-shape', 'Тренд', {
+          options: [
+            { value: 'linear', label: 'Линейный (y=0.6x)' },
+            { value: 'sin_trend', label: 'sin + тренд' },
+          ],
+          value: 'linear',
+        });
+        [cShape, cTrees, cDepth].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let dataX = [], dataY = [];
+        const N = 80;
+        const xMinTrain = 0, xMaxTrain = 6;
+        const xMinView = -3, xMaxView = 12;
+
+        function trueFn(x) {
+          if (cShape.input.value === 'linear') return 0.6 * x;
+          return Math.sin(x) + 0.4 * x;
+        }
+
+        function generate() {
+          dataX = []; dataY = [];
+          for (let i = 0; i < N; i++) {
+            const x = xMinTrain + Math.random() * (xMaxTrain - xMinTrain);
+            dataX.push(x);
+            dataY.push(trueFn(x) + App.Util.randn(0, 0.25));
+          }
+          update();
+        }
+
+        function buildTree(xs, ys, depth, maxDepth) {
+          if (depth >= maxDepth || xs.length < 4) return { val: App.Util.mean(ys) };
+          let bestMSE = Infinity, bestThr = 0;
+          const nCand = Math.max(4, Math.floor(xs.length * 0.6));
+          for (let t = 0; t < nCand; t++) {
+            const idx = Math.floor(Math.random() * xs.length);
+            const thr = xs[idx];
+            const lY = [], rY = [];
+            for (let j = 0; j < xs.length; j++) {
+              if (xs[j] <= thr) lY.push(ys[j]); else rY.push(ys[j]);
+            }
+            if (lY.length === 0 || rY.length === 0) continue;
+            const mL = App.Util.mean(lY), mR = App.Util.mean(rY);
+            let mse = 0;
+            for (const v of lY) mse += (v - mL) ** 2;
+            for (const v of rY) mse += (v - mR) ** 2;
+            if (mse < bestMSE) { bestMSE = mse; bestThr = thr; }
+          }
+          const lxs = [], lys = [], rxs = [], rys = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] <= bestThr) { lxs.push(xs[i]); lys.push(ys[i]); }
+            else { rxs.push(xs[i]); rys.push(ys[i]); }
+          }
+          if (lxs.length === 0 || rxs.length === 0) return { val: App.Util.mean(ys) };
+          return {
+            thr: bestThr,
+            left: buildTree(lxs, lys, depth + 1, maxDepth),
+            right: buildTree(rxs, rys, depth + 1, maxDepth),
+          };
+        }
+
+        function predictTree(tree, x) {
+          if (tree.val !== undefined) return tree.val;
+          return x <= tree.thr ? predictTree(tree.left, x) : predictTree(tree.right, x);
+        }
+
+        function update() {
+          const nTrees = +cTrees.input.value;
+          const maxDepth = +cDepth.input.value;
+          const trees = [];
+          for (let t = 0; t < nTrees; t++) {
+            const bx = [], by = [];
+            for (let i = 0; i < dataX.length; i++) {
+              const idx = Math.floor(Math.random() * dataX.length);
+              bx.push(dataX[idx]);
+              by.push(dataY[idx]);
+            }
+            trees.push(buildTree(bx, by, 0, maxDepth));
+          }
+
+          const gridX = App.Util.linspace(xMinView, xMaxView, 400);
+          const predY = gridX.map(gx => {
+            let s = 0;
+            for (const tree of trees) s += predictTree(tree, gx);
+            return s / nTrees;
+          });
+
+          // линейная модель
+          const mx = App.Util.mean(dataX), my = App.Util.mean(dataY);
+          let num = 0, den = 0;
+          for (let i = 0; i < dataX.length; i++) {
+            num += (dataX[i] - mx) * (dataY[i] - my);
+            den += (dataX[i] - mx) ** 2;
+          }
+          const slope = den > 0 ? num / den : 0;
+          const intercept = my - slope * mx;
+          const linY = gridX.map(x => intercept + slope * x);
+
+          const trueY = gridX.map(x => trueFn(x));
+          const scatter = dataX.map((x, i) => ({ x, y: dataY[i] }));
+          const rfCurve = gridX.map((x, i) => ({ x, y: predY[i] }));
+          const trueCurve = gridX.map((x, i) => ({ x, y: trueY[i] }));
+          const linCurve = gridX.map((x, i) => ({ x, y: linY[i] }));
+
+          // ошибка за пределами train
+          let outMSE = 0, outN = 0;
+          for (let i = 0; i < gridX.length; i++) {
+            if (gridX[i] < xMinTrain || gridX[i] > xMaxTrain) {
+              outMSE += (predY[i] - trueY[i]) ** 2;
+              outN++;
+            }
+          }
+          outMSE = outN > 0 ? outMSE / outN : 0;
+
+          // уровень последнего листа справа
+          let rightPlateau = predY[predY.length - 1];
+
+          const ctx = container.querySelector('#rfr2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Train (0..6)', data: scatter, backgroundColor: 'rgba(99,102,241,0.5)', pointRadius: 4 },
+                { label: 'Random Forest', data: rfCurve, type: 'line', borderColor: 'rgba(239,68,68,0.95)', borderWidth: 2.5, pointRadius: 0, fill: false, showLine: true },
+                { label: 'Линейная', data: linCurve, type: 'line', borderColor: 'rgba(245,158,11,0.85)', borderWidth: 1.8, pointRadius: 0, fill: false, showLine: true, borderDash: [2, 2] },
+                { label: 'Истина', data: trueCurve, type: 'line', borderColor: 'rgba(16,185,129,0.7)', borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Train на [0, 6], view [-3, 12]' } },
+              scales: {
+                x: { type: 'linear', min: xMinView, max: xMaxView, title: { display: true, text: 'x' } },
+                y: { suggestedMin: -2, suggestedMax: 8 },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#rfr2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">MSE вне train</div><div class="stat-value">${outMSE.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">RF @ x=12</div><div class="stat-value">${rightPlateau.toFixed(2)}</div></div>
+            <div class="stat-card"><div class="stat-label">Истина @ x=12</div><div class="stat-value">${trueFn(12).toFixed(2)}</div></div>
+          `;
+        }
+
+        [cTrees, cDepth].forEach(c => c.input.addEventListener('input', update));
+        cShape.input.addEventListener('change', generate);
+        container.querySelector('#rfr2-regen').onclick = generate;
+        generate();
+      },
+    },
+    ],
 
     python: `
       <h3>Python: Random Forest Regressor</h3>

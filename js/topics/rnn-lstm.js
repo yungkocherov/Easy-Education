@@ -687,8 +687,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'RNN на синусе',
+        html: `
         <h3>Симуляция: RNN учит последовательность</h3>
         <p>Простая RNN учится предсказывать следующую точку в синусоиде.</p>
         <div class="sim-container">
@@ -857,7 +859,180 @@ App.registerTopic({
         init();
         setTimeout(draw, 50);
       },
-    },
+      },
+      {
+        title: 'Vanishing gradient: RNN vs LSTM',
+        html: `
+          <h3>Исчезающий градиент: почему LSTM помнит дольше</h3>
+          <p>Распространяем градиент назад по времени через $T$ шагов. В ванильной RNN скрытое состояние сжимается через $\\tanh$, и $\\partial h_t / \\partial h_0 \\sim (W \\cdot \\tanh')^T$ — при $|W \\cdot \\tanh'| < 1$ градиент экспоненциально исчезает. В LSTM есть cell state $c_t$, и если forget gate $f \\approx 1$, градиент течёт по нему почти без затухания.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="rnnv-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;"><canvas id="rnnv-chart"></canvas></div>
+              <div class="sim-stats" id="rnnv-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#rnnv-controls');
+          const cT = App.makeControl('range', 'rnnv-t', 'Длина последовательности T', { min: 5, max: 100, step: 1, value: 40 });
+          const cW = App.makeControl('range', 'rnnv-w', 'Вес рекуррентной связи |W|', { min: 0.3, max: 1.5, step: 0.05, value: 0.9 });
+          const cF = App.makeControl('range', 'rnnv-f', 'LSTM forget gate f', { min: 0.5, max: 1.0, step: 0.01, value: 0.95 });
+          [cT, cW, cF].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function compute() {
+            const T = +cT.input.value;
+            const W = +cW.input.value;
+            const f = +cF.input.value;
+            // RNN: |∂h_T/∂h_0| ≈ prod |W * tanh'(z_t)|
+            // Предполагаем h_t ≈ 0.5 → tanh'(0.5)=1 - tanh²(0.5)≈0.79
+            const tanhDeriv = 0.79;
+            const rnn = [];
+            const lstm = [];
+            for (let t = 0; t <= T; t++) {
+              rnn.push(Math.pow(W * tanhDeriv, t));
+              lstm.push(Math.pow(f, t));
+            }
+            return { rnn, lstm };
+          }
+
+          function draw() {
+            const { rnn, lstm } = compute();
+            const T = rnn.length - 1;
+            const labels = rnn.map((_, i) => i);
+            const ctx = container.querySelector('#rnnv-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels,
+                datasets: [
+                  { label: 'RNN |∂h_t/∂h_0|', data: rnn.map(v => Math.max(1e-12, Math.abs(v))), borderColor: '#ef4444', borderWidth: 2.5, pointRadius: 0, fill: false },
+                  { label: 'LSTM |∂c_t/∂c_0| = f^t', data: lstm.map(v => Math.max(1e-12, v)), borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Норма градиента по времени (log-шкала)' } },
+                scales: {
+                  x: { title: { display: true, text: 'шаг t назад от конца' } },
+                  y: { type: 'logarithmic', min: 1e-12, max: 10, title: { display: true, text: '|grad|' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const rnnEnd = rnn[T];
+            const lstmEnd = lstm[T];
+            const ratio = lstmEnd / Math.max(1e-12, Math.abs(rnnEnd));
+            container.querySelector('#rnnv-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">T</div><div class="stat-value">${T}</div></div>
+              <div class="stat-card"><div class="stat-label">RNN grad @ t=T</div><div class="stat-value">${Math.abs(rnnEnd).toExponential(1)}</div></div>
+              <div class="stat-card"><div class="stat-label">LSTM grad @ t=T</div><div class="stat-value">${lstmEnd.toExponential(1)}</div></div>
+              <div class="stat-card"><div class="stat-label">LSTM/RNN</div><div class="stat-value">${ratio > 1 ? '×' + ratio.toExponential(1) : ratio.toFixed(2)}</div></div>
+            `;
+          }
+
+          [cT, cW, cF].forEach(c => c.input.addEventListener('input', draw));
+          setTimeout(draw, 50);
+        },
+      },
+      {
+        title: 'LSTM-ворота в действии',
+        html: `
+          <h3>Что делают ворота LSTM</h3>
+          <p>На каждом шаге LSTM решает: что забыть из cell state ($f_t$), что добавить ($i_t \\odot \\tilde{c}_t$), что вывести ($o_t$). Здесь показано, как три ворота реагируют на простой входной сигнал.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="rnng-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:380px;"><canvas id="rnng-chart"></canvas></div>
+              <div class="sim-stats" id="rnng-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#rnng-controls');
+          const cSignal = App.makeControl('select', 'rnng-sig', 'Входной сигнал', {
+            options: [
+              { value: 'pulse', label: 'Одиночный импульс' },
+              { value: 'double', label: 'Два импульса' },
+              { value: 'step', label: 'Ступенька' },
+              { value: 'noise', label: 'Шум + сигнал' },
+            ],
+            value: 'pulse',
+          });
+          const cKeep = App.makeControl('range', 'rnng-keep', 'Склонность помнить (bias f)', { min: -2, max: 4, step: 0.1, value: 2 });
+          [cSignal, cKeep].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function makeSignal(type) {
+            const T = 30;
+            const x = new Array(T).fill(0);
+            if (type === 'pulse') x[5] = 1;
+            else if (type === 'double') { x[5] = 1; x[15] = -1; }
+            else if (type === 'step') { for (let i = 5; i < 20; i++) x[i] = 1; }
+            else { for (let i = 0; i < T; i++) x[i] = (Math.random() - 0.5) * 0.3; x[10] = 1; }
+            return x;
+          }
+
+          function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+          function run() {
+            const x = makeSignal(cSignal.input.value);
+            const bf = +cKeep.input.value;
+            const T = x.length;
+            // fake LSTM: input i_t = sigmoid(x_t*2), f_t = sigmoid(bf - |x_t|*2), o_t = sigmoid(1)
+            // c_t = f_t * c_{t-1} + i_t * tanh(x_t*2)
+            let c = 0;
+            const fs = [], is = [], os = [], cs = [], hs = [];
+            for (let t = 0; t < T; t++) {
+              const i = sigmoid(x[t] * 3);
+              const f = sigmoid(bf - Math.abs(x[t]) * 2);
+              const o = sigmoid(1 + Math.abs(x[t]));
+              const cand = Math.tanh(x[t] * 2);
+              c = f * c + i * cand;
+              const h = o * Math.tanh(c);
+              is.push(i); fs.push(f); os.push(o); cs.push(c); hs.push(h);
+            }
+
+            const ctx = container.querySelector('#rnng-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: x.map((_, i) => i),
+                datasets: [
+                  { label: 'Вход x_t', data: x, borderColor: '#64748b', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'forget f_t', data: fs, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'input i_t', data: is, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'cell c_t', data: cs, borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, fill: false },
+                  { label: 'output h_t', data: hs, borderColor: '#a855f7', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, title: { display: true, text: 'Динамика ворот LSTM' } },
+                scales: { x: { title: { display: true, text: 'шаг t' } }, y: { suggestedMin: -1.2, suggestedMax: 1.5 } },
+              },
+            });
+            App.registerChart(chart);
+
+            container.querySelector('#rnng-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Шагов</div><div class="stat-value">${T}</div></div>
+              <div class="stat-card"><div class="stat-label">c_T</div><div class="stat-value">${cs.slice(-1)[0].toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Макс |h|</div><div class="stat-value">${Math.max(...hs.map(Math.abs)).toFixed(3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Средн. f</div><div class="stat-value">${(fs.reduce((a, b) => a + b, 0) / T).toFixed(2)}</div></div>
+            `;
+          }
+
+          [cSignal, cKeep].forEach(c => c.input.addEventListener('input', run));
+          setTimeout(run, 50);
+        },
+      },
+    ],
 
     python: `
       <h3>RNN и LSTM на Python (PyTorch)</h3>

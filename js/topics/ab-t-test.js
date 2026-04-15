@@ -521,8 +521,10 @@ p-value:      0.005       &lt;&lt;0.001     0.007
       }
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Две группы',
+        html: `
         <h3>Сравнение средних двух групп</h3>
         <p>Генерируем две группы с разными средними и смотрим, найдёт ли t-тест разницу.</p>
         <div class="sim-container">
@@ -573,7 +575,207 @@ p-value:      0.005       &lt;&lt;0.001     0.007
         container.querySelector('#abt-run').onclick = run;
         run();
       },
-    },
+      },
+      {
+        title: 'Критическая область',
+        html: `
+          <h3>t-статистика, критическая зона и p-value</h3>
+          <p>Синяя кривая — распределение $t$-статистики при $H_0$ (центрированное, нормальное приближение). Красные хвосты — критическая область (|t| &gt; z_{1−α/2}). Оранжевая вертикаль — наблюдённое значение $t$. Заштрихованная площадь (жёлтая) — p-value. Двигай эффект и σ: смотри, как $t$ выбегает за критическую границу.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abt2-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abt2-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="abt2-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abt2-controls');
+          const cDelta = App.makeControl('range', 'abt2-delta', 'Δ = μ(B) − μ(A)', { min: -5, max: 5, step: 0.1, value: 1.5 });
+          const cSigma = App.makeControl('range', 'abt2-sigma', 'σ (в группах)', { min: 0.5, max: 10, step: 0.1, value: 3 });
+          const cN = App.makeControl('range', 'abt2-n', 'n на группу', { min: 10, max: 500, step: 5, value: 80 });
+          const cAlpha = App.makeControl('select', 'abt2-alpha', 'α', {
+            options: [
+              { value: '0.01', label: '0.01' },
+              { value: '0.05', label: '0.05' },
+              { value: '0.1', label: '0.10' },
+            ],
+            value: '0.05',
+          });
+          [cDelta, cSigma, cN, cAlpha].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function zCrit(alpha) {
+            // two-sided
+            if (alpha <= 0.01) return 2.576;
+            if (alpha <= 0.05) return 1.96;
+            return 1.645;
+          }
+
+          function run() {
+            const delta = parseFloat(cDelta.input.value);
+            const sigma = parseFloat(cSigma.input.value);
+            const n = parseInt(cN.input.value, 10);
+            const alpha = parseFloat(cAlpha.input.value);
+
+            const se = Math.sqrt(2 * sigma * sigma / n);
+            const t = delta / se;
+            const crit = zCrit(alpha);
+            const pVal = 2 * (1 - App.Util.normalCDF(Math.abs(t)));
+
+            const xs = [];
+            const pdfNull = [];
+            const pdfCrit = [];
+            const pdfP = [];
+            const xMax = Math.max(4, Math.abs(t) + 1);
+            const STEPS = 160;
+            for (let i = 0; i <= STEPS; i++) {
+              const x = -xMax + (2 * xMax) * i / STEPS;
+              xs.push(x.toFixed(2));
+              const y = App.Util.normalPDF(x, 0, 1);
+              pdfNull.push(y);
+              pdfCrit.push((x <= -crit || x >= crit) ? y : null);
+              pdfP.push((x <= -Math.abs(t) || x >= Math.abs(t)) ? y : null);
+            }
+
+            const ctx = container.querySelector('#abt2-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: xs,
+                datasets: [
+                  { label: 'PDF при H₀', data: pdfNull, borderColor: 'rgba(59,130,246,0.9)', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.2 },
+                  { label: 'Критическая зона (α)', data: pdfCrit, borderColor: 'rgba(239,68,68,0.9)', backgroundColor: 'rgba(239,68,68,0.25)', borderWidth: 0, pointRadius: 0, fill: 'origin', tension: 0.2 },
+                  { label: 'p-value область', data: pdfP, borderColor: 'rgba(234,179,8,0.95)', backgroundColor: 'rgba(234,179,8,0.35)', borderWidth: 0, pointRadius: 0, fill: 'origin', tension: 0.2 },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  title: { display: true, text: 'Распределение t при H₀ (N=' + n + ', df=' + (2 * n - 2) + ')' },
+                  legend: { position: 'top' },
+                  annotation: undefined,
+                },
+                scales: {
+                  x: { ticks: { maxTicksLimit: 9 } },
+                  y: { title: { display: true, text: 'плотность' }, beginAtZero: true },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const sig = Math.abs(t) > crit;
+            container.querySelector('#abt2-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">t</div><div class="stat-value">' + t.toFixed(3) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">крит. порог</div><div class="stat-value">±' + crit.toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">p-value</div><div class="stat-value">' + pVal.toFixed(4) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Вердикт</div><div class="stat-value">' + (sig ? '✅ H₀ отверг.' : '❌ не отверг.') + '</div></div>';
+          }
+
+          [cDelta, cSigma, cN, cAlpha].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+      {
+        title: 'Power: n × эффект',
+        html: `
+          <h3>Мощность от размера выборки и величины эффекта</h3>
+          <p>Ядро A/B-теста: связка $n$, эффекта и детектируемости. Слева — карта мощности как функция $n$ (по оси X) при фиксированном эффекте. Слайдер «n на группу» покажет, что получится при твоём выбранном $n$. Больше шума ($\\sigma$) — кривая уезжает вправо и мощность падает.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="abt3-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="abt3-chart" style="max-height:320px;"></canvas></div>
+              <div class="sim-stats" id="abt3-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#abt3-controls');
+          const cN = App.makeControl('range', 'abt3-n', 'n на группу', { min: 10, max: 1000, step: 10, value: 150 });
+          const cDelta = App.makeControl('range', 'abt3-delta', 'Эффект Δ', { min: 0, max: 5, step: 0.1, value: 1 });
+          const cSigma = App.makeControl('range', 'abt3-sigma', 'σ', { min: 0.5, max: 10, step: 0.1, value: 3 });
+          [cN, cDelta, cSigma].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          const alpha = 0.05;
+          const zA = 1.96; // two-sided 0.05
+
+          function powerAt(n, delta, sigma) {
+            // Power = P(|Z| > zA | H1) где Z ~ N(delta*sqrt(n/2)/sigma, 1)
+            const ncp = (delta * Math.sqrt(n / 2)) / sigma;
+            // Аппроксимация: P(Z > zA − ncp) + P(Z < −zA − ncp)
+            const p1 = 1 - App.Util.normalCDF(zA - ncp);
+            const p2 = App.Util.normalCDF(-zA - ncp);
+            return p1 + p2;
+          }
+
+          function run() {
+            const n = parseInt(cN.input.value, 10);
+            const delta = parseFloat(cDelta.input.value);
+            const sigma = parseFloat(cSigma.input.value);
+
+            const ns = [];
+            const pows = [];
+            for (let k = 10; k <= 1000; k += 10) {
+              ns.push(k);
+              pows.push(powerAt(k, delta, sigma));
+            }
+            // Точка при выбранном n
+            const pointPow = powerAt(n, delta, sigma);
+
+            // Линия порога 0.8
+            const lineThresh = ns.map(() => 0.8);
+
+            const ctx = container.querySelector('#abt3-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ns,
+                datasets: [
+                  { label: 'Мощность(n)', data: pows, borderColor: 'rgba(16,185,129,0.95)', backgroundColor: 'rgba(16,185,129,0.15)', borderWidth: 3, pointRadius: 0, fill: true, tension: 0.25 },
+                  { label: 'Цель 0.8', data: lineThresh, borderColor: 'rgba(239,68,68,0.9)', borderDash: [6, 3], borderWidth: 2, pointRadius: 0, fill: false },
+                  {
+                    label: 'Ваш n=' + n,
+                    data: ns.map(k => (k === Math.round(n / 10) * 10 ? pointPow : null)),
+                    borderColor: 'rgba(59,130,246,1)',
+                    backgroundColor: 'rgba(59,130,246,1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    showLine: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Мощность vs n при Δ=' + delta.toFixed(1) + ', σ=' + sigma.toFixed(1) }, legend: { position: 'top' } },
+                scales: {
+                  x: { title: { display: true, text: 'n на группу' } },
+                  y: { min: 0, max: 1, title: { display: true, text: 'мощность (1 − β)' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            // Требуемое n для 0.8
+            let nReq = null;
+            for (let k = 10; k <= 100000; k += 5) {
+              if (powerAt(k, delta, sigma) >= 0.8) { nReq = k; break; }
+            }
+            container.querySelector('#abt3-stats').innerHTML =
+              '<div class="stat-card"><div class="stat-label">Мощность при n=' + n + '</div><div class="stat-value">' + (pointPow * 100).toFixed(1) + '%</div></div>' +
+              '<div class="stat-card"><div class="stat-label">n для 80%</div><div class="stat-value">' + (nReq == null ? '>100k' : nReq) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">Эффект (Δ/σ)</div><div class="stat-value">' + (delta / sigma).toFixed(2) + '</div></div>' +
+              '<div class="stat-card"><div class="stat-label">α</div><div class="stat-value">0.05</div></div>';
+          }
+
+          [cN, cDelta, cSigma].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>📊 t-тест для A/B теста средних</h3>

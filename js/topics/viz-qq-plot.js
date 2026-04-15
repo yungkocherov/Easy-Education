@@ -333,6 +333,122 @@ App.registerTopic({
       }
     ],
 
+    simulation: {
+      html: `
+        <h3>Читаем Q-Q plot глазами</h3>
+        <p>На оси X — теоретические квантили нормального распределения, на оси Y — эмпирические из твоей выборки. Нормальная выборка → точки ложатся на прямую. Тяжёлые хвосты → S-образный изгиб (концы «убегают» вверх/вниз). Правый скос → прогиб вниз слева, вверх справа. Переключай распределение — запомни характерные паттерны.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="viz-qq-ctrl"></div>
+          <div class="sim-buttons"><button class="btn" id="viz-qq-run">🔄 Новая выборка</button></div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="viz-qq-chart"></canvas></div>
+            <div class="sim-stats" id="viz-qq-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const ctrl = container.querySelector('#viz-qq-ctrl');
+        const cN = App.makeControl('range', 'viz-qq-n', 'Размер выборки', { min: 20, max: 2000, step: 10, value: 200 });
+        const cDist = App.makeControl('select', 'viz-qq-dist', 'Распределение', {
+          options: [
+            { value: 'normal', label: 'Нормальное (эталон)' },
+            { value: 'heavy', label: 'Тяжёлые хвосты (Student t₃)' },
+            { value: 'skew-right', label: 'Правый скос (log-normal)' },
+            { value: 'skew-left', label: 'Левый скос' },
+            { value: 'uniform', label: 'Равномерное (лёгкие хвосты)' },
+            { value: 'bimodal', label: 'Бимодальное' },
+          ],
+          value: 'heavy',
+        });
+        [cN, cDist].forEach(c => ctrl.appendChild(c.wrap));
+        let chart = null;
+        // Inverse normal (Beasley-Springer-like)
+        function normInv(p) {
+          const a = [2.515517, 0.802853, 0.010328];
+          const b = [1.432788, 0.189269, 0.001308];
+          const q = p > 0.5 ? 1 - p : p;
+          if (q <= 0) return p > 0.5 ? 5 : -5;
+          const t = Math.sqrt(-2 * Math.log(q));
+          const num = a[0] + a[1] * t + a[2] * t * t;
+          const den = 1 + b[0] * t + b[1] * t * t + b[2] * t * t * t;
+          const x = t - num / den;
+          return p > 0.5 ? x : -x;
+        }
+        function sample(n, dist) {
+          const s = [];
+          if (dist === 'normal') for (let i = 0; i < n; i++) s.push(App.Util.randn());
+          else if (dist === 'heavy') {
+            for (let i = 0; i < n; i++) {
+              const z = App.Util.randn();
+              let chi = 0;
+              for (let j = 0; j < 3; j++) chi += App.Util.randn() ** 2;
+              s.push(z / Math.sqrt(chi / 3));
+            }
+          } else if (dist === 'skew-right') {
+            for (let i = 0; i < n; i++) s.push(Math.exp(App.Util.randn(0, 0.7)) - 1.3);
+          } else if (dist === 'skew-left') {
+            for (let i = 0; i < n; i++) s.push(-(Math.exp(App.Util.randn(0, 0.7)) - 1.3));
+          } else if (dist === 'uniform') {
+            for (let i = 0; i < n; i++) s.push((Math.random() - 0.5) * 3.4);
+          } else if (dist === 'bimodal') {
+            for (let i = 0; i < n; i++) s.push(Math.random() < 0.5 ? App.Util.randn(-2, 0.4) : App.Util.randn(2, 0.4));
+          }
+          return s;
+        }
+        function run() {
+          const n = +cN.input.value;
+          const dist = cDist.input.value;
+          const data = sample(n, dist).sort((a, b) => a - b);
+          // Standardize for comparison
+          const mu = App.Util.mean(data);
+          const sd = App.Util.std(data);
+          const z = data.map(v => (v - mu) / sd);
+          // Theoretical quantiles
+          const theor = [];
+          for (let i = 0; i < n; i++) {
+            const p = (i + 0.5) / n;
+            theor.push(normInv(p));
+          }
+          const points = theor.map((t, i) => ({ x: t, y: z[i] }));
+          const lineEnds = [Math.min(...theor), Math.max(...theor)];
+          const idealLine = lineEnds.map(v => ({ x: v, y: v }));
+          // Shapiro-Wilk approx hardcore; use simple correlation on QQ as proxy
+          const meanT = App.Util.mean(theor);
+          const meanZ = App.Util.mean(z);
+          let num = 0, dt = 0, dz = 0;
+          for (let i = 0; i < n; i++) {
+            num += (theor[i] - meanT) * (z[i] - meanZ);
+            dt += (theor[i] - meanT) ** 2;
+            dz += (z[i] - meanZ) ** 2;
+          }
+          const r = num / Math.sqrt(dt * dz);
+          const ctx = container.querySelector('#viz-qq-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [
+                { label: 'Q-Q точки', data: points, backgroundColor: 'rgba(59,130,246,0.7)', pointRadius: 3 },
+                { label: 'y = x (если нормальное)', data: idealLine, type: 'line', borderColor: '#ef4444', borderWidth: 2, borderDash: [6, 4], pointRadius: 0, fill: false, showLine: true },
+              ],
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Q-Q plot: ' + dist + ', n=' + n } }, scales: { x: { type: 'linear', title: { display: true, text: 'Теоретические квантили N(0,1)' } }, y: { title: { display: true, text: 'Эмпирические (стандартизованные)' } } } },
+          });
+          App.registerChart(chart);
+          const verdict = r > 0.995 ? 'Очень близко к нормальному' : r > 0.98 ? 'Слегка отклоняется' : r > 0.95 ? 'Заметное отклонение' : 'Сильное отклонение';
+          container.querySelector('#viz-qq-stats').innerHTML =
+            '<div class="stat-card"><div class="stat-label">QQ-корреляция</div><div class="stat-value">' + r.toFixed(4) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Вердикт</div><div class="stat-value" style="font-size:0.85em">' + verdict + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Mean</div><div class="stat-value">' + mu.toFixed(2) + '</div></div>' +
+            '<div class="stat-card"><div class="stat-label">Std</div><div class="stat-value">' + sd.toFixed(2) + '</div></div>';
+        }
+        cN.input.addEventListener('change', run);
+        cDist.input.addEventListener('change', run);
+        container.querySelector('#viz-qq-run').onclick = run;
+        run();
+      },
+    },
+
     python: `
 <h3>Q-Q plot в Python</h3>
 

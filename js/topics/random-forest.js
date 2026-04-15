@@ -789,7 +789,9 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
+    simulation: [
+    {
+      title: 'Граница решений',
       html: `
         <h3>Симуляция: один vs много деревьев</h3>
         <p>Сравни границу одного дерева с лесом. Меняй число деревьев и глубину.</p>
@@ -965,6 +967,217 @@ App.registerTopic({
         window.addEventListener('resize', resize);
       },
     },
+    {
+      title: 'OOB vs Test: кривые ошибки',
+      html: `
+        <h3>Снижение ошибки по мере роста числа деревьев</h3>
+        <p>Строим лес и по ходу считаем <b>OOB accuracy</b> (оценка по bag-out объектам — бесплатный валидационный набор) и <b>Test accuracy</b>. Видно, что обе кривые сходятся к одному значению: OOB — честная оценка без отдельной тест-выборки. Прирост быстро насыщается после ~30-50 деревьев — добавлять 1000 бессмысленно.</p>
+        <div class="sim-container">
+          <div class="sim-controls" id="rf2-controls"></div>
+          <div class="sim-buttons">
+            <button class="btn" id="rf2-regen">🔄 Новые данные</button>
+          </div>
+          <div class="sim-output">
+            <div class="sim-chart-wrap"><canvas id="rf2-chart"></canvas></div>
+            <div class="sim-stats" id="rf2-stats"></div>
+          </div>
+        </div>
+      `,
+      init(container) {
+        const controls = container.querySelector('#rf2-controls');
+        const cShape = App.makeControl('select', 'rf2-shape', 'Форма данных', {
+          options: [{ value: 'moons', label: 'Две луны' }, { value: 'xor', label: 'XOR' }, { value: 'circle', label: 'Круг' }],
+          value: 'moons',
+        });
+        const cDepth = App.makeControl('range', 'rf2-depth', 'Max depth', { min: 1, max: 12, step: 1, value: 6 });
+        const cNoise = App.makeControl('range', 'rf2-noise', 'Шум (% меток)', { min: 0, max: 30, step: 1, value: 10 });
+        const cN = App.makeControl('range', 'rf2-n', 'Точек (train)', { min: 50, max: 400, step: 25, value: 150 });
+        [cShape, cDepth, cNoise, cN].forEach(c => controls.appendChild(c.wrap));
+
+        let chart = null;
+        let train = [], test = [];
+
+        function genPoint(shape, noise) {
+          let x, y, cls;
+          if (shape === 'moons') {
+            const t = Math.random() * Math.PI;
+            if (Math.random() < 0.5) {
+              x = 0.3 + 0.25 * Math.cos(t) + App.Util.randn(0, 0.04);
+              y = 0.45 + 0.25 * Math.sin(t) + App.Util.randn(0, 0.04);
+              cls = 0;
+            } else {
+              x = 0.55 + 0.25 * Math.cos(t + Math.PI) + App.Util.randn(0, 0.04);
+              y = 0.55 - 0.25 * Math.sin(t + Math.PI) + App.Util.randn(0, 0.04);
+              cls = 1;
+            }
+          } else if (shape === 'xor') {
+            x = Math.random(); y = Math.random();
+            cls = ((x > 0.5) ^ (y > 0.5)) ? 1 : 0;
+          } else {
+            x = Math.random(); y = Math.random();
+            const r = Math.sqrt((x - 0.5) ** 2 + (y - 0.5) ** 2);
+            cls = r < 0.25 ? 0 : 1;
+          }
+          if (Math.random() < noise) cls = 1 - cls;
+          return { x, y, cls };
+        }
+
+        function genData() {
+          const shape = cShape.input.value;
+          const noise = +cNoise.input.value / 100;
+          const n = +cN.input.value;
+          train = []; test = [];
+          for (let i = 0; i < n; i++) train.push(genPoint(shape, noise));
+          for (let i = 0; i < 400; i++) test.push(genPoint(shape, 0));
+          update();
+        }
+
+        function gini(items) {
+          if (items.length === 0) return 0;
+          let c0 = 0, c1 = 0;
+          items.forEach(p => p.cls === 0 ? c0++ : c1++);
+          const p0 = c0 / items.length, p1 = c1 / items.length;
+          return 1 - p0 * p0 - p1 * p1;
+        }
+        function majority(items) { let c0 = 0; items.forEach(p => p.cls === 0 && c0++); return c0 >= items.length - c0 ? 0 : 1; }
+
+        function buildTree(items, depth, maxDepth) {
+          if (depth >= maxDepth || items.length < 2 || gini(items) < 1e-9) {
+            return { leaf: true, cls: majority(items) };
+          }
+          const feats = ['x', 'y'];
+          const chosen = [feats[Math.floor(Math.random() * 2)]];
+          let best = null;
+          const base = gini(items);
+          chosen.forEach(feat => {
+            const vals = items.map(p => p[feat]).sort((a, b) => a - b);
+            const tryN = Math.min(vals.length - 1, 15);
+            for (let k = 0; k < tryN; k++) {
+              const i = 1 + Math.floor(Math.random() * (vals.length - 1));
+              const thr = (vals[i - 1] + vals[i]) / 2;
+              const L = items.filter(p => p[feat] < thr);
+              const R = items.filter(p => p[feat] >= thr);
+              if (L.length === 0 || R.length === 0) continue;
+              const w = (L.length * gini(L) + R.length * gini(R)) / items.length;
+              const gain = base - w;
+              if (!best || gain > best.gain) best = { feat, thr, gain, L, R };
+            }
+          });
+          if (!best || best.gain < 1e-6) return { leaf: true, cls: majority(items) };
+          return {
+            leaf: false, feat: best.feat, thr: best.thr,
+            left: buildTree(best.L, depth + 1, maxDepth),
+            right: buildTree(best.R, depth + 1, maxDepth),
+          };
+        }
+
+        function predictTree(tree, x, y) {
+          if (tree.leaf) return tree.cls;
+          const v = tree.feat === 'x' ? x : y;
+          return v < tree.thr ? predictTree(tree.left, x, y) : predictTree(tree.right, x, y);
+        }
+
+        function update() {
+          const maxDepth = +cDepth.input.value;
+          const nTreesMax = 60;
+
+          // Один "эталонный" deep tree для сравнения
+          const singleTree = buildTree(train, 0, maxDepth);
+          let singleCorrect = 0;
+          test.forEach(p => { if (predictTree(singleTree, p.x, p.y) === p.cls) singleCorrect++; });
+          const singleAcc = singleCorrect / test.length;
+
+          // Накопительные голоса
+          const oobVotes = train.map(() => [0, 0]);
+          const testVotes = test.map(() => [0, 0]);
+          const oobSeen = train.map(() => false);
+          const oobCurve = [];
+          const testCurve = [];
+          const xs = [];
+
+          for (let t = 0; t < nTreesMax; t++) {
+            const sample = [];
+            const inBag = new Set();
+            for (let i = 0; i < train.length; i++) {
+              const idx = Math.floor(Math.random() * train.length);
+              sample.push(train[idx]);
+              inBag.add(idx);
+            }
+            const tree = buildTree(sample, 0, maxDepth);
+            // OOB predictions
+            for (let i = 0; i < train.length; i++) {
+              if (!inBag.has(i)) {
+                const p = predictTree(tree, train[i].x, train[i].y);
+                oobVotes[i][p]++;
+                oobSeen[i] = true;
+              }
+            }
+            // Test votes
+            for (let i = 0; i < test.length; i++) {
+              const p = predictTree(tree, test[i].x, test[i].y);
+              testVotes[i][p]++;
+            }
+            // точки для графика
+            if ((t + 1) % 3 === 0 || t === 0) {
+              let oC = 0, oT = 0;
+              for (let i = 0; i < train.length; i++) {
+                if (oobSeen[i]) {
+                  oT++;
+                  const pred = oobVotes[i][1] > oobVotes[i][0] ? 1 : 0;
+                  if (pred === train[i].cls) oC++;
+                }
+              }
+              let tC = 0;
+              for (let i = 0; i < test.length; i++) {
+                const pred = testVotes[i][1] > testVotes[i][0] ? 1 : 0;
+                if (pred === test[i].cls) tC++;
+              }
+              xs.push(t + 1);
+              oobCurve.push(oT > 0 ? oC / oT : 0);
+              testCurve.push(tC / test.length);
+            }
+          }
+
+          const singleLine = xs.map(() => singleAcc);
+
+          const ctx = container.querySelector('#rf2-chart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: xs,
+              datasets: [
+                { label: 'OOB accuracy', data: oobCurve, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 2.5, pointRadius: 2, fill: false, tension: 0.2 },
+                { label: 'Test accuracy', data: testCurve, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 2.5, pointRadius: 2, fill: false, tension: 0.2 },
+                { label: 'Одно дерево (test)', data: singleLine, borderColor: '#ef4444', borderWidth: 1.8, borderDash: [5, 4], pointRadius: 0, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { title: { display: true, text: 'Accuracy vs число деревьев' }, legend: { position: 'top' } },
+              scales: {
+                x: { title: { display: true, text: 'n_trees' } },
+                y: { suggestedMin: 0.5, suggestedMax: 1.02, title: { display: true, text: 'Accuracy' } },
+              },
+            },
+          });
+          App.registerChart(chart);
+
+          container.querySelector('#rf2-stats').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Одно дерево</div><div class="stat-value">${(singleAcc * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Лес @ ${nTreesMax} (test)</div><div class="stat-value">${(testCurve[testCurve.length - 1] * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">Лес @ ${nTreesMax} (OOB)</div><div class="stat-value">${(oobCurve[oobCurve.length - 1] * 100).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">OOB − Test</div><div class="stat-value">${((oobCurve[oobCurve.length - 1] - testCurve[testCurve.length - 1]) * 100).toFixed(2)}%</div></div>
+          `;
+        }
+
+        [cShape, cNoise, cN].forEach(c => c.input.addEventListener('change', genData));
+        cDepth.input.addEventListener('input', update);
+        container.querySelector('#rf2-regen').onclick = genData;
+        genData();
+      },
+    },
+    ],
 
     python: `
       <h3>Python: случайный лес</h3>

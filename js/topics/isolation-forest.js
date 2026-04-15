@@ -463,8 +463,10 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'Поиск аномалий',
+        html: `
         <h3>Симуляция: поиск аномалий</h3>
         <p>Нормальные точки в двух кластерах + случайные выбросы. Цвет показывает score — красное = аномалия.</p>
         <div class="sim-container">
@@ -618,7 +620,222 @@ App.registerTopic({
         setTimeout(() => { genData(); resize(); rebuild(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+      },
+      {
+        title: 'Интуиция: длина пути',
+        html: `
+          <h3>Почему аномалии «изолируются» короче</h3>
+          <p>Строим <b>одно</b> изолирующее дерево случайных разбиений и следим за путём двух отмеченных точек: <span style="color:#3b82f6"><b>●</b> нормальной</span> (в гуще данных) и <span style="color:#dc2626"><b>●</b> аномальной</span> (на отшибе). Чем дальше точка от массы — тем быстрее случайный split отрежет её в свой отдельный лист. Это и есть ядро алгоритма: длина пути ≈ «типичность».</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="ifP-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="ifP-new">🎲 Новое дерево</button>
+              <button class="btn secondary" id="ifP-avg">📊 100 деревьев (среднее)</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:400px;padding:0;"><canvas id="ifP-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="ifP-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#ifP-controls');
+          const cOff = App.makeControl('range', 'ifP-off', 'Удалённость аномалии', { min: 0.1, max: 0.45, step: 0.01, value: 0.3 });
+          const cN = App.makeControl('range', 'ifP-n', 'Нормальных точек', { min: 30, max: 200, step: 10, value: 80 });
+          [cOff, cN].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#ifP-canvas');
+          const ctx = canvas.getContext('2d');
+          let points = [];
+          let normalIdx = 0, anomIdx = 0;
+          let splits = []; // {axis, thr, x0, y0, x1, y1, depth}
+          let pathNormal = [], pathAnom = []; // списки splits вдоль пути
+
+          function genData() {
+            const off = +cOff.input.value;
+            const n = +cN.input.value;
+            points = [];
+            for (let i = 0; i < n; i++) {
+              points.push({ x: 0.5 + App.Util.randn(0, 0.06), y: 0.5 + App.Util.randn(0, 0.06) });
+            }
+            // нормальная точка — ближайшая к центру
+            let bestD = Infinity;
+            points.forEach((p, i) => {
+              const d = (p.x - 0.5) ** 2 + (p.y - 0.5) ** 2;
+              if (d < bestD) { bestD = d; normalIdx = i; }
+            });
+            // аномалия — на расстоянии off от центра в правом верхнем углу
+            points.push({ x: 0.5 + off, y: 0.5 + off });
+            anomIdx = points.length - 1;
+            buildTree();
+          }
+
+          function buildTree() {
+            splits = [];
+            pathNormal = [];
+            pathAnom = [];
+            const MAX_DEPTH = 12;
+
+            function recurse(items, x0, y0, x1, y1, depth) {
+              if (items.length <= 1 || depth >= MAX_DEPTH) return { size: items.length, depth };
+              const axis = Math.random() < 0.5 ? 'x' : 'y';
+              const lo = axis === 'x' ? x0 : y0;
+              const hi = axis === 'x' ? x1 : y1;
+              if (hi - lo < 1e-4) return { size: items.length, depth };
+              const thr = lo + Math.random() * (hi - lo);
+              const L = items.filter(i => points[i][axis] < thr);
+              const R = items.filter(i => points[i][axis] >= thr);
+              const split = { axis, thr, x0, y0, x1, y1, depth };
+              splits.push(split);
+              // запоминаем путь для интересных точек
+              const hasNormal = items.includes(normalIdx);
+              const hasAnom = items.includes(anomIdx);
+              if (hasNormal) pathNormal.push(split);
+              if (hasAnom) pathAnom.push(split);
+              // рекурсия в левую/правую коробку
+              if (axis === 'x') {
+                recurse(L, x0, y0, thr, y1, depth + 1);
+                recurse(R, thr, y0, x1, y1, depth + 1);
+              } else {
+                recurse(L, x0, y0, x1, thr, depth + 1);
+                recurse(R, x0, thr, x1, y1, depth + 1);
+              }
+              return null;
+            }
+            recurse(points.map((_, i) => i), 0, 0, 1, 1, 0);
+            draw();
+          }
+
+          function avgOver(nTrees) {
+            let sNormal = 0, sAnom = 0;
+            for (let t = 0; t < nTrees; t++) {
+              pathNormal = []; pathAnom = [];
+              const MAX_DEPTH = 12;
+              function recurse(items, x0, y0, x1, y1, depth) {
+                if (items.length <= 1 || depth >= MAX_DEPTH) return;
+                const axis = Math.random() < 0.5 ? 'x' : 'y';
+                const lo = axis === 'x' ? x0 : y0;
+                const hi = axis === 'x' ? x1 : y1;
+                if (hi - lo < 1e-4) return;
+                const thr = lo + Math.random() * (hi - lo);
+                const L = items.filter(i => points[i][axis] < thr);
+                const R = items.filter(i => points[i][axis] >= thr);
+                const hasNormal = items.includes(normalIdx);
+                const hasAnom = items.includes(anomIdx);
+                const rec = { depth };
+                if (hasNormal) pathNormal.push(rec);
+                if (hasAnom) pathAnom.push(rec);
+                if (axis === 'x') {
+                  recurse(L, x0, y0, thr, y1, depth + 1);
+                  recurse(R, thr, y0, x1, y1, depth + 1);
+                } else {
+                  recurse(L, x0, y0, x1, thr, depth + 1);
+                  recurse(R, x0, thr, x1, y1, depth + 1);
+                }
+              }
+              recurse(points.map((_, i) => i), 0, 0, 1, 1, 0);
+              sNormal += pathNormal.length;
+              sAnom += pathAnom.length;
+            }
+            buildTree(); // вернём визуал к одному дереву
+            return { avgNormal: sNormal / nTrees, avgAnom: sAnom / nTrees };
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+
+            // рисуем все split-линии бледно
+            ctx.strokeStyle = 'rgba(148,163,184,0.4)';
+            ctx.lineWidth = 1;
+            splits.forEach(s => {
+              ctx.beginPath();
+              if (s.axis === 'x') {
+                ctx.moveTo(s.thr * W, s.y0 * H);
+                ctx.lineTo(s.thr * W, s.y1 * H);
+              } else {
+                ctx.moveTo(s.x0 * W, s.thr * H);
+                ctx.lineTo(s.x1 * W, s.thr * H);
+              }
+              ctx.stroke();
+            });
+
+            // splits вдоль пути аномалии — красным (они первыми отсекают её)
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2.5;
+            pathAnom.forEach(s => {
+              ctx.beginPath();
+              if (s.axis === 'x') {
+                ctx.moveTo(s.thr * W, s.y0 * H);
+                ctx.lineTo(s.thr * W, s.y1 * H);
+              } else {
+                ctx.moveTo(s.x0 * W, s.thr * H);
+                ctx.lineTo(s.x1 * W, s.thr * H);
+              }
+              ctx.stroke();
+            });
+
+            // splits вдоль пути нормальной — синим
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 1.5;
+            pathNormal.forEach(s => {
+              ctx.beginPath();
+              if (s.axis === 'x') {
+                ctx.moveTo(s.thr * W, s.y0 * H);
+                ctx.lineTo(s.thr * W, s.y1 * H);
+              } else {
+                ctx.moveTo(s.x0 * W, s.thr * H);
+                ctx.lineTo(s.x1 * W, s.thr * H);
+              }
+              ctx.stroke();
+            });
+
+            // точки
+            points.forEach((p, i) => {
+              if (i === normalIdx || i === anomIdx) return;
+              ctx.fillStyle = 'rgba(100,116,139,0.5)';
+              ctx.beginPath();
+              ctx.arc(p.x * W, p.y * H, 3, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+            // отмеченные точки поверх
+            const pN = points[normalIdx];
+            ctx.fillStyle = '#3b82f6';
+            ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(pN.x * W, pN.y * H, 8, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+            const pA = points[anomIdx];
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath(); ctx.arc(pA.x * W, pA.y * H, 8, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+            container.querySelector('#ifP-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Длина пути (аномалия)</div><div class="stat-value" style="color:#dc2626">${pathAnom.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Длина пути (нормальная)</div><div class="stat-value" style="color:#3b82f6">${pathNormal.length}</div></div>
+              <div class="stat-card"><div class="stat-label">Разница</div><div class="stat-value">${pathNormal.length - pathAnom.length}</div></div>
+              <div class="stat-card" style="background:#fef3c7"><div class="stat-label">Инсайт</div><div class="stat-value" style="font-size:12px">Случайный split чаще попадает в промежуток между аномалией и массой, чем внутри массы. Аномалия отсекается за 2-4 шага.</div></div>
+            `;
+          }
+
+          cOff.input.addEventListener('change', genData);
+          cN.input.addEventListener('change', genData);
+          container.querySelector('#ifP-new').onclick = buildTree;
+          container.querySelector('#ifP-avg').onclick = () => {
+            const { avgNormal, avgAnom } = avgOver(100);
+            container.querySelector('#ifP-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Ср. путь (аномалия, 100 деревьев)</div><div class="stat-value" style="color:#dc2626">${avgAnom.toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">Ср. путь (нормальная)</div><div class="stat-value" style="color:#3b82f6">${avgNormal.toFixed(2)}</div></div>
+              <div class="stat-card"><div class="stat-label">Отношение</div><div class="stat-value">${(avgNormal / Math.max(0.01, avgAnom)).toFixed(2)}×</div></div>
+              <div class="stat-card" style="background:#dcfce7"><div class="stat-label">Вывод</div><div class="stat-value" style="font-size:12px">Через 100 деревьев разница стабилизируется. Score IF = функция от средней длины пути.</div></div>
+            `;
+          };
+
+          setTimeout(() => { genData(); resize(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Python: Isolation Forest</h3>

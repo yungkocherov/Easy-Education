@@ -444,10 +444,12 @@ App.registerTopic({
       },
     ],
 
-    simulation: {
-      html: `
+    simulation: [
+      {
+        title: 'GD по эллиптической чаше',
+        html: `
         <h3>Симуляция: GD по ландшафту функции</h3>
-        <p>Наблюдай, как меняется траектория при разных η. Функция: $L(x,y) = x^2 + 5y^2$ (эллиптическая чаша).</p>
+        <p>Наблюдай, как меняется траектория при разных η. Функция: $L(x,y) = x^2 + 5y^2$ (эллиптическая чаша). При $\\eta > 0.2$ по оси $y$ начинается расхождение — градиент по $y$ в 5 раз круче.</p>
         <div class="sim-container">
           <div class="sim-controls" id="gd-controls"></div>
           <div class="sim-buttons">
@@ -578,7 +580,332 @@ App.registerTopic({
         setTimeout(() => { resize(); reset(); }, 50);
         window.addEventListener('resize', resize);
       },
-    },
+      },
+      {
+        title: 'SGD vs Momentum vs Adam',
+        html: `
+          <h3>Сравнение оптимизаторов на одной функции</h3>
+          <p>Три оптимизатора стартуют из одной точки на функции $L(x,y)=x^2+5y^2$. SGD «зигзажит» из-за разных градиентов по осям. Momentum сглаживает колебания. Adam адаптивно масштабирует шаг по каждой координате.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="gdc-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="gdc-run">▶ 60 шагов</button>
+              <button class="btn secondary" id="gdc-reset">↺ Сбросить</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:360px;padding:0;"><canvas id="gdc-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-chart-wrap" style="height:200px;"><canvas id="gdc-loss"></canvas></div>
+              <div class="sim-stats" id="gdc-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#gdc-controls');
+          const cLR = App.makeControl('range', 'gdc-lr', 'Learning rate η', { min: 0.01, max: 0.2, step: 0.005, value: 0.08 });
+          const cSX = App.makeControl('range', 'gdc-sx', 'Старт x', { min: -5, max: 5, step: 0.1, value: 4 });
+          const cSY = App.makeControl('range', 'gdc-sy', 'Старт y', { min: -2.5, max: 2.5, step: 0.05, value: 2 });
+          [cLR, cSX, cSY].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#gdc-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = { sgd: '#ef4444', mom: '#10b981', adam: '#3b82f6' };
+          const labels = { sgd: 'SGD', mom: 'Momentum β=0.9', adam: 'Adam' };
+          let trajectories = { sgd: [], mom: [], adam: [] };
+          let losses = { sgd: [], mom: [], adam: [] };
+          let lossChart = null;
+
+          function loss(x, y) { return x * x + 5 * y * y; }
+          function grad(x, y) { return [2 * x, 10 * y]; }
+
+          function reset() {
+            const sx = +cSX.input.value, sy = +cSY.input.value;
+            trajectories = { sgd: [[sx, sy]], mom: [[sx, sy]], adam: [[sx, sy]] };
+            losses = { sgd: [loss(sx, sy)], mom: [loss(sx, sy)], adam: [loss(sx, sy)] };
+            state = {
+              sgd: {},
+              mom: { vx: 0, vy: 0 },
+              adam: { mx: 0, my: 0, vx: 0, vy: 0, t: 0 },
+            };
+            draw();
+          }
+
+          let state = null;
+          function step() {
+            const lr = +cLR.input.value;
+            // SGD
+            {
+              const [x, y] = trajectories.sgd.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              const nx = x - lr * gx, ny = y - lr * gy;
+              trajectories.sgd.push([nx, ny]);
+              losses.sgd.push(loss(nx, ny));
+            }
+            // Momentum
+            {
+              const [x, y] = trajectories.mom.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              const beta = 0.9;
+              state.mom.vx = beta * state.mom.vx + gx;
+              state.mom.vy = beta * state.mom.vy + gy;
+              const nx = x - lr * state.mom.vx, ny = y - lr * state.mom.vy;
+              trajectories.mom.push([nx, ny]);
+              losses.mom.push(loss(nx, ny));
+            }
+            // Adam
+            {
+              const [x, y] = trajectories.adam.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              const b1 = 0.9, b2 = 0.999, eps = 1e-8;
+              state.adam.t++;
+              state.adam.mx = b1 * state.adam.mx + (1 - b1) * gx;
+              state.adam.my = b1 * state.adam.my + (1 - b1) * gy;
+              state.adam.vx = b2 * state.adam.vx + (1 - b2) * gx * gx;
+              state.adam.vy = b2 * state.adam.vy + (1 - b2) * gy * gy;
+              const mxh = state.adam.mx / (1 - Math.pow(b1, state.adam.t));
+              const myh = state.adam.my / (1 - Math.pow(b1, state.adam.t));
+              const vxh = state.adam.vx / (1 - Math.pow(b2, state.adam.t));
+              const vyh = state.adam.vy / (1 - Math.pow(b2, state.adam.t));
+              // Adam typically needs larger effective lr — scale by 5
+              const lrA = lr * 5;
+              const nx = x - lrA * mxh / (Math.sqrt(vxh) + eps);
+              const ny = y - lrA * myh / (Math.sqrt(vyh) + eps);
+              trajectories.adam.push([nx, ny]);
+              losses.adam.push(loss(nx, ny));
+            }
+          }
+
+          function run(n) { for (let i = 0; i < n; i++) step(); draw(); }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const xMin = -6, xMax = 6, yMin = -3, yMax = 3;
+            const toCanvas = (x, y) => [((x - xMin) / (xMax - xMin)) * W, ((yMax - y) / (yMax - yMin)) * H];
+            const levels = [0.5, 2, 5, 10, 20, 40, 80, 160];
+            levels.forEach(L => {
+              ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+              ctx.beginPath();
+              for (let t = 0; t <= 2 * Math.PI + 0.1; t += 0.05) {
+                const x = Math.sqrt(L) * Math.cos(t);
+                const y = Math.sqrt(L / 5) * Math.sin(t);
+                const [cx, cy] = toCanvas(x, y);
+                if (t === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+              }
+              ctx.stroke();
+            });
+            const [ox, oy] = toCanvas(0, 0);
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath(); ctx.arc(ox, oy, 5, 0, 2 * Math.PI); ctx.fill();
+
+            ['sgd', 'mom', 'adam'].forEach(k => {
+              ctx.strokeStyle = colors[k]; ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              trajectories[k].forEach(([x, y], i) => {
+                const [cx, cy] = toCanvas(x, y);
+                if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+              });
+              ctx.stroke();
+              const last = trajectories[k].slice(-1)[0];
+              const [cx, cy] = toCanvas(last[0], last[1]);
+              ctx.fillStyle = colors[k];
+              ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 2 * Math.PI); ctx.fill();
+            });
+
+            // Legend
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            let ly = 10;
+            ['sgd', 'mom', 'adam'].forEach(k => {
+              ctx.fillStyle = colors[k];
+              ctx.fillRect(10, ly + 2, 16, 3);
+              ctx.fillText(labels[k], 32, ly);
+              ly += 18;
+            });
+
+            // Loss chart
+            const lctx = container.querySelector('#gdc-loss').getContext('2d');
+            if (lossChart) lossChart.destroy();
+            lossChart = new Chart(lctx, {
+              type: 'line',
+              data: {
+                labels: losses.sgd.map((_, i) => i),
+                datasets: [
+                  { label: 'SGD', data: losses.sgd.map(v => Math.max(1e-6, v)), borderColor: colors.sgd, borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'Momentum', data: losses.mom.map(v => Math.max(1e-6, v)), borderColor: colors.mom, borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'Adam', data: losses.adam.map(v => Math.max(1e-6, v)), borderColor: colors.adam, borderWidth: 2, pointRadius: 0, fill: false },
+                ],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { type: 'logarithmic', min: 1e-6 }, x: { title: { display: true, text: 'шаг' } } } },
+            });
+            App.registerChart(lossChart);
+
+            container.querySelector('#gdc-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Шаг</div><div class="stat-value">${trajectories.sgd.length - 1}</div></div>
+              <div class="stat-card"><div class="stat-label">SGD loss</div><div class="stat-value">${App.Util.round(losses.sgd.slice(-1)[0], 4)}</div></div>
+              <div class="stat-card"><div class="stat-label">Momentum loss</div><div class="stat-value">${App.Util.round(losses.mom.slice(-1)[0], 4)}</div></div>
+              <div class="stat-card"><div class="stat-label">Adam loss</div><div class="stat-value">${App.Util.round(losses.adam.slice(-1)[0], 4)}</div></div>
+            `;
+          }
+
+          [cLR, cSX, cSY].forEach(c => c.input.addEventListener('input', reset));
+          container.querySelector('#gdc-run').onclick = () => run(60);
+          container.querySelector('#gdc-reset').onclick = reset;
+
+          setTimeout(() => { resize(); reset(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+      {
+        title: 'Седловая точка',
+        html: `
+          <h3>Седловая точка: где SGD зависает</h3>
+          <p>Функция $L(x,y) = x^2 - y^2$ имеет седло в начале координат: по $x$ — минимум, по $y$ — максимум. Старт около $y=0$ → градиент по $y$ мал, ванильный SGD может зависнуть. Momentum/Adam вырываются быстрее.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="gds-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="gds-run">▶ 80 шагов</button>
+              <button class="btn secondary" id="gds-reset">↺ Сбросить</button>
+            </div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap" style="height:380px;padding:0;"><canvas id="gds-canvas" class="sim-canvas"></canvas></div>
+              <div class="sim-stats" id="gds-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#gds-controls');
+          const cLR = App.makeControl('range', 'gds-lr', 'Learning rate η', { min: 0.01, max: 0.15, step: 0.005, value: 0.05 });
+          const cNoise = App.makeControl('range', 'gds-sy', 'Старт |y| (отклонение)', { min: 0.001, max: 0.3, step: 0.001, value: 0.01 });
+          [cLR, cNoise].forEach(c => controls.appendChild(c.wrap));
+
+          const canvas = container.querySelector('#gds-canvas');
+          const ctx = canvas.getContext('2d');
+          const colors = { sgd: '#ef4444', mom: '#10b981', adam: '#3b82f6' };
+          const labels = { sgd: 'SGD', mom: 'Momentum β=0.9', adam: 'Adam' };
+          let traj = {}, st = {};
+
+          function grad(x, y) { return [2 * x, -2 * y]; }
+
+          function reset() {
+            const sx = 3, sy = +cNoise.input.value;
+            traj = { sgd: [[sx, sy]], mom: [[sx, sy]], adam: [[sx, sy]] };
+            st = { mom: { vx: 0, vy: 0 }, adam: { mx: 0, my: 0, vx: 0, vy: 0, t: 0 } };
+            draw();
+          }
+
+          function step() {
+            const lr = +cLR.input.value;
+            {
+              const [x, y] = traj.sgd.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              traj.sgd.push([x - lr * gx, y - lr * gy]);
+            }
+            {
+              const [x, y] = traj.mom.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              st.mom.vx = 0.9 * st.mom.vx + gx;
+              st.mom.vy = 0.9 * st.mom.vy + gy;
+              traj.mom.push([x - lr * st.mom.vx, y - lr * st.mom.vy]);
+            }
+            {
+              const [x, y] = traj.adam.slice(-1)[0];
+              const [gx, gy] = grad(x, y);
+              const b1 = 0.9, b2 = 0.999, eps = 1e-8;
+              st.adam.t++;
+              st.adam.mx = b1 * st.adam.mx + (1 - b1) * gx;
+              st.adam.my = b1 * st.adam.my + (1 - b1) * gy;
+              st.adam.vx = b2 * st.adam.vx + (1 - b2) * gx * gx;
+              st.adam.vy = b2 * st.adam.vy + (1 - b2) * gy * gy;
+              const mxh = st.adam.mx / (1 - Math.pow(b1, st.adam.t));
+              const myh = st.adam.my / (1 - Math.pow(b1, st.adam.t));
+              const vxh = st.adam.vx / (1 - Math.pow(b2, st.adam.t));
+              const vyh = st.adam.vy / (1 - Math.pow(b2, st.adam.t));
+              const lrA = lr * 5;
+              traj.adam.push([x - lrA * mxh / (Math.sqrt(vxh) + eps), y - lrA * myh / (Math.sqrt(vyh) + eps)]);
+            }
+          }
+
+          function run(n) {
+            for (let i = 0; i < n; i++) {
+              step();
+              const tr = traj.sgd.slice(-1)[0];
+              if (Math.abs(tr[1]) > 5 || Math.abs(tr[0]) > 7) break;
+            }
+            draw();
+          }
+
+          function resize() { const r = canvas.getBoundingClientRect(); canvas.width = r.width; canvas.height = r.height; draw(); }
+
+          function draw() {
+            if (!canvas.width) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const xMin = -4, xMax = 4, yMin = -4, yMax = 4;
+            const toCanvas = (x, y) => [((x - xMin) / (xMax - xMin)) * W, ((yMax - y) / (yMax - yMin)) * H];
+            // фон — цвет по знаку L
+            const step = 8;
+            for (let px = 0; px < W; px += step) {
+              for (let py = 0; py < H; py += step) {
+                const x = xMin + (px / W) * (xMax - xMin);
+                const y = yMax - (py / H) * (yMax - yMin);
+                const L = x * x - y * y;
+                const v = Math.tanh(L / 5);
+                const r = Math.round(200 + 55 * Math.max(0, -v));
+                const g = Math.round(220 - 50 * Math.abs(v));
+                const b = Math.round(200 + 55 * Math.max(0, v));
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(px, py, step, step);
+              }
+            }
+            // седло — точка
+            const [ox, oy] = toCanvas(0, 0);
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(ox, oy, 5, 0, 2 * Math.PI); ctx.fill();
+
+            ['sgd', 'mom', 'adam'].forEach(k => {
+              ctx.strokeStyle = colors[k]; ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              traj[k].forEach(([x, y], i) => {
+                const [cx, cy] = toCanvas(x, y);
+                if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+              });
+              ctx.stroke();
+              const last = traj[k].slice(-1)[0];
+              const [cx, cy] = toCanvas(last[0], last[1]);
+              ctx.fillStyle = colors[k];
+              ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 2 * Math.PI); ctx.fill();
+            });
+
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            let ly = 10;
+            ['sgd', 'mom', 'adam'].forEach(k => {
+              ctx.fillStyle = colors[k];
+              ctx.fillRect(10, ly + 2, 16, 3);
+              ctx.fillText(labels[k], 32, ly);
+              ly += 18;
+            });
+
+            container.querySelector('#gds-stats').innerHTML = `
+              <div class="stat-card"><div class="stat-label">Шаг</div><div class="stat-value">${traj.sgd.length - 1}</div></div>
+              <div class="stat-card"><div class="stat-label">SGD |y|</div><div class="stat-value">${App.Util.round(Math.abs(traj.sgd.slice(-1)[0][1]), 3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Momentum |y|</div><div class="stat-value">${App.Util.round(Math.abs(traj.mom.slice(-1)[0][1]), 3)}</div></div>
+              <div class="stat-card"><div class="stat-label">Adam |y|</div><div class="stat-value">${App.Util.round(Math.abs(traj.adam.slice(-1)[0][1]), 3)}</div></div>
+            `;
+          }
+
+          [cLR, cNoise].forEach(c => c.input.addEventListener('input', reset));
+          container.querySelector('#gds-run').onclick = () => run(80);
+          container.querySelector('#gds-reset').onclick = reset;
+
+          setTimeout(() => { resize(); reset(); }, 50);
+          window.addEventListener('resize', resize);
+        },
+      },
+    ],
 
     python: `
       <h3>Градиентный спуск на Python</h3>

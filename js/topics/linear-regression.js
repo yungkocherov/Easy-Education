@@ -455,8 +455,8 @@ App.registerTopic({
 
     simulation: {
       html: `
-        <h3>Симуляция: подбор прямой</h3>
-        <p>Управляй углом, сдвигом, шумом и количеством точек. Наблюдай, как меняется MSE и R².</p>
+        <h3>Симуляция: подбор прямой и эффект выбросов</h3>
+        <p>Крути параметры, пробуй подогнать прямую вручную или нажми «Подогнать оптимально». Добавь выбросов и посмотри, как один-два экстремума уводят зелёную OLS-линию от пунктирной «чистой».</p>
         <div class="sim-container">
           <div class="sim-controls" id="lr-controls"></div>
           <div class="sim-buttons">
@@ -475,38 +475,56 @@ App.registerTopic({
         const cTrueB = App.makeControl('range', 'lr-true-b', 'Истинный сдвиг', { min: -5, max: 5, step: 0.5, value: 2 });
         const cNoise = App.makeControl('range', 'lr-noise', 'Шум σ', { min: 0, max: 5, step: 0.1, value: 1.5 });
         const cN = App.makeControl('range', 'lr-n', 'Число точек', { min: 10, max: 200, step: 5, value: 50 });
+        const cOutN = App.makeControl('range', 'lr-out-n', 'Выбросов', { min: 0, max: 10, step: 1, value: 0 });
+        const cOutY = App.makeControl('range', 'lr-out-y', 'Сила выброса по Y', { min: 5, max: 50, step: 1, value: 25 });
         const cGuessW = App.makeControl('range', 'lr-guess-w', 'Наш наклон $\\hat{w}$', { min: -3, max: 3, step: 0.05, value: 1 });
         const cGuessB = App.makeControl('range', 'lr-guess-b', 'Наш сдвиг $\\hat{b}$', { min: -5, max: 5, step: 0.1, value: 0 });
-        [cTrueW, cTrueB, cNoise, cN, cGuessW, cGuessB].forEach((c) => controls.appendChild(c.wrap));
+        [cTrueW, cTrueB, cNoise, cN, cOutN, cOutY, cGuessW, cGuessB].forEach((c) => controls.appendChild(c.wrap));
 
         let chart = null;
-        let dataX = [], dataY = [];
+        let dataX = [], dataY = [], isOutlier = [];
 
         function regenerate() {
           const w = +cTrueW.input.value;
           const b = +cTrueB.input.value;
           const sigma = +cNoise.input.value;
           const n = +cN.input.value;
-          dataX = []; dataY = [];
+          const nOut = +cOutN.input.value;
+          const outStrength = +cOutY.input.value;
+          dataX = []; dataY = []; isOutlier = [];
           for (let i = 0; i < n; i++) {
             const x = Math.random() * 10 - 5;
             const y = w * x + b + App.Util.randn(0, sigma);
             dataX.push(x);
             dataY.push(y);
+            isOutlier.push(false);
+          }
+          // Выбросы: фиксированные X (в основном справа), большой Y против тренда
+          for (let i = 0; i < nOut; i++) {
+            const x = 3 + Math.random() * 2; // справа, где влияют сильно
+            const sign = w >= 0 ? -1 : 1;     // против тренда
+            const y = w * x + b + sign * outStrength;
+            dataX.push(x);
+            dataY.push(y);
+            isOutlier.push(true);
           }
           update();
         }
 
-        function fitOptimal() {
-          // Аналитическое решение
-          const mx = App.Util.mean(dataX), my = App.Util.mean(dataY);
+        function fitOLS(xs, ys) {
+          const mx = App.Util.mean(xs), my = App.Util.mean(ys);
           let num = 0, den = 0;
-          for (let i = 0; i < dataX.length; i++) {
-            num += (dataX[i] - mx) * (dataY[i] - my);
-            den += (dataX[i] - mx) ** 2;
+          for (let i = 0; i < xs.length; i++) {
+            num += (xs[i] - mx) * (ys[i] - my);
+            den += (xs[i] - mx) ** 2;
           }
-          const w = num / den;
+          const w = num / (den || 1);
           const b = my - w * mx;
+          return { w, b };
+        }
+
+        function fitOptimal() {
+          const { w, b } = fitOLS(dataX, dataY);
           cGuessW.input.value = w.toFixed(2);
           cGuessB.input.value = b.toFixed(2);
           cGuessW.wrap.querySelector('.value-display').textContent = w.toFixed(2);
@@ -517,8 +535,10 @@ App.registerTopic({
         function update() {
           const gw = +cGuessW.input.value;
           const gb = +cGuessB.input.value;
+          const trueW = +cTrueW.input.value;
+          const trueB = +cTrueB.input.value;
 
-          // предсказания + ошибки
+          // предсказания + ошибки по ВСЕМ данным
           const preds = dataX.map((x) => gw * x + gb);
           let mse = 0, ssRes = 0, ssTot = 0;
           const my = App.Util.mean(dataY);
@@ -531,8 +551,22 @@ App.registerTopic({
           mse /= dataX.length;
           const r2 = 1 - ssRes / ssTot;
 
+          // OLS по всем точкам (включая выбросы) и OLS только по "чистым"
+          const olsAll = fitOLS(dataX, dataY);
+          const cleanX = dataX.filter((_, i) => !isOutlier[i]);
+          const cleanY = dataY.filter((_, i) => !isOutlier[i]);
+          const olsClean = cleanX.length > 1 ? fitOLS(cleanX, cleanY) : olsAll;
+
           const lineXs = [-5, 5];
-          const lineYs = lineXs.map((x) => gw * x + gb);
+          const guessLine = lineXs.map((x) => ({ x, y: gw * x + gb }));
+          const trueLine = lineXs.map((x) => ({ x, y: trueW * x + trueB }));
+          const olsAllLine = lineXs.map((x) => ({ x, y: olsAll.w * x + olsAll.b }));
+          const olsCleanLine = lineXs.map((x) => ({ x, y: olsClean.w * x + olsClean.b }));
+
+          const cleanData = [], outData = [];
+          for (let i = 0; i < dataX.length; i++) {
+            (isOutlier[i] ? outData : cleanData).push({ x: dataX[i], y: dataY[i] });
+          }
 
           const ctx = container.querySelector('#lr-chart').getContext('2d');
           if (chart) chart.destroy();
@@ -542,16 +576,53 @@ App.registerTopic({
               datasets: [
                 {
                   label: 'Данные',
-                  data: dataX.map((x, i) => ({ x, y: dataY[i] })),
+                  data: cleanData,
                   backgroundColor: 'rgba(59, 130, 246, 0.55)',
                   pointRadius: 4,
                 },
                 {
+                  label: 'Выбросы',
+                  data: outData,
+                  backgroundColor: 'rgba(234, 88, 12, 0.85)',
+                  borderColor: '#9a3412',
+                  borderWidth: 1.5,
+                  pointRadius: 6,
+                },
+                {
                   type: 'line',
                   label: 'Наша прямая',
-                  data: lineXs.map((x, i) => ({ x, y: lineYs[i] })),
+                  data: guessLine,
                   borderColor: '#dc2626',
                   borderWidth: 2.5,
+                  pointRadius: 0,
+                  fill: false,
+                },
+                {
+                  type: 'line',
+                  label: 'OLS по всем',
+                  data: olsAllLine,
+                  borderColor: '#16a34a',
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  fill: false,
+                },
+                {
+                  type: 'line',
+                  label: 'OLS без выбросов',
+                  data: olsCleanLine,
+                  borderColor: 'rgba(16, 185, 129, 0.75)',
+                  borderWidth: 1.75,
+                  borderDash: [6, 4],
+                  pointRadius: 0,
+                  fill: false,
+                },
+                {
+                  type: 'line',
+                  label: 'Истинная зависимость',
+                  data: trueLine,
+                  borderColor: 'rgba(100, 116, 139, 0.8)',
+                  borderWidth: 1.5,
+                  borderDash: [3, 3],
                   pointRadius: 0,
                   fill: false,
                 },
@@ -572,10 +643,11 @@ App.registerTopic({
           statsEl.innerHTML = '';
           const cards = [
             ['MSE', App.Util.round(mse, 3)],
-            ['RMSE', App.Util.round(Math.sqrt(mse), 3)],
-            ['R²', App.Util.round(r2, 3)],
-            ['Истинный w', cTrueW.input.value],
-            ['Наш ŵ', gw.toFixed(2)],
+            ['R² (наша)', App.Util.round(r2, 3)],
+            ['OLS ŵ (все)', olsAll.w.toFixed(2)],
+            ['OLS ŵ (чистые)', olsClean.w.toFixed(2)],
+            ['Δŵ от выбросов', (olsAll.w - olsClean.w).toFixed(2)],
+            ['Истинный w', trueW.toFixed(2)],
           ];
           cards.forEach(([label, val]) => {
             const card = document.createElement('div');
@@ -585,7 +657,7 @@ App.registerTopic({
           });
         }
 
-        [cTrueW, cTrueB, cNoise, cN].forEach((c) => c.input.addEventListener('input', regenerate));
+        [cTrueW, cTrueB, cNoise, cN, cOutN, cOutY].forEach((c) => c.input.addEventListener('input', regenerate));
         [cGuessW, cGuessB].forEach((c) => c.input.addEventListener('input', update));
         container.querySelector('#lr-regen').onclick = regenerate;
         container.querySelector('#lr-fit').onclick = fitOptimal;

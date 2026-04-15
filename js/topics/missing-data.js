@@ -347,113 +347,278 @@ App.registerTopic({
       }
     ],
 
-    simulation: `
-      <div class="sim-container">
-        <div class="sim-controls">
-          <h3>Симуляция: влияние метода вменения на распределение</h3>
-          <div class="control-group">
-            <label>Доля пропусков: <span id="missing-pct-label">20%</span></label>
-            <input type="range" id="missing-pct" min="5" max="60" value="20" step="5"
-              oninput="document.getElementById('missing-pct-label').textContent=this.value+'%'">
-          </div>
-          <div class="control-group">
-            <label>Метод вменения:</label>
-            <select id="missing-method">
-              <option value="mean">Mean (среднее)</option>
-              <option value="median" selected>Median (медиана)</option>
-              <option value="zero">Constant (0)</option>
-              <option value="knn">KNN (имитация)</option>
-            </select>
-          </div>
-          <div class="control-group">
-            <label>Добавить выброс:</label>
-            <input type="checkbox" id="missing-outlier">
-            <span>(значение × 5 в 5% строк)</span>
-          </div>
-          <button class="btn-primary" onclick="runMissingSimulation()">Показать эффект</button>
-        </div>
-        <div id="missing-sim-output" class="sim-output">
-          <p style="color:#64748b;">Нажмите кнопку чтобы запустить симуляцию.</p>
-        </div>
-      </div>
-      <script>
-      function runMissingSimulation() {
-        const pct = parseInt(document.getElementById('missing-pct').value) / 100;
-        const method = document.getElementById('missing-method').value;
-        const hasOutlier = document.getElementById('missing-outlier').checked;
-        const out = document.getElementById('missing-sim-output');
-
-        // Generate 20 values from normal(50, 10)
-        const seed = [42,37,55,61,48,52,39,58,44,53,47,56,41,60,38,51,49,57,43,54];
-        let data = seed.slice();
-        if (hasOutlier) { data[3] = 250; data[11] = 220; }
-
-        // Introduce missing
-        const missingIdx = [];
-        for (let i = 0; i < data.length; i++) {
-          if (Math.random() < pct || (i === 5 || i === 12 || i === 17)) missingIdx.push(i);
-        }
-        const nMissing = Math.min(Math.round(data.length * pct), data.length - 3);
-        const fixedMissing = [2, 7, 13, 16, 4, 9, 1, 18, 6, 14].slice(0, nMissing);
-
-        const known = data.filter((_, i) => !fixedMissing.includes(i));
-        const mean = known.reduce((a,b)=>a+b,0)/known.length;
-        const sorted = [...known].sort((a,b)=>a-b);
-        const median = known.length % 2 === 0
-          ? (sorted[known.length/2-1]+sorted[known.length/2])/2
-          : sorted[Math.floor(known.length/2)];
-        const variance = known.map(v=>(v-mean)**2).reduce((a,b)=>a+b,0)/known.length;
-        const std = Math.sqrt(variance);
-
-        let fillValue;
-        const methodNames = {mean:'Среднее', median:'Медиана', zero:'Константа 0', knn:'KNN (имитация)'};
-        if (method === 'mean') fillValue = mean;
-        else if (method === 'median') fillValue = median;
-        else if (method === 'zero') fillValue = 0;
-        else fillValue = median + (Math.random()-0.5)*std*0.5; // KNN approx
-
-        const filled = data.map((v,i) => fixedMissing.includes(i) ? fillValue : v);
-        const filledMean = filled.reduce((a,b)=>a+b,0)/filled.length;
-        const filledVar = filled.map(v=>(v-filledMean)**2).reduce((a,b)=>a+b,0)/filled.length;
-        const filledStd = Math.sqrt(filledVar);
-
-        out.innerHTML = \`
-          <h4>Результат: \${methodNames[method]}, пропусков: \${(pct*100).toFixed(0)}%\${hasOutlier ? ', с выбросами' : ''}</h4>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
-            <div style="padding:10px;background:#f0fdf4;border-radius:6px;border:1px solid #bbf7d0;">
-              <b>До вменения (по известным):</b><br>
-              N известных: \${known.length} из \${data.length}<br>
-              Среднее: \${mean.toFixed(1)}<br>
-              Медиана: \${median.toFixed(1)}<br>
-              Std: \${std.toFixed(1)}
+    simulation: [
+      {
+        title: 'Imputers в 2D',
+        html: `
+          <h3>Mean / Median / KNN / Iterative на одних данных</h3>
+          <p>Есть два коррелированных признака $X_1, X_2$. Часть значений $X_2$ — пропуски. Разные импьютеры дают разные вменённые точки: mean/median ложатся на горизонтальную линию (игнорируют $X_1$), KNN и Iterative используют связь с $X_1$ и восстанавливают данные близко к истинной прямой.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="miImp-controls"></div>
+            <div class="sim-buttons">
+              <button class="btn" id="miImp-regen">🔄 Новые данные</button>
             </div>
-            <div style="padding:10px;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe;">
-              <b>После вменения (\${methodNames[method]}):</b><br>
-              N: \${filled.length} (все строки сохранены)<br>
-              Среднее: \${filledMean.toFixed(1)}<br>
-              Вменено значение: \${fillValue.toFixed(1)}<br>
-              Std: \${filledStd.toFixed(2)} <span style="color:\${filledStd < std*0.85?'#ef4444':'#059669'}">\${filledStd < std*0.85 ? '▼ занижена' : '≈ норма'}</span>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="miImp-chart"></canvas></div>
+              <div class="sim-stats" id="miImp-stats"></div>
             </div>
           </div>
-          <table class="data-table">
-            <thead><tr><th>№</th><th>Исходное</th><th>Статус</th><th>После вменения</th></tr></thead>
-            <tbody>
-              \${data.map((v,i) => {
-                const isMissing = fixedMissing.includes(i);
-                return \`<tr style="\${isMissing?'background:#fef3c7;':''}">
-                  <td>\${i+1}</td>
-                  <td>\${isMissing ? '<span style="color:#ef4444;font-weight:600;">NaN</span>' : v}</td>
-                  <td>\${isMissing ? '⚠ пропуск' : '✓'}</td>
-                  <td style="\${isMissing?'color:#2563eb;font-weight:600;':''}">\${filled[i].toFixed(1)}</td>
-                </tr>\`;
-              }).join('')}
-            </tbody>
-          </table>
-          \${pct > 0.4 ? '<p style="color:#ef4444;font-weight:600;margin-top:8px;">⚠ Более 40% пропусков — любой метод вменения будет давать существенное искажение распределения.</p>' : ''}
-        \`;
-      }
-      </script>
-    `,
+        `,
+        init(container) {
+          const controls = container.querySelector('#miImp-controls');
+          const cMethod = App.makeControl('select', 'miImp-method', 'Метод', {
+            options: [
+              { value: 'mean', label: 'Mean imputation' },
+              { value: 'median', label: 'Median imputation' },
+              { value: 'knn', label: 'KNN (k=5, по X1)' },
+              { value: 'iter', label: 'Iterative (линейная регрессия)' },
+              { value: 'all', label: 'Все методы сразу' },
+            ],
+            value: 'all',
+          });
+          const cN = App.makeControl('range', 'miImp-n', 'Число точек', { min: 30, max: 300, step: 10, value: 120 });
+          const cRho = App.makeControl('range', 'miImp-rho', 'Истинная ρ(X1, X2)', { min: -0.95, max: 0.95, step: 0.05, value: 0.8 });
+          const cPct = App.makeControl('range', 'miImp-pct', 'Доля пропусков X2', { min: 0.05, max: 0.5, step: 0.05, value: 0.25 });
+          [cMethod, cN, cRho, cPct].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+          let seed = null;
+
+          function regen() {
+            const n = +cN.input.value;
+            const rho = +cRho.input.value;
+            const pct = +cPct.input.value;
+            const x1 = [], x2 = [];
+            for (let i = 0; i < n; i++) {
+              const z1 = App.Util.randn();
+              const z2 = App.Util.randn();
+              x1.push(z1 * 2);
+              x2.push((rho * z1 + Math.sqrt(1 - rho * rho) * z2) * 2);
+            }
+            const missing = new Array(n).fill(false);
+            // Добавим пропуски случайно (MCAR)
+            for (let i = 0; i < n; i++) if (Math.random() < pct) missing[i] = true;
+            seed = { x1, x2, missing };
+          }
+
+          function linreg(xs, ys) {
+            const mx = App.Util.mean(xs), my = App.Util.mean(ys);
+            let num = 0, den = 0;
+            for (let i = 0; i < xs.length; i++) {
+              num += (xs[i] - mx) * (ys[i] - my);
+              den += (xs[i] - mx) ** 2;
+            }
+            const slope = num / (den || 1e-12);
+            return { slope, intercept: my - slope * mx };
+          }
+
+          function impute(method) {
+            const { x1, x2, missing } = seed;
+            const known = x2.filter((_, i) => !missing[i]);
+            const knownX1 = x1.filter((_, i) => !missing[i]);
+            const imputed = x2.slice();
+            if (method === 'mean') {
+              const m = App.Util.mean(known);
+              for (let i = 0; i < x2.length; i++) if (missing[i]) imputed[i] = m;
+            } else if (method === 'median') {
+              const md = App.Util.median(known);
+              for (let i = 0; i < x2.length; i++) if (missing[i]) imputed[i] = md;
+            } else if (method === 'knn') {
+              const k = 5;
+              for (let i = 0; i < x2.length; i++) {
+                if (!missing[i]) continue;
+                const dists = knownX1.map((v, j) => [Math.abs(v - x1[i]), known[j]]);
+                dists.sort((a, b) => a[0] - b[0]);
+                let s = 0;
+                for (let j = 0; j < Math.min(k, dists.length); j++) s += dists[j][1];
+                imputed[i] = s / Math.min(k, dists.length);
+              }
+            } else if (method === 'iter') {
+              const lr = linreg(knownX1, known);
+              for (let i = 0; i < x2.length; i++) if (missing[i]) imputed[i] = lr.intercept + lr.slope * x1[i];
+            }
+            return imputed;
+          }
+
+          function run() {
+            if (!seed) regen();
+            const { x1, x2, missing } = seed;
+            const method = cMethod.input.value;
+
+            const observed = x1.map((x, i) => missing[i] ? null : { x, y: x2[i] }).filter(Boolean);
+            const truth = x1.map((x, i) => missing[i] ? { x, y: x2[i] } : null).filter(Boolean);
+
+            const datasets = [
+              { label: 'Наблюдаемые', data: observed, backgroundColor: 'rgba(59,130,246,0.55)', pointRadius: 4 },
+              { label: 'Истинные (скрытые)', data: truth, backgroundColor: 'rgba(148,163,184,0.35)', pointRadius: 5, pointStyle: 'triangle' },
+            ];
+
+            const methodsToShow = method === 'all' ? ['mean', 'median', 'knn', 'iter'] : [method];
+            const colors = { mean: 'rgba(239,68,68,0.9)', median: 'rgba(245,158,11,0.9)', knn: 'rgba(16,185,129,0.9)', iter: 'rgba(139,92,246,0.9)' };
+            const labels = { mean: 'Mean', median: 'Median', knn: 'KNN', iter: 'Iterative' };
+            const errors = {};
+            for (const m of methodsToShow) {
+              const imp = impute(m);
+              const pts = x1.map((x, i) => missing[i] ? { x, y: imp[i] } : null).filter(Boolean);
+              datasets.push({
+                label: labels[m] + ' импьют',
+                data: pts,
+                backgroundColor: colors[m],
+                pointRadius: 5,
+                pointStyle: 'crossRot',
+                borderColor: colors[m],
+                borderWidth: 2,
+              });
+              // MSE на пропущенных
+              let sse = 0, cnt = 0;
+              for (let i = 0; i < x1.length; i++) if (missing[i]) { sse += (imp[i] - x2[i]) ** 2; cnt++; }
+              errors[m] = cnt ? Math.sqrt(sse / cnt) : 0;
+            }
+
+            const ctx = container.querySelector('#miImp-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'scatter',
+              data: { datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Каждый крестик — вменённое значение на месте пропуска' } },
+                scales: {
+                  x: { title: { display: true, text: 'X1 (наблюдается всегда)' } },
+                  y: { title: { display: true, text: 'X2 (часть — пропуски)' } },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#miImp-stats');
+            statsEl.innerHTML = '';
+            const nMiss = missing.filter(Boolean).length;
+            const cards = [['Пропусков', nMiss + ' из ' + x1.length]];
+            for (const m of methodsToShow) cards.push(['RMSE ' + labels[m], errors[m].toFixed(3)]);
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cMethod, cN, cRho, cPct].forEach(c => c.input.addEventListener('input', () => { if (c === cN || c === cRho || c === cPct) regen(); run(); }));
+          cMethod.input.addEventListener('change', run);
+          container.querySelector('#miImp-regen').onclick = () => { regen(); run(); };
+          regen();
+          run();
+        },
+      },
+      {
+        title: 'MCAR vs MAR vs MNAR',
+        html: `
+          <h3>MCAR, MAR, MNAR: когда среднее смещается</h3>
+          <p>Сгенерируем данные и применим три механизма пропусков. Для каждого посчитаем <b>среднее по наблюдаемым</b> и сравним с истинным средним. MCAR — несмещённое. MAR — можно поправить моделью. <b>MNAR</b> — среднее систематически смещено, никакое mean/median-вменение это не спасёт.</p>
+          <div class="sim-container">
+            <div class="sim-controls" id="miMech-controls"></div>
+            <div class="sim-output">
+              <div class="sim-chart-wrap"><canvas id="miMech-chart"></canvas></div>
+              <div class="sim-stats" id="miMech-stats"></div>
+            </div>
+          </div>
+        `,
+        init(container) {
+          const controls = container.querySelector('#miMech-controls');
+          const cN = App.makeControl('range', 'miMech-n', 'Размер выборки', { min: 200, max: 3000, step: 100, value: 1000 });
+          const cStrength = App.makeControl('range', 'miMech-str', 'Сила механизма', { min: 0.1, max: 1, step: 0.05, value: 0.6 });
+          [cN, cStrength].forEach(c => controls.appendChild(c.wrap));
+
+          let chart = null;
+
+          function run() {
+            const n = +cN.input.value;
+            const str = +cStrength.input.value;
+
+            // Истинные данные: зарплата ~ LogNormal, возраст независимый
+            const salary = [];
+            const age = [];
+            for (let i = 0; i < n; i++) {
+              salary.push(Math.exp(App.Util.randn(4, 0.5)) * 10); // medianish ~ 545
+              age.push(25 + Math.random() * 40);
+            }
+            const trueMean = App.Util.mean(salary);
+
+            // MCAR: случайно, независимо от всего
+            const mcar = salary.map(v => Math.random() < str * 0.4 ? null : v);
+            // MAR: вероятность пропуска зависит от возраста (полностью наблюдаемого)
+            const mar = salary.map((v, i) => {
+              const p = str * (age[i] - 25) / 40;
+              return Math.random() < p ? null : v;
+            });
+            // MNAR: вероятность пропуска зависит от самой зарплаты — богатые не отвечают
+            const mnar = salary.map(v => {
+              const p = str * (v / (trueMean * 3));
+              return Math.random() < p ? null : v;
+            });
+
+            function observedMean(arr) {
+              const f = arr.filter(v => v !== null);
+              return f.length ? App.Util.mean(f) : 0;
+            }
+            function biasPct(arr) {
+              const m = observedMean(arr);
+              return ((m - trueMean) / trueMean) * 100;
+            }
+
+            // гистограммы
+            const lo = 0, hi = App.Util.quantile(salary, 0.99);
+            const hTrue = App.Util.histogram(salary, 40, [lo, hi]);
+            const hMCAR = App.Util.histogram(mcar.filter(v => v !== null), 40, [lo, hi]);
+            const hMAR = App.Util.histogram(mar.filter(v => v !== null), 40, [lo, hi]);
+            const hMNAR = App.Util.histogram(mnar.filter(v => v !== null), 40, [lo, hi]);
+
+            const ctx = container.querySelector('#miMech-chart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: hTrue.centers.map(c => App.Util.round(c, 0)),
+                datasets: [
+                  { label: 'Истинное', data: hTrue.counts, borderColor: 'rgba(15,23,42,0.7)', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'MCAR (наблюд.)', data: hMCAR.counts, borderColor: 'rgba(16,185,129,0.9)', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'MAR (наблюд.)', data: hMAR.counts, borderColor: 'rgba(245,158,11,0.9)', borderWidth: 2, pointRadius: 0, fill: false },
+                  { label: 'MNAR (наблюд.)', data: hMNAR.counts, borderColor: 'rgba(239,68,68,0.9)', borderWidth: 2.5, pointRadius: 0, fill: false },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Распределения наблюдаемых зарплат при разных механизмах пропусков' } },
+                scales: {
+                  x: { title: { display: true, text: 'Зарплата' }, ticks: { maxTicksLimit: 10 } },
+                  y: { title: { display: true, text: 'Частота' }, beginAtZero: true },
+                },
+              },
+            });
+            App.registerChart(chart);
+
+            const statsEl = container.querySelector('#miMech-stats');
+            statsEl.innerHTML = '';
+            const cards = [
+              ['Истинное ср.', trueMean.toFixed(1)],
+              ['MCAR bias', biasPct(mcar).toFixed(1) + '%'],
+              ['MAR bias', biasPct(mar).toFixed(1) + '%'],
+              ['MNAR bias', biasPct(mnar).toFixed(1) + '% ⚠'],
+            ];
+            cards.forEach(([l, v]) => {
+              const d = document.createElement('div');
+              d.className = 'stat-card';
+              d.innerHTML = `<div class="stat-label">${l}</div><div class="stat-value">${v}</div>`;
+              statsEl.appendChild(d);
+            });
+          }
+
+          [cN, cStrength].forEach(c => c.input.addEventListener('input', run));
+          run();
+        },
+      },
+    ],
 
     python: `
       <h3>🐍 Обработка пропусков в Python</h3>
