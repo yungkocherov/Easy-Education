@@ -64,7 +64,7 @@ App.registerTopic({
       <p>Добавить «обход» слоя: $y = F(x) + x$. Градиент может «протекать» напрямую через identity-часть, минуя нелинейность. Это позволило обучать ResNet-152 и глубже. См. <a onclick="App.selectTopic('glossary-residual')">Residual connections</a>.</p>
 
       <h4>5. Gradient Clipping (против exploding)</h4>
-      <p>Ограничить норму градиента: если $\\|g\\| > \\tau$, то $g \\leftarrow g \\cdot \\tau / \\|g\\|$. Простой и эффективный приём, особенно для RNN. PyTorch: `torch.nn.utils.clip_grad_norm_`.</p>
+      <p>Ограничить норму градиента: если $\\|g\\| > \\tau$, то $g \\leftarrow g \\cdot \\tau / \\|g\\|$. Простой и эффективный приём, особенно для RNN. PyTorch: <code>torch.nn.utils.clip_grad_norm_</code>.</p>
 
       <h4>6. LSTM/GRU (для RNN)</h4>
       <p>Механизм ворот позволяет информации «проходить» через много шагов без затухания градиента. Специально разработан для решения vanishing gradient в рекуррентных сетях.</p>

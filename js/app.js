@@ -79,8 +79,7 @@ const App = (function () {
     examples: 'Примеры',
     simulation: 'Симуляция',
     python: '🐍 Python',
-    applications: 'Применение',
-    proscons: 'Плюсы / Минусы',
+    applications: '🎯 Применение',
     extra: 'Дополнительно',
     links: '📎 Ссылки',
   };

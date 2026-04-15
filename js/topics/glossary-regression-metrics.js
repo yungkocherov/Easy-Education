@@ -102,13 +102,13 @@ App.registerTopic({
       </ul>
     `,
 
-    links: \`
+    links: `
       <h3>📖 Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Mean_squared_error" target="_blank">Wikipedia: MSE</a></li>
         <li><a href="https://en.wikipedia.org/wiki/Coefficient_of_determination" target="_blank">Wikipedia: R²</a></li>
         <li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics" target="_blank">sklearn: Regression metrics</a></li>
       </ul>
-    \`
+    `
   }
 });

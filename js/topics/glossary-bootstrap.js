@@ -66,7 +66,7 @@ bootstrap — лучший способ.</div>
         <li>Предскажи $x_i$ только этими деревьями (усредняй их голоса).</li>
         <li>Сравни с истинной меткой $y_i$.</li>
       </ol>
-      <p>OOB score — почти эквивалент cross-validation, но <b>бесплатный</b>: не нужно делать отдельную разбивку. В sklearn `RandomForestClassifier(oob_score=True)`.</p>
+      <p>OOB score — почти эквивалент cross-validation, но <b>бесплатный</b>: не нужно делать отдельную разбивку. В sklearn <code>RandomForestClassifier(oob_score=True)</code>.</p>
 
       <h3>📈 Типы bootstrap CI</h3>
       <ul>

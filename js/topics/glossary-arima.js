@@ -42,7 +42,7 @@ App.registerTopic({
         <li><b>Определи d</b>: проверь стационарность (ADF тест). Если не стационарен — дифференцируй и повтори. Обычно $d \\in \\{0, 1, 2\\}$.</li>
         <li><b>Определи p</b>: смотри на <b>PACF</b> (Partial Autocorrelation Function). Если PACF «обрывается» после лага $k$ — $p = k$.</li>
         <li><b>Определи q</b>: смотри на <b>ACF</b> (Autocorrelation Function). Если ACF «обрывается» после лага $k$ — $q = k$.</li>
-        <li><b>Альтернатива</b>: автоматически — `auto_arima` (пакет `pmdarima`) или AIC/BIC grid search.</li>
+        <li><b>Альтернатива</b>: автоматически — <code>auto_arima</code> (пакет <code>pmdarima</code>) или AIC/BIC grid search.</li>
       </ol>
 
       <h3>📊 Распознавание по ACF/PACF</h3>

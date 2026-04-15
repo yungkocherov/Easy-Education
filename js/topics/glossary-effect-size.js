@@ -4,7 +4,7 @@
 App.registerTopic({
   id: 'glossary-effect-size',
   category: 'glossary',
-  title: 'Размер эффекта (Cohen\\'s d)',
+  title: "Размер эффекта (Cohen's d)",
   summary: 'Стандартизованная мера «насколько большая разница». p-value говорит, есть ли эффект; effect size — насколько он велик. Независим от размера выборки.',
 
   tabs: {

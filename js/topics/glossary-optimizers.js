@@ -37,7 +37,7 @@ App.registerTopic({
       <h3>🎯 Nesterov Momentum</h3>
       <p>Улучшенная версия momentum: сначала «делает шаг», потом смотрит градиент в новой точке:</p>
       <div class="math-block">$$v_{t+1} = \\beta v_t + \\nabla L(w_t - \\eta \\beta v_t)$$</div>
-      <p>Это «предсказание следующего шага» немного уменьшает колебания. В PyTorch `SGD(momentum=0.9, nesterov=True)`.</p>
+      <p>Это «предсказание следующего шага» немного уменьшает колебания. В PyTorch <code>SGD(momentum=0.9, nesterov=True)</code>.</p>
 
       <h3>📊 AdaGrad (2011)</h3>
       <p>Идея: каждому параметру — свой learning rate, зависящий от истории градиентов:</p>
