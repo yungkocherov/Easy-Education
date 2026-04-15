@@ -581,7 +581,7 @@ plt.show()
 
       <h3>🔄 Альтернативы</h3>
       <ul>
-        <li><b><a class="glossary-link" onclick="App.selectTopic('viz-kde')">KDE (Kernel Density Estimation)</a></b> — если нужна гладкая оценка плотности без артефактов бинов. Одна кривая вместо столбиков, легко накладывать несколько распределений.</li>
+        <li><b>KDE (Kernel Density Estimation)</b> — если нужна гладкая оценка плотности без артефактов бинов. Одна кривая вместо столбиков, легко накладывать несколько распределений.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('viz-box-plot')">Box plot</a></b> — когда надо параллельно сравнить 3+ группы. Компактно, читаемо, автоматически выделяет выбросы.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('viz-violin-plot')">Violin plot</a></b> — комбинация box plot и KDE: показывает и квартили, и форму. Идеально для сравнения групп, где важна мультимодальность.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('viz-qq-plot')">Q-Q plot</a></b> — если задача именно проверить соответствие эталонному распределению (обычно нормальному). Гораздо точнее гистограммы на малых $n$.</li>

@@ -101,14 +101,20 @@ simulation: {
 ## Проверка перед коммитом
 
 ```bash
-# Синтаксис всех топиков
-for f in js/topics/*.js; do node --check "$f" 2>&1 | grep -q SyntaxError && echo "BROKEN: $f"; done
-
-# Проверка, что файл подключён в index.html
-grep 'topics/my-topic.js' index.html
+node validate.js
 ```
 
-Нет тестов, нет линтера — визуально проверять в браузере (`python -m http.server 8000` или `start.bat`).
+Валидатор (`validate.js`, чистый Node без зависимостей) проверяет:
+- Синтаксис каждого `js/topics/*.js` через `node --check`.
+- Регистрацию топика через `App.registerTopic(...)`: обязательные поля (`id`, `title`, `category`, `tabs`), валидность категории, уникальность id.
+- Подключение каждого файла в `index.html` через `<script src>`.
+- Мёртвые внутренние ссылки: каждый `App.selectTopic('xxx')` должен указывать на существующий топик.
+- Утечки Chart.js: если `new Chart(` встречается чаще, чем `App.registerChart(`, — предупреждение.
+- Неизвестные ключи во `tabs` (не из `theory|examples|simulation|python|applications|extra|links`).
+
+Выход 0 — всё ок, выход 1 — есть ошибки. Предупреждения не ломают билд, но стоит чинить.
+
+Визуальная проверка симуляций — только в браузере (`python -m http.server 8000` или `start.bat`). Headless-тесты не делаем.
 
 ## Стиль коммитов
 

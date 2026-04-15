@@ -733,7 +733,7 @@ plt.show()</code></pre>
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('random-forest')">Random Forest</a> или <a class="glossary-link" onclick="App.selectTopic('gradient-boosting')">Gradient Boosting</a></b> — если зависимость нелинейна, есть взаимодействия признаков и интерпретация не обязательна. На табличных данных XGBoost/LightGBM почти всегда побеждают логрег по AUC на 3–10%.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('svm')">SVM</a> с RBF-ядром</b> — если граница классов сложная, но данных мало (до 10к). Даёт лучшие границы на small datasets, но теряет калибровку вероятностей и масштабируемость.</li>
-        <li><b><a class="glossary-link" onclick="App.selectTopic('naive-bayes')">Naive Bayes</a></b> — для задач классификации текстов с очень ограниченными данными. Быстрее логрега, работает даже на 100 примерах, хотя предположение о независимости признаков наивно.</li>
+        <li><b>Naive Bayes</b> — для задач классификации текстов с очень ограниченными данными. Быстрее логрега, работает даже на 100 примерах, хотя предположение о независимости признаков наивно.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('neural-network')">Нейросеть</a> (MLP)</b> — если данных много ($n &gt; 10^5$), признаки сложные и допустим blackbox. На табличных данных это обычно избыточно, но для эмбеддингов пользователей/товаров — лучший выбор.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('decision-tree')">Дерево решений</a></b> — если нужна абсолютно прозрачная модель «если → то» для бизнеса, которую можно перенести в if/else. Теряешь калиброванные вероятности, но выигрываешь в наглядности.</li>
       </ul>

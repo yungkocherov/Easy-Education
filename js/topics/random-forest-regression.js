@@ -2,7 +2,7 @@
    Random Forest для регрессии
    ========================================================================== */
 App.registerTopic({
-  id: 'random-forest-reg',
+  id: 'random-forest-regression',
   category: 'ml-reg',
   title: 'Random Forest для регрессии',
   summary: 'Ансамбль деревьев: каждое предсказывает число, берём среднее.',

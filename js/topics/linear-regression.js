@@ -814,8 +814,8 @@ plt.show()</code></pre>
 
       <h3>🔄 Альтернативы — что взять вместо и почему</h3>
       <ul>
-        <li><b><a class="glossary-link" onclick="App.selectTopic('ridge-regression')">Ridge-регрессия</a></b> — если есть мультиколлинеарность или $p$ сопоставимо с $n$. Сохраняет линейную интерпретацию, но стабилизирует оценки. Первая вещь, которую пробуют, когда обычная OLS «шатается».</li>
-        <li><b><a class="glossary-link" onclick="App.selectTopic('lasso-regression')">Lasso-регрессия</a></b> — если нужно автоматически выбрать важные признаки из сотен. Зануляет коэффициенты нерелевантных переменных и даёт разреженную модель, которую проще объяснить.</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('regularization')">Ridge-регрессия</a></b> — если есть мультиколлинеарность или $p$ сопоставимо с $n$. Сохраняет линейную интерпретацию, но стабилизирует оценки. Первая вещь, которую пробуют, когда обычная OLS «шатается».</li>
+        <li><b><a class="glossary-link" onclick="App.selectTopic('regularization')">Lasso-регрессия</a></b> — если нужно автоматически выбрать важные признаки из сотен. Зануляет коэффициенты нерелевантных переменных и даёт разреженную модель, которую проще объяснить.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('decision-tree')">Дерево решений</a> или <a class="glossary-link" onclick="App.selectTopic('random-forest-regression')">Random Forest Regression</a></b> — если зависимость нелинейна, есть взаимодействия и категориальные признаки. Теряешь формальные p-values, но выигрываешь в точности без ручного feature engineering.</li>
         <li><b><a class="glossary-link" onclick="App.selectTopic('gradient-boosting')">Gradient Boosting</a> (XGBoost/LightGBM/CatBoost)</b> — если цель одна: минимизировать RMSE на табличных данных. Дефолтный выбор на Kaggle и в продакшене, когда интерпретация не критична.</li>
         <li><b>Huber / Quantile regression</b> — если в данных есть выбросы или нужна оценка не среднего, а медианы / квантиля (например, VaR в финансах). Сохраняет линейность модели, но меняет функцию потерь.</li>

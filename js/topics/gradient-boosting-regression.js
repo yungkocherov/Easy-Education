@@ -2,7 +2,7 @@
    <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">Gradient</a> Boosting для регрессии
    ========================================================================== */
 App.registerTopic({
-  id: 'gradient-boosting-reg',
+  id: 'gradient-boosting-regression',
   category: 'ml-reg',
   title: 'Gradient Boosting для регрессии',
   summary: 'Последовательные деревья исправляют остатки — самое естественное применение бустинга.',

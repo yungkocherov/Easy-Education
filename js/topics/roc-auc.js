@@ -780,7 +780,7 @@ print(f'Average Precision: {ap:.4f}')</code></pre>
 
       <h3>🔄 Альтернативы — что взять вместо и почему</h3>
       <ul>
-        <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-pr-auc')">Precision-Recall AUC (Average Precision)</a></b> — обязательна при сильном дисбалансе. Показывает реальный precision на разных уровнях recall и не обманывает, как ROC.</li>
+        <li><b>Precision-Recall AUC (Average Precision)</b> — обязательна при сильном дисбалансе. Показывает реальный precision на разных уровнях recall и не обманывает, как ROC.</li>
         <li><b>Partial AUC (pAUC)</b> — если интересует только узкая область FPR (например, FPR &lt; 5%). Интегрируется только по ней, точнее отражает реальный use case.</li>
         <li><b>Brier score и log loss</b> — когда важны честные вероятности, а не ранжирование. Штрафуют плохо калиброванные модели.</li>
         <li><b>Cost-sensitive metric</b> — если FP и FN имеют явную цену, метрика должна её учитывать. Expected value / expected cost — наиболее бизнес-ориентированный вариант.</li>
