@@ -67,7 +67,7 @@ const App = (function () {
     const category = categories.find((c) => c.id === topic.category);
     document.getElementById('breadcrumb').textContent = category ? category.name : '';
     document.getElementById('topic-title').textContent = topic.title;
-    document.getElementById('topic-summary').textContent = topic.summary || '';
+    document.getElementById('topic-summary').innerHTML = topic.summary || '';
 
     renderTabs(topic);
     renderNav(document.getElementById('search').value);
@@ -78,10 +78,10 @@ const App = (function () {
     theory: 'Теория',
     examples: 'Примеры',
     simulation: 'Симуляция',
-    python: '🐍 Python',
-    applications: '🎯 Применение',
+    python: 'Python',
+    applications: 'Применение',
     extra: 'Дополнительно',
-    links: '📎 Ссылки',
+    links: 'Ссылки',
   };
 
   function renderTabs(topic) {

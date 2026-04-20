@@ -5,7 +5,7 @@ App.registerTopic({
   id: 'nlp-basics',
   category: 'dl',
   title: 'NLP: от текста к числам',
-  summary: `Bag-of-Words, TF-IDF, Word2Vec, <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">embeddings</a> — как превратить текст в признаки.`,
+  summary: `Bag-of-Words, <a class="glossary-link" onclick="App.selectTopic('glossary-tfidf')">TF-IDF</a>, Word2Vec, <a class="glossary-link" onclick="App.selectTopic('glossary-embedding')">embeddings</a> — как превратить текст в признаки.`,
 
   tabs: {
     theory: `
