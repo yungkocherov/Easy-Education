@@ -12,6 +12,7 @@ const { execSync } = require('child_process');
 
 const ROOT = __dirname;
 const TOPICS_DIR = path.join(ROOT, 'js', 'topics');
+const QUIZ_DIR = path.join(ROOT, 'js', 'quiz');
 const INDEX_HTML = path.join(ROOT, 'index.html');
 
 const VALID_CATEGORIES = new Set([
@@ -130,7 +131,98 @@ for (const file of topicFiles) {
   }
 }
 
-/* ---------- 4. Chart.js leak check ---------- */
+/* ---------- 4. Quiz files check ---------- */
+
+const quizFiles = fs.existsSync(QUIZ_DIR)
+  ? fs.readdirSync(QUIZ_DIR).filter(f => f.endsWith('.js')).sort()
+  : [];
+const quizzes = new Map(); // topicId → { file, count }
+
+for (const file of quizFiles) {
+  const filePath = path.join(QUIZ_DIR, file);
+  const qFile = `quiz/${file}`;
+  const src = fs.readFileSync(filePath, 'utf8');
+
+  // syntax
+  try {
+    execSync(`node --check "${filePath}"`, { stdio: 'pipe' });
+  } catch (e) {
+    const msg = (e.stderr || Buffer.from('')).toString().split('\n').slice(1, 3).join(' ').trim();
+    err(qFile, `syntax error — ${msg.slice(0, 180)}`);
+    continue;
+  }
+
+  // sandbox with fake App.registerQuiz
+  const captured = [];
+  const noop = () => {};
+  const fakeApp = {
+    registerQuiz(topicId, data) { captured.push({ topicId, data }); },
+    registerTopic: noop,
+    selectTopic: noop,
+    registerChart: noop,
+    destroyCharts: noop,
+    Util: new Proxy({}, { get: () => () => [] }),
+    QuizUtil: new Proxy({}, { get: () => () => '' }),
+    makeControl: () => ({ wrap: {}, input: {} }),
+    listTopics: () => [],
+    listCategories: () => [],
+  };
+  const sandbox = {
+    App: fakeApp,
+    Chart: function () { return {}; },
+    document: new Proxy({}, { get: () => () => ({ appendChild: noop, querySelector: noop }) }),
+    window: {},
+    console: { log: noop, warn: noop, error: noop },
+  };
+  try {
+    vm.runInNewContext(src, sandbox, { filename: qFile, timeout: 2000 });
+  } catch (e) {
+    warn(qFile, `couldn't execute in sandbox: ${e.message.slice(0, 140)}`);
+    continue;
+  }
+
+  if (captured.length === 0) {
+    warn(qFile, 'no App.registerQuiz() call');
+    continue;
+  }
+
+  for (const { topicId, data } of captured) {
+    if (!topicId) { err(qFile, 'registerQuiz: empty topicId'); continue; }
+    if (!topics.has(topicId)) {
+      err(qFile, `registerQuiz("${topicId}") — no such topic`);
+    }
+    if (!data || !Array.isArray(data.questions)) {
+      err(qFile, 'registerQuiz: missing "questions" array');
+      continue;
+    }
+    if (data.questions.length === 0) {
+      warn(qFile, 'registerQuiz: empty questions array');
+    }
+    data.questions.forEach((q, i) => {
+      const tag = `q${i + 1}`;
+      if (!q.prompt) err(qFile, `${tag}: missing "prompt"`);
+      if (!Array.isArray(q.options) || q.options.length < 2) {
+        err(qFile, `${tag}: need at least 2 options`);
+        return;
+      }
+      const correct = q.options.filter((o) => o.correct).length;
+      if (correct === 0) err(qFile, `${tag}: no option marked correct:true`);
+      q.options.forEach((o, j) => {
+        if (typeof o.text !== 'string' || !o.text.trim()) {
+          err(qFile, `${tag}: option ${j + 1} missing "text"`);
+        }
+      });
+    });
+    quizzes.set(topicId, { file: qFile, count: data.questions.length });
+  }
+
+  // проверяем подключение в index.html
+  if (!indexHtml.includes(`js/quiz/${file}`)) {
+    err(qFile, `not linked in index.html — add <script src="js/quiz/${file}"></script>`);
+  }
+}
+
+/* ---------- 5. Chart.js leak check ---------- */
 
 for (const file of topicFiles) {
   const src = fs.readFileSync(path.join(TOPICS_DIR, file), 'utf8');
@@ -141,14 +233,17 @@ for (const file of topicFiles) {
   }
 }
 
-/* ---------- 5. Отчёт ---------- */
+/* ---------- 6. Отчёт ---------- */
 
 const pad = (s, n) => (s + ' '.repeat(n)).slice(0, n);
 
 console.log('');
 console.log('=== Easy Education validator ===');
-console.log(`  files checked:   ${topicFiles.length}`);
+console.log(`  topic files:     ${topicFiles.length}`);
 console.log(`  topics found:    ${topics.size}`);
+console.log(`  quiz files:      ${quizFiles.length}`);
+console.log(`  quizzes found:   ${quizzes.size}`);
+console.log(`  quiz questions:  ${[...quizzes.values()].reduce((s, q) => s + q.count, 0)}`);
 console.log(`  warnings:        ${warnings.length}`);
 console.log(`  errors:          ${errors.length}`);
 console.log('');

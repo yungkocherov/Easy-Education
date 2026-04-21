@@ -746,5 +746,7 @@ const App = (function () {
     destroyCharts,
     Util,
     makeControl,
+    listTopics: () => topics.slice(),
+    listCategories: () => categories.slice(),
   };
 })();
