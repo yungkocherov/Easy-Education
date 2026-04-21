@@ -30,7 +30,7 @@ body {
   padding: 20px 20px 12px;
   border-bottom: 1px solid #1e293b;
 }
-.brand h1 {
+.brand h1, .brand .brand-title {
   font-size: 20px;
   font-weight: 700;
   color: #f1f5f9;
@@ -275,7 +275,7 @@ body {
 .tab-content {
   padding: 28px 40px 60px;
   max-width: 1100px;
-  margin: 0 auto 0 20%;
+  margin: 0 auto;
   overflow-x: hidden;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -582,7 +582,121 @@ canvas.sim-canvas {
 .lesson-box { background: #fdf4ff; border-left: 4px solid #a855f7; padding: 12px 16px; border-radius: 4px; margin: 16px 0; color: #581c87; font-size: 14px; }
 .lesson-box::before { content: "💡 Что мы узнали: "; font-weight: 700; color: #6b21a8; }
 
+/* ========== Burger + scrim (mobile) ========== */
+.burger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 60;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.burger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #0f172a;
+  border-radius: 2px;
+}
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 40;
+}
+body.drawer-open .scrim { display: block; }
+
+/* ========== Prev / Next ========== */
+.topic-prevnext {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+.prevnext-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
+  color: #1e293b;
+  transition: background 0.15s, border-color 0.15s;
+}
+.prevnext-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.prevnext-btn.next { text-align: right; }
+.prevnext-label { font-size: 12px; color: #64748b; font-weight: 600; }
+.prevnext-title { font-size: 15px; font-weight: 600; color: #0f172a; }
+
+/* ========== Resume banner ========== */
+.resume-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #1e3a8a;
+}
+.resume-banner b { color: #0f172a; }
+.resume-btn {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+.resume-btn:hover { background: #2563eb; }
+.resume-close {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.resume-close:hover { color: #0f172a; }
+
 @media (max-width: 900px) {
   #app { grid-template-columns: 1fr; }
-  #sidebar { display: none; }
+  .burger { display: flex; }
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.2);
+  }
+  #sidebar.open { transform: translateX(0); }
+  #content { padding-top: 60px; }
+  .tab-content { padding: 20px 16px 60px; }
+  .topic-prevnext { grid-template-columns: 1fr; }
 }

@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Easy Education — DS / ML / DL</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <!-- KaTeX для математики -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
@@ -15,10 +13,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+  <button id="burger" class="burger" aria-label="Меню" aria-controls="sidebar">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="scrim" class="scrim"></div>
   <div id="app">
     <aside id="sidebar">
-      <div class="brand" id="brand" style="cursor:pointer;">
-        <h1>Easy Education</h1>
+      <div class="brand" id="brand" style="cursor:pointer;" role="link" tabindex="0" aria-label="На главную">
+        <div class="brand-title">Easy Education</div>
         <p class="subtitle">DS · ML · DL — наглядно</p>
       </div>
       <div class="search-wrap">
@@ -35,7 +37,7 @@
         <div class="welcome-features">
           <div class="welcome-feature">
             <div class="welcome-icon">📚</div>
-            <div><b>79 тем</b> — от статистики до трансформеров</div>
+            <div><b><span id="topic-count">100+</span> тем</b> — от статистики до трансформеров</div>
           </div>
           <div class="welcome-feature">
             <div class="welcome-icon">🎮</div>
@@ -193,131 +195,131 @@
   </div>
 
   <!-- Core -->
-  <script src="js/app.js"></script>
+  <script defer src="js/app.js"></script>
 
   <!-- Topics: Статистика -->
-  <script src="js/topics/descriptive-stats.js"></script>
-  <script src="js/topics/probability-basics.js"></script>
-  <script src="js/topics/distributions.js"></script>
-  <script src="js/topics/clt.js"></script>
-  <script src="js/topics/hypothesis-testing.js"></script>
-  <script src="js/topics/correlation.js"></script>
-  <script src="js/topics/time-series.js"></script>
+  <script defer src="js/topics/descriptive-stats.js"></script>
+  <script defer src="js/topics/probability-basics.js"></script>
+  <script defer src="js/topics/distributions.js"></script>
+  <script defer src="js/topics/clt.js"></script>
+  <script defer src="js/topics/hypothesis-testing.js"></script>
+  <script defer src="js/topics/correlation.js"></script>
+  <script defer src="js/topics/time-series.js"></script>
 
   <!-- Topics: Эксперименты и аналитика -->
-  <script src="js/topics/ab-testing-intro.js"></script>
-  <script src="js/topics/ab-z-test.js"></script>
-  <script src="js/topics/ab-t-test.js"></script>
-  <script src="js/topics/ab-chi-square.js"></script>
-  <script src="js/topics/ab-mann-whitney.js"></script>
-  <script src="js/topics/ab-bayesian.js"></script>
-  <script src="js/topics/ab-multiple-testing.js"></script>
-  <script src="js/topics/causal-inference.js"></script>
-  <script src="js/topics/product-analytics.js"></script>
+  <script defer src="js/topics/ab-testing-intro.js"></script>
+  <script defer src="js/topics/ab-z-test.js"></script>
+  <script defer src="js/topics/ab-t-test.js"></script>
+  <script defer src="js/topics/ab-chi-square.js"></script>
+  <script defer src="js/topics/ab-mann-whitney.js"></script>
+  <script defer src="js/topics/ab-bayesian.js"></script>
+  <script defer src="js/topics/ab-multiple-testing.js"></script>
+  <script defer src="js/topics/causal-inference.js"></script>
+  <script defer src="js/topics/product-analytics.js"></script>
 
   <!-- Topics: Основы ML -->
-  <script src="js/topics/intro-ml.js"></script>
-  <script src="js/topics/feature-engineering.js"></script>
-  <script src="js/topics/missing-data.js"></script>
-  <script src="js/topics/metrics.js"></script>
-  <script src="js/topics/roc-auc.js"></script>
-  <script src="js/topics/shap-explainability.js"></script>
-  <script src="js/topics/cross-validation.js"></script>
-  <script src="js/topics/stacking.js"></script>
-  <script src="js/topics/bias-variance.js"></script>
-  <script src="js/topics/regularization.js"></script>
-  <script src="js/topics/smote.js"></script>
-  <script src="js/topics/hyperparameter-tuning.js"></script>
-  <script src="js/topics/recsys.js"></script>
+  <script defer src="js/topics/intro-ml.js"></script>
+  <script defer src="js/topics/feature-engineering.js"></script>
+  <script defer src="js/topics/missing-data.js"></script>
+  <script defer src="js/topics/metrics.js"></script>
+  <script defer src="js/topics/roc-auc.js"></script>
+  <script defer src="js/topics/shap-explainability.js"></script>
+  <script defer src="js/topics/cross-validation.js"></script>
+  <script defer src="js/topics/stacking.js"></script>
+  <script defer src="js/topics/bias-variance.js"></script>
+  <script defer src="js/topics/regularization.js"></script>
+  <script defer src="js/topics/smote.js"></script>
+  <script defer src="js/topics/hyperparameter-tuning.js"></script>
+  <script defer src="js/topics/recsys.js"></script>
 
   <!-- Topics: Регрессия -->
-  <script src="js/topics/linear-regression.js"></script>
-  <script src="js/topics/knn-regression.js"></script>
-  <script src="js/topics/decision-tree-regression.js"></script>
-  <script src="js/topics/random-forest-regression.js"></script>
-  <script src="js/topics/gradient-boosting-regression.js"></script>
-  <script src="js/topics/svr.js"></script>
+  <script defer src="js/topics/linear-regression.js"></script>
+  <script defer src="js/topics/knn-regression.js"></script>
+  <script defer src="js/topics/decision-tree-regression.js"></script>
+  <script defer src="js/topics/random-forest-regression.js"></script>
+  <script defer src="js/topics/gradient-boosting-regression.js"></script>
+  <script defer src="js/topics/svr.js"></script>
 
   <!-- Topics: Классификация -->
-  <script src="js/topics/logistic-regression.js"></script>
-  <script src="js/topics/knn.js"></script>
-  <script src="js/topics/decision-tree.js"></script>
-  <script src="js/topics/random-forest.js"></script>
-  <script src="js/topics/gradient-boosting.js"></script>
-  <script src="js/topics/svm.js"></script>
-  <script src="js/topics/bayesian.js"></script>
-  <script src="js/topics/boosting-comparison.js"></script>
+  <script defer src="js/topics/logistic-regression.js"></script>
+  <script defer src="js/topics/knn.js"></script>
+  <script defer src="js/topics/decision-tree.js"></script>
+  <script defer src="js/topics/random-forest.js"></script>
+  <script defer src="js/topics/gradient-boosting.js"></script>
+  <script defer src="js/topics/svm.js"></script>
+  <script defer src="js/topics/bayesian.js"></script>
+  <script defer src="js/topics/boosting-comparison.js"></script>
 
   <!-- Topics: Кластеризация и снижение размерности -->
-  <script src="js/topics/kmeans.js"></script>
-  <script src="js/topics/dbscan.js"></script>
-  <script src="js/topics/pca.js"></script>
-  <script src="js/topics/tsne-umap.js"></script>
-  <script src="js/topics/isolation-forest.js"></script>
+  <script defer src="js/topics/kmeans.js"></script>
+  <script defer src="js/topics/dbscan.js"></script>
+  <script defer src="js/topics/pca.js"></script>
+  <script defer src="js/topics/tsne-umap.js"></script>
+  <script defer src="js/topics/isolation-forest.js"></script>
 
   <!-- Topics: Нейронные сети -->
-  <script src="js/topics/gradient-descent.js"></script>
-  <script src="js/topics/perceptron.js"></script>
-  <script src="js/topics/neural-network.js"></script>
-  <script src="js/topics/cnn.js"></script>
-  <script src="js/topics/nlp-basics.js"></script>
-  <script src="js/topics/rnn-lstm.js"></script>
-  <script src="js/topics/transformer.js"></script>
-  <script src="js/topics/transfer-learning.js"></script>
-  <script src="js/topics/generative-models.js"></script>
+  <script defer src="js/topics/gradient-descent.js"></script>
+  <script defer src="js/topics/perceptron.js"></script>
+  <script defer src="js/topics/neural-network.js"></script>
+  <script defer src="js/topics/cnn.js"></script>
+  <script defer src="js/topics/nlp-basics.js"></script>
+  <script defer src="js/topics/rnn-lstm.js"></script>
+  <script defer src="js/topics/transformer.js"></script>
+  <script defer src="js/topics/transfer-learning.js"></script>
+  <script defer src="js/topics/generative-models.js"></script>
 
   <!-- Topics: Глоссарий -->
-  <script src="js/topics/viz-histogram.js"></script>
-  <script src="js/topics/viz-box-plot.js"></script>
-  <script src="js/topics/viz-violin-plot.js"></script>
-  <script src="js/topics/viz-qq-plot.js"></script>
-  <script src="js/topics/viz-scatter-plot.js"></script>
-  <script src="js/topics/glossary-confidence-interval.js"></script>
-  <script src="js/topics/glossary-t-distribution.js"></script>
-  <script src="js/topics/glossary-funnel.js"></script>
-  <script src="js/topics/glossary-cohort-analysis.js"></script>
-  <script src="js/topics/glossary-dag.js"></script>
-  <script src="js/topics/glossary-overfitting.js"></script>
-  <script src="js/topics/glossary-loss-functions.js"></script>
-  <script src="js/topics/glossary-sigmoid-softmax.js"></script>
-  <script src="js/topics/glossary-activations.js"></script>
-  <script src="js/topics/glossary-embedding.js"></script>
-  <script src="js/topics/glossary-confusion-matrix.js"></script>
-  <script src="js/topics/glossary-entropy.js"></script>
-  <script src="js/topics/glossary-kernel-trick.js"></script>
-  <script src="js/topics/glossary-attention.js"></script>
-  <script src="js/topics/glossary-gradient.js"></script>
-  <script src="js/topics/glossary-one-hot.js"></script>
-  <script src="js/topics/glossary-regression-metrics.js"></script>
-  <script src="js/topics/glossary-standard-error.js"></script>
-  <script src="js/topics/glossary-degrees-of-freedom.js"></script>
-  <script src="js/topics/glossary-anova.js"></script>
-  <script src="js/topics/glossary-nonparametric-tests.js"></script>
-  <script src="js/topics/glossary-covariance.js"></script>
-  <script src="js/topics/glossary-z-test.js"></script>
-  <script src="js/topics/glossary-mle-map.js"></script>
-  <script src="js/topics/glossary-eigen.js"></script>
-  <script src="js/topics/glossary-svd.js"></script>
-  <script src="js/topics/glossary-bootstrap.js"></script>
-  <script src="js/topics/glossary-kl-divergence.js"></script>
-  <script src="js/topics/glossary-curse-dimensionality.js"></script>
-  <script src="js/topics/glossary-cosine-similarity.js"></script>
-  <script src="js/topics/glossary-tfidf.js"></script>
-  <script src="js/topics/glossary-tokenization.js"></script>
-  <script src="js/topics/glossary-vanishing-gradient.js"></script>
-  <script src="js/topics/glossary-batchnorm.js"></script>
-  <script src="js/topics/glossary-residual.js"></script>
-  <script src="js/topics/glossary-optimizers.js"></script>
-  <script src="js/topics/glossary-early-stopping.js"></script>
-  <script src="js/topics/glossary-dropout.js"></script>
-  <script src="js/topics/glossary-stationarity.js"></script>
-  <script src="js/topics/glossary-arima.js"></script>
-  <script src="js/topics/glossary-data-leakage.js"></script>
-  <script src="js/topics/glossary-effect-size.js"></script>
-  <script src="js/topics/glossary-multiple-testing.js"></script>
-  <script src="js/topics/glossary-ab-metrics.js"></script>
-  <script src="js/topics/glossary-calibration.js"></script>
-  <script src="js/topics/glossary-matrix-factorization.js"></script>
+  <script defer src="js/topics/viz-histogram.js"></script>
+  <script defer src="js/topics/viz-box-plot.js"></script>
+  <script defer src="js/topics/viz-violin-plot.js"></script>
+  <script defer src="js/topics/viz-qq-plot.js"></script>
+  <script defer src="js/topics/viz-scatter-plot.js"></script>
+  <script defer src="js/topics/glossary-confidence-interval.js"></script>
+  <script defer src="js/topics/glossary-t-distribution.js"></script>
+  <script defer src="js/topics/glossary-funnel.js"></script>
+  <script defer src="js/topics/glossary-cohort-analysis.js"></script>
+  <script defer src="js/topics/glossary-dag.js"></script>
+  <script defer src="js/topics/glossary-overfitting.js"></script>
+  <script defer src="js/topics/glossary-loss-functions.js"></script>
+  <script defer src="js/topics/glossary-sigmoid-softmax.js"></script>
+  <script defer src="js/topics/glossary-activations.js"></script>
+  <script defer src="js/topics/glossary-embedding.js"></script>
+  <script defer src="js/topics/glossary-confusion-matrix.js"></script>
+  <script defer src="js/topics/glossary-entropy.js"></script>
+  <script defer src="js/topics/glossary-kernel-trick.js"></script>
+  <script defer src="js/topics/glossary-attention.js"></script>
+  <script defer src="js/topics/glossary-gradient.js"></script>
+  <script defer src="js/topics/glossary-one-hot.js"></script>
+  <script defer src="js/topics/glossary-regression-metrics.js"></script>
+  <script defer src="js/topics/glossary-standard-error.js"></script>
+  <script defer src="js/topics/glossary-degrees-of-freedom.js"></script>
+  <script defer src="js/topics/glossary-anova.js"></script>
+  <script defer src="js/topics/glossary-nonparametric-tests.js"></script>
+  <script defer src="js/topics/glossary-covariance.js"></script>
+  <script defer src="js/topics/glossary-z-test.js"></script>
+  <script defer src="js/topics/glossary-mle-map.js"></script>
+  <script defer src="js/topics/glossary-eigen.js"></script>
+  <script defer src="js/topics/glossary-svd.js"></script>
+  <script defer src="js/topics/glossary-bootstrap.js"></script>
+  <script defer src="js/topics/glossary-kl-divergence.js"></script>
+  <script defer src="js/topics/glossary-curse-dimensionality.js"></script>
+  <script defer src="js/topics/glossary-cosine-similarity.js"></script>
+  <script defer src="js/topics/glossary-tfidf.js"></script>
+  <script defer src="js/topics/glossary-tokenization.js"></script>
+  <script defer src="js/topics/glossary-vanishing-gradient.js"></script>
+  <script defer src="js/topics/glossary-batchnorm.js"></script>
+  <script defer src="js/topics/glossary-residual.js"></script>
+  <script defer src="js/topics/glossary-optimizers.js"></script>
+  <script defer src="js/topics/glossary-early-stopping.js"></script>
+  <script defer src="js/topics/glossary-dropout.js"></script>
+  <script defer src="js/topics/glossary-stationarity.js"></script>
+  <script defer src="js/topics/glossary-arima.js"></script>
+  <script defer src="js/topics/glossary-data-leakage.js"></script>
+  <script defer src="js/topics/glossary-effect-size.js"></script>
+  <script defer src="js/topics/glossary-multiple-testing.js"></script>
+  <script defer src="js/topics/glossary-ab-metrics.js"></script>
+  <script defer src="js/topics/glossary-calibration.js"></script>
+  <script defer src="js/topics/glossary-matrix-factorization.js"></script>
 
   <!-- Init -->
   <script>window.addEventListener('DOMContentLoaded', () => App.init());</script>

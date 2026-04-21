@@ -46,20 +46,25 @@ const App = (function () {
         const item = document.createElement('a');
         item.className = 'nav-item' + (t.id === currentTopicId ? ' active' : '');
         item.textContent = t.title;
-        item.onclick = () => selectTopic(t.id);
+        item.href = '#/topic/' + t.id;
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectTopic(t.id);
+          closeDrawer();
+        });
         nav.appendChild(item);
       });
     });
   }
 
   /* ---------- Выбор темы ---------- */
-  function selectTopic(id) {
+  function selectTopic(id, opts = {}) {
+    const topic = topics.find((t) => t.id === id);
+    if (!topic) return;
     destroyCharts();
     currentTopicId = id;
     currentTabKey = 'theory';
     currentSubTabIdx = 0;
-    const topic = topics.find((t) => t.id === id);
-    if (!topic) return;
 
     document.getElementById('welcome').classList.add('hidden');
     document.getElementById('topic-view').classList.remove('hidden');
@@ -71,6 +76,15 @@ const App = (function () {
 
     renderTabs(topic);
     renderNav(document.getElementById('search').value);
+
+    try { localStorage.setItem('ee:lastTopic', id); } catch (e) {}
+    if (!opts.fromHistory) {
+      const newHash = '#/topic/' + id;
+      if (location.hash !== newHash) {
+        history.pushState({ topicId: id }, '', newHash);
+      }
+    }
+    document.getElementById('content').scrollTop = 0;
   }
 
   /* ---------- Вкладки ---------- */
@@ -172,6 +186,8 @@ const App = (function () {
       if (typeof tabData.init === 'function') tabData.init(pane);
     }
 
+    renderPrevNext(topic, el);
+
     // KaTeX рендеринг
     if (window.renderMathInElement) {
       window.renderMathInElement(pane, {
@@ -184,6 +200,54 @@ const App = (function () {
         throwOnError: false,
       });
     }
+  }
+
+  /* ---------- Prev/Next навигация ---------- */
+  function renderPrevNext(topic, container) {
+    const sameCat = topics.filter((t) => t.category === topic.category);
+    const idx = sameCat.findIndex((t) => t.id === topic.id);
+    const prev = idx > 0 ? sameCat[idx - 1] : null;
+    const next = idx >= 0 && idx < sameCat.length - 1 ? sameCat[idx + 1] : null;
+    if (!prev && !next) return;
+
+    const nav = document.createElement('div');
+    nav.className = 'topic-prevnext';
+
+    if (prev) {
+      const a = document.createElement('a');
+      a.className = 'prevnext-btn prev';
+      a.href = '#/topic/' + prev.id;
+      a.innerHTML = '<span class="prevnext-label">← Предыдущая</span><span class="prevnext-title">' + escapeHtml(prev.title) + '</span>';
+      a.addEventListener('click', (e) => { e.preventDefault(); selectTopic(prev.id); });
+      nav.appendChild(a);
+    } else {
+      nav.appendChild(document.createElement('span'));
+    }
+
+    if (next) {
+      const a = document.createElement('a');
+      a.className = 'prevnext-btn next';
+      a.href = '#/topic/' + next.id;
+      a.innerHTML = '<span class="prevnext-label">Следующая →</span><span class="prevnext-title">' + escapeHtml(next.title) + '</span>';
+      a.addEventListener('click', (e) => { e.preventDefault(); selectTopic(next.id); });
+      nav.appendChild(a);
+    }
+
+    container.appendChild(nav);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  /* ---------- Мобильный drawer ---------- */
+  function toggleDrawer() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.body.classList.toggle('drawer-open');
+  }
+  function closeDrawer() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.body.classList.remove('drawer-open');
   }
 
   /* ---------- Управление графиками ---------- */
@@ -583,20 +647,95 @@ const App = (function () {
   }
 
   /* ---------- Init ---------- */
-  function goHome() {
+  function goHome(opts = {}) {
+    destroyCharts();
     currentTopicId = null;
     document.getElementById('welcome').classList.remove('hidden');
     document.getElementById('topic-view').classList.add('hidden');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     document.getElementById('content').scrollTop = 0;
+    closeDrawer();
+    if (!opts.fromHistory && location.hash && location.hash !== '#/') {
+      history.pushState({}, '', '#/');
+    }
+  }
+
+  function parseHash() {
+    const h = location.hash || '';
+    const m = h.match(/^#\/topic\/([a-z0-9-]+)/i);
+    return m ? m[1] : null;
+  }
+
+  function routeFromHash(fromHistory) {
+    const id = parseHash();
+    if (id && topics.find((t) => t.id === id)) {
+      selectTopic(id, { fromHistory: true });
+    } else {
+      goHome({ fromHistory: true });
+    }
   }
 
   function init() {
     renderNav();
+    const countEl = document.getElementById('topic-count');
+    if (countEl) countEl.textContent = topics.length;
+
+    let searchTimer = null;
     document.getElementById('search').addEventListener('input', (e) => {
-      renderNav(e.target.value);
+      const val = e.target.value;
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => renderNav(val), 120);
     });
-    document.getElementById('brand').addEventListener('click', goHome);
+
+    const brand = document.getElementById('brand');
+    brand.addEventListener('click', () => goHome());
+    brand.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+    });
+
+    const burger = document.getElementById('burger');
+    if (burger) burger.addEventListener('click', toggleDrawer);
+    const scrim = document.getElementById('scrim');
+    if (scrim) scrim.addEventListener('click', closeDrawer);
+
+    window.addEventListener('popstate', () => routeFromHash(true));
+
+    if (parseHash()) {
+      routeFromHash(true);
+    } else {
+      renderResumeBanner();
+    }
+  }
+
+  function renderResumeBanner() {
+    let lastId = null;
+    try { lastId = localStorage.getItem('ee:lastTopic'); } catch (e) {}
+    if (!lastId) return;
+    const topic = topics.find((t) => t.id === lastId);
+    if (!topic) return;
+    const welcome = document.getElementById('welcome');
+    if (!welcome || document.getElementById('resume-banner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'resume-banner';
+    banner.className = 'resume-banner';
+    banner.innerHTML = '<span>📖 Продолжить: <b></b></span>';
+    banner.querySelector('b').textContent = topic.title;
+    const btn = document.createElement('a');
+    btn.className = 'resume-btn';
+    btn.textContent = 'Открыть →';
+    btn.href = '#/topic/' + topic.id;
+    btn.addEventListener('click', (e) => { e.preventDefault(); selectTopic(topic.id); });
+    banner.appendChild(btn);
+    const close = document.createElement('button');
+    close.className = 'resume-close';
+    close.setAttribute('aria-label', 'Закрыть');
+    close.textContent = '×';
+    close.addEventListener('click', () => {
+      banner.remove();
+      try { localStorage.removeItem('ee:lastTopic'); } catch (e) {}
+    });
+    banner.appendChild(close);
+    welcome.insertBefore(banner, welcome.firstChild);
   }
 
   return {

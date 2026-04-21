@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/topics-57-blue?style=for-the-badge" alt="57 topics"/>
+  <img src="https://img.shields.io/badge/topics-108-blue?style=for-the-badge" alt="108 topics"/>
   <img src="https://img.shields.io/badge/language-Russian-green?style=for-the-badge" alt="Russian"/>
   <img src="https://img.shields.io/badge/no_build-vanilla_JS-orange?style=for-the-badge" alt="Vanilla JS"/>
 </p>
@@ -7,7 +7,7 @@
 # Easy Education — DS / ML / DL
 
 **Интерактивный учебник** по Data Science, Machine Learning и Deep Learning.  
-57 тем с теорией, пошаговыми примерами, интерактивными симуляциями и Python-кодом — прямо в браузере, без установки.
+108 тем с теорией, пошаговыми примерами, интерактивными симуляциями и Python-кодом — прямо в браузере, без установки.
 
 > **[Открыть учебник онлайн](https://yungkocherov.github.io/Easy-Education/)**
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 57 тем в 7 категориях
+## 108 тем в 8 категориях
 
 ### Статистика (7 тем)
 Описательная статистика · Теория вероятности · Распределения · ЦПТ · Проверка гипотез · Корреляция · Временные ряды
@@ -48,6 +48,9 @@ K-Means · DBSCAN · PCA · t-SNE / UMAP · Isolation Forest
 ### Нейронные сети (9 тем)
 Градиентный спуск · Перцептрон · MLP · CNN · Основы NLP · RNN / LSTM · Transformer · Transfer Learning · Генеративные модели
 
+### Глоссарий (51 тема)
+Визуализации (гистограмма, box plot, violin, QQ, scatter), ключевые понятия (доверительный интервал, t-распределение, overfitting, bias-variance, attention, embedding, loss-функции, активации, оптимизаторы, KL-дивергенция, SVD, bootstrap, data leakage и др.)
+
 ---
 
 ## Маршруты обучения
@@ -68,9 +71,7 @@ K-Means · DBSCAN · PCA · t-SNE / UMAP · Isolation Forest
 | **Примеры** | Пошаговые расчёты на конкретных данных |
 | **Симуляция** | Интерактивные слайдеры и графики |
 | **Python** | Готовый код (sklearn, PyTorch, statsmodels) |
-| **Применение** | Где используется на практике |
-| **Плюсы / Минусы** | Когда работает, когда нет |
-| **Математика** | Формулы и доказательства |
+| **Применение** | Где используется, сильные стороны, ограничения, когда применять — когда нет, альтернативы |
 | **Дополнительно** | Deep-dive в продвинутые аспекты |
 | **Ссылки** | Внешние ресурсы для углубления |
 
@@ -118,7 +119,7 @@ Easy-Education/
 │   └── styles.css          # Все стили
 └── js/
     ├── app.js              # Ядро: навигация, табы, утилиты, Chart.js менеджер
-    └── topics/             # 57 файлов — по одному на тему
+    └── topics/             # 108 файлов — по одному на тему
         ├── intro-ml.js
         ├── descriptive-stats.js
         ├── ...
@@ -134,7 +135,7 @@ Easy-Education/
 ```javascript
 App.registerTopic({
   id: 'my-topic',
-  category: 'ml-basics',  // stats | ab | ml-basics | ml-reg | ml-cls | ml-unsup | dl
+  category: 'ml-basics',  // stats | ab | ml-basics | ml-reg | ml-cls | ml-unsup | dl | glossary
   title: 'Название темы',
   summary: 'Краткое описание в одну строку.',
   tabs: {
@@ -144,15 +145,16 @@ App.registerTopic({
     ],
     simulation: { html: `<div>...</div>`, init(container) { /* JS */ } },
     python: `<pre><code>...</code></pre>`,
-    applications: `<h3>Применение</h3>...`,
-    proscons: `<h3>Плюсы</h3>...<h3>Минусы</h3>...`,
+    applications: `<h3>🎯 Где применяется</h3>...<h3>✅ Сильные стороны</h3>...<h3>⚠️ Ограничения</h3>...<h3>🧭 Когда применять</h3>...<h3>🔄 Альтернативы</h3>...`,
+    extra: `<h3>Дополнительно</h3>...`,
     links: `<h3>Ссылки</h3><ul>...</ul>`,
   },
 });
 ```
 
-2. Добавьте `<script src="js/topics/my-topic.js"></script>` в `index.html`.
-3. Готово — тема появится в навигации.
+2. Добавьте `<script defer src="js/topics/my-topic.js"></script>` в `index.html`.
+3. Запустите `node validate.js` — проверит синтаксис, обязательные поля, мёртвые ссылки.
+4. Готово — тема появится в навигации.
 
 ---
 
