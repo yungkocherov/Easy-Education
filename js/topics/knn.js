@@ -17,42 +17,59 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 205" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
-          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">kNN: k=3 ближайших соседа</text>
+        <svg viewBox="0 0 500 230" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">kNN: голосование 3 ближайших соседей</text>
           <!-- Background -->
-          <rect x="30" y="25" width="440" height="165" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-          <!-- Class 1 dots (blue) -->
-          <circle cx="120" cy="70" r="9" fill="#6366f1" opacity="0.85"/>
-          <circle cx="90" cy="105" r="9" fill="#6366f1" opacity="0.85"/>
-          <circle cx="155" cy="95" r="9" fill="#6366f1" opacity="0.85"/>
-          <circle cx="70" cy="145" r="9" fill="#6366f1" opacity="0.85"/>
-          <circle cx="145" cy="145" r="9" fill="#6366f1" opacity="0.85"/>
-          <!-- Class 2 dots (amber) -->
-          <circle cx="340" cy="65" r="9" fill="#f59e0b" opacity="0.85"/>
-          <circle cx="380" cy="100" r="9" fill="#f59e0b" opacity="0.85"/>
-          <circle cx="355" cy="135" r="9" fill="#f59e0b" opacity="0.85"/>
-          <circle cx="410" cy="145" r="9" fill="#f59e0b" opacity="0.85"/>
-          <circle cx="420" cy="75" r="9" fill="#f59e0b" opacity="0.85"/>
-          <!-- Query point (star) -->
-          <polygon points="250,97 257,116 277,116 261,128 268,147 250,135 232,147 239,128 223,116 243,116" fill="#10b981" stroke="#065f46" stroke-width="1.5"/>
-          <!-- k=3 dashed circle -->
-          <circle cx="250" cy="120" r="78" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="7,4"/>
-          <text x="330" y="56" font-size="9" fill="#ef4444">k=3 (радиус)</text>
-          <!-- Lines to 3 nearest (within circle) -->
-          <line x1="250" y1="120" x2="155" y2="95" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
-          <line x1="250" y1="120" x2="355" y2="135" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
-          <line x1="250" y1="120" x2="340" y2="65" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+          <rect x="30" y="25" width="440" height="170" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+          <!-- k=3 dashed circle, центр (250,105), r=58 -->
+          <circle cx="250" cy="105" r="58" fill="#fef2f2" stroke="#ef4444" stroke-width="2" stroke-dasharray="7,4"/>
+
+          <!-- Class A (blue) — далеко слева -->
+          <circle cx="75" cy="55" r="8" fill="#6366f1" opacity="0.85"/>
+          <circle cx="110" cy="90" r="8" fill="#6366f1" opacity="0.85"/>
+          <circle cx="70" cy="130" r="8" fill="#6366f1" opacity="0.85"/>
+          <circle cx="130" cy="170" r="8" fill="#6366f1" opacity="0.85"/>
+          <circle cx="155" cy="55" r="8" fill="#6366f1" opacity="0.85"/>
+          <!-- Class A inside circle -->
+          <circle cx="210" cy="80" r="8" fill="#6366f1" opacity="0.95" stroke="#1e1b4b" stroke-width="1"/>
+
+          <!-- Class B (amber) — далеко справа -->
+          <circle cx="395" cy="55" r="8" fill="#f59e0b" opacity="0.85"/>
+          <circle cx="430" cy="95" r="8" fill="#f59e0b" opacity="0.85"/>
+          <circle cx="395" cy="135" r="8" fill="#f59e0b" opacity="0.85"/>
+          <circle cx="370" cy="170" r="8" fill="#f59e0b" opacity="0.85"/>
+          <!-- Class B inside circle -->
+          <circle cx="300" cy="90" r="8" fill="#f59e0b" opacity="0.95" stroke="#78350f" stroke-width="1"/>
+          <circle cx="275" cy="150" r="8" fill="#f59e0b" opacity="0.95" stroke="#78350f" stroke-width="1"/>
+
+          <!-- Lines from query to 3 nearest -->
+          <line x1="250" y1="105" x2="210" y2="80" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8"/>
+          <line x1="250" y1="105" x2="300" y2="90" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8"/>
+          <line x1="250" y1="105" x2="275" y2="150" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8"/>
+
+          <!-- Query: зелёный круг с "?" -->
+          <circle cx="250" cy="105" r="12" fill="#10b981" stroke="#065f46" stroke-width="1.5"/>
+          <text x="250" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">?</text>
+
+          <!-- Annotation для радиуса -->
+          <text x="305" y="48" font-size="9" fill="#ef4444" font-weight="600">k=3 (радиус)</text>
+          <line x1="320" y1="51" x2="295" y2="62" stroke="#ef4444" stroke-width="1" opacity="0.6"/>
+
+          <!-- Результат голосования -->
+          <text x="250" y="190" text-anchor="middle" font-size="10" fill="#334155">1 × класс A + 2 × класс B → <tspan fill="#b45309" font-weight="700">класс B</tspan></text>
+
           <!-- Legend -->
-          <circle cx="55" cy="198" r="6" fill="#6366f1"/>
-          <text x="66" y="202" font-size="9" fill="#334155">класс A</text>
-          <circle cx="120" cy="198" r="6" fill="#f59e0b"/>
-          <text x="131" y="202" font-size="9" fill="#334155">класс B</text>
-          <polygon points="190,194 194,204 186,204" fill="#10b981"/>
-          <text x="200" y="202" font-size="9" fill="#334155">запрос</text>
-          <line x1="250" y1="198" x2="270" y2="198" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="275" y="202" font-size="9" fill="#334155">радиус k=3</text>
+          <circle cx="55" cy="218" r="6" fill="#6366f1"/>
+          <text x="66" y="222" font-size="9" fill="#334155">класс A</text>
+          <circle cx="120" cy="218" r="6" fill="#f59e0b"/>
+          <text x="131" y="222" font-size="9" fill="#334155">класс B</text>
+          <circle cx="195" cy="218" r="6" fill="#10b981"/>
+          <text x="206" y="222" font-size="9" fill="#334155">новая точка</text>
+          <line x1="285" y1="218" x2="305" y2="218" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="310" y="222" font-size="9" fill="#334155">граница 3 соседей</text>
         </svg>
-        <div class="caption">kNN с k=3: зелёная звезда — новая точка, красная окружность — радиус 3 ближайших соседей. Среди попавших 1 синяя + 2 оранжевых → предсказывается класс B (большинство).</div>
+        <div class="caption">kNN с k=3: зелёный кружок «?» — точка, которую нужно классифицировать. Красный круг — область трёх ближайших соседей. Внутри: 1 синий + 2 оранжевых → большинством голосов получаем класс B.</div>
       </div>
 
       <h3>💡 Идея алгоритма</h3>

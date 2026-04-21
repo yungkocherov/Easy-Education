@@ -22,7 +22,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 205" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
+        <svg viewBox="0 0 500 225" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
           <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">K-Means: три кластера с центроидами</text>
           <!-- Background -->
           <rect x="25" y="25" width="450" height="165" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
@@ -60,14 +60,14 @@ App.registerTopic({
           <!-- Dashed circle around cluster 3 -->
           <circle cx="415" cy="120" r="50" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
           <!-- Legend -->
-          <circle cx="50" cy="200" r="5" fill="#6366f1"/>
-          <text x="62" y="204" font-size="9" fill="#334155">кластер 1</text>
-          <circle cx="140" cy="200" r="5" fill="#10b981"/>
-          <text x="152" y="204" font-size="9" fill="#334155">кластер 2</text>
-          <circle cx="230" cy="200" r="5" fill="#f59e0b"/>
-          <text x="242" y="204" font-size="9" fill="#334155">кластер 3</text>
-          <circle cx="320" cy="200" r="10" fill="#6366f1" stroke="#fff" stroke-width="2"/>
-          <text x="336" y="204" font-size="9" fill="#334155">центроид</text>
+          <circle cx="50" cy="210" r="5" fill="#6366f1"/>
+          <text x="62" y="214" font-size="9" fill="#334155">кластер 1</text>
+          <circle cx="140" cy="210" r="5" fill="#10b981"/>
+          <text x="152" y="214" font-size="9" fill="#334155">кластер 2</text>
+          <circle cx="230" cy="210" r="5" fill="#f59e0b"/>
+          <text x="242" y="214" font-size="9" fill="#334155">кластер 3</text>
+          <circle cx="320" cy="210" r="9" fill="#6366f1" stroke="#fff" stroke-width="2"/>
+          <text x="336" y="214" font-size="9" fill="#334155">центроид</text>
         </svg>
         <div class="caption">K-Means с k=3: большие круги с C₁/C₂/C₃ — центроиды, малые точки — данные, пунктирные окружности — границы кластерного назначения.</div>
       </div>

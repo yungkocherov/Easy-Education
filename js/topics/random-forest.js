@@ -23,7 +23,7 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
+        <svg viewBox="0 0 540 230" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
           <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Random Forest: ансамблирование деревьев</text>
           <!-- Tree 1 -->
           <rect x="30" y="30" width="130" height="110" rx="6" fill="#eff6ff" stroke="#6366f1" stroke-width="1.5"/>
@@ -73,13 +73,13 @@ App.registerTopic({
           <rect x="412" y="110" width="26" height="16" rx="3" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
           <text x="425" y="122" text-anchor="middle" font-size="8" fill="#065f46">да</text>
           <text x="435" y="155" text-anchor="middle" font-size="9" fill="#64748b">выборка: bootstrap C</text>
-          <!-- Arrows down to vote box -->
-          <line x1="95" y1="165" x2="200" y2="192" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line x1="265" y1="165" x2="265" y2="190" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line x1="435" y1="165" x2="330" y2="192" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Arrows down to vote box (end just above box top y=200) -->
+          <line x1="95" y1="167" x2="195" y2="196" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="265" y1="167" x2="265" y2="196" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="435" y1="167" x2="335" y2="196" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
           <!-- Vote box -->
-          <rect x="165" y="188" width="200" height="20" rx="5" fill="#6366f1"/>
-          <text x="265" y="202" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">ГОЛОСОВАНИЕ / УСРЕДНЕНИЕ</text>
+          <rect x="165" y="202" width="200" height="22" rx="5" fill="#6366f1"/>
+          <text x="265" y="217" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">ГОЛОСОВАНИЕ / УСРЕДНЕНИЕ</text>
           <!-- Arrow markers -->
           <defs>
             <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">

@@ -23,49 +23,65 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
-          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SVM: максимальный зазор между классами</text>
-          <!-- Background -->
-          <rect x="30" y="25" width="440" height="160" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-          <!-- Class 1 dots (blue / indigo) -->
-          <circle cx="100" cy="65" r="9" fill="#6366f1"/>
-          <circle cx="80" cy="100" r="9" fill="#6366f1"/>
-          <circle cx="120" cy="130" r="9" fill="#6366f1"/>
-          <circle cx="65" cy="148" r="9" fill="#6366f1"/>
-          <circle cx="140" cy="85" r="9" fill="#6366f1"/>
-          <!-- Class 2 dots (amber) -->
-          <circle cx="350" cy="55" r="9" fill="#f59e0b"/>
-          <circle cx="390" cy="85" r="9" fill="#f59e0b"/>
-          <circle cx="360" cy="120" r="9" fill="#f59e0b"/>
-          <circle cx="420" cy="140" r="9" fill="#f59e0b"/>
-          <circle cx="400" cy="55" r="9" fill="#f59e0b"/>
-          <!-- Support vectors (highlighted with stroke) -->
-          <circle cx="140" cy="85" r="9" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
-          <circle cx="120" cy="130" r="9" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
-          <circle cx="350" cy="55" r="9" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
-          <circle cx="360" cy="120" r="9" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
-          <!-- Decision boundary (solid) -->
-          <line x1="220" y1="30" x2="250" y2="175" stroke="#6366f1" stroke-width="2.5"/>
-          <!-- Margin lines (dashed) -->
-          <line x1="178" y1="30" x2="208" y2="175" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <line x1="262" y1="30" x2="292" y2="175" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <!-- Margin label -->
-          <text x="230" y="98" text-anchor="middle" font-size="10" fill="#64748b">margin</text>
-          <line x1="180" y1="103" x2="262" y2="103" stroke="#64748b" stroke-width="1" marker-end="url(#sv_arr)"/>
-          <!-- Labels -->
-          <text x="90" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">Класс A</text>
-          <text x="390" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Класс B</text>
-          <text x="235" y="45" text-anchor="middle" font-size="9" fill="#6366f1">граница</text>
-          <!-- Support vector label -->
-          <text x="450" y="88" font-size="8" fill="#ef4444">← опорные</text>
-          <text x="450" y="99" font-size="8" fill="#ef4444">   векторы</text>
+        <svg viewBox="0 0 500 230" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;">
           <defs>
-            <marker id="sv_arr" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
-              <path d="M0,0 L5,2.5 L0,5 Z" fill="#64748b"/>
+            <marker id="svm_arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+            </marker>
+            <marker id="svm_arr_red" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
             </marker>
           </defs>
+          <text x="250" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SVM: максимальный зазор между классами</text>
+          <!-- Background -->
+          <rect x="30" y="25" width="440" height="170" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+          <!-- Margin lines (dashed) — границы коридора, наклон dx/dy=10/165 -->
+          <line x1="200" y1="30" x2="210" y2="195" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.85"/>
+          <line x1="270" y1="30" x2="280" y2="195" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.85"/>
+          <!-- Decision boundary (solid, между margin) -->
+          <line x1="235" y1="30" x2="245" y2="195" stroke="#334155" stroke-width="2.5"/>
+
+          <!-- Margin arrow + label -->
+          <line x1="205" y1="112" x2="275" y2="112" stroke="#64748b" stroke-width="1" marker-end="url(#svm_arr)" marker-start="url(#svm_arr)"/>
+          <text x="240" y="106" text-anchor="middle" font-size="10" fill="#64748b">margin</text>
+
+          <!-- Class A dots (blue) — слева -->
+          <circle cx="90" cy="55" r="8" fill="#6366f1"/>
+          <circle cx="70" cy="100" r="8" fill="#6366f1"/>
+          <circle cx="55" cy="140" r="8" fill="#6366f1"/>
+          <circle cx="115" cy="170" r="8" fill="#6366f1"/>
+          <circle cx="135" cy="50" r="8" fill="#6366f1"/>
+          <circle cx="155" cy="105" r="8" fill="#6366f1"/>
+          <!-- Class B dots (amber) — справа -->
+          <circle cx="385" cy="50" r="8" fill="#f59e0b"/>
+          <circle cx="415" cy="90" r="8" fill="#f59e0b"/>
+          <circle cx="395" cy="135" r="8" fill="#f59e0b"/>
+          <circle cx="425" cy="165" r="8" fill="#f59e0b"/>
+          <circle cx="355" cy="175" r="8" fill="#f59e0b"/>
+          <circle cx="345" cy="60" r="8" fill="#f59e0b"/>
+
+          <!-- Support vectors — лежат точно на margin -->
+          <circle cx="203" cy="80" r="8" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="207" cy="140" r="8" fill="#6366f1" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="272" cy="70" r="8" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
+          <circle cx="276" cy="155" r="8" fill="#f59e0b" stroke="#ef4444" stroke-width="2.5"/>
+
+          <!-- Annotation "опорные векторы" с leader-линиями к двум SV -->
+          <line x1="180" y1="220" x2="208" y2="148" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="180" y1="220" x2="277" y2="163" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+          <rect x="155" y="212" width="135" height="16" rx="3" fill="#fff" stroke="#ef4444" stroke-width="1"/>
+          <text x="222" y="224" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">опорные векторы</text>
+
+          <!-- Class labels (на переднем плане, в отдельных зонах) -->
+          <rect x="35" y="212" width="65" height="16" rx="3" fill="#fff" stroke="#6366f1" stroke-width="1"/>
+          <text x="67" y="224" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">Класс A</text>
+          <rect x="395" y="212" width="65" height="16" rx="3" fill="#fff" stroke="#d97706" stroke-width="1"/>
+          <text x="427" y="224" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Класс B</text>
+          <rect x="237" y="40" width="65" height="16" rx="3" fill="#fff" stroke="#334155" stroke-width="1"/>
+          <text x="269" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">граница</text>
         </svg>
-        <div class="caption">SVM находит гиперплоскость (синяя линия) с максимальным зазором (margin) между классами. Пунктирные линии — границы margin. Точки с красной обводкой — опорные векторы.</div>
+        <div class="caption">SVM находит разделяющую границу (тёмная линия) с максимальным зазором (margin) между классами. Пунктирные линии — границы margin. Точки с красной обводкой лежат точно на margin — это и есть опорные векторы; только они определяют положение границы.</div>
       </div>
 
       <h3>🎯 Задача максимального зазора</h3>

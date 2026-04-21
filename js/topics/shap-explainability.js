@@ -23,38 +23,37 @@ App.registerTopic({
       </div>
 
       <div class="illustration bordered">
-        <svg viewBox="0 0 540 230" xmlns="http://www.w3.org/2000/svg" style="max-width:540px;">
-          <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SHAP Waterfall: объяснение одного предсказания</text>
+        <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" style="max-width:640px;">
+          <text x="320" y="18" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">SHAP Waterfall: объяснение одного предсказания</text>
           <!-- Base value bar -->
-          <rect x="60" y="35" width="200" height="22" fill="#94a3b8" rx="3"/>
-          <text x="55" y="50" text-anchor="end" font-size="10" fill="#64748b">Базовое значение</text>
-          <text x="265" y="50" font-size="10" fill="#fff" font-weight="600">E[f(x)] = 250 000</text>
+          <rect x="140" y="35" width="200" height="22" fill="#94a3b8" rx="3"/>
+          <text x="135" y="50" text-anchor="end" font-size="10" fill="#64748b">Базовое значение</text>
+          <text x="240" y="50" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">E[f(x)] = 250 000</text>
           <!-- Feature 1: площадь +80k -->
-          <rect x="260" y="65" width="110" height="22" fill="#ef4444" rx="3"/>
-          <text x="255" y="80" text-anchor="end" font-size="10" fill="#64748b">Площадь 120м²</text>
-          <text x="315" y="80" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+80 000</text>
+          <rect x="340" y="65" width="110" height="22" fill="#ef4444" rx="3"/>
+          <text x="335" y="80" text-anchor="end" font-size="10" fill="#64748b">Площадь 120м²</text>
+          <text x="395" y="80" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+80 000</text>
           <!-- Feature 2: район +45k -->
-          <rect x="370" y="95" width="62" height="22" fill="#ef4444" rx="3"/>
-          <text x="365" y="110" text-anchor="end" font-size="10" fill="#64748b">Центр города</text>
-          <text x="401" y="110" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+45k</text>
-          <!-- Feature 3: этаж -15k -->
-          <rect x="402" y="125" width="40" height="22" fill="#3b82f6" rx="3" transform="translate(30,0) scale(-1,1) translate(-874,0)"/>
-          <rect x="392" y="125" width="40" height="22" fill="#3b82f6" rx="3"/>
-          <text x="387" y="140" text-anchor="end" font-size="10" fill="#64748b">1-й этаж</text>
-          <text x="412" y="140" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">−15k</text>
+          <rect x="450" y="95" width="62" height="22" fill="#ef4444" rx="3"/>
+          <text x="445" y="110" text-anchor="end" font-size="10" fill="#64748b">Центр города</text>
+          <text x="481" y="110" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+45k</text>
+          <!-- Feature 3: этаж -15k (negative, going left from 512) -->
+          <rect x="472" y="125" width="40" height="22" fill="#3b82f6" rx="3"/>
+          <text x="467" y="140" text-anchor="end" font-size="10" fill="#64748b">1-й этаж</text>
+          <text x="492" y="140" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">−15k</text>
           <!-- Feature 4: год +20k -->
-          <rect x="392" y="155" width="55" height="22" fill="#ef4444" rx="3"/>
-          <text x="387" y="170" text-anchor="end" font-size="10" fill="#64748b">2020 год</text>
-          <text x="419" y="170" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+20k</text>
+          <rect x="472" y="155" width="55" height="22" fill="#ef4444" rx="3"/>
+          <text x="467" y="170" text-anchor="end" font-size="10" fill="#64748b">2020 год</text>
+          <text x="499" y="170" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">+20k</text>
           <!-- Final prediction -->
-          <rect x="60" y="185" width="387" height="22" fill="#10b981" rx="3"/>
-          <text x="55" y="200" text-anchor="end" font-size="10" fill="#64748b" font-weight="600">Предсказание</text>
-          <text x="253" y="200" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">f(x) = 380 000 ₽</text>
+          <rect x="140" y="185" width="387" height="22" fill="#10b981" rx="3"/>
+          <text x="135" y="200" text-anchor="end" font-size="10" fill="#64748b" font-weight="600">Предсказание</text>
+          <text x="333" y="200" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">f(x) = 380 000 ₽</text>
           <!-- Arrow legend -->
-          <rect x="370" y="210" width="12" height="10" fill="#ef4444" rx="1"/>
-          <text x="386" y="219" font-size="9" fill="#334155">повышает цену</text>
-          <rect x="450" y="210" width="12" height="10" fill="#3b82f6" rx="1"/>
-          <text x="466" y="219" font-size="9" fill="#334155">снижает цену</text>
+          <rect x="370" y="225" width="12" height="10" fill="#ef4444" rx="1"/>
+          <text x="386" y="234" font-size="9" fill="#334155">повышает цену</text>
+          <rect x="490" y="225" width="12" height="10" fill="#3b82f6" rx="1"/>
+          <text x="506" y="234" font-size="9" fill="#334155">снижает цену</text>
         </svg>
         <div class="caption">SHAP waterfall chart: каждый признак «сдвигает» предсказание от базового значения (среднего по датасету) к финальному. Красные — увеличивают, синие — уменьшают.</div>
       </div>

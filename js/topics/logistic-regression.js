@@ -34,18 +34,16 @@ App.registerTopic({
           <text x="50" y="178" text-anchor="end" font-size="9" fill="#64748b">0</text>
           <text x="50" y="100" text-anchor="end" font-size="9" fill="#64748b">0.5</text>
           <text x="50" y="24" text-anchor="end" font-size="9" fill="#64748b">1</text>
-          <!-- Sigmoid curve -->
-          <path d="M55,170 C80,168 110,162 150,148 C185,135 205,115 240,97 C270,80 295,62 335,48 C365,37 395,28 465,24" fill="none" stroke="#6366f1" stroke-width="2.8"/>
-          <!-- Threshold line at 0.5 -->
-          <line x1="240" y1="25" x2="240" y2="175" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
-          <text x="242" y="40" font-size="9" fill="#f59e0b" font-weight="600">порог 0.5</text>
+          <!-- Sigmoid curve: точные точки σ(z) при z=−6..6, x∈[55,470], y∈[175,24] -->
+          <path d="M55,174.6 L89.6,173.7 L124.2,172.3 L158.7,167.9 L193.3,157.0 L227.9,134.4 L262.5,99.5 L297.1,64.6 L331.7,41.9 L366.3,31.1 L400.8,26.7 L435.4,24.7 L470,24.4" fill="none" stroke="#6366f1" stroke-width="2.8" stroke-linejoin="round"/>
+          <!-- Threshold line at z=0 (центр оси) -->
+          <line x1="262.5" y1="25" x2="262.5" y2="175" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
+          <text x="265" y="40" font-size="9" fill="#f59e0b" font-weight="600">порог 0.5</text>
           <!-- Class labels -->
-          <text x="120" y="190" text-anchor="middle" font-size="10" fill="#10b981" font-weight="600">→ класс 0</text>
-          <text x="360" y="190" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="600">→ класс 1</text>
-          <!-- Horizontal threshold line label -->
-          <text x="62" y="94" font-size="8" fill="#64748b">─ ─ ─</text>
-          <!-- Arrow annotation -->
-          <text x="390" y="130" font-size="9" fill="#6366f1">σ(z) = 1/(1+e⁻ᶻ)</text>
+          <text x="135" y="190" text-anchor="middle" font-size="10" fill="#10b981" font-weight="600">→ класс 0</text>
+          <text x="380" y="190" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="600">→ класс 1</text>
+          <!-- Formula annotation -->
+          <text x="380" y="130" font-size="9" fill="#6366f1">σ(z) = 1/(1+e⁻ᶻ)</text>
         </svg>
         <div class="caption">Сигмоидная функция: превращает любое число z в вероятность от 0 до 1. Жёлтая пунктирная линия — порог 0.5 для принятия решения о классе.</div>
       </div>
