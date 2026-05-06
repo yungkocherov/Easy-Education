@@ -14,7 +14,7 @@ App.registerTopic({
         <p>Ты стреляешь по мишени. Каждый выстрел — предсказание, центр мишени — истинное значение. Метрика — это способ оценить, насколько хорошо ты стреляешь. Можно считать среднее расстояние до центра (MAE), среднее квадрат расстояния (MSE), или долю объяснённой дисперсии (R²). У каждой метрики свои плюсы.</p>
       </div>
 
-      <h3>📐 MSE — Mean Squared Error</h3>
+      <h3>MSE — Mean Squared Error</h3>
       <div class="math-block">$$\\text{MSE} = \\frac{1}{n}\\sum_{i=1}^n (y_i - \\hat{y}_i)^2$$</div>
       <ul>
         <li><b>Единицы:</b> квадрат единиц target (если target в рублях — MSE в рублях²)</li>
@@ -23,7 +23,7 @@ App.registerTopic({
         <li><b>Когда:</b> стандартный выбор для линейной регрессии, нейросетей</li>
       </ul>
 
-      <h3>📐 RMSE — Root Mean Squared Error</h3>
+      <h3>RMSE — Root Mean Squared Error</h3>
       <div class="math-block">$$\\text{RMSE} = \\sqrt{\\text{MSE}} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^n (y_i - \\hat{y}_i)^2}$$</div>
       <ul>
         <li><b>Единицы:</b> те же, что у target (рубли → рубли). Интерпретируема напрямую!</li>
@@ -32,7 +32,7 @@ App.registerTopic({
         <li><b>Когда:</b> когда нужно сообщить ошибку в «человеческих» единицах</li>
       </ul>
 
-      <h3>📐 MAE — Mean Absolute Error</h3>
+      <h3>MAE — Mean Absolute Error</h3>
       <div class="math-block">$$\\text{MAE} = \\frac{1}{n}\\sum_{i=1}^n |y_i - \\hat{y}_i|$$</div>
       <ul>
         <li><b>Единицы:</b> те же, что у target</li>
@@ -41,7 +41,7 @@ App.registerTopic({
         <li><b>Когда:</b> данные с выбросами, нужна медианная регрессия</li>
       </ul>
 
-      <h3>📐 R² — коэффициент детерминации</h3>
+      <h3>R² — коэффициент детерминации</h3>
       <div class="math-block">$$R^2 = 1 - \\frac{\\sum (y_i - \\hat{y}_i)^2}{\\sum (y_i - \\bar{y})^2} = 1 - \\frac{\\text{MSE модели}}{\\text{дисперсия таргета}}$$</div>
       <ul>
         <li><b>Диапазон:</b> от −∞ до 1. R²=1 → идеальная модель. R²=0 → модель не лучше простого среднего. R²&lt;0 → хуже среднего!</li>
@@ -56,7 +56,7 @@ App.registerTopic({
         <p>Где $p$ — число признаков. Штрафует за добавление бесполезных признаков. Если новый признак не улучшает модель — adjusted R² упадёт.</p>
       </div>
 
-      <h3>📐 MAPE — Mean Absolute Percentage Error</h3>
+      <h3>MAPE — Mean Absolute Percentage Error</h3>
       <div class="math-block">$$\\text{MAPE} = \\frac{1}{n}\\sum_{i=1}^n \\left|\\frac{y_i - \\hat{y}_i}{y_i}\\right| \\times 100\\%$$</div>
       <ul>
         <li><b>Единицы:</b> проценты (безразмерная!)</li>
@@ -66,7 +66,7 @@ App.registerTopic({
         <li><b>Когда:</b> прогнозирование спроса, финансы, отчёты для стейкхолдеров</li>
       </ul>
 
-      <h3>🧭 Как выбрать метрику</h3>
+      <h3>Как выбрать метрику</h3>
       <table>
         <tr><th>Ситуация</th><th>Рекомендуемая метрика</th></tr>
         <tr><td>Оптимизация модели (loss function)</td><td><b>MSE</b> — гладкая, дифференцируемая</td></tr>
@@ -78,7 +78,7 @@ App.registerTopic({
         <tr><td>Target на разных масштабах</td><td><b>MAPE</b> или log-transform + MSE</td></tr>
       </table>
 
-      <h3>🔢 Числовой пример</h3>
+      <h3>Числовой пример</h3>
       <table>
         <tr><th>i</th><th>yᵢ (реальное)</th><th>ŷᵢ (предсказание)</th><th>ошибка</th><th>|ошибка|</th><th>ошибка²</th><th>|ошибка/y| %</th></tr>
         <tr><td>1</td><td>100</td><td>95</td><td>−5</td><td>5</td><td>25</td><td>5%</td></tr>
@@ -94,7 +94,7 @@ App.registerTopic({
       </ul>
       <p>Обрати внимание: MSE/RMSE доминируется 4-м примером (ошибка 30 → квадрат 900). MAE более «ровная». MAPE показывает, что 4-й пример — 25% ошибка, что критично.</p>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('glossary-loss-functions')">Функции потерь</a> — MSE/MAE как loss для оптимизации</li>
         <li><a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a> — R² как основная метрика</li>
@@ -103,7 +103,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Mean_squared_error" target="_blank">Wikipedia: MSE</a></li>
         <li><a href="https://en.wikipedia.org/wiki/Coefficient_of_determination" target="_blank">Wikipedia: R²</a></li>

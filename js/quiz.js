@@ -372,7 +372,7 @@
     const total = s.answers.length;
     const pct = Math.round((score / total) * 100);
     let verdict = 'Есть над чем поработать';
-    if (pct >= 90) verdict = 'Почти идеально 🎯';
+    if (pct >= 90) verdict = 'Почти идеально';
     else if (pct >= 70) verdict = 'Хорошо, но можно лучше';
     else if (pct >= 50) verdict = 'Неплохо — но есть пробелы';
 
@@ -393,7 +393,7 @@
             </div>`;
           }).join('')
         }</div>`
-      : '<div class="quiz-all-correct">Все ответы верны 🎉</div>';
+      : '<div class="quiz-all-correct">Все ответы верны</div>';
 
     body.innerHTML = `
       <div class="quiz-result">

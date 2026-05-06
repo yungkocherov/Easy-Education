@@ -14,12 +14,12 @@ App.registerTopic({
         <p>Представь, что ты учишь собаку приносить палку. Нужна система поощрений и штрафов: принесла палку — награда, не принесла — лёгкий выговор, убежала совсем в другую сторону — жёсткий штраф. Это и есть <b>функция потерь</b>: математическое описание того, насколько «плохо» ошиблась модель. От выбора функции зависит, какие ошибки модель будет бояться сильнее, а какие прощать.</p>
       </div>
 
-      <h3>🎯 Зачем нужна функция потерь</h3>
+      <h3>Зачем нужна функция потерь</h3>
       <p>Модель ML ищет параметры $\\theta$, которые <b>минимизируют среднюю потерю</b> на тренировочных данных:</p>
       <div class="math-block">$$\\theta^* = \\arg\\min_\\theta \\frac{1}{n}\\sum_{i=1}^n L(y_i, f_\\theta(x_i))$$</div>
       <p>Функция $L$ и определяет, что значит «хорошо» или «плохо» — это наш способ сказать модели, чего мы от неё хотим.</p>
 
-      <h3>📊 Для регрессии (предсказание числа)</h3>
+      <h3>Для регрессии (предсказание числа)</h3>
       <div class="illustration bordered">
         <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
           <text x="380" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">Функции потерь для регрессии</text>
@@ -101,7 +101,7 @@ App.registerTopic({
       <div class="math-block">$$L_\\delta(r) = \\begin{cases} \\frac{1}{2}r^2, & |r| \\leq \\delta \\\\ \\delta(|r| - \\frac{\\delta}{2}), & |r| > \\delta \\end{cases}$$</div>
       <p>Гибрид MSE и MAE: квадрат для маленьких ошибок (гладкий), линейный для больших (робастный). $\\delta$ — граница переключения.</p>
 
-      <h3>📊 Для классификации</h3>
+      <h3>Для классификации</h3>
 
       <h4>Cross-Entropy (Log-Loss)</h4>
       <div class="math-block">$$L = -\\frac{1}{n}\\sum [y_i \\log \\hat{p}_i + (1-y_i)\\log(1-\\hat{p}_i)]$$</div>
@@ -116,7 +116,7 @@ App.registerTopic({
       <div class="math-block">$$L = -(1-\\hat{p})^\\gamma \\log(\\hat{p})$$</div>
       <p>Расширение cross-entropy для сильно несбалансированных классов. Фактор $(1-\\hat{p})^\\gamma$ уменьшает вклад «легких» примеров, заставляя модель фокусироваться на сложных. Применяется в детекции объектов.</p>
 
-      <h3>🧭 Как выбрать функцию потерь</h3>
+      <h3>Как выбрать функцию потерь</h3>
       <table>
         <tr><th>Задача</th><th>Рекомендация</th></tr>
         <tr><td>Регрессия без выбросов</td><td>MSE (быстро, стабильно)</td></tr>
@@ -128,7 +128,7 @@ App.registerTopic({
         <tr><td>Сильный дисбаланс классов</td><td>Focal Loss или weighted CE</td></tr>
       </table>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('linear-regression')">Линейная регрессия</a> — MSE как «сердце»</li>
         <li><a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a> — Cross-Entropy</li>
@@ -138,7 +138,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Loss_function" target="_blank">Wikipedia: Loss function</a></li>
         <li><a href="https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html" target="_blank">ML Cheatsheet: Loss Functions</a></li>

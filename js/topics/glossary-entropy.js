@@ -15,7 +15,7 @@ App.registerTopic({
         <p>Когда решающее дерево делает split: оно ищет вопрос, <b>максимально снижающий энтропию</b> — то есть максимально проясняющий ответ. Это и называется <b>Information Gain</b>: сколько неопределённости мы устранили одним вопросом.</p>
       </div>
 
-      <h3>📐 Определение энтропии Шеннона</h3>
+      <h3>Определение энтропии Шеннона</h3>
       <div class="math-block">$$H(X) = -\\sum_{i=1}^K p_i \\log_2 p_i$$</div>
       <p>где $p_i$ — вероятность $i$-го класса. Единица измерения — биты.</p>
 
@@ -79,7 +79,7 @@ App.registerTopic({
         </script>
       </div>
 
-      <h3>🎯 Information Gain (прирост информации)</h3>
+      <h3>Information Gain (прирост информации)</h3>
       <p>Когда решающее дерево выбирает, по какому признаку сделать split, оно считает <b>information gain</b> — на сколько уменьшается энтропия после разделения.</p>
       <div class="math-block">$$\\text{IG}(S, A) = H(S) - \\sum_{v \\in \\text{values}(A)} \\frac{|S_v|}{|S|} H(S_v)$$</div>
       <p>где $S$ — исходное множество, $A$ — признак, $S_v$ — подмножество с значением $v$ у признака $A$.</p>
@@ -94,18 +94,18 @@ App.registerTopic({
         <li><b>IG = 1 − 0.39 = 0.61 бит</b>. Split по цвету снизил неопределённость на 0.61 бит.</li>
       </ul>
 
-      <h3>🔢 Gini Impurity — альтернатива энтропии</h3>
+      <h3>Gini Impurity — альтернатива энтропии</h3>
       <p>Другая популярная мера «нечистоты» для деревьев решений:</p>
       <div class="math-block">$$\\text{Gini}(S) = 1 - \\sum_{i=1}^K p_i^2$$</div>
       <p>Интерпретация: вероятность того, что две случайно выбранные из $S$ точки принадлежат разным классам. Gini = 0 — все одного класса, Gini = 0.5 — максимум для бинарной задачи (vs 1 бит у энтропии).</p>
       <p>Практически Gini и Entropy дают очень похожие деревья. Gini чуть быстрее (не нужен log). CART использует Gini, ID3/C4.5 — энтропию.</p>
 
-      <h3>🧮 Cross-Entropy Loss</h3>
+      <h3>Cross-Entropy Loss</h3>
       <p>Та же формула энтропии применяется как функция потерь классификации:</p>
       <div class="math-block">$$L = -\\sum_{i=1}^K y_i \\log \\hat{p}_i$$</div>
       <p>где $y_i$ — one-hot истинный класс, $\\hat{p}_i$ — предсказанная вероятность. Это <b>cross-entropy между истинным и предсказанным распределением</b> — сколько «битов» нужно, чтобы закодировать истину, если предполагать предсказанное распределение. Минимум при $\\hat{p} = y$.</p>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('decision-tree')">Решающее дерево</a> — Gini/Entropy при построении</li>
         <li><a onclick="App.selectTopic('glossary-loss-functions')">Функции потерь</a> — cross-entropy как loss</li>
@@ -114,7 +114,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)" target="_blank">Wikipedia: Information entropy</a></li>
         <li><a href="https://www.youtube.com/watch?v=v68zYyaEmEA" target="_blank">StatQuest: Entropy explained</a></li>

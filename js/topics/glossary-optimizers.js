@@ -19,12 +19,12 @@ App.registerTopic({
         </ul>
       </div>
 
-      <h3>📐 SGD — Stochastic Gradient Descent</h3>
+      <h3>SGD — Stochastic Gradient Descent</h3>
       <p>Самый простой оптимизатор: обновляет веса по градиенту, вычисленному на одном мини-батче:</p>
       <div class="math-block">$$w_{t+1} = w_t - \\eta \\cdot \\nabla L(w_t)$$</div>
       <p>где $\\eta$ — learning rate. «Stochastic» — потому что градиент шумный (считается по подвыборке, а не по всему датасету). Этот шум на самом деле помогает — не застревать в локальных минимумах.</p>
 
-      <h3>🚀 SGD + Momentum</h3>
+      <h3>SGD + Momentum</h3>
       <p>Копит «инерцию» — если несколько последних шагов шли в одном направлении, продолжай в том же:</p>
       <div class="math-block">$$v_{t+1} = \\beta v_t + \\nabla L(w_t), \\quad w_{t+1} = w_t - \\eta v_{t+1}$$</div>
       <p>Обычно $\\beta = 0.9$. Эффекты:</p>
@@ -34,17 +34,17 @@ App.registerTopic({
         <li>Преодолевает мелкие локальные минимумы и седловые точки.</li>
       </ul>
 
-      <h3>🎯 Nesterov Momentum</h3>
+      <h3>Nesterov Momentum</h3>
       <p>Улучшенная версия momentum: сначала «делает шаг», потом смотрит градиент в новой точке:</p>
       <div class="math-block">$$v_{t+1} = \\beta v_t + \\nabla L(w_t - \\eta \\beta v_t)$$</div>
       <p>Это «предсказание следующего шага» немного уменьшает колебания. В PyTorch <code>SGD(momentum=0.9, nesterov=True)</code>.</p>
 
-      <h3>📊 AdaGrad (2011)</h3>
+      <h3>AdaGrad (2011)</h3>
       <p>Идея: каждому параметру — свой learning rate, зависящий от истории градиентов:</p>
       <div class="math-block">$$w_{t+1,i} = w_{t,i} - \\frac{\\eta}{\\sqrt{G_{t,i} + \\varepsilon}} \\cdot g_{t,i}, \\quad G_{t,i} = \\sum_{s=1}^t g_{s,i}^2$$</div>
       <p>Часто обновляемые параметры получают меньший lr, редко обновляемые — больший. Хорошо для разреженных данных (NLP, реклама). <b>Проблема</b>: lr монотонно уменьшается, обучение может остановиться.</p>
 
-      <h3>📊 RMSprop (2012)</h3>
+      <h3>RMSprop (2012)</h3>
       <p>Тот же принцип, но вместо суммы квадратов — <b>экспоненциальное скользящее среднее</b>:</p>
       <div class="math-block">$$G_{t,i} = \\rho G_{t-1,i} + (1-\\rho) g_{t,i}^2$$</div>
       <p>$\\rho = 0.9$. Не «забывает» навсегда, lr не падает до нуля. Отлично работает для RNN.</p>
@@ -62,7 +62,7 @@ App.registerTopic({
       <div class="math-block">$$w_{t+1} = w_t - \\frac{\\eta \\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\varepsilon} - \\eta \\lambda w_t$$</div>
       <p>Результат: лучшее обобщение, чем у оригинального Adam. Используется в почти всех современных LLM (GPT, BERT, LLaMA).</p>
 
-      <h3>🎯 Learning Rate Schedule</h3>
+      <h3>Learning Rate Schedule</h3>
       <p>Вместо постоянного $\\eta$ его часто меняют со временем:</p>
       <ul>
         <li><b>Step decay</b>: $\\eta \\to \\eta \\cdot 0.1$ каждые N эпох.</li>
@@ -72,7 +72,7 @@ App.registerTopic({
         <li><b>One-cycle</b> (Leslie Smith): растёт, затем падает. Работает на удивление хорошо.</li>
       </ul>
 
-      <h3>⚖️ Какой оптимизатор выбрать</h3>
+      <h3>Какой оптимизатор выбрать</h3>
       <table>
         <tr><th>Задача</th><th>Рекомендация</th></tr>
         <tr><td>Default для всего</td><td>Adam / AdamW</td></tr>
@@ -84,7 +84,7 @@ App.registerTopic({
       </table>
       <p>Правило: <b>начни с Adam, потом попробуй SGD+momentum</b>. Для RL — только Adam.</p>
 
-      <h3>🔢 Пример: эффект momentum</h3>
+      <h3>Пример: эффект momentum</h3>
       <div class="calc">Loss: L(w) = w², старт w=5, lr=0.3
 
 SGD:
@@ -100,7 +100,7 @@ SGD + momentum β=0.9:
 
 Momentum ускоряет, но может «промахнуться» — нужна хорошая настройка.</div>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('gradient-descent')">Градиентный спуск</a></li>
         <li><a onclick="App.selectTopic('glossary-gradient')">Градиент</a></li>
@@ -108,7 +108,7 @@ Momentum ускоряет, но может «промахнуться» — ну
       </ul>
     `,
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://arxiv.org/abs/1412.6980" target="_blank">Adam paper</a></li>
         <li><a href="https://www.ruder.io/optimizing-gradient-descent/" target="_blank">Sebastian Ruder: overview of optimizers</a></li>

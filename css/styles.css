@@ -108,24 +108,35 @@ body {
 .welcome-feature {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  background: #f8fafc;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   color: #334155;
+  line-height: 1.55;
 }
-.welcome-icon { font-size: 20px; flex-shrink: 0; }
+.welcome-feature .welcome-num {
+  flex-shrink: 0;
+  width: 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  padding-top: 1px;
+}
 .welcome .hint {
   margin-top: 24px;
   padding: 14px 18px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  color: #1e40af;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+  color: #1e293b;
   font-size: 14px;
-  text-align: center;
+  text-align: left;
 }
 /* ========== Learning paths ========== */
 .learning-paths {
@@ -141,22 +152,31 @@ body {
 }
 .path-card {
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 16px 18px;
   margin-bottom: 12px;
   background: #fff;
-  border-left: 4px solid #94a3b8;
+  border-left: 3px solid #94a3b8;
 }
 .path-card.path-analyst { border-left-color: #3b82f6; }
 .path-card.path-ml { border-left-color: #10b981; }
 .path-card.path-dl { border-left-color: #8b5cf6; }
 .path-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
 }
-.path-icon { font-size: 20px; }
+.path-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+.path-card.path-analyst .path-tag { color: #3b82f6; }
+.path-card.path-ml .path-tag { color: #10b981; }
+.path-card.path-dl .path-tag { color: #8b5cf6; }
 .path-name { font-size: 16px; font-weight: 700; color: #0f172a; }
 .path-desc { font-size: 13px; color: #64748b; margin-bottom: 10px; }
 .path-steps {
@@ -282,9 +302,23 @@ body {
 }
 
 /* ========== Контент вкладок ========== */
-.tab-pane h3 { font-size: 20px; margin: 24px 0 12px; color: #0f172a; }
+.tab-pane h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 40px 0 14px;
+  padding-bottom: 8px;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+  border-bottom: 1px solid #e2e8f0;
+}
 .tab-pane h3:first-child { margin-top: 0; }
-.tab-pane h4 { font-size: 16px; margin: 18px 0 8px; color: #1e293b; }
+.tab-pane h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 22px 0 8px;
+  color: #1e293b;
+  letter-spacing: -0.1px;
+}
 .tab-pane p { margin-bottom: 12px; color: #334155; }
 .tab-pane ul, .tab-pane ol { margin: 8px 0 14px 24px; color: #334155; }
 .tab-pane li { margin-bottom: 6px; }
@@ -469,25 +503,24 @@ canvas.sim-canvas {
 
 /* ========== Intuition / analogy block ========== */
 .intuition {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #fcd34d;
-  border-radius: 12px;
-  padding: 18px 22px;
-  margin: 8px 0 24px;
-  position: relative;
-  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.12);
+  background: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #94a3b8;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 16px 0 24px;
 }
 .intuition .intuition-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  color: #78350f;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1.2px;
   margin-bottom: 8px;
 }
-.intuition p { color: #451a03; font-size: 15px; line-height: 1.65; margin-bottom: 10px; }
+.intuition p { color: #1e293b; font-size: 15px; line-height: 1.65; margin-bottom: 10px; }
 .intuition p:last-child { margin-bottom: 0; }
-.intuition b, .intuition strong { color: #7c2d12; }
+.intuition b, .intuition strong { color: #0f172a; }
 
 /* ========== Term with tooltip ========== */
 .term {
@@ -580,7 +613,7 @@ canvas.sim-canvas {
 .answer-box p:last-child { margin-bottom: 0; }
 
 .lesson-box { background: #fdf4ff; border-left: 4px solid #a855f7; padding: 12px 16px; border-radius: 4px; margin: 16px 0; color: #581c87; font-size: 14px; }
-.lesson-box::before { content: "💡 Что мы узнали: "; font-weight: 700; color: #6b21a8; }
+.lesson-box::before { content: "Что мы узнали: "; font-weight: 700; color: #6b21a8; }
 
 /* ========== Burger + scrim (mobile) ========== */
 .burger {

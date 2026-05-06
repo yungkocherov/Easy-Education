@@ -16,7 +16,7 @@ App.registerTopic({
         <p>Dropout делает то же самое с нейронами: случайно «вырубает» часть из них при обучении. Нейроны не могут полагаться только друг на друга — каждый учится делать что-то полезное <b>сам по себе</b>.</p>
       </div>
 
-      <h3>📐 Как работает</h3>
+      <h3>Как работает</h3>
       <p>При обучении, для каждого forward pass и для каждого нейрона:</p>
       <ul>
         <li>С вероятностью $p$ (например, 0.5) умножь его выход на 0 («выключен»).</li>
@@ -24,11 +24,11 @@ App.registerTopic({
       </ul>
       <p>На inference dropout <b>выключен</b>: используются все нейроны без масштабирования.</p>
 
-      <h3>🔢 Формула</h3>
+      <h3>Формула</h3>
       <p>Обычный слой: $h = \\sigma(Wx + b)$.</p>
       <p>Dropout слой: $h = \\text{mask} \\odot \\sigma(Wx + b) / (1-p)$, где mask ~ Bernoulli($1-p$).</p>
 
-      <h3>🎯 Типичные значения $p$</h3>
+      <h3>Типичные значения $p$</h3>
       <ul>
         <li><b>Входной слой</b>: $p = 0.1$-$0.2$ (низкий, не вырубай сразу много информации).</li>
         <li><b>Скрытые слои</b>: $p = 0.3$-$0.5$ (классика для FC-слоёв).</li>
@@ -36,7 +36,7 @@ App.registerTopic({
         <li><b>Embeddings (NLP)</b>: $p = 0.1$-$0.3$.</li>
       </ul>
 
-      <h3>⚙️ Train vs inference</h3>
+      <h3>Train vs inference</h3>
       <table>
         <tr><th>Режим</th><th>Что происходит</th></tr>
         <tr><td>Train</td><td>Вырубаем случайные нейроны, компенсируем 1/(1-p)</td></tr>
@@ -44,7 +44,7 @@ App.registerTopic({
       </table>
       <p>Частая ошибка: забыть переключить сеть в eval mode на инференсе (<code>model.eval()</code> в PyTorch). Тогда dropout продолжит работать, и предсказания будут случайными.</p>
 
-      <h3>💡 Почему работает — интерпретации</h3>
+      <h3>Почему работает — интерпретации</h3>
       <ul>
         <li><b>Ансамбль</b>: обучая с dropout, ты неявно обучаешь $2^N$ разных подсетей (где $N$ — число нейронов). На инференсе получается «усреднение» этих подсетей.</li>
         <li><b>Бороться с co-adaptation</b>: нейроны не могут «делегировать» работу соседу, потому что сосед может быть выключен.</li>
@@ -52,7 +52,7 @@ App.registerTopic({
         <li><b>Равносильно Gaussian-шуму</b> на активациях (в некоторых предельных случаях).</li>
       </ul>
 
-      <h3>🔢 Пример: MLP с dropout</h3>
+      <h3>Пример: MLP с dropout</h3>
       <div class="calc">class MLP(nn.Module):
     def __init__(self):
         super().__init__()
@@ -71,7 +71,7 @@ App.registerTopic({
 model.train()  # dropout активен
 model.eval()   # dropout выключен</div>
 
-      <h3>🎨 Варианты dropout</h3>
+      <h3>Варианты dropout</h3>
       <ul>
         <li><b>Standard Dropout</b>: независимо «вырубает» отдельные нейроны.</li>
         <li><b>Spatial Dropout (CNN)</b>: вырубает целые feature maps, сохраняя пространственные корреляции.</li>
@@ -81,7 +81,7 @@ model.eval()   # dropout выключен</div>
         <li><b>Stochastic Depth</b>: случайно «выключает» целые residual blocks.</li>
       </ul>
 
-      <h3>⚠️ Dropout в современных архитектурах</h3>
+      <h3>Dropout в современных архитектурах</h3>
       <ul>
         <li><b>CNN</b>: сегодня часто заменяется BatchNorm + data augmentation.</li>
         <li><b>Transformer</b>: dropout остался — в attention weights и в FFN блоках.</li>
@@ -89,10 +89,10 @@ model.eval()   # dropout выключен</div>
         <li><b>ResNet</b>: dropout в основных блоках не используется (residual + BN достаточно).</li>
       </ul>
 
-      <h3>📊 Эффект на accuracy</h3>
+      <h3>Эффект на accuracy</h3>
       <p>В классическом эксперименте Hinton et al. (2012) dropout улучшил ошибку MNIST с 1.62% до 1.35% — значительный прирост без изменения архитектуры. На ImageNet — прирост в ~2% top-5 accuracy.</p>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('regularization')">Регуляризация</a></li>
         <li><a onclick="App.selectTopic('glossary-overfitting')">Переобучение</a></li>
@@ -101,7 +101,7 @@ model.eval()   # dropout выключен</div>
       </ul>
     `,
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://jmlr.org/papers/v15/srivastava14a.html" target="_blank">Srivastava et al. (2014): Dropout paper</a></li>
       </ul>

@@ -15,7 +15,7 @@ App.registerTopic({
         <p>Противоположная проблема — <b>недообучение</b>: студент не выучил материал вообще, и на контрольной, и на экзамене получает 30 баллов. Золотая середина — учится понимать принципы, чтобы обобщать на новые задачи. Это наша цель.</p>
       </div>
 
-      <h3>🎯 Определение</h3>
+      <h3>Определение</h3>
       <p><b>Переобучение (overfitting)</b> — ситуация, когда модель показывает низкую ошибку на тренировочных данных, но высокую ошибку на тестовых (или в продакшене). Модель «запомнила» шум и специфику train-выборки вместо того, чтобы выучить общие закономерности.</p>
 
       <div class="illustration bordered">
@@ -63,7 +63,7 @@ App.registerTopic({
             <!-- Smooth curve following points -->
             <path d="M295,212 Q320,180 340,140 Q365,105 380,100 Q395,105 420,145 Q445,185 465,212" fill="none" stroke="#059669" stroke-width="2.5"/>
             <text x="380" y="235" text-anchor="middle" font-size="10" fill="#059669">Train ошибка: НИЗКАЯ</text>
-            <text x="380" y="248" text-anchor="middle" font-size="10" fill="#059669">Test ошибка: НИЗКАЯ ✓</text>
+            <text x="380" y="248" text-anchor="middle" font-size="10" fill="#059669">Test ошибка: НИЗКАЯ </text>
           </g>
           <!-- Overfitting -->
           <g>
@@ -84,7 +84,7 @@ App.registerTopic({
             <!-- Wiggly curve passing through every point exactly -->
             <path d="M540,210 Q550,150 560,180 Q570,220 580,140 Q590,90 600,110 Q610,160 620,100 Q630,60 640,115 Q650,200 660,145 Q670,90 680,185 Q690,235 700,210" fill="none" stroke="#dc2626" stroke-width="2.2"/>
             <text x="620" y="235" text-anchor="middle" font-size="10" fill="#dc2626">Train ошибка: ~0 (идеально)</text>
-            <text x="620" y="248" text-anchor="middle" font-size="10" fill="#dc2626">Test ошибка: ВЫСОКАЯ ✗</text>
+            <text x="620" y="248" text-anchor="middle" font-size="10" fill="#dc2626">Test ошибка: ВЫСОКАЯ </text>
           </g>
           <text x="380" y="295" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">Чёрные точки — обучающие данные (у каждого своя случайность — шум)</text>
           <text x="380" y="315" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Цель: модель, которая отражает ПАТТЕРН, а не шум</text>
@@ -92,7 +92,7 @@ App.registerTopic({
         <div class="caption">Слева — модель слишком простая (горизонтальная линия), не ловит закономерность. Справа — модель слишком сложная, проходит через каждую точку, включая шум. По центру — правильный баланс.</div>
       </div>
 
-      <h3>🔍 Как обнаружить переобучение</h3>
+      <h3>Как обнаружить переобучение</h3>
       <ol>
         <li><b>Сравни train и test ошибки</b>. Если разница большая (train 0.02, test 0.15) — переобучение.</li>
         <li><b>Посмотри на learning curves</b>. Train ошибка падает, test ошибка сначала падает, потом растёт — точка разворота = начало переобучения.</li>
@@ -100,7 +100,7 @@ App.registerTopic({
         <li><b>Проверь на новых данных</b>. Соберите свежий датасет и оцените — honest test.</li>
       </ol>
 
-      <h3>🛠 Как бороться с переобучением</h3>
+      <h3>Как бороться с переобучением</h3>
       <table>
         <tr><th>Метод</th><th>Как работает</th></tr>
         <tr><td><b>Больше данных</b></td><td>С ростом n сложной модели труднее запомнить всё. Самое надёжное лекарство.</td></tr>
@@ -112,7 +112,7 @@ App.registerTopic({
         <tr><td><b>Bagging / ансамбли</b></td><td>Усреднение нескольких моделей снижает variance</td></tr>
       </table>
 
-      <h3>⚠️ Частые причины переобучения</h3>
+      <h3>Частые причины переобучения</h3>
       <ul>
         <li><b>Слишком мало данных</b> — модель «запоминает» вместо обучения.</li>
         <li><b>Слишком много признаков</b> (curse of dimensionality) — модель находит ложные паттерны.</li>
@@ -121,7 +121,7 @@ App.registerTopic({
         <li><b>Утечка данных (leakage)</b> — признак, который содержит информацию о target из будущего.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('bias-variance')">Bias-Variance Tradeoff</a></li>
         <li><a onclick="App.selectTopic('regularization')">Регуляризация</a></li>
@@ -130,7 +130,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Overfitting" target="_blank">Wikipedia: Overfitting</a></li>
         <li><a href="https://www.youtube.com/watch?v=EuBBz3bI-aA" target="_blank">StatQuest: Bias and Variance</a></li>

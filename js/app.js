@@ -13,7 +13,7 @@ const App = (function () {
     { id: 'ml-cls', name: 'Классификация' },
     { id: 'ml-unsup', name: 'Кластеризация и снижение размерности' },
     { id: 'dl', name: 'Нейронные сети' },
-    { id: 'glossary', name: '📚 Глоссарий' },
+    { id: 'glossary', name: 'Глоссарий' },
   ];
   let currentTopicId = null;
   let currentTabKey = null;
@@ -718,7 +718,7 @@ const App = (function () {
     const banner = document.createElement('div');
     banner.id = 'resume-banner';
     banner.className = 'resume-banner';
-    banner.innerHTML = '<span>📖 Продолжить: <b></b></span>';
+    banner.innerHTML = '<span>Продолжить: <b></b></span>';
     banner.querySelector('b').textContent = topic.title;
     const btn = document.createElement('a');
     btn.className = 'resume-btn';

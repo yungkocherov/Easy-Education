@@ -19,7 +19,7 @@ App.registerTopic({
         </ul>
       </div>
 
-      <h3>🎯 Общая идея: Gradient Boosting</h3>
+      <h3>Общая идея: Gradient Boosting</h3>
       <p>Все три библиотеки реализуют одну концепцию — <b>последовательное построение деревьев</b>, где каждое следующее дерево исправляет ошибки предыдущих. Отличия — в деталях реализации, которые дают разные скорость, точность и удобство.</p>
 
       <div class="key-concept">
@@ -27,7 +27,7 @@ App.registerTopic({
         <p>Все три: (1) строят деревья последовательно, (2) каждое дерево обучается на остатках предыдущих, (3) используют gradient descent в функциональном пространстве, (4) поддерживают регуляризацию. Разница — в <b>как</b> строить дерево, <b>как</b> обрабатывать признаки, <b>как</b> ускорить вычисления.</p>
       </div>
 
-      <h3>⚡ XGBoost (eXtreme Gradient Boosting, 2014)</h3>
+      <h3>XGBoost (eXtreme Gradient Boosting, 2014)</h3>
       <p>Чен Тяньци создал XGBoost для соревнований по ML — и он быстро стал стандартом. Ключевые идеи:</p>
       <ul>
         <li><b>Аппроксимация 2-го порядка:</b> использует и <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиент</a>, и гессиан (вторую производную) для более точных сплитов.</li>
@@ -39,7 +39,7 @@ App.registerTopic({
       <div class="math-block">$$\\text{Gain} = \\frac{1}{2}\\left[\\frac{G_L^2}{H_L + \\lambda} + \\frac{G_R^2}{H_R + \\lambda} - \\frac{(G_L + G_R)^2}{H_L + H_R + \\lambda}\\right] - \\gamma$$</div>
       <p>Где $G$ — сумма градиентов, $H$ — сумма гессианов. Дерево делает сплит только если Gain > 0.</p>
 
-      <h3>🚀 LightGBM (Light Gradient Boosting Machine, 2017)</h3>
+      <h3>LightGBM (Light Gradient Boosting Machine, 2017)</h3>
       <p>Microsoft Research сделали LightGBM быстрее XGBoost в 5-20 раз. Как:</p>
       <ul>
         <li><b>Рост дерева: leaf-wise</b> — вместо всех узлов одного уровня, выбирает лист с <b>максимальным loss reduction</b>. Даёт более точные, но асимметричные деревья.</li>
@@ -87,9 +87,9 @@ App.registerTopic({
             <line x1="258" y1="175" x2="280" y2="212" stroke="#475569" stroke-width="1"/>
 
             <text x="190" y="265" text-anchor="middle" font-size="11" fill="#475569">Ограничение: max_depth</text>
-            <text x="190" y="283" text-anchor="middle" font-size="11" fill="#059669">✓ Сбалансированное</text>
-            <text x="190" y="298" text-anchor="middle" font-size="11" fill="#059669">✓ Меньше <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a></text>
-            <text x="190" y="313" text-anchor="middle" font-size="11" fill="#dc2626">✗ Медленнее достигает loss</text>
+            <text x="190" y="283" text-anchor="middle" font-size="11" fill="#059669">Сбалансированное</text>
+            <text x="190" y="298" text-anchor="middle" font-size="11" fill="#059669">Меньше <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучения</a></text>
+            <text x="190" y="313" text-anchor="middle" font-size="11" fill="#dc2626">Медленнее достигает loss</text>
           </g>
 
           <!-- Leaf-wise tree -->
@@ -122,13 +122,13 @@ App.registerTopic({
             <line x1="442" y1="238" x2="420" y2="268" stroke="#475569" stroke-width="1"/>
             <line x1="458" y1="238" x2="480" y2="268" stroke="#475569" stroke-width="1"/>
 
-            <text x="570" y="313" text-anchor="middle" font-size="11" fill="#059669">✓ Быстрее снижает loss</text>
+            <text x="570" y="313" text-anchor="middle" font-size="11" fill="#059669">Быстрее снижает loss</text>
           </g>
         </svg>
         <div class="caption">Слева — level-wise растёт симметрично, все ветки одной глубины. Справа — leaf-wise идёт «в глубину» туда, где наибольший выигрыш по loss. Асимметричное дерево быстрее снижает ошибку, но легче переобучается.</div>
       </div>
 
-      <h3>🐱 CatBoost (Categorical Boosting, 2017)</h3>
+      <h3>CatBoost (Categorical Boosting, 2017)</h3>
       <p>Яндекс создал CatBoost специально для данных с <b>категориальными признаками</b> (город, тип товара, операционная система):</p>
       <ul>
         <li><b>Ordered Target Encoding</b> — кодирует категории средним таргета, но с хитростью: для каждого объекта использует только предыдущие объекты (предотвращает target leakage).</li>
@@ -137,7 +137,7 @@ App.registerTopic({
         <li><b>Не нужен <a class="glossary-link" onclick="App.selectTopic('glossary-one-hot')">one-hot</a> encoding</b> — принимает категории «как есть», без ручной подготовки.</li>
       </ul>
 
-      <h3>📊 Сравнительная таблица</h3>
+      <h3>Сравнительная таблица</h3>
       <table>
         <tr><th></th><th>XGBoost</th><th>LightGBM</th><th>CatBoost</th></tr>
         <tr><td><b>Рост дерева</b></td><td>Level-wise</td><td>Leaf-wise</td><td>Symmetric (level-wise)</td></tr>
@@ -151,7 +151,7 @@ App.registerTopic({
         <tr><td><b>Лучше для</b></td><td>Любые задачи</td><td>Большие данные</td><td>Много категорий</td></tr>
       </table>
 
-      <h3>🔧 Ключевые гиперпараметры</h3>
+      <h3>Ключевые гиперпараметры</h3>
       <table>
         <tr><th>Параметр</th><th>XGBoost</th><th>LightGBM</th><th>CatBoost</th></tr>
         <tr><td><b>Скорость обучения</b></td><td>learning_rate</td><td>learning_rate</td><td>learning_rate</td></tr>
@@ -164,7 +164,7 @@ App.registerTopic({
         <tr><td><b>Min в листе</b></td><td>min_child_weight</td><td>min_child_samples</td><td>min_data_in_leaf</td></tr>
       </table>
 
-      <h3>📋 Как выбрать библиотеку</h3>
+      <h3>Как выбрать библиотеку</h3>
       <ul>
         <li><b>Данные > 1M строк</b> → LightGBM (скорость решает).</li>
         <li><b>Много категориальных признаков</b> → CatBoost (не нужен ручной encoding).</li>
@@ -174,7 +174,7 @@ App.registerTopic({
         <li><b>Продакшен с малой латентностью</b> → CatBoost (быстрый inference за счёт symmetric trees).</li>
       </ul>
 
-      <h3>⚠️ Частые ошибки</h3>
+      <h3>Частые ошибки</h3>
       <ul>
         <li><b>«LightGBM всегда быстрее»</b> — на маленьких датасетах разница минимальна, а leaf-wise может переобучиться.</li>
         <li><b>«CatBoost только для категорий»</b> — нет, он хорош и на числовых данных, просто для категорий особенно силён.</li>
@@ -309,7 +309,7 @@ App.registerTopic({
         <div class="sim-container">
           <div class="sim-controls" id="bc-controls"></div>
           <div class="sim-buttons">
-            <button class="btn" id="bc-regen">🔄 Новые данные</button>
+            <button class="btn" id="bc-regen">Новые данные</button>
           </div>
           <div class="sim-output">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -739,7 +739,7 @@ print(f"Ensemble AUC: {roc_auc_score(y_test, p_ensemble):.4f}")
     `,
 
     applications: `
-      <h3>🎯 Где применяется каждая библиотека — реальные кейсы</h3>
+      <h3>Где применяется каждая библиотека — реальные кейсы</h3>
       <ul>
         <li><b>XGBoost — старая гвардия Kaggle и enterprise.</b> Стандарт в банках и крупных компаниях США: проверен с 2014 года, есть интеграции во все ML-платформы (Databricks, SageMaker, Vertex AI), отлично задокументирован. Если ты приходишь в банк с существующим ML-стеком, там уже стоит XGBoost.</li>
         <li><b>LightGBM — рекламные системы и огромные данные.</b> Microsoft создал его именно для Bing Ads, и сегодня он стандарт на задачах CTR/CVR prediction с десятками миллионов строк и сотнями признаков. Там, где XGBoost тренируется час, LightGBM справляется за 10 минут.</li>
@@ -749,7 +749,7 @@ print(f"Ensemble AUC: {roc_auc_score(y_test, p_ensemble):.4f}")
         <li><b>Учебные задачи и маленькие данные — sklearn GradientBoosting.</b> Без зависимостей, простой API, достаточно для понимания алгоритма и работы на датасетах &lt; 50K строк. Дальше — миграция на XGBoost/LightGBM.</li>
       </ul>
 
-      <h3>✅ Сильные стороны — и когда они решают выбор</h3>
+      <h3>Сильные стороны — и когда они решают выбор</h3>
       <p><b>XGBoost: надёжность и регуляризация.</b> L1/L2 регуляризация на уровне функции потерь, tree pruning через gain threshold, честная обработка sparse-данных — всё это делает XGBoost предсказуемым на средних датасетах (10K-1M строк). Если ты не знаешь, что выбрать, и у тебя обычная таблица — начинай с XGBoost.</p>
       <p><b>LightGBM: скорость на больших данных.</b> Histogram-based split (дискретизация в 256 бинов) + GOSS (gradient-based one-side sampling) + EFB (exclusive feature bundling) дают x10-x50 ускорение относительно XGBoost на датасетах от миллиона строк. Leaf-wise рост даёт более глубокую оптимизацию при том же числе узлов.</p>
       <p><b>CatBoost: категориальные признаки без ручной работы.</b> Ordered target encoding (leak-free target encoding внутри CV) плюс feature combinations (автоматические произведения категорий) — это целый класс фич, которые XGBoost и LightGBM требуют делать руками. Если у тебя 50+ категориальных колонок — CatBoost сэкономит дни feature engineering.</p>
@@ -757,7 +757,7 @@ print(f"Ensemble AUC: {roc_auc_score(y_test, p_ensemble):.4f}")
       <p><b>CatBoost: быстрый inference.</b> Symmetric trees (oblivious trees) имеют одинаковую структуру на каждом уровне — инференс векторизуется в десятки раз быстрее, чем у XGBoost/LightGBM. Важно для real-time API.</p>
       <p><b>Random Forest: устойчивость и простота.</b> Работает без тюнинга, не переобучается с ростом деревьев, дружелюбен к шумным меткам. Для задач, где «надо запустить и забыть», RF всё ещё лучший выбор.</p>
 
-      <h3>⚠️ Ограничения каждой библиотеки — и где это реально бьёт</h3>
+      <h3>Ограничения каждой библиотеки — и где это реально бьёт</h3>
       <p><b>XGBoost: нет нативных категорий (до версии 1.5).</b> Нужен one-hot или ручной target encoding. На high-cardinality фичах это создаёт разреженные матрицы и замедляет обучение. Если у тебя много категорий — LightGBM или CatBoost проще.</p>
       <p><b>XGBoost: медленнее LightGBM на больших данных.</b> На датасете в 10M строк разница в скорости обучения может быть 5-10х. Для итеративного тюнинга это часы против минут — существенно для итераций.</p>
       <p><b>LightGBM: leaf-wise рост переобучается на маленьких данных.</b> Аггрессивная оптимизация по «самому плохому» листу даёт глубокие несбалансированные деревья, которые запоминают шум на датасетах &lt; 10K строк. Нужно аккуратно выставлять <code>num_leaves</code> и <code>min_data_in_leaf</code>.</p>
@@ -766,9 +766,9 @@ print(f"Ensemble AUC: {roc_auc_score(y_test, p_ensemble):.4f}")
       <p><b>CatBoost: меньше гибкости в структуре деревьев.</b> Oblivious trees (одинаковые сплиты на уровне) ограничивают выразительность — на некоторых задачах XGBoost/LightGBM найдут более тонкие паттерны. Обычно проигрыш 0.5-1%, но он есть.</p>
       <p><b>Random Forest: уступает всем трём GBM в точности.</b> На Kaggle и в продакшене, где точность = деньги, RF — это бейзлайн, а не финальная модель. Разница 2-5% почти всегда в пользу бустинга.</p>
 
-      <h3>🧭 Какую библиотеку выбрать — матрица решений</h3>
+      <h3>Какую библиотеку выбрать — матрица решений</h3>
       <table>
-        <tr><th>✅ Бери эту библиотеку когда</th><th>❌ НЕ бери когда</th></tr>
+        <tr><th>Бери эту библиотеку когда</th><th>НЕ бери когда</th></tr>
         <tr>
           <td><b>XGBoost</b> — классический табличный ML, 10K–1M строк, есть комьюнити и зрелый стек</td>
           <td>XGBoost: миллионы строк и критична скорость — LightGBM в разы быстрее</td>
@@ -799,7 +799,7 @@ print(f"Ensemble AUC: {roc_auc_score(y_test, p_ensemble):.4f}")
         </tr>
       </table>
 
-      <h3>🔄 Альтернативы по конкретным сценариям</h3>
+      <h3>Альтернативы по конкретным сценариям</h3>
       <ul>
         <li><b>Если ты в сомнениях и у тебя обычные таблички</b> — бери <b>CatBoost</b>: лучшие дефолты, меньше шансов выстрелить в ногу без тюнинга. Для большинства продакшен-задач этого достаточно.</li>
         <li><b>Если у тебя огромные данные и нужна скорость</b> — <b>LightGBM</b> с аккуратным тюнингом <code>num_leaves</code> и <code>min_data_in_leaf</code>. GPU-режим ещё больше ускорит обучение.</li>

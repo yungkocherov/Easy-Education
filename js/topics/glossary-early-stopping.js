@@ -15,7 +15,7 @@ App.registerTopic({
         <p><b>Early stopping</b> — это правило: «Следи за val loss. Если он перестал улучшаться N эпох подряд — остановись и откатись к лучшей версии». Просто как палка, но работает как мощная регуляризация.</p>
       </div>
 
-      <h3>📐 Алгоритм</h3>
+      <h3>Алгоритм</h3>
       <ol>
         <li>Разбей данные на train / val (обычно 80/20).</li>
         <li>Обучай модель, после каждой эпохи вычисляй val loss.</li>
@@ -24,7 +24,7 @@ App.registerTopic({
         <li>Если patience превышен — остановить обучение, вернуть best checkpoint.</li>
       </ol>
 
-      <h3>⚙️ Параметры</h3>
+      <h3>Параметры</h3>
       <ul>
         <li><b>patience</b>: сколько «плохих» эпох терпеть. Типично 5-20.</li>
         <li><b>min_delta</b>: минимальное улучшение, считающееся значимым (например, 0.001). Предотвращает остановку из-за шума.</li>
@@ -32,7 +32,7 @@ App.registerTopic({
         <li><b>restore_best_weights</b>: вернуть ли веса лучшей эпохи (обычно да).</li>
       </ul>
 
-      <h3>💡 Почему это регуляризация</h3>
+      <h3>Почему это регуляризация</h3>
       <p>Early stopping ограничивает <b>число итераций оптимизации</b>. Интуитивно: у модели не хватает «времени» выучить шум. Формально можно показать, что это эквивалентно L2 регуляризации при определённых условиях (для линейных моделей).</p>
       <p>Преимущества:</p>
       <ul>
@@ -41,7 +41,7 @@ App.registerTopic({
         <li>Бесплатно — просто перестали обучать.</li>
       </ul>
 
-      <h3>📊 Типичная картина</h3>
+      <h3>Типичная картина</h3>
       <div class="calc">Эпоха | Train Loss | Val Loss | Счётчик patience
   1   | 0.80       | 0.85     | —
   5   | 0.45       | 0.52     | —
@@ -54,7 +54,7 @@ App.registerTopic({
 
 Восстанавливаем веса с эпохи 10, где был минимум val loss.</div>
 
-      <h3>🎯 Использование в sklearn и ML-библиотеках</h3>
+      <h3>Использование в sklearn и ML-библиотеках</h3>
 
       <h4>XGBoost / LightGBM</h4>
       <div class="calc">model = xgb.XGBClassifier(n_estimators=10000)
@@ -88,7 +88,7 @@ for epoch in range(100):
             break
 model.load_state_dict(torch.load('best.pt'))</div>
 
-      <h3>⚠️ Частые ошибки</h3>
+      <h3>Частые ошибки</h3>
       <ul>
         <li><b>Использование test set для early stopping</b> → утечка информации. Используй отдельный val set.</li>
         <li><b>Слишком маленький patience</b> (2-3) → останавливаешься на случайном шуме до того, как модель реально сошлась.</li>
@@ -97,7 +97,7 @@ model.load_state_dict(torch.load('best.pt'))</div>
         <li><b>Мониторишь train loss</b> → он всегда падает, early stopping никогда не сработает.</li>
       </ul>
 
-      <h3>🏆 Где особенно полезно</h3>
+      <h3>Где особенно полезно</h3>
       <ul>
         <li><b>Gradient Boosting</b>: обычно ставят большое $n_\\text{estimators}$ + early stopping. Автоматически находит оптимальное число деревьев.</li>
         <li><b>Fine-tuning LLM</b>: предотвращает catastrophic forgetting и переобучение.</li>
@@ -105,7 +105,7 @@ model.load_state_dict(torch.load('best.pt'))</div>
         <li><b>Любое обучение, где epoch-count — гиперпараметр</b>: вместо подбора сделай early stopping.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('regularization')">Регуляризация</a> — early stopping как её разновидность</li>
         <li><a onclick="App.selectTopic('glossary-overfitting')">Переобучение</a></li>
@@ -114,7 +114,7 @@ model.load_state_dict(torch.load('best.pt'))</div>
       </ul>
     `,
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Early_stopping" target="_blank">Wikipedia: Early stopping</a></li>
       </ul>

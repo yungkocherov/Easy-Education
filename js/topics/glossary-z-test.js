@@ -19,12 +19,12 @@ App.registerTopic({
         <p>Студент сильнее в математике <b>относительно класса</b>, хотя сырой балл там ниже. Это и есть <b>стандартизация</b> через z-score.</p>
       </div>
 
-      <h3>📐 Формула z-score</h3>
+      <h3>Формула z-score</h3>
       <div class="math-block">$$z = \\frac{x - \\mu}{\\sigma}$$</div>
       <p>где $x$ — значение, $\\mu$ — среднее, $\\sigma$ — стандартное отклонение. Результат — «сколько стандартных отклонений» $x$ отстоит от $\\mu$. Единицы измерения сокращаются — z безразмерен.</p>
       <p>После стандартизации вектор признаков имеет среднее 0 и std 1. Это называется <b>z-нормализация</b> или <b>StandardScaler</b> в sklearn.</p>
 
-      <h3>🎯 z-тест</h3>
+      <h3>z-тест</h3>
       <p>Проверка гипотезы о среднем, когда $\\sigma$ <b>известно</b> или выборка большая ($n \\geq 30$):</p>
       <div class="math-block">$$z = \\frac{\\bar{x} - \\mu_0}{\\sigma/\\sqrt{n}} = \\frac{\\bar{x} - \\mu_0}{\\text{SE}}$$</div>
       <p>При H₀: $z \\sim N(0, 1)$. Сравниваем с критическими значениями:</p>
@@ -34,12 +34,12 @@ App.registerTopic({
         <li>$z > 1.645$ (one-sided) — для α=0.05 только справа.</li>
       </ul>
 
-      <h3>🎯 z-test для пропорций</h3>
+      <h3>z-test для пропорций</h3>
       <p>Частый случай в A/B тестах — сравнение двух конверсий:</p>
       <div class="math-block">$$z = \\frac{\\hat{p}_A - \\hat{p}_B}{\\sqrt{\\hat{p}(1-\\hat{p})\\left(\\frac{1}{n_A} + \\frac{1}{n_B}\\right)}}$$</div>
       <p>где $\\hat{p} = (x_A + x_B)/(n_A + n_B)$ — pooled пропорция. Работает при $n \\hat{p}, n(1-\\hat{p}) \\geq 10$ (нормальная аппроксимация биномиального).</p>
 
-      <h3>📊 Таблица z-квантилей</h3>
+      <h3>Таблица z-квантилей</h3>
       <table>
         <tr><th>Уровень уверенности</th><th>Two-sided z</th><th>One-sided z</th></tr>
         <tr><td>90%</td><td>1.645</td><td>1.282</td></tr>
@@ -48,19 +48,19 @@ App.registerTopic({
         <tr><td>99.9%</td><td>3.291</td><td>3.090</td></tr>
       </table>
 
-      <h3>⚖️ z-тест vs t-тест</h3>
+      <h3>z-тест vs t-тест</h3>
       <ul>
         <li><b>z-тест</b>: σ известно, или $n$ большое (> 30) → используй $N(0, 1)$.</li>
         <li><b>t-тест</b>: σ неизвестно и $n$ маленькое → используй $t(n-1)$. Плата — более широкие критические значения.</li>
       </ul>
       <p>На больших выборках разница ничтожна (t сходится к z), поэтому sklearn/scipy в А/Б часто используют z-тест даже когда σ оценивается.</p>
 
-      <p class="callout tip">📊 <b>Полный числовой пример A/B-теста конверсий</b> с пошаговым разбором p_pooled → SE → z → p-value находится в теме <a onclick="App.selectTopic('ab-z-test')">z-тест для конверсий</a>.</p>
+      <p class="callout tip"><b>Полный числовой пример A/B-теста конверсий</b> с пошаговым разбором p_pooled → SE → z → p-value находится в теме <a onclick="App.selectTopic('ab-z-test')">z-тест для конверсий</a>.</p>
 
-      <h3>💡 z-score как outlier detection</h3>
+      <h3>z-score как outlier detection</h3>
       <p>Правило: значения с $|z| > 3$ считаются выбросами (вероятность такого события для $N(0,1)$ ≈ 0.27%). Это очень грубый метод — не работает для скошенных распределений. Для них лучше использовать IQR или устойчивые методы.</p>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('ab-z-test')">z-тест (подробно)</a></li>
         <li><a onclick="App.selectTopic('ab-t-test')">t-тест</a></li>
@@ -71,7 +71,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Z-test" target="_blank">Wikipedia: Z-test</a></li>
         <li><a href="https://en.wikipedia.org/wiki/Standard_score" target="_blank">Standard score (z-score)</a></li>

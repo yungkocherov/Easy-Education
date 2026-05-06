@@ -15,25 +15,25 @@ App.registerTopic({
         <p><b>Нормализация</b> — это приём: перед тем как передать активации дальше, приведи их к среднему 0 и дисперсии 1. Тогда следующий слой всегда видит «стандартизованный» вход, его задача стабильна. Результат: обучение идёт быстрее, позволяет использовать большие learning rate, и часто работает как регуляризация.</p>
       </div>
 
-      <h3>📐 Batch Normalization (2015)</h3>
+      <h3>Batch Normalization (2015)</h3>
       <p>Для каждого признака в слое вычисли среднее и дисперсию <b>по мини-батчу</b> и нормализуй:</p>
       <div class="math-block">$$\\hat{x}_i = \\frac{x_i - \\mu_{\\text{batch}}}{\\sqrt{\\sigma^2_{\\text{batch}} + \\varepsilon}}$$</div>
       <p>Затем добавить обучаемые масштаб $\\gamma$ и сдвиг $\\beta$:</p>
       <div class="math-block">$$y_i = \\gamma \\hat{x}_i + \\beta$$</div>
       <p>$\\gamma, \\beta$ — обучаются обратным распространением. Это позволяет сети, если нужно, «отменить» нормализацию (вернуть исходное распределение).</p>
 
-      <h3>⚙️ BN во время train vs inference</h3>
+      <h3>BN во время train vs inference</h3>
       <ul>
         <li><b>Train</b>: $\\mu, \\sigma$ считаются по текущему мини-батчу. Параллельно поддерживается <b>скользящее среднее</b> $\\mu_{\\text{ema}}, \\sigma_{\\text{ema}}$ по всей тренировке.</li>
         <li><b>Inference</b>: используются фиксированные $\\mu_{\\text{ema}}, \\sigma_{\\text{ema}}$ — нет зависимости от случайного батча.</li>
       </ul>
       <p>Эта двойственность — источник многих багов. Забыли <code>model.eval()</code> → BN использует статистики текущего батча, и предсказания зависят от того, с кем объект подавался.</p>
 
-      <h3>🎯 Где ставить BN</h3>
+      <h3>Где ставить BN</h3>
       <p>Стандартная последовательность слоя: <b>Linear/Conv → BN → ReLU</b>. Логика: сначала линейная трансформация, затем нормализация (чтобы убрать смещение), затем нелинейность.</p>
       <p>Некоторые варианты: BN до или после активации, но классическая схема работает хорошо.</p>
 
-      <h3>⚠️ Проблемы BN</h3>
+      <h3>Проблемы BN</h3>
       <ul>
         <li><b>Зависит от размера батча</b>: плохо работает при batch_size=1 или 2 (статистики шумные).</li>
         <li><b>Плохо работает с RNN</b>: длина последовательностей разная, сложно нормализовать.</li>
@@ -41,23 +41,23 @@ App.registerTopic({
         <li><b>Проблемы с трансферным обучением</b>: статистики из pretrained BN могут не подходить к новому датасету.</li>
       </ul>
 
-      <h3>📐 Layer Normalization (2016)</h3>
+      <h3>Layer Normalization (2016)</h3>
       <p>Альтернатива BN, которая нормализует <b>по признакам одного примера</b>, а не по батчу:</p>
       <div class="math-block">$$\\mu_i = \\frac{1}{d}\\sum_{j=1}^d x_{ij}, \\quad \\sigma_i^2 = \\frac{1}{d}\\sum_{j=1}^d (x_{ij} - \\mu_i)^2$$</div>
       <p>То есть для каждого примера $i$ считается своё среднее по $d$ фичам. Не зависит от batch size, идеально подходит для NLP/Transformer.</p>
 
-      <h3>⚖️ BN vs LN: когда что использовать</h3>
+      <h3>BN vs LN: когда что использовать</h3>
       <table>
         <tr><th>Случай</th><th>BN</th><th>LN</th></tr>
-        <tr><td>CNN для изображений</td><td>✓</td><td>✗ (хуже)</td></tr>
-        <tr><td>Transformer</td><td>✗</td><td>✓ (стандарт)</td></tr>
-        <tr><td>RNN / LSTM</td><td>✗ (неудобно)</td><td>✓</td></tr>
-        <tr><td>Маленький batch (&lt;8)</td><td>✗</td><td>✓</td></tr>
-        <tr><td>Большой batch (&gt;32)</td><td>✓</td><td>≈</td></tr>
-        <tr><td>Online inference (1 пример)</td><td>через EMA</td><td>✓ (естественно)</td></tr>
+        <tr><td>CNN для изображений</td><td></td><td>(хуже)</td></tr>
+        <tr><td>Transformer</td><td></td><td>(стандарт)</td></tr>
+        <tr><td>RNN / LSTM</td><td>(неудобно)</td><td></td></tr>
+        <tr><td>Маленький batch (&lt;8)</td><td></td><td></td></tr>
+        <tr><td>Большой batch (&gt;32)</td><td></td><td>≈</td></tr>
+        <tr><td>Online inference (1 пример)</td><td>через EMA</td><td>(естественно)</td></tr>
       </table>
 
-      <h3>🎯 Варианты нормализации</h3>
+      <h3>Варианты нормализации</h3>
       <ul>
         <li><b>Batch Norm (BN)</b>: по батчу. CNN стандарт.</li>
         <li><b>Layer Norm (LN)</b>: по признакам одного примера. Transformer, RNN.</li>
@@ -66,7 +66,7 @@ App.registerTopic({
         <li><b>RMSNorm</b>: упрощённая LN без вычитания среднего. Используется в LLaMA.</li>
       </ul>
 
-      <h3>💡 Почему BN работает (теории)</h3>
+      <h3>Почему BN работает (теории)</h3>
       <p>Изначальное объяснение («уменьшает internal covariate shift») оказалось <b>недостаточным</b>. Современные работы предлагают:</p>
       <ul>
         <li><b>Smoother loss landscape</b>: BN делает функцию потерь более «гладкой», что позволяет использовать бо́льшие learning rate.</li>
@@ -75,7 +75,7 @@ App.registerTopic({
       </ul>
       <p>Точная теория всё ещё обсуждается, но факт работы — неоспорим.</p>
 
-      <h3>🔢 Пример: BN в сверточной сети</h3>
+      <h3>Пример: BN в сверточной сети</h3>
       <div class="calc">Conv2D (32 filters, 3×3)
   → output: (batch_size=64, channels=32, H, W)
 BatchNorm2D(32)
@@ -86,7 +86,7 @@ BatchNorm2D(32)
 ReLU
   → output: (64, 32, H, W), готов для следующего слоя</div>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('glossary-vanishing-gradient')">Vanishing gradients</a> — BN помогает бороться</li>
         <li><a onclick="App.selectTopic('neural-network')">Нейронные сети</a></li>
@@ -96,7 +96,7 @@ ReLU
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://arxiv.org/abs/1502.03167" target="_blank">BatchNorm original paper (Ioffe & Szegedy, 2015)</a></li>
         <li><a href="https://arxiv.org/abs/1607.06450" target="_blank">LayerNorm paper (Ba et al., 2016)</a></li>

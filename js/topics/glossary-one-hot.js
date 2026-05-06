@@ -15,7 +15,7 @@ App.registerTopic({
         <p><b>One-hot encoding</b> решает это элегантно: вместо одной колонки делаем столько колонок, сколько значений, и ставим 1 только в ту, которая соответствует текущему значению. Каждая категория получает свою «осу́», они равноправны.</p>
       </div>
 
-      <h3>🎯 Определение</h3>
+      <h3>Определение</h3>
       <p><b>One-hot encoding</b> — преобразование категориальной переменной с $K$ значениями в $K$ бинарных (0/1) признаков. Для каждой строки ровно один признак = 1 (тот, что соответствует её категории), остальные = 0.</p>
 
       <div class="illustration bordered">
@@ -37,7 +37,7 @@ App.registerTopic({
             <text x="150" y="202" text-anchor="middle" font-size="12">красный</text>
             <rect x="90" y="210" width="120" height="25" fill="#fff" stroke="#cbd5e1"/>
             <text x="150" y="227" text-anchor="middle" font-size="12">синий</text>
-            <text x="150" y="255" text-anchor="middle" font-size="10" fill="#dc2626">✗ Модель не понимает текст</text>
+            <text x="150" y="255" text-anchor="middle" font-size="10" fill="#dc2626">Модель не понимает текст</text>
           </g>
 
           <!-- Arrow -->
@@ -95,25 +95,25 @@ App.registerTopic({
             <text x="545" y="227" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">1</text>
             <rect x="600" y="210" width="110" height="25" fill="#fff" stroke="#cbd5e1"/>
             <text x="655" y="227" text-anchor="middle" font-size="13">0</text>
-            <text x="555" y="255" text-anchor="middle" font-size="10" fill="#059669">✓ Числовое представление, равноправные категории</text>
+            <text x="555" y="255" text-anchor="middle" font-size="10" fill="#059669">Числовое представление, равноправные категории</text>
           </g>
           <text x="380" y="285" text-anchor="middle" font-size="11" fill="#64748b">Каждая строка имеет ровно одну 1 и несколько 0. Отсюда название «one-hot».</text>
         </svg>
         <div class="caption">Категориальный признак «цвет» с 3 значениями превращается в 3 бинарных признака. Каждая строка имеет ровно одну «горячую» единицу.</div>
       </div>
 
-      <h3>🎯 Когда использовать</h3>
+      <h3>Когда использовать</h3>
       <table>
         <tr><th>Ситуация</th><th>Подходит?</th></tr>
-        <tr><td>Номинальные (неупорядоченные) категории</td><td><b>✅ Да</b> — цвет, город, страна</td></tr>
-        <tr><td>Линейные модели (регрессия, SVM)</td><td>✅ Да</td></tr>
-        <tr><td>Нейросети</td><td>✅ Да, но часто лучше embedding</td></tr>
-        <tr><td>Деревья (RF, GB)</td><td>⚠️ Иногда лучше label encoding — деревья справляются</td></tr>
-        <tr><td>Много уникальных значений (high cardinality)</td><td>❌ Избегай — тысячи колонок замедлят модель</td></tr>
-        <tr><td>Ordinal (упорядоченные) категории</td><td>❌ Используй ordinal encoding — размер S/M/L/XL имеет порядок</td></tr>
+        <tr><td>Номинальные (неупорядоченные) категории</td><td><b>Да</b> — цвет, город, страна</td></tr>
+        <tr><td>Линейные модели (регрессия, SVM)</td><td>Да</td></tr>
+        <tr><td>Нейросети</td><td>Да, но часто лучше embedding</td></tr>
+        <tr><td>Деревья (RF, GB)</td><td>Иногда лучше label encoding — деревья справляются</td></tr>
+        <tr><td>Много уникальных значений (high cardinality)</td><td>Избегай — тысячи колонок замедлят модель</td></tr>
+        <tr><td>Ordinal (упорядоченные) категории</td><td>Используй ordinal encoding — размер S/M/L/XL имеет порядок</td></tr>
       </table>
 
-      <h3>⚠️ Подводные камни</h3>
+      <h3>Подводные камни</h3>
 
       <h4>1. Dummy variable trap (линейная зависимость)</h4>
       <p>Если кодировать 3 категории как 3 столбца, они линейно зависимы: $\\text{red} + \\text{blue} + \\text{green} = 1$. Для линейных моделей (регрессия) это создаёт мультиколлинеарность. Решение — <b>drop_first</b>: оставить $K-1$ столбцов, «базовая» категория закодирована нулями во всех.</p>
@@ -125,7 +125,7 @@ App.registerTopic({
       <h4>3. Новые категории при inference</h4>
       <p>Что если в продакшене пришло значение, которого не было в train? Нужно решить заранее: ошибка? Отдельная колонка «unknown»? sklearn <code>OneHotEncoder(handle_unknown='ignore')</code> обрабатывает это корректно.</p>
 
-      <h3>🔢 Альтернативы one-hot</h3>
+      <h3>Альтернативы one-hot</h3>
       <table>
         <tr><th>Метод</th><th>Идея</th><th>Когда лучше</th></tr>
         <tr><td><b>Label encoding</b></td><td>Каждой категории — число</td><td>Ordinal данные, деревья</td></tr>
@@ -135,7 +135,7 @@ App.registerTopic({
         <tr><td><b>Hashing</b></td><td>Hash-функция в фиксированное число колонок</td><td>Огромная cardinality, потоковая обработка</td></tr>
       </table>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('feature-engineering')">Feature Engineering</a></li>
         <li><a onclick="App.selectTopic('glossary-embedding')">Embedding</a> — современная альтернатива</li>
@@ -144,7 +144,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/One-hot" target="_blank">Wikipedia: One-hot</a></li>
         <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html" target="_blank">sklearn.OneHotEncoder</a></li>
