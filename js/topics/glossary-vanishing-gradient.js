@@ -15,12 +15,12 @@ App.registerTopic({
         <p>При обучении нейронной сети происходит то же самое. Градиент от функции потерь через <b>цепное правило</b> умножается на производные каждого слоя. Если эти производные < 1 — градиент <b>исчезает</b> (vanishing). Если > 1 — <b>взрывается</b> (exploding). В обоих случаях обучение ломается.</p>
       </div>
 
-      <h3>📐 Откуда берётся</h3>
+      <h3>Откуда берётся</h3>
       <p>По цепному правилу, градиент функции потерь $L$ по весам первого слоя в сети с $k$ слоями:</p>
       <div class="math-block">$$\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial h_k} \\cdot \\frac{\\partial h_k}{\\partial h_{k-1}} \\cdot \\frac{\\partial h_{k-1}}{\\partial h_{k-2}} \\cdots \\frac{\\partial h_2}{\\partial h_1} \\cdot \\frac{\\partial h_1}{\\partial w_1}$$</div>
       <p>Это произведение $k$ якобианов. Если каждый имеет норму ~0.5, то общая норма ~$0.5^k$ — экспоненциально мала. Если ~2, то ~$2^k$ — экспоненциально велика.</p>
 
-      <h3>⚠️ Vanishing gradient (исчезающий)</h3>
+      <h3>Vanishing gradient (исчезающий)</h3>
       <p>Симптомы:</p>
       <ul>
         <li>Loss практически не падает, или падает только у последних слоёв.</li>
@@ -35,7 +35,7 @@ App.registerTopic({
         <li>Глубокие RNN — ещё хуже: один якобиан повторяется $T$ раз во времени.</li>
       </ul>
 
-      <h3>🔥 Exploding gradient (взрывающийся)</h3>
+      <h3>Exploding gradient (взрывающийся)</h3>
       <p>Симптомы:</p>
       <ul>
         <li>Loss внезапно становится NaN.</li>
@@ -44,7 +44,7 @@ App.registerTopic({
       </ul>
       <p>Менее опасен, чем vanishing (легко обнаружить и починить gradient clipping'ом), но тоже критичен.</p>
 
-      <h3>💡 Решения</h3>
+      <h3>Решения</h3>
 
       <h4>1. ReLU вместо sigmoid/tanh</h4>
       <p>Производная ReLU = 1 (для положительных) или 0. Нет затухания в активной области. Вариации: Leaky ReLU, ELU, GELU. Это одна из причин, почему глубокое обучение «взлетело» после 2012.</p>
@@ -72,7 +72,7 @@ App.registerTopic({
       <h4>7. Более короткие backprop paths</h4>
       <p>Transformer использует self-attention с коротким путём от любого токена к любому другому — одним умножением матриц, без длинной цепочки рекуррентных шагов. Это одна из причин, почему Transformer победил RNN.</p>
 
-      <h3>🔢 Пример: sigmoid в глубокой сети</h3>
+      <h3>Пример: sigmoid в глубокой сети</h3>
       <div class="calc">Предположим сеть с 20 слоями на sigmoid активациях.
 Худший случай: каждая производная ≈ 0.1 (в насыщении sigmoid).
 Градиент первого слоя ~ 0.1²⁰ = 10⁻²⁰.
@@ -83,7 +83,7 @@ Learning rate = 0.01. Обновление веса:
 
 С ReLU и He init: градиент порядка 1, обновления нормальные.</div>
 
-      <h3>📊 Как диагностировать</h3>
+      <h3>Как диагностировать</h3>
       <ul>
         <li>Строй <b>gradient norm</b> для каждого слоя во время обучения. Если разница на порядки — проблема.</li>
         <li>Смотри на распределение активаций: много нулей у ReLU → dying ReLU; насыщение у sigmoid → vanishing.</li>
@@ -91,7 +91,7 @@ Learning rate = 0.01. Обновление веса:
         <li>Для RNN: backprop through time (BPTT) → явно подвержено обеим проблемам.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('glossary-activations')">Активационные функции</a> — ReLU решает большую часть vanishing</li>
         <li><a onclick="App.selectTopic('glossary-batchnorm')">BatchNorm</a></li>
@@ -102,7 +102,7 @@ Learning rate = 0.01. Обновление веса:
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Vanishing_gradient_problem" target="_blank">Wikipedia: Vanishing gradient</a></li>
       </ul>

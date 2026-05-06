@@ -15,10 +15,10 @@ App.registerTopic({
         <p><b>Attention</b> — это математическая версия этой идеи. Для каждого слова модель вычисляет «насколько внимательно смотреть» на каждое другое слово. Итоговое представление слова — это <b>взвешенная сумма</b> всех остальных, где веса = «внимание».</p>
       </div>
 
-      <h3>🎯 Зачем нужен attention</h3>
+      <h3>Зачем нужен attention</h3>
       <p>До attention, в RNN информация из начала последовательности «утекала» к концу. К 50-му слову модель уже плохо помнила 1-е. Attention решает это радикально: <b>каждое слово имеет прямой доступ ко всем остальным</b>, независимо от расстояния.</p>
 
-      <h3>📐 Формула Scaled Dot-Product Attention</h3>
+      <h3>Формула Scaled Dot-Product Attention</h3>
       <div class="math-block">$$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{Q K^T}{\\sqrt{d_k}}\\right) V$$</div>
       <p>Три компонента:</p>
       <ul>
@@ -90,7 +90,7 @@ App.registerTopic({
         <div class="caption">Слово «он» вычисляет свой Query и сравнивает с Key каждого другого слова. Softmax превращает «совпадения» в веса (они в сумме = 1). Финальное представление «он» — взвешенная сумма V всех токенов. Высокий вес 0.62 на «Кот» означает: модель поняла антецедент местоимения.</div>
       </div>
 
-      <h3>⚙️ Алгоритм за 4 шага</h3>
+      <h3>Алгоритм за 4 шага</h3>
       <ol>
         <li><b>Вычисляем Q, K, V</b> для каждого токена через линейные проекции: $Q = xW^Q$, $K = xW^K$, $V = xW^V$.</li>
         <li><b>Scores</b>: $\\text{score}_{ij} = Q_i \\cdot K_j$ — насколько $i$-й токен «интересуется» $j$-м.</li>
@@ -103,7 +103,7 @@ App.registerTopic({
         <p>При большом $d_k$ скалярные произведения имеют большую дисперсию → softmax становится «почти one-hot», модель даёт всё внимание одному токену. Деление на $\\sqrt{d_k}$ возвращает дисперсию к единице и делает softmax «мягким».</p>
       </div>
 
-      <h3>🧩 Виды attention</h3>
+      <h3>Виды attention</h3>
       <ul>
         <li><b>Self-attention</b> — Q, K, V из одной последовательности. Каждое слово смотрит на все остальные в этом же предложении. Базовый блок Transformer.</li>
         <li><b>Cross-attention</b> — Q из одной последовательности, K и V из другой. Используется в encoder-decoder моделях: decoder смотрит на encoder при переводе.</li>
@@ -111,7 +111,7 @@ App.registerTopic({
         <li><b>Multi-head attention</b> — $h$ параллельных attention'ов с разными проекциями. Каждая «голова» учит свой паттерн (синтаксис, семантика, позиции).</li>
       </ul>
 
-      <h3>💥 Революция attention в NLP</h3>
+      <h3>Революция attention в NLP</h3>
       <p>До 2017: RNN/LSTM доминировали в NLP. Paper «Attention is All You Need» (2017) показал: можно выбросить рекуррентность и оставить <b>только attention</b>. Результат — Transformer, который:</p>
       <ul>
         <li>Параллелится (нет зависимости от времени, как в RNN).</li>
@@ -120,14 +120,14 @@ App.registerTopic({
       </ul>
       <p>Attention стал основой BERT, GPT, T5, LLaMA, Claude и практически всей современной NLP/LLM-индустрии.</p>
 
-      <h3>⚠️ Ограничения</h3>
+      <h3>Ограничения</h3>
       <ul>
         <li><b>O(n²) сложность</b> по длине последовательности. Для 10k токенов — 100M операций.</li>
         <li><b>Не учитывает порядок</b> сам по себе — нужно добавлять positional encoding.</li>
         <li><b>Большое потребление памяти</b> при длинных контекстах.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('transformer')">Transformer</a> — главное применение attention</li>
         <li><a onclick="App.selectTopic('rnn-lstm')">RNN/LSTM</a> — что было до attention</li>
@@ -136,7 +136,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention Is All You Need (2017)</a></li>
         <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank">3Blue1Brown: Attention in transformers</a></li>

@@ -15,7 +15,7 @@ App.registerTopic({
         <p>То же с ML моделями: predict_proba возвращает 0.8, но это не значит, что модель «уверена на 80%». Random Forest, например, обычно даёт <b>сглаженные</b> вероятности (никогда не 0.99 или 0.01). SVM и нейросети — наоборот, переуверены. Калибровка это исправляет.</p>
       </div>
 
-      <h3>🎯 Когда важна калибровка</h3>
+      <h3>Когда важна калибровка</h3>
       <ul>
         <li><b>Risk scoring</b>: банк решает выдать ли кредит — нужна реальная вероятность дефолта, а не просто ранжирование.</li>
         <li><b>Медицина</b>: «вероятность болезни 30%» должна быть истинной, чтобы врач принял правильное решение.</li>
@@ -24,7 +24,7 @@ App.registerTopic({
       </ul>
       <p>Когда не важна: если задача — только классификация (argmax), а не вероятности. Тогда достаточно правильного ranking.</p>
 
-      <h3>📊 Reliability diagram</h3>
+      <h3>Reliability diagram</h3>
       <p>Главный визуальный инструмент. Разбиваем предсказания на бины (например, [0, 0.1], [0.1, 0.2], ...). Для каждого бина считаем:</p>
       <ul>
         <li><b>Среднюю предсказанную вероятность</b> (центр бина).</li>
@@ -32,7 +32,7 @@ App.registerTopic({
       </ul>
       <p>Идеально откалиброванная модель даёт точки на диагонали ($y = x$). Отклонение вверх — модель занижает, вниз — завышает.</p>
 
-      <h3>🔢 Метрики калибровки</h3>
+      <h3>Метрики калибровки</h3>
 
       <h4>Brier score</h4>
       <div class="math-block">$$\\text{Brier} = \\frac{1}{N}\\sum_{i=1}^N (\\hat{p}_i - y_i)^2$$</div>
@@ -47,7 +47,7 @@ App.registerTopic({
       <div class="math-block">$$\\text{ECE} = \\sum_{m=1}^M \\frac{|B_m|}{N} \\cdot |\\text{acc}(B_m) - \\text{conf}(B_m)|$$</div>
       <p>Усреднённая разница между точностью и средней уверенностью по бинам. ECE=0 — идеально. Удобно для отчётов.</p>
 
-      <h3>🛠 Методы калибровки</h3>
+      <h3>Методы калибровки</h3>
 
       <h4>1. Platt Scaling (1999)</h4>
       <p>Тренируем логистическую регрессию <b>поверх</b> сырых предсказаний модели:</p>
@@ -75,18 +75,18 @@ App.registerTopic({
         <li>Стандарт для DL после статьи Guo et al. (2017).</li>
       </ul>
 
-      <h3>📊 Какие модели нуждаются в калибровке</h3>
+      <h3>Какие модели нуждаются в калибровке</h3>
       <table>
         <tr><th>Модель</th><th>Калибровка по умолчанию</th></tr>
-        <tr><td>Logistic Regression</td><td>✓ Хорошо откалибрована</td></tr>
-        <tr><td>Naive Bayes</td><td>✗ Плохо (переуверена)</td></tr>
-        <tr><td>Random Forest</td><td>✗ Сглажена в середине</td></tr>
-        <tr><td>SVM</td><td>✗ Не возвращает вероятности (нужен Platt)</td></tr>
+        <tr><td>Logistic Regression</td><td>Хорошо откалибрована</td></tr>
+        <tr><td>Naive Bayes</td><td>Плохо (переуверена)</td></tr>
+        <tr><td>Random Forest</td><td>Сглажена в середине</td></tr>
+        <tr><td>SVM</td><td>Не возвращает вероятности (нужен Platt)</td></tr>
         <tr><td>Gradient Boosting</td><td>≈ Чуть переуверена</td></tr>
-        <tr><td>Нейронные сети</td><td>✗ Сильно переуверены</td></tr>
+        <tr><td>Нейронные сети</td><td>Сильно переуверены</td></tr>
       </table>
 
-      <h3>💡 sklearn пример</h3>
+      <h3>sklearn пример</h3>
       <div class="calc">from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC
 
@@ -102,7 +102,7 @@ brier = brier_score_loss(y_test, probas[:, 1])
 from sklearn.calibration import calibration_curve
 prob_pred, prob_true = calibration_curve(y_test, probas[:, 1], n_bins=10)</div>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('metrics')">Метрики классификации</a></li>
         <li><a onclick="App.selectTopic('roc-auc')">ROC-AUC</a></li>
@@ -110,7 +110,7 @@ prob_pred, prob_true = calibration_curve(y_test, probas[:, 1], n_bins=10)</div>
       </ul>
     `,
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Brier_score" target="_blank">Brier score</a></li>
         <li><a href="https://arxiv.org/abs/1706.04599" target="_blank">Guo et al. (2017): On Calibration of Modern Neural Networks</a></li>

@@ -37,24 +37,24 @@ App.registerTopic({
           <!-- TP cell (green) -->
           <rect x="145" y="58" width="165" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
           <text x="228" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#065f46">TP</text>
-          <text x="228" y="100" text-anchor="middle" font-size="10" fill="#065f46">True Positive ✓</text>
+          <text x="228" y="100" text-anchor="middle" font-size="10" fill="#065f46">True Positive </text>
           <!-- FN cell (red) -->
           <rect x="315" y="58" width="165" height="55" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
           <text x="398" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#991b1b">FN</text>
-          <text x="398" y="100" text-anchor="middle" font-size="10" fill="#991b1b">False Negative ✗</text>
+          <text x="398" y="100" text-anchor="middle" font-size="10" fill="#991b1b">False Negative </text>
           <!-- FP cell (red) -->
           <rect x="145" y="118" width="165" height="55" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
           <text x="228" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#991b1b">FP</text>
-          <text x="228" y="160" text-anchor="middle" font-size="10" fill="#991b1b">False Positive ✗</text>
+          <text x="228" y="160" text-anchor="middle" font-size="10" fill="#991b1b">False Positive </text>
           <!-- TN cell (green) -->
           <rect x="315" y="118" width="165" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
           <text x="398" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#065f46">TN</text>
-          <text x="398" y="160" text-anchor="middle" font-size="10" fill="#065f46">True Negative ✓</text>
+          <text x="398" y="160" text-anchor="middle" font-size="10" fill="#065f46">True Negative </text>
         </svg>
         <div class="caption"><a class="glossary-link" onclick="App.selectTopic('glossary-confusion-matrix')">Матрица ошибок</a> (Confusion Matrix): TP и TN — верные предсказания (зелёные), FP и FN — ошибки (красные). Все метрики классификации строятся из этих 4 чисел.</div>
       </div>
 
-      <h3>🎯 Зачем нужны метрики</h3>
+      <h3>Зачем нужны метрики</h3>
       <p>Модель классификации предсказывает классы. Но <b>насколько хорошо</b> она это делает? Нужен способ измерения, чтобы:</p>
       <ul>
         <li>Сравнивать модели между собой и выбирать лучшую.</li>
@@ -64,18 +64,18 @@ App.registerTopic({
       </ul>
       <p>Но нет одной «правильной» метрики — выбор зависит от задачи и цены ошибок.</p>
 
-      <h3>📊 Матрица ошибок — основа всего</h3>
+      <h3>Матрица ошибок — основа всего</h3>
       <p><span class="term" data-tip="Confusion Matrix. Таблица, которая показывает, сколько предсказаний каждого класса оказались правильными, а сколько — ошибочными.">Confusion Matrix</span> — это таблица, где строки — реальные классы, столбцы — предсказанные. Для бинарной задачи получается 4 ячейки:</p>
 
       <table>
         <tr><th></th><th>Предсказано: Положительный</th><th>Предсказано: Отрицательный</th></tr>
-        <tr><th>Реально: Положительный</th><td>✓ <b>TP</b> (True Positive)<br>Верно предсказали «да»</td><td>✗ <b>FN</b> (False Negative)<br>Пропустили положительный</td></tr>
-        <tr><th>Реально: Отрицательный</th><td>✗ <b>FP</b> (False Positive)<br>Ложная тревога</td><td>✓ <b>TN</b> (True Negative)<br>Верно предсказали «нет»</td></tr>
+        <tr><th>Реально: Положительный</th><td><b>TP</b> (True Positive)<br>Верно предсказали «да»</td><td><b>FN</b> (False Negative)<br>Пропустили положительный</td></tr>
+        <tr><th>Реально: Отрицательный</th><td><b>FP</b> (False Positive)<br>Ложная тревога</td><td><b>TN</b> (True Negative)<br>Верно предсказали «нет»</td></tr>
       </table>
 
       <p>Все метрики выводятся из этих 4 чисел. Разница между метриками — в том, какие комбинации ячеек они считают.</p>
 
-      <h3>🧮 Основные метрики — подробно</h3>
+      <h3>Основные метрики — подробно</h3>
 
       <h4>Accuracy (точность общая)</h4>
       <div class="math-block">$$\\text{Accuracy} = \\frac{TP + TN}{TP + TN + FP + FN}$$</div>
@@ -114,7 +114,7 @@ App.registerTopic({
         <li>β = 0.5 → F0.5 (precision важнее).</li>
       </ul>
 
-      <h3>🎯 Какую метрику выбрать</h3>
+      <h3>Какую метрику выбрать</h3>
 
       <table>
         <tr><th>Ситуация</th><th>Метрика</th><th>Пример</th></tr>
@@ -125,7 +125,7 @@ App.registerTopic({
         <tr><td>Порог ещё не выбран</td><td>ROC-AUC, PR-AUC</td><td>Сравнение моделей</td></tr>
       </table>
 
-      <h3>🔍 Порог решения — скрытый параметр</h3>
+      <h3>Порог решения — скрытый параметр</h3>
       <p>Большинство моделей выдают <b>вероятность</b>, а не класс. Класс получается применением порога:</p>
       <div class="math-block">$$\\hat{y} = \\begin{cases} 1, & p \\geq \\text{threshold} \\\\ 0, & p < \\text{threshold} \\end{cases}$$</div>
       <p>По умолчанию threshold = 0.5. Но он должен быть подобран под задачу:</p>
@@ -134,7 +134,7 @@ App.registerTopic({
         <li>Высокий порог → меньше FP, но и пропусков больше (высокий precision, низкий recall).</li>
       </ul>
 
-      <h3>📊 Многоклассовая классификация</h3>
+      <h3>Многоклассовая классификация</h3>
       <p>Если классов больше двух, метрики обобщаются через <b>усреднение</b>:</p>
       <ul>
         <li><b>Macro-average</b> — считаем метрику для каждого класса, усредняем. Равный вес каждому классу.</li>
@@ -143,7 +143,7 @@ App.registerTopic({
       </ul>
       <p>При дисбалансе: macro показывает качество на редких классах, micro «приятно выглядит», но скрывает проблемы.</p>
 
-      <h3>📉 Метрики для регрессии (коротко)</h3>
+      <h3>Метрики для регрессии (коротко)</h3>
       <p>Для задачи регрессии применяются другие метрики:</p>
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a></b> (Mean Absolute Error) — средняя модуль ошибки. Устойчива к выбросам.</li>
@@ -153,7 +153,7 @@ App.registerTopic({
         <li><b><a class="glossary-link" onclick="App.selectTopic('glossary-regression-metrics')">MAPE</a></b> — в процентах от истинного значения.</li>
       </ul>
 
-      <h3>⚠️ Частые заблуждения</h3>
+      <h3>Частые заблуждения</h3>
       <ul>
         <li><b>«Accuracy — хорошая метрика по умолчанию»</b> — только при сбалансированных классах. Иначе опасно.</li>
         <li><b>«F1 = 0.9 — значит модель хорошая»</b> — не всегда. Важен контекст: что сравниваем, какие есть alternatives.</li>
@@ -222,7 +222,7 @@ FP = 5    (не спам, помечен как спам — ложная тре
 FN = 30 - 20 = 10   (спам, пропущен фильтром)
 TN = 170 - 5 = 165  (не спам, пропущен верно)
 
-Проверка: 20 + 5 + 10 + 165 = 200 ✓</div>
+Проверка: 20 + 5 + 10 + 165 = 200 </div>
             <div class="why">Confusion matrix — это таблица 2×2. TP и TN — верные решения, FP и FN — ошибки. FN здесь — спам, который дошёл до пользователя. FP — важное письмо, ушедшее в спам-папку.</div>
           </div>
 
@@ -469,7 +469,7 @@ F1        = 2*0.625*1.0/(0.625+1.0) = <b>0.769</b></div>
         <div class="sim-container">
           <div class="sim-controls" id="met-controls"></div>
           <div class="sim-buttons">
-            <button class="btn" id="met-regen">🔄 Новые предсказания</button>
+            <button class="btn" id="met-regen">Новые предсказания</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap"><canvas id="met-chart"></canvas></div>
@@ -651,7 +651,7 @@ print(df.round(3))</code></pre>
     `,
 
     applications: `
-      <h3>🎯 Где применяется на практике</h3>
+      <h3>Где применяется на практике</h3>
       <ul>
         <li><b>Выбор модели на валидации.</b> Сравнить LightGBM и CatBoost невозможно без общей метрики. Выбор правильной метрики — первый шаг любого ML-проекта: «какое число мы максимизируем?» должно быть зафиксировано до обучения.</li>
         <li><b>Настройка порога классификации.</b> <code>predict_proba</code> даёт вероятности, но решение бизнес-логики принимается по порогу. Precision/recall позволяют подобрать его под конкретную цену FP и FN — например, fraud-система блокирует только при $P &gt; 0.95$.</li>
@@ -662,7 +662,7 @@ print(df.round(3))</code></pre>
         <li><b>Регрессионные задачи.</b> RMSE vs MAE vs MAPE vs R² — выбор зависит от выбросов, масштаба, важности относительной ошибки.</li>
       </ul>
 
-      <h3>✅ Сильные стороны — и почему выбор метрики важен</h3>
+      <h3>Сильные стороны — и почему выбор метрики важен</h3>
       <p><b>Метрика — это цель оптимизации, не просто число в отчёте.</b> Что измеряешь — то и улучшаешь. Выбрал accuracy на дисбалансе — получил модель, предсказывающую большинственный класс. Выбрал recall — получил модель, кричащую «positive» на всё подряд. Goodhart's law в полной красе.</p>
       <p><b>Precision и recall — два измерения одной проблемы.</b> Вместе они дают полную картину: precision — насколько чисты твои «positive» предсказания, recall — насколько ты поймал реальных positive. Смотреть только на одно — однобоко.</p>
       <p><b>F1 и F-beta — агрегатор precision/recall.</b> F1 — гармоническое среднее, наказывает перекос. F-beta с $\\beta &gt; 1$ смещает баланс в пользу recall (медицина), с $\\beta &lt; 1$ — в пользу precision (реклама, спам).</p>
@@ -670,7 +670,7 @@ print(df.round(3))</code></pre>
       <p><b>PR-AUC — ROC для дисбаланса.</b> При очень редком positive-классе (0.1%) ROC-AUC обманчиво высокий. PR-AUC показывает реальную картину precision на разных уровнях recall.</p>
       <p><b>Cost-sensitive метрики.</b> Когда FP стоит 100₽, а FN — 10 000₽, никакой F1 не заменит расчёт ожидаемой стоимости ошибок. Custom metric — стандарт в fraud, churn, медицинских системах.</p>
 
-      <h3>⚠️ Ограничения — ловушки, в которые попадают все</h3>
+      <h3>Ограничения — ловушки, в которые попадают все</h3>
       <p><b>Accuracy при дисбалансе — бесполезна.</b> Классификатор, предсказывающий «не рак» всем подряд, даст accuracy 99.5% на датасете с 0.5% positive. Это не модель, это константа. Всегда смотри на confusion matrix и recall на минорном классе.</p>
       <p><b>Precision без recall (и наоборот) — однобока.</b> Модель с precision 1.0 и recall 0.01 — технически «безупречная», но ловит 1% fraud-ов. Один показатель всегда лжёт.</p>
       <p><b>Усреднение в multi-class — ловушка.</b> Macro, micro, weighted average дают разные числа на одних и тех же предсказаниях. Macro игнорирует дисбаланс, micro его учитывает, weighted — середина. Выбор схемы должен быть осознанным.</p>
@@ -678,9 +678,9 @@ print(df.round(3))</code></pre>
       <p><b>R² обманчив в нелинейной регрессии.</b> R² считает, насколько модель лучше константы. Если таргет и так слабо варьируется, R² может быть близок к 1 при ошибках, критичных для бизнеса.</p>
       <p><b>Метрики не учитывают стоимость ошибок по умолчанию.</b> F1 считает FP и FN равнозначными. В медицине это преступно (FN = пропущенный рак). Нужна кастомная метрика или порог, подобранный по стоимости.</p>
 
-      <h3>🧭 Какую метрику брать в какой ситуации</h3>
+      <h3>Какую метрику брать в какой ситуации</h3>
       <table>
-        <tr><th>✅ Бери когда</th><th>❌ НЕ бери когда</th></tr>
+        <tr><th>Бери когда</th><th>НЕ бери когда</th></tr>
         <tr>
           <td><b>Accuracy</b> — сбалансированные классы, ошибки FP и FN равнозначны</td>
           <td>Классы несбалансированы (&gt; 80/20) — accuracy обманет</td>
@@ -723,7 +723,7 @@ print(df.round(3))</code></pre>
         </tr>
       </table>
 
-      <h3>🔄 Альтернативы и расширения</h3>
+      <h3>Альтернативы и расширения</h3>
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('roc-auc')">ROC-AUC и PR-AUC</a></b> — подробный разбор кривых, когда брать какую. Must-read перед выбором метрики для бинарной классификации.</li>
         <li><b>Cost-sensitive learning и expected value</b> — если известны реальные $ стоимости FP и FN, считай ожидаемую прибыль/убыток, а не F1. Это прямо связывает ML с бизнесом.</li>
@@ -757,16 +757,16 @@ print(df.round(3))</code></pre>
     `,
 
     links: `
-      <h3>📺 Видео</h3>
+      <h3>Видео</h3>
       <ul>
         <li><a href="https://www.youtube.com/watch?v=Kdsp6soqA7o" target="_blank">StatQuest: Confusion Matrix</a> — наглядное объяснение матрицы ошибок, precision и recall</li>
         <li><a href="https://www.youtube.com/watch?v=4jRBRDbJemM" target="_blank">StatQuest: ROC and AUC</a> — как строится ROC-кривая и что такое AUC</li>
       </ul>
-      <h3>📖 Статьи</h3>
+      <h3>Статьи</h3>
       <ul>
         <li><a href="https://habr.com/ru/search/?q=%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D0%BA%D0%B8%20%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D0%B8%20precision%20recall%20F1" target="_blank">Метрики качества классификации на Habr</a> — подробный разбор всех метрик на русском</li>
       </ul>
-      <h3>📚 Документация</h3>
+      <h3>Документация</h3>
       <ul>
         <li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html" target="_blank">sklearn: Model evaluation</a> — полный справочник по всем метрикам в sklearn</li>
       </ul>

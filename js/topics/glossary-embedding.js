@@ -15,7 +15,7 @@ App.registerTopic({
         <p>Embedding делает то же самое для <b>дискретных объектов</b>: вместо безликого ID присваивает каждому объекту вектор из 50-500 чисел, где близкие вектора означают похожие объекты.</p>
       </div>
 
-      <h3>🎯 Что такое embedding</h3>
+      <h3>Что такое embedding</h3>
       <p><b>Embedding</b> — отображение дискретных сущностей (слов, категорий, товаров, пользователей) в <b>непрерывное векторное пространство</b> малой размерности (обычно 50–1024), где геометрическое расстояние отражает семантическую близость.</p>
 
       <div class="illustration bordered">
@@ -130,14 +130,14 @@ App.registerTopic({
         <div class="caption">One-hot и embedding — два способа кодировать дискретные сущности. One-hot прост, но лишён семантики. Embedding учится на данных и кодирует смысл через геометрию вектора.</div>
       </div>
 
-      <h3>🔑 Откуда берутся embedding'и</h3>
+      <h3>Откуда берутся embedding'и</h3>
       <ol>
         <li><b>Обучаются вместе с моделью</b> — как параметры. Например, в нейросети для рекомендаций слой <code>Embedding(num_users, 50)</code> — это матрица $U \\times 50$, которая обучается.</li>
         <li><b>Pretrained</b> — обучены на больших корпусах и скачиваются (Word2Vec, GloVe, BERT, CLIP). Можно использовать как есть или fine-tune'ить.</li>
         <li><b>Через понижение размерности</b> — из one-hot + SVD/PCA получаются плотные вектора (старый подход).</li>
       </ol>
 
-      <h3>🎯 Где используются embedding'и</h3>
+      <h3>Где используются embedding'и</h3>
       <table>
         <tr><th>Область</th><th>Что embedding'уется</th></tr>
         <tr><td><b>NLP</b></td><td>Слова, предложения, документы (Word2Vec, BERT)</td></tr>
@@ -149,18 +149,18 @@ App.registerTopic({
         <tr><td><b>Мультимодальные</b></td><td>Текст + картинка в общем пространстве (CLIP)</td></tr>
       </table>
 
-      <h3>📐 Меры близости в embedding-пространстве</h3>
+      <h3>Меры близости в embedding-пространстве</h3>
       <ul>
         <li><b>Cosine similarity</b>: $\\cos(\\theta) = \\frac{u \\cdot v}{\\|u\\|\\|v\\|}$ — угол между векторами. Наиболее популярная, не зависит от длины вектора.</li>
         <li><b>Euclidean distance</b>: $\\|u - v\\|$ — обычное расстояние. Зависит от масштаба.</li>
         <li><b>Dot product</b>: $u \\cdot v$ — простое скалярное произведение. Используется в attention.</li>
       </ul>
 
-      <h3>✨ Магия embedding'ов: алгебра смыслов</h3>
+      <h3>Магия embedding'ов: алгебра смыслов</h3>
       <div class="math-block">$$\\vec{\\text{король}} - \\vec{\\text{мужчина}} + \\vec{\\text{женщина}} \\approx \\vec{\\text{королева}}$$</div>
       <p>В хорошем embedding-пространстве арифметика векторов соответствует семантическим операциям. Это знаменитый результат Word2Vec, показавший, что векторное представление <b>реально выучивает смысл</b>, а не просто статистику.</p>
 
-      <h3>⚠️ Типичные ошибки</h3>
+      <h3>Типичные ошибки</h3>
       <ul>
         <li><b>Слишком большая размерность</b> — переобучение, замедление.</li>
         <li><b>Слишком маленькая</b> — embedding не вмещает достаточно информации (bottleneck).</li>
@@ -168,7 +168,7 @@ App.registerTopic({
         <li><b>Утечка через embedding</b> — обучил embedding на всех данных, включая test → утечка.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('nlp-basics')">Основы NLP</a> — Word2Vec, TF-IDF vs embedding</li>
         <li><a onclick="App.selectTopic('recsys')">Рекомендательные системы</a> — user/item embeddings</li>
@@ -178,7 +178,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Word_embedding" target="_blank">Wikipedia: Word embedding</a></li>
         <li><a href="https://projector.tensorflow.org/" target="_blank">TensorFlow Embedding Projector</a> — интерактивная визуализация</li>

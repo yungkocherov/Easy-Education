@@ -69,7 +69,7 @@ App.registerTopic({
         <div class="caption">Gradient Boosting регрессия: $F_0 = \\bar{y}$, затем каждое дерево $h_t$ обучается предсказывать остатки $r_t = y - F_{t-1}(x)$. Финальная модель — сумма всех деревьев с шагом $\\eta$.</div>
       </div>
 
-      <h3>📐 Алгоритм: шаг за шагом</h3>
+      <h3>Алгоритм: шаг за шагом</h3>
       <p>Классический Gradient Boosting (Friedman, 2001) для регрессии с потерями MSE:</p>
       <ol>
         <li><b>Инициализация:</b> $F_0(x) = \\bar{y}$ (среднее всех $y_i$).</li>
@@ -89,7 +89,7 @@ App.registerTopic({
         <p>Для MSE: $L = \\frac{1}{2}(y - F)^2$. Отрицательный градиент: $-\\frac{\\partial L}{\\partial F} = y - F = r$. То есть для MSE остатки = отрицательный градиент <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>. Мы делаем <b>градиентный спуск в пространстве функций</b>, а не в пространстве параметров. Для других функций потерь (<a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MAE</a>, Huber) псевдо-остатки отличаются — отсюда и название.</p>
       </div>
 
-      <h3>📉 <a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — скорость обучения</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — скорость обучения</h3>
       <p>Без η каждое новое дерево полностью «закрывало» бы остатки — быстро, но <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучение</a>. С η мы <b>замедляем</b> исправление:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
       <ul>
@@ -99,7 +99,7 @@ App.registerTopic({
       </ul>
       <p><b>Правило:</b> уменьши η → увеличь n_estimators. Компромисс: η=0.05, n=500 часто оптимален.</p>
 
-      <h3>🛡️ Борьба с переобучением</h3>
+      <h3>Борьба с переобучением</h3>
       <p>Gradient Boosting легко переобучается. Три главных инструмента:</p>
       <ul>
         <li><b>Малый η + <a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">early stopping</a>:</b> валидационная ошибка перестала падать → стоп.</li>
@@ -108,14 +108,14 @@ App.registerTopic({
         <li><b>max_features &lt; 1.0:</b> случайные признаки, как в Random Forest. Типично 0.8 или 'sqrt'.</li>
       </ul>
 
-      <h3>🎯 <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Huber Loss</a> — устойчивость к выбросам</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">Huber Loss</a> — устойчивость к выбросам</h3>
       <p>MSE квадратично штрафует выбросы. Для зашумлённых данных лучше работает <span class="term" data-tip="Huber Loss. Гибрид MSE и MAE: квадратичный при малых ошибках (|r| ≤ δ) и линейный при больших. Устойчив к выбросам, но дифференцируем.">функция потерь Хьюбера</span>:</p>
       <div class="math-block">$$L_\\delta(r) = \\begin{cases} \\frac{1}{2}r^2, & |r| \\leq \\delta \\\\ \\delta(|r| - \\delta/2), & |r| > \\delta \\end{cases}$$</div>
       <p>Псевдо-остатки для Huber Loss:</p>
       <div class="math-block">$$r_i = \\begin{cases} y_i - F(x_i), & |y_i - F(x_i)| \\leq \\delta \\\\ \\delta \\cdot \\text{sign}(y_i - F(x_i)), & |y_i - F(x_i)| > \\delta \\end{cases}$$</div>
       <p>В sklearn: <code>GradientBoostingRegressor(loss='huber', alpha=0.9)</code>, где alpha — квантиль для отсечения выбросов.</p>
 
-      <h3>🚀 XGBoost / LightGBM для регрессии</h3>
+      <h3>XGBoost / LightGBM для регрессии</h3>
       <p>Современные реализации Gradient Boosting добавляют ряд улучшений:</p>
       <ul>
         <li><b>XGBoost:</b> второй порядок Тейлора (используется и гессиан), регуляризация листьев ($\\lambda$, $\\gamma$). Быстрее sklearn-овской версии.</li>
@@ -149,7 +149,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>🔗 Как это связано с другими темами</h3>
+      <h3>Как это связано с другими темами</h3>
       <ul>
         <li><b>Random Forest регрессия</b> — параллельный ансамбль (деревья независимы). GB — последовательный (каждое дерево зависит от предыдущих). GB обычно точнее, RF быстрее обучается.</li>
         <li><b>Decision Tree регрессия</b> — base learner в GB. Обычно используют неглубокие деревья (depth=3–5).</li>
@@ -692,7 +692,7 @@ App.registerTopic({
           <div class="sim-buttons">
             <button class="btn" id="gbr-add1">+1 итерация</button>
             <button class="btn" id="gbr-add10">+10 итераций</button>
-            <button class="btn secondary" id="gbr-reset">🔄 Сброс</button>
+            <button class="btn secondary" id="gbr-reset">Сброс</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap"><canvas id="gbr-pred"></canvas></div>
@@ -859,7 +859,7 @@ App.registerTopic({
         <div class="sim-container">
           <div class="sim-controls" id="gbr2-controls"></div>
           <div class="sim-buttons">
-            <button class="btn" id="gbr2-regen">🔄 Новые данные</button>
+            <button class="btn" id="gbr2-regen">Новые данные</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap"><canvas id="gbr2-chart"></canvas></div>
@@ -1124,7 +1124,7 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
     `,
 
     applications: `
-      <h3>🎯 Где применяется на практике</h3>
+      <h3>Где применяется на практике</h3>
       <ul>
         <li><b>Kaggle-регрессии и индустриальные бенчмарки.</b> XGBoost/LightGBM/CatBoost стабильно доминируют в любых таблично-регрессионных соревнованиях: от House Prices до M5 Forecasting. Если ты хочешь медаль на tabular regression, ты делаешь бустинг и его стекинги.</li>
         <li><b>Прогноз спроса и продаж.</b> Ритейл (Walmart, X5, OZON) строит GBM на фичах вида <code>lag_7, lag_14, lag_28, rolling_mean, is_holiday</code>. LightGBM умеет быстро тренироваться на миллионах SKU × дни, а квантильная регрессия даёт прогноз «с запасом» для закупок.</li>
@@ -1135,7 +1135,7 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
         <li><b>Медицинские регрессионные задачи.</b> Прогноз длительности госпитализации, дозировки препарата, уровня биомаркера — задачи с малыми данными, смешанными признаками и требованием объяснимости (SHAP для врача).</li>
       </ul>
 
-      <h3>✅ Сильные стороны — и почему они важны</h3>
+      <h3>Сильные стороны — и почему они важны</h3>
       <p><b>Лучшая точность среди классики на табличной регрессии.</b> На идентичных данных GBM обычно даёт +2-5% $R^2$ или -10-20% RMSE относительно Random Forest. Для бизнеса это разница между моделью, которая зарабатывает деньги, и моделью, которая «просто работает».</p>
       <p><b>Гибкие лоссы под задачу.</b> MSE (классика), MAE/Huber (устойчивость к выбросам), Quantile (прогноз с заданной перестраховкой), Gamma/Tweedie (страхование), Poisson (счётные данные) — всё из коробки. Это позволяет оптимизировать именно ту функцию, которая соответствует бизнес-метрике.</p>
       <p><b>Quantile regression «бесплатно».</b> Обучаешь три модели — на 10%, 50%, 90% квантили — и получаешь prediction interval без доверительных интервалов и Байеса. Для прогноза спроса это означает «мы уверены, что продадим не меньше X и не больше Y».</p>
@@ -1144,7 +1144,7 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
       <p><b>SHAP-объяснения из коробки.</b> Для регрессионных задач (банки, медицина, страхование) SHAP даёт точный разложенный вклад каждого признака в предсказание — это нужно и для объяснений клиентам, и для sanity check модели.</p>
       <p><b>Не требует масштабирования признаков.</b> Как и все tree-based методы, GBM работает с порогами — можно смешивать доход в рублях и возраст в годах. Один этап препроцессинга и связанный с ним класс багов отпадают.</p>
 
-      <h3>⚠️ Ограничения — и когда они реально бьют</h3>
+      <h3>Ограничения — и когда они реально бьют</h3>
       <p><b>Не экстраполирует — самая болезненная слабость в регрессии.</b> Листья возвращают среднее обучающих $y$. Если в train максимум целевой переменной 200, а в тесте 500 — прогноз будет около 200. Для временных рядов с трендом (рост пользователей, инфляция цен) нужны либо явные лаговые фичи + детренд, либо другие модели.</p>
       <p><b>Сильно переобучается без early stopping.</b> Без ES модель настойчиво «дочинивает» остатки до нуля — и в итоге запоминает шум в train. В отличие от RF, где увеличение деревьев безопасно, в GBM это буквально хуже. Early stopping не опциональная опция, а обязательное условие.</p>
       <p><b>Чувствителен к выбросам в целевой переменной (с MSE).</b> Один аномально большой $y$ даст огромный градиент, и последующие деревья будут пытаться его «исправить», раз за разом ловя шум. Решение — Huber loss или Quantile loss, но надо знать об этом заранее.</p>
@@ -1152,9 +1152,9 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
       <p><b>Последовательное обучение.</b> Деревья нельзя обучать параллельно (каждое зависит от остатков предыдущего). Параллелится только поиск сплитов внутри дерева. На очень больших данных это заметно медленнее, чем RF.</p>
       <p><b>Медленный инференс на больших ансамблях.</b> Production-модели часто имеют 1000+ деревьев глубины 6-8. Для real-time API (SLA &lt; 5 мс) придётся либо урезать <code>n_estimators</code>, либо квантизовать, либо дистиллировать.</p>
 
-      <h3>🧭 Когда брать Gradient Boosting Regression — и когда точно не стоит</h3>
+      <h3>Когда брать Gradient Boosting Regression — и когда точно не стоит</h3>
       <table>
-        <tr><th>✅ Бери GBM-регрессию когда</th><th>❌ НЕ бери когда</th></tr>
+        <tr><th>Бери GBM-регрессию когда</th><th>НЕ бери когда</th></tr>
         <tr>
           <td>Нужна максимальная точность на табличной регрессии — Kaggle, продакшен, деньги</td>
           <td>Мало данных (&lt; 500 строк) — RF или линейная модель безопаснее</td>
@@ -1185,7 +1185,7 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
         </tr>
       </table>
 
-      <h3>🔄 Альтернативы — что взять вместо и почему</h3>
+      <h3>Альтернативы — что взять вместо и почему</h3>
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('random-forest-regression')">Random Forest Regression</a></b> — если нет времени тюнить, данных мало или целевая полна выбросов. Потеряешь 2-5% RMSE, но получишь устойчивость и «работу из коробки».</li>
         <li><b>LightGBM</b> отдельно — если данных &gt; 100K строк. Histogram-based splits обучаются в десятки раз быстрее sklearn GBM при сопоставимом качестве.</li>
@@ -1196,15 +1196,15 @@ for name, model in [('MSE', mse_model), ('Huber', huber_model)]:
     `,
 
     links: `
-      <h3>📺 Видео</h3>
+      <h3>Видео</h3>
       <ul>
         <li><a href="https://www.youtube.com/watch?v=3CC4N4z3GJc" target="_blank">StatQuest: Gradient Boost</a> — пошаговое построение градиентного бустинга для регрессии</li>
       </ul>
-      <h3>📖 Статьи</h3>
+      <h3>Статьи</h3>
       <ul>
         <li><a href="https://habr.com/ru/search/?q=%D0%B3%D1%80%D0%B0%D0%B4%D0%B8%D0%B5%D0%BD%D1%82%D0%BD%D1%8B%D0%B9%20%D0%B1%D1%83%D1%81%D1%82%D0%B8%D0%BD%D0%B3%20%D1%80%D0%B5%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D1%8F" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация на русском языке</li>
       </ul>
-      <h3>📚 Документация</h3>
+      <h3>Документация</h3>
       <ul>
         <li><a href="https://xgboost.readthedocs.io/en/stable/" target="_blank">XGBoost документация</a> — официальная документация XGBoost</li>
         <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html" target="_blank">sklearn: GradientBoostingRegressor</a> — документация градиентного бустинга для регрессии в sklearn</li>

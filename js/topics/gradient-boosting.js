@@ -31,7 +31,7 @@ App.registerTopic({
           <text x="85" y="70" text-anchor="middle" font-size="9" fill="#475569">Исходные данные</text>
           <text x="85" y="85" text-anchor="middle" font-size="9" fill="#475569">F₀ = среднее(y)</text>
           <text x="85" y="108" text-anchor="middle" font-size="9" fill="#ef4444">Ошибка: большая</text>
-          <text x="85" y="133" text-anchor="middle" font-size="20">📊</text>
+          <text x="85" y="133" text-anchor="middle" font-size="20"></text>
           <!-- Plus sign -->
           <text x="168" y="85" text-anchor="middle" font-size="24" font-weight="700" fill="#10b981">+</text>
           <!-- Stage 2 box: residuals -->
@@ -40,7 +40,7 @@ App.registerTopic({
           <text x="265" y="70" text-anchor="middle" font-size="9" fill="#475569">Учится на остатках</text>
           <text x="265" y="85" text-anchor="middle" font-size="9" fill="#475569">r = y − F₀(x)</text>
           <text x="265" y="108" text-anchor="middle" font-size="9" fill="#f59e0b">Ошибка: меньше</text>
-          <text x="265" y="133" text-anchor="middle" font-size="20">📉</text>
+          <text x="265" y="133" text-anchor="middle" font-size="20"></text>
           <!-- Plus sign -->
           <text x="352" y="85" text-anchor="middle" font-size="24" font-weight="700" fill="#10b981">+</text>
           <!-- Stage 3 box: smaller residuals -->
@@ -49,7 +49,7 @@ App.registerTopic({
           <text x="445" y="70" text-anchor="middle" font-size="9" fill="#475569">Учится на новых</text>
           <text x="445" y="85" text-anchor="middle" font-size="9" fill="#475569">остатках r²</text>
           <text x="445" y="108" text-anchor="middle" font-size="9" fill="#10b981">Ошибка: минимальна</text>
-          <text x="445" y="133" text-anchor="middle" font-size="20">✅</text>
+          <text x="445" y="133" text-anchor="middle" font-size="20"></text>
           <!-- Bottom result line -->
           <line x1="85" y1="165" x2="85" y2="178" stroke="#64748b" stroke-width="1.5"/>
           <line x1="265" y1="165" x2="265" y2="178" stroke="#64748b" stroke-width="1.5"/>
@@ -62,7 +62,7 @@ App.registerTopic({
         <div class="caption">Gradient Boosting: каждое следующее дерево обучается на остатках (ошибках) предыдущих. Финальная модель — взвешенная сумма всех деревьев.</div>
       </div>
 
-      <h3>💡 Основная идея</h3>
+      <h3>Основная идея</h3>
       <p>Gradient Boosting — это ансамбль деревьев, где каждое следующее дерево обучается на <b>ошибках</b> предыдущих. Это принципиально отличается от Random Forest, где деревья независимы.</p>
 
       <p>Общая схема:</p>
@@ -84,14 +84,14 @@ App.registerTopic({
         <p>Boosting исправляет <b>bias</b> слабых моделей, объединяя их в сильную. Каждое дерево — небольшое улучшение, но много маленьких улучшений складываются в отличный результат.</p>
       </div>
 
-      <h3>🔍 Почему «градиентный»?</h3>
+      <h3>Почему «градиентный»?</h3>
       <p>На самом деле каждое новое дерево учится не на самих остатках, а на <b>отрицательном <a class="glossary-link" onclick="App.selectTopic('glossary-gradient')">градиенте</a></b> <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">функции потерь</a>:</p>
       <div class="math-block">$$r_i^{(m)} = -\\left[\\frac{\\partial L(y_i, F(x_i))}{\\partial F(x_i)}\\right]_{F=F_{m-1}}$$</div>
 
       <p>Для <a class="glossary-link" onclick="App.selectTopic('glossary-loss-functions')">MSE</a> градиент = $y - F$, то есть обычный остаток. Но для других функций потерь (log-loss, Huber) градиент другой — и именно на нём учится новое дерево.</p>
       <p>Это и есть <b>gradient boosting</b>: мы делаем шаг в сторону уменьшения loss, «спускаясь по градиенту» в пространстве функций.</p>
 
-      <h3>⚙️ <a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — главный параметр</h3>
+      <h3><a class="glossary-link" onclick="App.selectTopic('glossary-optimizers')">Learning rate</a> η — главный параметр</h3>
       <p>Без коэффициента $\\eta$ (learning rate) каждое новое дерево полностью заменяло бы ошибки предыдущих — это быстро переобучается. Поэтому мы «замедляем» обучение:</p>
       <div class="math-block">$$F_m = F_{m-1} + \\eta \\cdot h_m$$</div>
 
@@ -103,7 +103,7 @@ App.registerTopic({
 
       <p><b>Правило:</b> меньше η → нужно больше деревьев M. Чаще всего η ∈ [0.01, 0.1].</p>
 
-      <h3>🛡️ Как бороться с <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучением</a></h3>
+      <h3>Как бороться с <a class="glossary-link" onclick="App.selectTopic('glossary-overfitting')">переобучением</a></h3>
       <p>Boosting склонен к переобучению. Инструменты борьбы:</p>
       <ul>
         <li><b>Learning rate</b> — главная ручка. Маленький η + много деревьев.</li>
@@ -114,7 +114,7 @@ App.registerTopic({
         <li><b>Регуляризация</b> — L1/L2 на листьях (XGBoost, LightGBM).</li>
       </ul>
 
-      <h3>🚀 Современные реализации</h3>
+      <h3>Современные реализации</h3>
       <p>Простой Gradient Boosting — медленный и базовый. На практике используют оптимизированные библиотеки:</p>
 
       <h4>XGBoost (2014)</h4>
@@ -141,7 +141,7 @@ App.registerTopic({
         <li>Симметричные деревья — быстрый inference.</li>
       </ul>
 
-      <h3>⚖️ Бустинг vs Random Forest</h3>
+      <h3>Бустинг vs Random Forest</h3>
       <table>
         <tr><th>Критерий</th><th>Random Forest</th><th>Gradient Boosting</th></tr>
         <tr><td>Построение</td><td>Параллельно</td><td>Последовательно</td></tr>
@@ -153,7 +153,7 @@ App.registerTopic({
         <tr><td>Параллелизация</td><td>Отличная</td><td>Слабая</td></tr>
       </table>
 
-      <h3>⚖️ Плюсы и ограничения</h3>
+      <h3>Плюсы и ограничения</h3>
       <p><b>Плюсы:</b></p>
       <ul>
         <li><b>Обычно лучшее качество</b> на табличных данных.</li>
@@ -172,7 +172,7 @@ App.registerTopic({
         <li>Чувствителен к шуму в таргете.</li>
       </ul>
 
-      <h3>⚠️ Частые заблуждения</h3>
+      <h3>Частые заблуждения</h3>
       <ul>
         <li><b>«Чем больше M, тем лучше»</b> — нет, модель переобучится. Используй <a class="glossary-link" onclick="App.selectTopic('glossary-early-stopping')">early stopping</a>.</li>
         <li><b>«Boosting заменяет deep learning»</b> — на табличных данных да, на изображениях/тексте — нет.</li>
@@ -218,7 +218,7 @@ App.registerTopic({
         </div>
       </div>
 
-      <h3>🔗 Как это связано с другими темами</h3>
+      <h3>Как это связано с другими темами</h3>
       <ul>
         <li><b>Decision Tree</b> — базовый блок бустинга.</li>
         <li><b>Random Forest</b> — альтернативный ансамбль деревьев.</li>
@@ -374,7 +374,7 @@ App.registerTopic({
               <tr><td>100</td><td>1.21</td><td>1.48</td><td>—</td></tr>
               <tr><td>150</td><td>0.87</td><td>1.22</td><td>—</td></tr>
               <tr><td>200</td><td>0.64</td><td>1.08</td><td>—</td></tr>
-              <tr><td>250</td><td>0.48</td><td>1.01</td><td>★ Лучший</td></tr>
+              <tr><td>250</td><td>0.48</td><td>1.01</td><td>Лучший</td></tr>
               <tr><td>300</td><td>0.35</td><td>1.04</td><td>+0.03</td></tr>
               <tr><td>350</td><td>0.27</td><td>1.09</td><td>+0.08</td></tr>
               <tr><td>400</td><td>0.21</td><td>1.18</td><td>+0.17</td></tr>
@@ -434,10 +434,10 @@ App.registerTopic({
         <div class="sim-container">
           <div class="sim-controls" id="gb-controls"></div>
           <div class="sim-buttons">
-            <button class="btn" id="gb-step">➕ 1 итерация</button>
+            <button class="btn" id="gb-step">1 итерация</button>
             <button class="btn" id="gb-step10">+10 итераций</button>
             <button class="btn secondary" id="gb-reset">↺ Сброс</button>
-            <button class="btn secondary" id="gb-regen">🔄 Новые данные</button>
+            <button class="btn secondary" id="gb-regen">Новые данные</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap" style="height:340px;"><canvas id="gb-chart"></canvas></div>
@@ -610,7 +610,7 @@ App.registerTopic({
         <div class="sim-container">
           <div class="sim-controls" id="gb2-controls"></div>
           <div class="sim-buttons">
-            <button class="btn" id="gb2-regen">🔄 Новые данные</button>
+            <button class="btn" id="gb2-regen">Новые данные</button>
           </div>
           <div class="sim-output">
             <div class="sim-chart-wrap"><canvas id="gb2-chart"></canvas></div>
@@ -818,7 +818,7 @@ plt.show()</code></pre>
     `,
 
     applications: `
-      <h3>🎯 Где применяется на практике</h3>
+      <h3>Где применяется на практике</h3>
       <ul>
         <li><b>Kaggle и ML-соревнования.</b> На любом турнире по табличным данным 70-90% топовых решений построены на XGBoost/LightGBM/CatBoost или их стекинге. Это буквально state-of-the-art на structured data — нейросети редко обыгрывают бустинг без большого feature engineering.</li>
         <li><b>Кредитный скоринг и антифрод.</b> Банки используют GBM для расчёта PD (probability of default), оценки риска транзакции, скоринга заявок. Хорошо калиброванные вероятности + SHAP для объяснений регулятору делают его топ-1 выбором в финтехе.</li>
@@ -829,7 +829,7 @@ plt.show()</code></pre>
         <li><b>Baseline-топ для любого tabular ML.</b> «Начни с LightGBM» — стандартный совет в 2025 году. Любая следующая модель должна бить этот бенчмарк, иначе нет смысла её внедрять.</li>
       </ul>
 
-      <h3>✅ Сильные стороны — и почему они важны</h3>
+      <h3>Сильные стороны — и почему они важны</h3>
       <p><b>Лучшее качество на табличных данных среди классики.</b> Последовательная коррекция ошибок через градиентный спуск в функциональном пространстве — фундаментально сильнее, чем усреднение независимых деревьев (RF). На идентичных данных бустинг типично даёт +2-5% метрики к RF, а на сложных — и больше.</p>
       <p><b>Гибкость по функциям потерь.</b> MSE, MAE, Huber, Log-loss, Quantile loss, попарный ранжирующий лосс, кастомные — всё работает через один и тот же фреймворк. Это позволяет напрямую оптимизировать бизнес-метрику (например, 80-процентный квантиль для прогноза верхней границы спроса).</p>
       <p><b>Нативная обработка пропусков.</b> XGBoost, LightGBM и CatBoost умеют автоматически решать, в какую ветку отправить NaN. Это снимает целый класс задач препроцессинга — не нужно придумывать, чем заполнять пропуски.</p>
@@ -838,7 +838,7 @@ plt.show()</code></pre>
       <p><b>Early stopping как естественная регуляризация.</b> Обучение останавливается, когда валидационная метрика перестаёт улучшаться — это автоматически подбирает оптимальное число деревьев и не даёт переобучиться. Удобнее, чем ручной подбор <code>n_estimators</code>.</p>
       <p><b>SHAP «бесплатно».</b> TreeSHAP работает на бустинговых деревьях за полиномиальное время и даёт точные объяснения вкладов признаков. Для продакшена и регуляторов это означает, что можно объяснить любое предсказание клиенту и аудитору.</p>
 
-      <h3>⚠️ Ограничения — и когда они реально бьют</h3>
+      <h3>Ограничения — и когда они реально бьют</h3>
       <p><b>Легко переобучается без аккуратного тюнинга.</b> Без early stopping, слишком большой <code>max_depth</code> или маленький <code>min_child_weight</code> — и модель запомнит train целиком, дав catastrophic overfit. В отличие от RF, где «больше деревьев = лучше», у бустинга «больше деревьев без ES = хуже».</p>
       <p><b>Последовательное обучение — не параллелится по деревьям.</b> Каждое дерево зависит от остатков предыдущих, поэтому обучение идёт построчно. Параллелить можно только внутри дерева (поиск сплитов). На очень больших данных это делает обучение заметно медленнее, чем у RF.</p>
       <p><b>Чувствителен к шуму в метках.</b> Если у тебя перепутанные метки в train, бустинг будет настойчиво их «дочинивать», раз за разом учась на ошибках, — и вбивать шум в модель. RF усредняет шум через bagging, а GBM его усиливает.</p>
@@ -846,9 +846,9 @@ plt.show()</code></pre>
       <p><b>Не экстраполирует.</b> Как и любая tree-based модель, GBM ограничен диапазоном обучающего $y$. Для трендовых временных рядов нужны либо лаговые признаки, либо detrending, либо вообще другие модели (ARIMA, Prophet, Neural Forecast).</p>
       <p><b>Медленный инференс при 1000+ деревьях.</b> Production-модели часто имеют $T &gt; 1000$ — каждый запрос проходит через все деревья последовательно. Для жёсткой latency (&lt; 5 мс) нужна либо дистилляция в меньшую модель, либо квантизация, либо GPU-inference.</p>
 
-      <h3>🧭 Когда брать Gradient Boosting — и когда точно не стоит</h3>
+      <h3>Когда брать Gradient Boosting — и когда точно не стоит</h3>
       <table>
-        <tr><th>✅ Бери Gradient Boosting когда</th><th>❌ НЕ бери когда</th></tr>
+        <tr><th>Бери Gradient Boosting когда</th><th>НЕ бери когда</th></tr>
         <tr>
           <td>Нужна максимальная точность на табличных данных — Kaggle, продакшен, деньги</td>
           <td>Данных критически мало (&lt; 500 строк) — переобучится даже с early stopping</td>
@@ -879,7 +879,7 @@ plt.show()</code></pre>
         </tr>
       </table>
 
-      <h3>🔄 Альтернативы — что взять вместо и почему</h3>
+      <h3>Альтернативы — что взять вместо и почему</h3>
       <ul>
         <li><b><a class="glossary-link" onclick="App.selectTopic('random-forest')">Random Forest</a></b> — если нет времени тюнить, данных мало (сотни строк) или метки зашумлены. Работает «из коробки», почти не переобучается, устойчив к шуму. Проиграет 2-5% accuracy, но экономит день работы.</li>
         <li><b>LightGBM</b> отдельно — если у тебя очень большие данные (&gt; 1M строк) и критична скорость обучения. Histogram-based splits и leaf-wise рост дают x10-x50 ускорение относительно классического XGBoost.</li>
@@ -926,15 +926,15 @@ plt.show()</code></pre>
     `,
 
     links: `
-      <h3>📺 Видео</h3>
+      <h3>Видео</h3>
       <ul>
         <li><a href="https://www.youtube.com/watch?v=3CC4N4z3GJc" target="_blank">StatQuest: Gradient Boost (часть 1)</a> — пошаговое построение градиентного бустинга</li>
       </ul>
-      <h3>📖 Статьи</h3>
+      <h3>Статьи</h3>
       <ul>
         <li><a href="https://habr.com/ru/search/?q=%D0%B3%D1%80%D0%B0%D0%B4%D0%B8%D0%B5%D0%BD%D1%82%D0%BD%D1%8B%D0%B9%20%D0%B1%D1%83%D1%81%D1%82%D0%B8%D0%BD%D0%B3%20XGBoost%20LightGBM" target="_blank">Градиентный бустинг на Habr</a> — теория и реализация XGBoost/LightGBM на русском</li>
       </ul>
-      <h3>📚 Документация</h3>
+      <h3>Документация</h3>
       <ul>
         <li><a href="https://xgboost.readthedocs.io/en/stable/" target="_blank">XGBoost документация</a> — официальная документация XGBoost</li>
         <li><a href="https://lightgbm.readthedocs.io/en/latest/" target="_blank">LightGBM документация</a> — официальная документация LightGBM</li>

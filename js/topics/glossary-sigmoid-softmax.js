@@ -14,7 +14,7 @@ App.registerTopic({
         <p>Твоя модель выдаёт число — например, <b>2.7</b>. Что это значит? Для классификации нужно понять: это вероятность класса? Но вероятность должна быть от 0 до 1. Sigmoid и Softmax — это «переводчики»: они берут любое число (или вектор чисел) и превращают в правильно распределённые вероятности.</p>
       </div>
 
-      <h3>📐 Sigmoid: для бинарной классификации</h3>
+      <h3>Sigmoid: для бинарной классификации</h3>
       <div class="math-block">$$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$</div>
       <p>Принимает любое число $z \\in (-\\infty, +\\infty)$ и возвращает значение в $(0, 1)$ — идеально для вероятности «да/нет».</p>
 
@@ -74,7 +74,7 @@ App.registerTopic({
         <li>Производная: $\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$ — удобно для backprop</li>
       </ul>
 
-      <h3>📐 Softmax: для многоклассовой классификации</h3>
+      <h3>Softmax: для многоклассовой классификации</h3>
       <p>Обобщение sigmoid на $K$ классов. Принимает вектор чисел $(z_1, z_2, \\ldots, z_K)$ и возвращает вектор вероятностей, которые в сумме дают 1:</p>
       <div class="math-block">$$\\text{softmax}(z_k) = \\frac{e^{z_k}}{\\sum_{j=1}^K e^{z_j}}$$</div>
 
@@ -84,7 +84,7 @@ App.registerTopic({
         <ul>
           <li>Экспоненты: $e^{2.0}=7.39$, $e^{1.0}=2.72$, $e^{0.5}=1.65$. Сумма = 11.76.</li>
           <li>Вероятности: $[7.39/11.76,\\ 2.72/11.76,\\ 1.65/11.76] = [0.63,\\ 0.23,\\ 0.14]$</li>
-          <li>Сумма = 1.0 ✓. Модель уверена в классе 1 на 63%.</li>
+          <li>Сумма = 1.0 . Модель уверена в классе 1 на 63%.</li>
         </ul>
       </div>
 
@@ -96,7 +96,7 @@ App.registerTopic({
         <li>Для $K=2$ softmax математически эквивалентен sigmoid.</li>
       </ul>
 
-      <h3>🎯 Где применяются</h3>
+      <h3>Где применяются</h3>
       <table>
         <tr><th>Задача</th><th>Функция</th></tr>
         <tr><td>Логистическая регрессия (бинарная)</td><td>Sigmoid на выходе</td></tr>
@@ -107,14 +107,14 @@ App.registerTopic({
         <tr><td>Gating в LSTM/GRU</td><td>Sigmoid (что забыть / запомнить)</td></tr>
       </table>
 
-      <h3>⚠️ Численные проблемы и решения</h3>
+      <h3>Численные проблемы и решения</h3>
       <ul>
         <li><b>Overflow в softmax</b>: если $z_k$ очень большое, $e^{z_k}$ взрывается. Решение — вычесть максимум: $\\text{softmax}(z) = \\text{softmax}(z - \\max(z))$.</li>
         <li><b>Underflow в sigmoid</b>: при очень отрицательном $z$, $e^{-z}$ → ∞. Решение — использовать <code>log-sigmoid</code> или <code>torch.nn.BCEWithLogitsLoss</code> (комбинирует sigmoid + log в одной операции стабильно).</li>
         <li><b>Log-softmax</b>: вместо отдельных softmax + log используй <code>log_softmax</code> для численной стабильности в cross-entropy.</li>
       </ul>
 
-      <h3>🔗 Связанные темы</h3>
+      <h3>Связанные темы</h3>
       <ul>
         <li><a onclick="App.selectTopic('logistic-regression')">Логистическая регрессия</a></li>
         <li><a onclick="App.selectTopic('neural-network')">Нейронные сети</a></li>
@@ -124,7 +124,7 @@ App.registerTopic({
     `,
 
     links: `
-      <h3>📖 Ресурсы</h3>
+      <h3>Ресурсы</h3>
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Sigmoid_function" target="_blank">Wikipedia: Sigmoid</a></li>
         <li><a href="https://en.wikipedia.org/wiki/Softmax_function" target="_blank">Wikipedia: Softmax</a></li>
